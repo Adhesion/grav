@@ -8,8 +8,6 @@
 #include "glutil.h"
 #include <cmath>
 
-#include <FTGL/ftgl.h>
-
 static inline int pow2(int x) {
   int i;
   for (i = 2; i < x; i <<= 1);
@@ -31,6 +29,9 @@ VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
     destScaleX = scaleX; destScaleY = scaleY;
     selected = false;
     animated = true;
+    
+    font = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
+    font->FaceSize(100);
 }
 
 VideoSource::~VideoSource()
@@ -40,6 +41,8 @@ VideoSource::~VideoSource()
     
     // gl destructors
     glDeleteTextures( 1, &texid );
+    
+    delete font;
 }
 
 void VideoSource::draw()
@@ -163,28 +166,37 @@ void VideoSource::draw()
 
     glEnd();
     
-    glDisable(GL_TEXTURE_2D);    
-    //glTranslatef(x, -y+getHeight()/2 - 0.2f, z);
-    //glScalef( 5.0f, 5.0f, 5.0f );
-    glColor3f( 1.0f, 1.0f, 1.0f );
-    std::string test = std::string("test");
-    //printf( "starting to write string\n" );
-    //const char* c = test.c_str();
-    //const unsigned char* uc = (const unsigned char*)test.c_str();
+    glDisable(GL_TEXTURE_2D);
+    
     name = getMetadata(VPMSession::VPMSESSION_SDES_NAME);
     const char* nc = name.c_str();
-    //char* c = "test";
     
-    float spacing = 0.20f;
+    //float spacing = 0.20f;
+    //float i = -(name.length()*spacing/2.0f);
+    
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    glTranslatef( -getWidth()/2.0f, getHeight()/2.0f+0.5f, 0.0f );
+    float scaleFactor = 0.006f * scaleX / 10.0f;
+    glScalef( scaleFactor, scaleFactor, scaleFactor );
+    
+    glColor3f( 1.0f, 1.0f, 1.0f );
+    
+    font->Render(nc);
+    
+    glDisable(GL_BLEND);
+    
+    /*float spacing = 0.20f;
     //float i = -name.length()*spacing/2.0f;
     float i = -getWidth();
     for (; *nc != '\0'; nc++)
     {
         glRasterPos2f( i*spacing, getHeight()/2.0f+0.2f );
-        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_10,*nc);
+        //glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_10,*nc);
         i++;
     }
-    //glutStrokeString(GLUT_STROKE_MONO_ROMAN, uc);
+    //glutStrokeString(GLUT_STROKE_MONO_ROMAN, uc);*/
     
     glPopMatrix();
 }

@@ -16,6 +16,8 @@
 #include <GL/glu.h>
 #include <GL/freeglut.h>
 
+#include <FTGL/ftgl.h>
+
 #include <string>
 
 class VideoSource
@@ -52,6 +54,7 @@ private:
     
     unsigned int tex_width, tex_height; // dimensions rounded up to power of 2
     GLuint texid; // GL texture identifier
+    FTFont* font;
     
     float x,y,z; // position in world space (center of the video)
     float destX, destY; // x/y destinations for movement

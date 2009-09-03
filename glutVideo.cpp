@@ -67,6 +67,11 @@ static float dragEndY;
 // for checking click-and-drag
 static bool lastBoxed; // was our last selection a boxed selection?
 static bool leftButtonHeld;
+static bool clickedInside;
+static int holdCounter;
+
+// special input modifiers like CTRL
+static int special;
 
 static void glutDisplay(void);
 static void glutReshape(int w, int h);
@@ -139,7 +144,7 @@ static void glutDisplay(void)
     }
   
     // draw the click-and-drag selection box
-    if ( leftButtonHeld )
+    if ( holdCounter > 1 && leftButtonHeld )
     {
 	    glEnable(GL_BLEND);
 	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -194,6 +199,7 @@ static void glutKeyboard(unsigned char key, int x, int y)
     for ( si = sources.begin(); si != sources.end(); si++ )
       {
         printf( "name: %s\n", (*si)->getMetadata(VPMSession::VPMSESSION_SDES_NAME).c_str() );
+        printf( "cname: %s\n", (*si)->getMetadata(VPMSession::VPMSESSION_SDES_CNAME).c_str() );
         printf( "\tpos (world): %f,%f\n", (*si)->getX(), (*si)->getY() );
         GLdouble scrX; GLdouble scrY; GLdouble scrZ;
         worldToScreen( (GLdouble)(*si)->getX(), (GLdouble)(*si)->getY(), 
@@ -296,6 +302,8 @@ void glutReshape(int w, int h)
 
 void glutMouse( int button, int state, int x, int y )
 {
+    special = glutGetModifiers();
+    
     if ( state == GLUT_DOWN && button == GLUT_LEFT_BUTTON )
     {
         // glut screen coords are y-flipped relative to GL screen coords
@@ -316,28 +324,46 @@ void glutMouse( int button, int state, int x, int y )
         // the clicked position in empty space
         if ( !selectVideos( false ) )
         {
+            clickedInside = false;
             if ( !selectedSources.empty() )
             {
 	            printf( "moving videos...\n" );
-	            std::vector<VideoSource*>::const_iterator sli;
                 float movePosX = mouseX; float movePosY = mouseY;
-                for ( sli = selectedSources.begin(); 
-                       sli != selectedSources.end();
-                       sli++ )
-	            {
-	                (*sli)->moveX( movePosX );
-	                (*sli)->moveY( movePosY );
-	                (*sli)->setSelect( false );
-	                
-	                // check & set the position difference between videos
-	                // so that they're not all moved to the same position
-	                std::vector<VideoSource*>::const_iterator next = sli+1;
-	                if ( next != selectedSources.end() )
-	                {
-	                    movePosX += (*next)->getX() - (*sli)->getX();
-	                    movePosY += (*next)->getY() - (*sli)->getY();
-	                }
-	            }
+                std::vector<VideoSource*>::const_iterator sli;
+                
+                float avgX = 0.0f, avgY = 0.0f;
+                int num = selectedSources.size();
+                
+                if ( num == 1 )
+                {
+                    selectedSources[0]->moveX( movePosX );
+                    selectedSources[0]->moveY( movePosY );
+                    selectedSources[0]->setSelect( false );
+                }
+                // if moving >1, center the videos around the click point
+                // we need to find the average pos beforehand
+                else
+                {
+                    for ( sli = selectedSources.begin(); 
+                           sli != selectedSources.end();
+                           sli++ )
+                    {
+                        avgX += (*sli)->getX();
+                        avgY += (*sli)->getY();
+                    }
+                    avgX = avgX / num;
+                    avgY = avgY / num;
+                
+                    for ( sli = selectedSources.begin(); 
+                           sli != selectedSources.end();
+                           sli++ )
+    	            {
+    	                (*sli)->moveX( movePosX + ((*sli)->getX()-avgX) );
+    	                (*sli)->moveY( movePosY + ((*sli)->getY()-avgY) );
+    	                (*sli)->setSelect( false );
+    	            }
+                }
+                
 	            selectedSources.clear();
             }
             else
@@ -349,11 +375,12 @@ void glutMouse( int button, int state, int x, int y )
         //selectVideos( true );
         printf( "resetting held state to false\n" );
         leftButtonHeld = false;
+        holdCounter = 0;
     }
 }
 
 void glutActiveMotion( int x, int y )
-{
+{   
     // glut screen coords are y-flipped relative to GL screen coords
     y = windowHeight - y;
     
@@ -363,13 +390,29 @@ void glutActiveMotion( int x, int y )
     
     dragEndX = mouseX;
     dragEndY = mouseY;
-    if ( leftButtonHeld )
+    
+    // for click-and-drag movement
+    if ( clickedInside )
+    {
+        std::vector<VideoSource*>::reverse_iterator sli;
+        for ( sli = selectedSources.rbegin(); sli != selectedSources.rend();
+                sli++ )
+        {
+            (*sli)->moveX( mouseX + 
+                      ((*sli)->getX() - (*selectedSources.rbegin())->getX()) );
+            (*sli)->moveY( mouseY + 
+                      ((*sli)->getY() - (*selectedSources.rbegin())->getY()) );
+        }
+    }
+    else if ( leftButtonHeld )//&& 
+            //(selectedSources.size() == 0 || special == GLUT_ACTIVE_CTRL ) )
         selectVideos(true);
+    
+    holdCounter++;
 }
 
 bool selectVideos( bool box )
 {
-    int special = glutGetModifiers();
     bool videoSelected = false;
     
     std::vector<VideoSource*>::reverse_iterator si;
@@ -380,12 +423,6 @@ bool selectVideos( bool box )
     printf( "performing box selection? %i\n", box );
     printf( "was the last selection box? %i\n", lastBoxed );
     
-    // if we don't have ctrl held down, we can only select one
-    // video at a time so clear the current list of selected videos
-    if ( special != GLUT_ACTIVE_CTRL && 
-            (box && lastBoxed) )
-        clearSelected();
-    
     for ( si = sources.rbegin(); si != sources.rend(); si++ )
     {
         // find the bounds of the video
@@ -394,61 +431,65 @@ bool selectVideos( bool box )
         float bottom = (*si)->getY() - (*si)->getHeight()/2;
         float top = (*si)->getY() + (*si)->getHeight()/2;
         
-        bool clickedInside = (left < mouseX) && (mouseX < right) &&
-                (bottom < mouseY) && (mouseY < top);
-        if ( clickedInside && !box )
-            clearSelected();
+        // for click-and-drag movement
+        clickedInside = (left < mouseX) && (mouseX < right) &&
+                (bottom < mouseY) && (mouseY < top) && !leftButtonHeld;
         
-        bool isBoxedX = false;
-        bool isBoxedY = false;
+        // rectangle that defines the selection area
+        float selectL, selectR, selectU, selectD;
         if (box)
         {
 	        if ( dragStartX < dragEndX )
 	        {
-	            if ( dragStartX < left && left < dragEndX )
-	                isBoxedX = true;
+                selectL = dragStartX; selectR = dragEndX;
 	        }
 	        else
 	        {
-	            if ( dragEndX < right && right < dragStartX )
-	                isBoxedX = true;
+                selectL = dragEndX; selectR = dragStartX;
 	        }
 	        if ( dragStartY < dragEndY )
 	        {
-	            if ( dragStartY < bottom && bottom < dragEndY )
-	                isBoxedY = true;
+                selectD = dragStartY; selectU = dragEndY;
 	        }
 	        else
 	        {
-	            if ( dragEndY < top && top < dragStartY )
-	                isBoxedY = true;
+                selectD = dragEndY; selectU = dragStartY;
 	        }
             lastBoxed = true;
         }
         else
-            lastBoxed = false;
-        
-        // if we clicked inside a video (on single click) or if there's
-        // a video inside the bounds of the selection box...
-        if ( clickedInside || (isBoxedX && isBoxedY && box) )
         {
-                
+            selectL = selectR = mouseX;
+            selectU = selectD = mouseY;
+            lastBoxed = false;
+        }
+        
+        bool intersect = !(selectL > right || selectR < left ||
+                            selectD > top || selectU < bottom);
+        
+        if ( intersect )
+        {
+            // clear the list of selected if we're clicking on a new video
+            if ( clickedInside && !(*si)->isSelected() &&
+                    special != GLUT_ACTIVE_CTRL )
+                clearSelected();
+            
             (*si)->setSelect( true );
             videoSelected = true;
-            printf( "selected a video...\n" );
+            //printf( "selected a video...\n" );
             
             // take the selected video and put it and the end of the list
             // so it'll be rendered on top
             std::vector<VideoSource*>::iterator cur =
                 sources.begin() - 1 + distance( si, sources.rend() );
-            printf( "size of sources before: %i\n", sources.size() );
-            printf( "names of cur & reverse iter: %s, %s\n",
-                (*cur)->getName().c_str(), (*si)->getName().c_str() );
+            //printf( "size of sources before: %i\n", sources.size() );
+            //printf( "names of cur & reverse iter: %s, %s\n",
+            //    (*cur)->getName().c_str(), (*si)->getName().c_str() );
             VideoSource* temp = (*cur);
             sources.erase( cur );
-            printf( "size of sources after: %i\n", sources.size() );
+            //printf( "size of sources after: %i\n", sources.size() );
             sources.push_back( temp );
-            printf( "size of sources after after: %i\n", sources.size() );
+            //printf( "size of sources after after: %i\n", sources.size() );
             
             selectedSources.push_back( temp );
             if ( !box ) break; // so we only select one video per click
@@ -564,5 +605,7 @@ listener::vpmsession_source_app(VPMSession &session,
 				const char *data, 
 				uint32_t data_len)
 {
-  // Ignore
+    printf( "RTP app data received\n" );
+    printf( "app: %s\n", app );
+    printf( "data: %s\n", data );
 }
