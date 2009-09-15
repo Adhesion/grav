@@ -16,7 +16,7 @@ static inline int pow2(int x) {
 
 VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
                             VPMVideoBufferSink* vs, float _x, float _y ) :
-    session( _session ), ssrc( _ssrc ), videoSink( vs ), x( _x ), y( _y )
+    session( _session ), ssrc( _ssrc ), videoSink( vs ), RectangleBase(_x,_y)
 {
     vwidth = videoSink->getImageWidth();
     vheight = videoSink->getImageHeight();
@@ -24,14 +24,7 @@ VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
     z = 0.0f; angle = 0.0f;
     tex_width = 0; tex_height = 0;
     texid = 0;
-    scaleX = 5.0f; scaleY = 5.0f;
-    destX = x; destY = y;
-    destScaleX = scaleX; destScaleY = scaleY;
-    selected = false;
-    animated = true;
-    
-    font = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
-    font->FaceSize(100);
+    drawCounter = 0;
 }
 
 VideoSource::~VideoSource()
@@ -47,17 +40,13 @@ VideoSource::~VideoSource()
 
 void VideoSource::draw()
 {
-    // movement animation
-    x += (destX-x)/10.0f;
-    y += (destY-y)/10.0f;
-    scaleX += (destScaleX-scaleX)/10.0f;
-    scaleY += (destScaleY-scaleY)/10.0f;
-    // snap to the destination, since we'll never actually get there via
-    // the above lines due to roundoff errors
-    if ( fabs(destX-x) < 0.01f ) x = destX;
-    if ( fabs(destY-y) < 0.01f ) y = destY;
-    if ( fabs(destScaleX-scaleX) < 0.01f ) scaleX = destScaleX;
-    if ( fabs(destScaleY-scaleY) < 0.01f ) scaleY = destScaleY;
+    animateValues();
+    
+    if ( drawCounter > 29 )
+    {
+        updateName();
+        drawCounter = 0;
+    }
     
     // set up our position
     glPushMatrix();
@@ -65,22 +54,7 @@ void VideoSource::draw()
     glRotatef(angle, 0.0, 1.0, 0.0);
     glTranslatef(x,y,z);
     
-    // draw the border first
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBegin(GL_QUADS);
-    
-    // if selected the border should be yellow
-    if ( selected ) glColor4f ( 1.0f, 1.0f, 0.0f, 0.8f );
-    else glColor4f( 1.0f, 1.0f, 1.0f, 0.5f );
-    
-    glVertex3f(-getWidth()/2.0-0.3, -getHeight()/2.0-0.3, 0.0);
-    glVertex3f(-getWidth()/2.0-0.3, getHeight()/2.0+0.3, 0.0);
-    glVertex3f(getWidth()/2.0+0.3, getHeight()/2.0+0.3, 0.0);
-    glVertex3f(getWidth()/2.0+0.3, -getHeight()/2.0-0.3, 0.0);
-    
-    glEnd();
-    glDisable(GL_BLEND);
+    RectangleBase::draw();
     
     float s = 1.0;
     float t = 1.0;
@@ -168,37 +142,9 @@ void VideoSource::draw()
     
     glDisable(GL_TEXTURE_2D);
     
-    name = getMetadata(VPMSession::VPMSESSION_SDES_NAME);
-    const char* nc = name.c_str();
-    
-    //float spacing = 0.20f;
-    //float i = -(name.length()*spacing/2.0f);
-    
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    glTranslatef( -getWidth()/2.0f, getHeight()/2.0f+0.5f, 0.0f );
-    float scaleFactor = 0.006f * scaleX / 10.0f;
-    glScalef( scaleFactor, scaleFactor, scaleFactor );
-    
-    glColor3f( 1.0f, 1.0f, 1.0f );
-    
-    font->Render(nc);
-    
-    glDisable(GL_BLEND);
-    
-    /*float spacing = 0.20f;
-    //float i = -name.length()*spacing/2.0f;
-    float i = -getWidth();
-    for (; *nc != '\0'; nc++)
-    {
-        glRasterPos2f( i*spacing, getHeight()/2.0f+0.2f );
-        //glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_10,*nc);
-        i++;
-    }
-    //glutStrokeString(GLUT_STROKE_MONO_ROMAN, uc);*/
-    
     glPopMatrix();
+    
+    drawCounter++;
 }
 
 void VideoSource::scaleNative()
@@ -239,55 +185,21 @@ std::string VideoSource::getMetadata( VPMSession::VPMSession_SDES type )
     return temp;
 }
 
+void VideoSource::updateName()
+{
+    std::string tempName = getMetadata( VPMSession::VPMSESSION_SDES_NAME );
+    if ( tempName == "" )
+        name = getMetadata( VPMSession::VPMSESSION_SDES_CNAME );
+    else
+        name = tempName;
+}
+
 float VideoSource::getWidth()
 {
     return aspect * scaleX;
 }
 
 float VideoSource::getHeight()
-{
-    return scaleY;
-}
-
-void VideoSource::moveX( float _x )
-{
-    destX = _x;
-    if ( !animated ) x = _x;
-}
-
-void VideoSource::moveY( float _y )
-{
-    destY = _y;
-    if ( !animated ) y = _y;
-}
-
-void VideoSource::setScale( float xs, float ys )
-{
-    destScaleX = xs; destScaleY = ys;
-    if ( !animated) { scaleX = xs; scaleY = ys; }
-}
-
-float VideoSource::getX()
-{
-    return x;
-}
-
-float VideoSource::getY()
-{
-    return y;
-}
-
-float VideoSource::getZ()
-{
-    return z;
-}
-
-float VideoSource::getScaleX()
-{
-    return scaleX;
-}
-
-float VideoSource::getScaleY()
 {
     return scaleY;
 }
@@ -300,14 +212,4 @@ uint32_t VideoSource::getssrc()
 std::string VideoSource::getName()
 {
 	return name;
-}
-
-bool VideoSource::isSelected()
-{
-    return selected;
-}
-
-void VideoSource::setSelect( bool select )
-{
-    selected = select;
 }
