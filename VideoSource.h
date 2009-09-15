@@ -9,6 +9,8 @@
  * @author Andrew Ford
  */
 
+#include "RectangleBase.h"
+
 #include <VPMedia/video/VPMVideoBufferSink.h>
 #include <VPMedia/VPMSession.h>
 
@@ -16,11 +18,7 @@
 #include <GL/glu.h>
 #include <GL/freeglut.h>
 
-#include <FTGL/ftgl.h>
-
-#include <string>
-
-class VideoSource
+class VideoSource : public RectangleBase
 {
 
 public:
@@ -29,20 +27,29 @@ public:
     ~VideoSource();
     
     void draw();
-    void scaleNative(); // change the scale of the video to be native size
-                        // relative to the screen size
+    
+    /*
+     * Change the scale of the video to be native size
+     * relative to the screen size.
+     */
+    void scaleNative();
+    
+    /*
+     * Retrieve stream metadata (SDES-only) from the VPMedia session.
+     */
     std::string getMetadata( VPMSession::VPMSession_SDES type );
-    float getWidth(); float getHeight();
-    // dimensions of the source in world space
-    void moveX( float _x ); void moveY( float _y );
-    // change the position of the source
-    void setScale( float xs, float ys ); // change the scale of the video
-    float getX(); float getY(); float getZ();
-    float getScaleX(); float getScaleY();
+    
+    /*
+     * Updates the overall name label of the source from the SDES metadata:
+     * SDES_NAME if it's available, SDES_CNAME if not.
+     */
+    void updateName();
+    
     uint32_t getssrc();
     std::string getName();
-    bool isSelected();
-    void setSelect( bool select );
+    
+    // overrides the functions from RectangleBase to account for aspect ratio
+    float getWidth(); float getHeight();
 
 private:
     VPMSession* session; // reference to the session that this video comes from
@@ -50,19 +57,11 @@ private:
     VPMVideoBufferSink* videoSink; // the source of the video data
     unsigned int vwidth, vheight; // original dimensions of the video
     float aspect; // aspect ratio of the video
-    std::string name;
     
     unsigned int tex_width, tex_height; // dimensions rounded up to power of 2
     GLuint texid; // GL texture identifier
-    FTFont* font;
     
-    float x,y,z; // position in world space (center of the video)
-    float destX, destY; // x/y destinations for movement
-    float angle;
-    float scaleX, scaleY;
-    float destScaleX, destScaleY;
-    bool selected;
-    bool animated;
+    int drawCounter; // keeps track of how many times we've drawn
 
 };
 
