@@ -21,7 +21,6 @@ VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
     vwidth = videoSink->getImageWidth();
     vheight = videoSink->getImageHeight();
     aspect = (float)vwidth / (float)vheight;
-    z = 0.0f; angle = 0.0f;
     tex_width = 0; tex_height = 0;
     texid = 0;
     drawCounter = 0;
@@ -34,8 +33,6 @@ VideoSource::~VideoSource()
     
     // gl destructors
     glDeleteTextures( 1, &texid );
-    
-    delete font;
 }
 
 void VideoSource::draw()
@@ -62,12 +59,15 @@ void VideoSource::draw()
     // first draw call
     bool init = (texid == 0);
 
-    // allocate the buffer iff it's the first time or if it's been resized
+    // allocate the buffer if it's the first time or if it's been resized
     if ( init || vwidth != videoSink->getImageWidth() ||
         vheight != videoSink->getImageHeight() ) {
       vwidth = videoSink->getImageWidth();
       vheight = videoSink->getImageHeight();
-      aspect = (float)vwidth / (float)vheight;
+      if ( vheight > 0 )
+        aspect = (float)vwidth / (float)vheight;
+      else
+        aspect = 1.33f;
       tex_width = pow2(vwidth);
       tex_height = pow2(vheight);
       printf( "image size is %ix%i\n", vwidth, 
@@ -120,6 +120,10 @@ void VideoSource::draw()
 
     s = (float)vwidth/(float)tex_width;
     t = (float)vheight/(float)tex_height;
+    
+    // X & Y distances from center to edge
+    float Xdist = getWidth()/2;
+    float Ydist = getHeight()/2;
 
     glBegin(GL_QUADS);
     glColor3f( 1.0f, 1.0f, 1.0f );
@@ -127,20 +131,31 @@ void VideoSource::draw()
     // size of the video in world space will be equivalent to getWidth x
     // getHeight, which is the same as (aspect*scaleX) x scaleY
     glTexCoord2f(0.0, 0.0);
-    glVertex3f(-getWidth()/2, -getHeight()/2, 0.0);
+    glVertex3f(-Xdist, -Ydist, 0.0);
     
     glTexCoord2f(0.0, t);
-    glVertex3f(-getWidth()/2, getHeight()/2, 0.0);
+    glVertex3f(-Xdist, Ydist, 0.0);
 
     glTexCoord2f(s, t);
-    glVertex3f(getWidth()/2, getHeight()/2, 0.0);
+    glVertex3f(Xdist, Ydist, 0.0);
 
     glTexCoord2f(s, 0.0);
-    glVertex3f(getWidth()/2, -getHeight()/2, 0.0);
+    glVertex3f(Xdist, -Ydist, 0.0);
 
     glEnd();
     
     glDisable(GL_TEXTURE_2D);
+    
+    if ( vwidth == 0 || vheight == 0 )
+    {      
+        glPushMatrix();
+        glTranslatef( -2.0f, 1.5f, 0.0f );
+        float scaleFactor = 0.001f * scaleX;
+        glScalef( scaleFactor, scaleFactor, scaleFactor );
+        std::string waitingMessage( "Waiting for video..." );
+        font->Render( waitingMessage.c_str() );
+        glPopMatrix();
+    }
     
     glPopMatrix();
     
@@ -189,9 +204,15 @@ void VideoSource::updateName()
 {
     std::string tempName = getMetadata( VPMSession::VPMSESSION_SDES_NAME );
     if ( tempName == "" )
+    {
         name = getMetadata( VPMSession::VPMSESSION_SDES_CNAME );
+        //printf( "in updateName, got cname: %s\n", name.c_str() );
+    }
     else
+    {
         name = tempName;
+        //printf( "in updateName, got name: %s\n", name.c_str() );
+    }
 }
 
 float VideoSource::getWidth()
