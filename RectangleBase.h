@@ -21,11 +21,16 @@ typedef struct {
     float A;
 } RGBAColor;
 
+// we need to do forward declaration since rectanglebase and group circularly
+// reference each other
+class Group;
+
 class RectangleBase
 {
 
 public:
     RectangleBase( float _x, float _y );
+    ~RectangleBase();
 
     /*
      * Returns the width or height of the object. These are virtual because
@@ -39,8 +44,8 @@ public:
      * Change the position of the object. Move may or may not have animation
      * (based on the animation switch), set will never have animation.
      */
-    void move( float _x, float _y );
-    void setPos( float _x, float _y );
+    virtual void move( float _x, float _y );
+    virtual void setPos( float _x, float _y );
     
     /*
      * Change the size of the object.
@@ -49,8 +54,13 @@ public:
     
     float getX(); float getY(); float getZ();
     float getScaleX(); float getScaleY();
+    void setName( std::string s );
+    std::string getName();
     bool isSelected();
     void setSelect( bool select );
+    bool isGrouped();
+    void setGroup( Group* g );
+    Group* getGroup();
     
     /*
      * Checks whether this object intersects with another rectangle, defined
@@ -77,11 +87,15 @@ protected:
     
     RGBAColor borderColor;
     RGBAColor destBColor;
+    RGBAColor baseBColor;
     std::string name;
     
     FTFont* font;
     
     bool selected;
+    bool grouped;
+    Group* myGroup;
+    
     bool animated;
     void animateValues();
     

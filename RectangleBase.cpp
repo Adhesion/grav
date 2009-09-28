@@ -5,23 +5,39 @@
  */
 
 #include "RectangleBase.h"
+#include "Group.h"
 
 #include <cmath>
 
 RectangleBase::RectangleBase( float _x, float _y )
 {
     scaleX = 5.0f; scaleY = 5.0f;
-    destX = x; destY = y;
+    x = -15.0f; y = 15.0f; z = 0.0f;
+    angle = 0.0f;
+    destX = _x; destY = _y;
     destScaleX = scaleX; destScaleY = scaleY;
     selected = false;
     destBColor.R = 1.0f; destBColor.G = 1.0f;
     destBColor.B = 1.0f; destBColor.A = 0.5f;
     borderColor = destBColor;
+    baseBColor = destBColor;
     animated = true;
     name = "";
+    myGroup = NULL;
     
     font = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
     font->FaceSize(100);
+}
+
+RectangleBase::~RectangleBase()
+{
+    printf( "rectanglebase destructor for %s\n", name.c_str() );
+    if ( isGrouped() )
+        myGroup->remove( this );
+    printf( "removed from group\n" );
+    
+    delete font;
+    printf( "rectanglebase destructor ending\n" );
 }
 
 float RectangleBase::getWidth()
@@ -79,6 +95,16 @@ float RectangleBase::getScaleY()
     return scaleY;
 }
 
+void RectangleBase::setName( std::string s )
+{
+    name = s;
+}
+
+std::string RectangleBase::getName()
+{
+    return name;
+}
+
 bool RectangleBase::isSelected()
 {
     return selected;
@@ -94,12 +120,26 @@ void RectangleBase::setSelect( bool select )
     }
     else
     {
-        destBColor.R = 1.0f; destBColor.G = 1.0f;
-        destBColor.B = 1.0f, destBColor.A = 0.5f;
+        destBColor = baseBColor;
     }
     
     if ( !animated )
         borderColor = destBColor;
+}
+
+bool RectangleBase::isGrouped()
+{
+    return ( myGroup != NULL );
+}
+
+void RectangleBase::setGroup( Group* g )
+{
+    myGroup = g;
+}
+
+Group* RectangleBase::getGroup()
+{
+    return myGroup;
 }
 
 bool RectangleBase::intersect( float L, float R, float U, float D )
@@ -149,13 +189,21 @@ void RectangleBase::draw()
     
     glTranslatef( -getWidth()/2.0f, getHeight()/2.0f+0.5f, 0.0f );
     glRasterPos2f( -getWidth()/2.0f, getHeight()/2.0f+0.5f );
-    float scaleFactor = 0.006f * scaleX / 10.0f;
+    float scaleFactor = 0.006f * scaleX / 10.0f * 3;
     glScalef( scaleFactor, scaleFactor, scaleFactor );
     
-    glColor3f( 1.0f, 1.0f, 1.0f );
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_POLYGON_SMOOTH);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     
     const char* nc = name.c_str();
     font->Render(nc);
+
+    //glDisable(GL_BLEND);
+    //glDisable(GL_POLYGON_SMOOTH);
     
     glPopMatrix();
     

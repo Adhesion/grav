@@ -17,6 +17,8 @@
 
 #include "VideoSource.h"
 #include "glutil.h"
+#include "RectangleBase.h"
+#include "Group.h"
 
 class listener : public VPMSessionListener {
 public:
@@ -41,8 +43,6 @@ public:
 
 static VPMSession *session;
 static uint32_t session_ts;
-static std::vector<VPMVideoBufferSink*> session_sinks;
-static std::vector<VPMVideoBufferSink*>::iterator session_sink_current;
 static listener session_listener;
 
 static float screen_width;
@@ -70,6 +70,10 @@ static bool lastBoxed; // was our last selection a boxed selection?
 static bool leftButtonHeld;
 static bool clickedInside;
 static int holdCounter;
+static bool drawSelectionBox;
+
+// for enabling siteID-based groups
+static bool enableSiteIDGroups;
 
 // special input modifiers like CTRL
 static int special;
@@ -84,10 +88,14 @@ static void glutActiveMotion(int x, int y);
 
 static bool selectVideos( bool box );
 static void clearSelected();
+static void ungroupAll();
 static void retileVideos();
 
 static std::vector<VideoSource*> sources;
-static std::vector<VideoSource*> selectedSources;
+static std::vector<RectangleBase*> drawnObjects;
+static std::vector<RectangleBase*> selectedObjects;
+static std::vector<RectangleBase*> tempSelectedObjects;
+static std::map<std::string,Group*> siteIDGroups;
 
 int main(int argc, char *argv[])
 {
@@ -114,7 +122,6 @@ int main(int argc, char *argv[])
   }
 
   session_ts = random32();
-  session_sink_current = session_sinks.end();
 
   glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize(windowWidth, windowHeight);
@@ -136,22 +143,38 @@ int main(int argc, char *argv[])
 static void glutDisplay(void)
 {
     glClear(GL_COLOR_BUFFER_BIT);
-
+    
     // iterate through all sources and draw here
-    std::vector<VideoSource*>::const_iterator si;
-    for ( si = sources.begin(); si != sources.end(); si++ )
+    std::vector<RectangleBase*>::const_iterator si;
+    //printf( "drawing %i objects\n", drawnObjects.size() );
+    //printf( "there are %i video sources and %i groups\n",
+    //            sources.size(), siteIDGroups.size() );
+    for ( si = drawnObjects.begin(); si != drawnObjects.end(); si++ )
     {
-	    (*si)->draw();
+        // only draw if not grouped - groups are responsible for
+        // drawing their members
+        if ( !(*si)->isGrouped() )
+        {
+	        (*si)->draw();
+            //printf( "drawing %s\n", (*si)->getName().c_str() );
+        }
+        else
+        {
+            //printf( "%s is grouped, not drawing\n", (*si)->getName().c_str() );
+            //printf( "its group is %s\n", (*si)->getGroup()->getName().c_str() );
+        }
     }
-  
+    
     // draw the click-and-drag selection box
-    if ( holdCounter > 1 && leftButtonHeld )
+    if ( holdCounter > 1 && drawSelectionBox )
     {
 	    glEnable(GL_BLEND);
 	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        // the main box
 	    glBegin(GL_QUADS);
 	    
-	    glColor4f( 0.1f, 0.2f, 1.0f, 0.25f );
+	    glColor4f( 0.1f, 0.2f, 1.0f, holdCounter/25.0f * 0.25f );
 	    
 	    glVertex3f(dragStartX, dragStartY, 0.0f);
 	    glVertex3f(dragEndX, dragStartY, 0.0f);
@@ -159,10 +182,27 @@ static void glutDisplay(void)
 	    glVertex3f(dragStartX, dragEndY, 0.0f);
 	    
 	    glEnd();
+        
+        // the outline
+        glBegin(GL_LINE_LOOP);
+        
+        glColor4f( 0.5f, 0.6f, 1.0f, holdCounter/25.0f * 0.25f );
+        
+        glVertex3f(dragStartX, dragStartY, 0.0f);
+        glVertex3f(dragEndX, dragStartY, 0.0f);
+        glVertex3f(dragEndX, dragEndY, 0.0f);
+        glVertex3f(dragStartX, dragEndY, 0.0f);
+        
+        glEnd();
+        
 	    glDisable(GL_BLEND);
     }
-
+    
     glutSwapBuffers();
+    
+    //printf( "holdcounter is %i\n", holdCounter );
+    if ( !leftButtonHeld && holdCounter > 0 )
+        holdCounter-=2;
 }
 
 static void glutKeyboard(unsigned char key, int x, int y)
@@ -176,17 +216,23 @@ static void glutKeyboard(unsigned char key, int x, int y)
 
   switch(key) {
 
-  case 'a':
-    if (session_sink_current != session_sinks.begin()) {
-      session_sink_current --;
+  case 's':
+    printf( "current sources selected: %i\n", selectedObjects.size() );
+    for ( unsigned int i = 0; i < selectedObjects.size(); i++ )
+    {
+        printf( "%s\n", selectedObjects[i]->getName().c_str() );
     }
     break;
-
-  case 's':
-    t = session_sink_current;
-    session_sink_current ++;
-    if (session_sink_current == session_sinks.end()) {
-      session_sink_current = t;
+  
+  case 't':
+    printf( "rearranging groups...\n" );
+    for ( unsigned int i = 0; i < selectedObjects.size(); i++ )
+    {
+        Group* g = dynamic_cast<Group*>(selectedObjects[i]);
+        if ( g != NULL )
+        {
+            g->rearrange();
+        }
     }
     break;
     
@@ -222,6 +268,16 @@ static void glutKeyboard(unsigned char key, int x, int y)
     {
         (*si)->move(0.0f,0.0f);
     }
+    break;
+    
+  case 'g':
+    if ( enableSiteIDGroups )
+    {
+        enableSiteIDGroups = false;
+        ungroupAll();
+    }
+    else
+        enableSiteIDGroups = true;
     break;
 
   case ',':
@@ -309,6 +365,8 @@ void glutMouse( int button, int state, int x, int y )
         // glut screen coords are y-flipped relative to GL screen coords
         y = windowHeight - y;
         
+        drawSelectionBox = false;
+        
         // get world coords for current mouse pos
         screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f, &mouseX, &mouseY,
                         &mouseZ );
@@ -324,27 +382,27 @@ void glutMouse( int button, int state, int x, int y )
         // the clicked position in empty space
         if ( !selectVideos( false ) )
         {
-            clickedInside = false;
-            if ( !selectedSources.empty() )
+            //clickedInside = false;
+            if ( !selectedObjects.empty() )
             {
 	            printf( "moving videos...\n" );
                 float movePosX = mouseX; float movePosY = mouseY;
-                std::vector<VideoSource*>::const_iterator sli;
+                std::vector<RectangleBase*>::const_iterator sli;
                 
                 float avgX = 0.0f, avgY = 0.0f;
-                int num = selectedSources.size();
+                int num = selectedObjects.size();
                 
                 if ( num == 1 )
                 {
-                    selectedSources[0]->move( movePosX, movePosY );
-                    selectedSources[0]->setSelect( false );
+                    selectedObjects[0]->move( movePosX, movePosY );
+                    selectedObjects[0]->setSelect( false );
                 }
                 // if moving >1, center the videos around the click point
                 // we need to find the average pos beforehand
                 else
                 {
-                    for ( sli = selectedSources.begin(); 
-                           sli != selectedSources.end();
+                    for ( sli = selectedObjects.begin(); 
+                           sli != selectedObjects.end();
                            sli++ )
                     {
                         avgX += (*sli)->getX();
@@ -353,8 +411,8 @@ void glutMouse( int button, int state, int x, int y )
                     avgX = avgX / num;
                     avgY = avgY / num;
                 
-                    for ( sli = selectedSources.begin(); 
-                           sli != selectedSources.end();
+                    for ( sli = selectedObjects.begin(); 
+                           sli != selectedObjects.end();
                            sli++ )
     	            {
     	                (*sli)->move( movePosX + ((*sli)->getX()-avgX),
@@ -363,10 +421,12 @@ void glutMouse( int button, int state, int x, int y )
     	            }
                 }
                 
-	            selectedSources.clear();
+	            selectedObjects.clear();
             }
             else
+            {
                 leftButtonHeld = true;
+            }
         }
     }
     else if ( state == GLUT_UP )
@@ -374,7 +434,6 @@ void glutMouse( int button, int state, int x, int y )
         //selectVideos( true );
         printf( "resetting held state to false\n" );
         leftButtonHeld = false;
-        holdCounter = 0;
     }
 }
 
@@ -393,38 +452,40 @@ void glutActiveMotion( int x, int y )
     // for click-and-drag movement
     if ( clickedInside )
     {
-        std::vector<VideoSource*>::reverse_iterator sli;
-        for ( sli = selectedSources.rbegin(); sli != selectedSources.rend();
+        std::vector<RectangleBase*>::reverse_iterator sli;
+        for ( sli = selectedObjects.rbegin(); sli != selectedObjects.rend();
                 sli++ )
         {
             (*sli)->move( mouseX + 
-                      ((*sli)->getX() - (*selectedSources.rbegin())->getX()),
+                      ((*sli)->getX() - (*selectedObjects.rbegin())->getX()),
                           mouseY + 
-                      ((*sli)->getY() - (*selectedSources.rbegin())->getY()) );
+                      ((*sli)->getY() - (*selectedObjects.rbegin())->getY()) );
         }
+        drawSelectionBox = false;
     }
     else if ( leftButtonHeld ) {//&& 
             //(selectedSources.size() == 0 || special == GLUT_ACTIVE_CTRL ) )
         clearSelected();
         selectVideos(true);
+        drawSelectionBox = true;
     }
     
-    holdCounter++;
+    if ( holdCounter < 25 ) holdCounter++;
 }
 
 bool selectVideos( bool box )
 {
     bool videoSelected = false;
     
-    std::vector<VideoSource*>::reverse_iterator si;
+    std::vector<RectangleBase*>::reverse_iterator si;
     // reverse means we'll get the video that's on top first, since videos
     // later in the list will render on top of previous ones
-    std::vector<VideoSource*>::const_iterator sli;
+    std::vector<RectangleBase*>::const_iterator sli;
     
     printf( "performing box selection? %i\n", box );
     printf( "was the last selection box? %i\n", lastBoxed );
     
-    for ( si = sources.rbegin(); si != sources.rend(); si++ )
+    for ( si = drawnObjects.rbegin(); si != drawnObjects.rend(); si++ )
     {        
         // rectangle that defines the selection area
         float selectL, selectR, selectU, selectD;
@@ -456,26 +517,30 @@ bool selectVideos( bool box )
                     special != GLUT_ACTIVE_CTRL )
                 clearSelected();
             
-            (*si)->setSelect( true );
             videoSelected = true;
-            //printf( "selected a video...\n" );
             
-            // take the selected video and put it and the end of the list
-            // so it'll be rendered on top
-            std::vector<VideoSource*>::iterator cur =
-                sources.begin() - 1 + distance( si, sources.rend() );
-            //printf( "size of sources before: %i\n", sources.size() );
-            //printf( "names of cur & reverse iter: %s, %s\n",
-            //    (*cur)->getName().c_str(), (*si)->getName().c_str() );
-            VideoSource* temp = (*cur);
-            sources.erase( cur );
-            //printf( "size of sources after: %i\n", sources.size() );
-            sources.push_back( temp );
-            //printf( "size of sources after after: %i\n", sources.size() );
+            if ( !(*si)->isSelected() )
+            {
+                (*si)->setSelect( true );
+                selectedObjects.push_back( *si );
+            }
             
-            selectedSources.push_back( temp );
-            if ( !box ) break; // so we only select one video per click
-                               // when single-clicking
+            // take the selected video and put it at the end of the list so
+            // it'll be rendered on top - but only if we just clicked on it
+            if ( !leftButtonHeld )
+            {
+                // since we can only delete a normal iterator (not a reverse
+                // one) we have to calculate our current position
+                std::vector<RectangleBase*>::iterator cur =
+                    drawnObjects.begin() - 1 + 
+                    distance( si, drawnObjects.rend() );
+                RectangleBase* temp = (*cur);
+                drawnObjects.erase( cur );
+                drawnObjects.push_back( temp );
+                
+                break; // so we only select one video per click
+                       // when single-clicking
+            }
         }
     }
     
@@ -485,10 +550,34 @@ bool selectVideos( bool box )
 void clearSelected()
 {
     printf( "clearing\n" );
-    for ( std::vector<VideoSource*>::iterator sli = selectedSources.begin();
-            sli != selectedSources.end(); sli++ )
+    for ( std::vector<RectangleBase*>::iterator sli = selectedObjects.begin();
+            sli != selectedObjects.end(); sli++ )
         (*sli)->setSelect(false);
-    selectedSources.clear();
+    selectedObjects.clear();
+}
+
+void ungroupAll()
+{
+    printf( "deleting %i groups\n", siteIDGroups.size() );
+    std::vector<RectangleBase*>::iterator it;
+    for ( it = drawnObjects.begin(); it != drawnObjects.end(); )
+    {
+        Group* g = dynamic_cast<Group*>((*it));
+        if ( g != NULL )
+        {
+            g->removeAll();
+            it = drawnObjects.erase(it);
+            delete g;
+            printf( "single group deleted\n" );
+        }
+        else
+        {
+            printf( "not a group, skipping\n" );
+            it++;
+        }
+    }
+    siteIDGroups.clear();
+    printf( "siteIDgroups cleared\n" );
 }
 
 void retileVideos()
@@ -541,6 +630,7 @@ listener::vpmsession_source_created(VPMSession &session,
     VideoSource* source = new VideoSource( &session, ssrc, sink, x, y );
     sources.push_back( source );
     source->updateName();
+    drawnObjects.push_back( source );
     
     // do some basic grid positions
     x += 6.0f;
@@ -590,4 +680,45 @@ listener::vpmsession_source_app(VPMSession &session,
     //printf( "RTP app data received\n" );
     //printf( "app: %s\n", app );
     //printf( "data: %s\n", data );
+    
+    std::string appS( app, 4 );
+    std::string dataS( data );
+    
+    if ( appS.compare( "site" ) == 0 && enableSiteIDGroups )
+    {
+        std::vector<VideoSource*>::iterator i = sources.begin();
+        //printf( "in rtcp app, got %i sources\n", sources.size() );
+        while ( (*i)->getssrc() != ssrc ) 
+        {
+            //printf( "ssrc: %08x\n", (*i)->getssrc() );
+            i++;
+        
+            if ( i == sources.end() )
+            {
+                //printf( "ssrc %08x not found?\n", ssrc );
+                return;
+            }
+        }
+        //printf( "source with ssrc %08x found\n", ssrc );
+        
+        if ( !(*i)->isGrouped() )
+        {
+            Group* g;
+            std::map<std::string,Group*>::iterator mapi = siteIDGroups.find(dataS);
+            
+            if ( mapi == siteIDGroups.end() )
+            {
+                g = new Group(0.0f,0.0f);
+                g->setName( dataS );
+                drawnObjects.push_back( g );
+                siteIDGroups.insert( std::pair<std::string,Group*>(dataS, g) );
+            }
+            else
+            {
+                g = mapi->second;
+            }
+            
+            g->add( *i );
+        }
+    }
 }
