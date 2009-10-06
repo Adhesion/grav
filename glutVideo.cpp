@@ -91,6 +91,11 @@ static void clearSelected();
 static void ungroupAll();
 static void retileVideos();
 
+// for moving videos to the top of the drawnObject (for both drawing and
+// selection)
+static void moveToTop( RectangleBase* object );
+static void moveToTop( std::vector<RectangleBase*>::iterator i );
+
 static std::vector<VideoSource*> sources;
 static std::vector<RectangleBase*> drawnObjects;
 static std::vector<RectangleBase*> selectedObjects;
@@ -242,18 +247,29 @@ static void glutKeyboard(unsigned char key, int x, int y)
     
   case 'w':
     printf( "We currently have %i sources.\n", sources.size() );
+    printf( "We currently have %i objects in drawnObjects.\n",
+                 drawnObjects.size() );
     
     for ( si = sources.begin(); si != sources.end(); si++ )
       {
-        printf( "name: %s\n", (*si)->getMetadata(VPMSession::VPMSESSION_SDES_NAME).c_str() );
-        printf( "cname: %s\n", (*si)->getMetadata(VPMSession::VPMSESSION_SDES_CNAME).c_str() );
+        printf( "name: %s\n", 
+               (*si)->getMetadata(VPMSession::VPMSESSION_SDES_NAME).c_str() );
+        printf( "cname: %s\n", 
+               (*si)->getMetadata(VPMSession::VPMSESSION_SDES_CNAME).c_str() );
+        printf( "loc: %s\n", 
+               (*si)->getMetadata(VPMSession::VPMSESSION_SDES_LOC).c_str() );
         printf( "\tpos (world): %f,%f\n", (*si)->getX(), (*si)->getY() );
         GLdouble scrX; GLdouble scrY; GLdouble scrZ;
         worldToScreen( (GLdouble)(*si)->getX(), (GLdouble)(*si)->getY(), 
                         (GLdouble)(*si)->getZ(), &scrX, &scrY, &scrZ);
         printf( "\tpos (screen): %f,%f,%f\n", scrX, scrY, scrZ );
+        printf( "\tis grouped? %i\n", (*si)->isGrouped() );
       }
     break;
+    
+  case 'o':
+    printf( "random32: %i\n", random32() );
+    printf( "random32max: %i\n", random32_max() );
     
   case 'n':
     for ( si = sources.begin(); si != sources.end(); si++ )
@@ -531,12 +547,10 @@ bool selectVideos( bool box )
             {
                 // since we can only delete a normal iterator (not a reverse
                 // one) we have to calculate our current position
-                std::vector<RectangleBase*>::iterator cur =
+                std::vector<RectangleBase*>::iterator current =
                     drawnObjects.begin() - 1 + 
                     distance( si, drawnObjects.rend() );
-                RectangleBase* temp = (*cur);
-                drawnObjects.erase( cur );
-                drawnObjects.push_back( temp );
+                moveToTop( current );
                 
                 break; // so we only select one video per click
                        // when single-clicking
@@ -567,7 +581,17 @@ void ungroupAll()
         {
             g->removeAll();
             it = drawnObjects.erase(it);
+            
+            if ( g->isSelected() )
+            {
+                std::vector<RectangleBase*>::iterator j =
+                    selectedObjects.begin();
+                while ( (*j) != g ) j++;
+                selectedObjects.erase( j );
+            }
+            
             delete g;
+            
             printf( "single group deleted\n" );
         }
         else
@@ -586,20 +610,47 @@ void retileVideos()
     y = 7.0f;
     float buffer = 1.0f; // space between videos
     
-    std::vector<VideoSource*>::iterator si;
-    for ( si = sources.begin(); si != sources.end(); si++ )
+    std::vector<RectangleBase*>::iterator si;
+    for ( si = drawnObjects.begin(); si != drawnObjects.end(); si++ )
     {
-        (*si)->move(x,y);
-        std::vector<VideoSource*>::iterator next = si + 1;
-        if ( next == sources.end() ) next = sources.begin();
-        x += (*si)->getWidth()/2 + buffer +
-                (*next)->getWidth()/2;
-        if ( x > 9.0f )
+        if ( !(*si)->isGrouped() )
         {
-            x = -9.0f;
-            y -= (*si)->getHeight()/2 + buffer +
-                    (*next)->getHeight()/2;
+            (*si)->move(x,y);
+            std::vector<RectangleBase*>::iterator next = si + 1;
+            if ( next == drawnObjects.end() ) next = drawnObjects.begin();
+            x += (*si)->getWidth()/2 + buffer +
+                    (*next)->getWidth()/2;
+            if ( x > 8.0f )
+            {
+                x = -9.0f;
+                y -= (*si)->getHeight()/2 + buffer +
+                        (*next)->getHeight()/2;
+            }
         }
+        Group* g = dynamic_cast<Group*>(*si);
+        if ( g != NULL )
+            g->rearrange();
+    }
+}
+
+void moveToTop( RectangleBase* object )
+{
+    std::vector<RectangleBase*>::iterator i = drawnObjects.begin();
+    while ( (*i) != object ) i++;
+    moveToTop( i );
+}
+
+void moveToTop( std::vector<RectangleBase*>::iterator i )
+{
+    RectangleBase* temp = (*i);
+    drawnObjects.erase( i );
+    drawnObjects.push_back( temp );
+    
+    Group* g = dynamic_cast<Group*>( temp );
+    if ( g != NULL )
+    {
+        for ( int i = 0; i < g->numObjects(); i++ )
+            moveToTop( (*g)[i] );
     }
 }
 
@@ -634,7 +685,7 @@ listener::vpmsession_source_created(VPMSession &session,
     
     // do some basic grid positions
     x += 6.0f;
-    if ( x > 18.0f )
+    if ( x > 9.0f )
     {
         x = -7.5f;
         y -= 6.0f;
@@ -653,12 +704,28 @@ listener::vpmsession_source_deleted(VPMSession &session,
 				    const char *reason)
 {
     std::vector<VideoSource*>::iterator si;
+    printf( "grav: deleting ssrc 0x%08x\n", ssrc );
     for ( si = sources.begin(); si != sources.end(); si++ )
     {
         if ( (*si)->getssrc() == ssrc )
         {
-            sources.erase( si );
+            printf( "source is %s\n", (*si)->getName().c_str() );
+            RectangleBase* temp = (RectangleBase*)(*si);
+            std::vector<RectangleBase*>::iterator i = drawnObjects.begin();
+            while ( (*i) != temp ) i++;
+            drawnObjects.erase( i );
+            
+            if ( temp->isSelected() )
+            {
+                std::vector<RectangleBase*>::iterator j =
+                    selectedObjects.begin();
+                while ( (*j) != temp ) j++;
+                selectedObjects.erase( j );
+            }
+            
             delete (*si);
+            sources.erase( si );
+            return;
         }
     }
 }
@@ -719,6 +786,7 @@ listener::vpmsession_source_app(VPMSession &session,
             }
             
             g->add( *i );
+            retileVideos();
         }
     }
 }

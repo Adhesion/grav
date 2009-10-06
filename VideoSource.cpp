@@ -39,12 +39,6 @@ void VideoSource::draw()
 {
     animateValues();
     
-    if ( drawCounter > 29 )
-    {
-        updateName();
-        drawCounter = 0;
-    }
-    
     // set up our position
     glPushMatrix();
 
@@ -158,8 +152,6 @@ void VideoSource::draw()
     }
     
     glPopMatrix();
-    
-    drawCounter++;
 }
 
 void VideoSource::scaleNative()
@@ -211,6 +203,7 @@ void VideoSource::updateName()
     else
     {
         name = tempName;
+        finalName = true;
         //printf( "in updateName, got name: %s\n", name.c_str() );
     }
 }
