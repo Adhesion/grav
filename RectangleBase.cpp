@@ -18,10 +18,11 @@ RectangleBase::RectangleBase( float _x, float _y )
     destScaleX = scaleX; destScaleY = scaleY;
     selected = false;
     destBColor.R = 1.0f; destBColor.G = 1.0f;
-    destBColor.B = 1.0f; destBColor.A = 0.5f;
+    destBColor.B = 1.0f; destBColor.A = 0.7f;
     borderColor = destBColor;
     baseBColor = destBColor;
     animated = true;
+    finalName = false;
     name = "";
     myGroup = NULL;
     
@@ -132,14 +133,31 @@ bool RectangleBase::isGrouped()
     return ( myGroup != NULL );
 }
 
+bool RectangleBase::isGroup()
+{
+    return false;
+}
+
 void RectangleBase::setGroup( Group* g )
 {
     myGroup = g;
+    if ( g == NULL )
+        updateName();
 }
 
 Group* RectangleBase::getGroup()
 {
     return myGroup;
+}
+
+bool RectangleBase::usingFinalName()
+{
+    return finalName;
+}
+
+void RectangleBase::updateName()
+{
+    
 }
 
 bool RectangleBase::intersect( float L, float R, float U, float D )
@@ -168,6 +186,13 @@ void RectangleBase::draw()
 {
     // note that the position should be set before calling this
     
+    // do things we only want to do every X frames, like updating the name
+    if ( drawCounter > 29 )
+    {
+        if ( !usingFinalName() ) updateName();
+        drawCounter = 0;
+    }
+    
     // draw the border first
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -186,15 +211,22 @@ void RectangleBase::draw()
     glDisable(GL_BLEND);
     
     glPushMatrix();
+
+    float yOffset = 0.4f;
+    float scaleFactor = 0.006f * scaleX / 10.0f * 1.5f;
+    if ( isGroup() ) 
+    {
+        yOffset = 0.9f;
+        scaleFactor = 0.006f * scaleX / 10.0f;
+    }
     
-    glTranslatef( -getWidth()/2.0f, getHeight()/2.0f+0.5f, 0.0f );
-    glRasterPos2f( -getWidth()/2.0f, getHeight()/2.0f+0.5f );
-    float scaleFactor = 0.006f * scaleX / 10.0f * 3;
+    glTranslatef( -getWidth()/2.0f, getHeight()/2.0f+yOffset, 0.0f );
+    glRasterPos2f( -getWidth()/2.0f, getHeight()/2.0f+yOffset );
     glScalef( scaleFactor, scaleFactor, scaleFactor );
     
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glEnable(GL_POLYGON_SMOOTH);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_LINE_SMOOTH);
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -202,8 +234,8 @@ void RectangleBase::draw()
     const char* nc = name.c_str();
     font->Render(nc);
 
-    //glDisable(GL_BLEND);
-    //glDisable(GL_POLYGON_SMOOTH);
+    glDisable(GL_BLEND);
+    glDisable(GL_LINE_SMOOTH);
     
     glPopMatrix();
     
@@ -217,6 +249,8 @@ void RectangleBase::draw()
         i++;
     }
     //glutStrokeString(GLUT_STROKE_MONO_ROMAN, uc);*/
+    
+    drawCounter++;
 }
 
 void RectangleBase::animateValues()

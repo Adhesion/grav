@@ -11,10 +11,10 @@
 Group::Group( float _x, float _y ) :
     RectangleBase( _x, _y )
 {
-    baseBColor.R = random32()/random32_max();
-    baseBColor.G = 1.0f;
-    baseBColor.B = 0.0f;
-    baseBColor.A = 0.85f;
+    baseBColor.R = (float)random32()/(float)random32_max();
+    baseBColor.G = (float)random32()/(float)random32_max();
+    baseBColor.B = (float)random32()/(float)random32_max();
+    baseBColor.A = 0.7f;
     destBColor = baseBColor;
     name = std::string( "Group" );
     
@@ -42,6 +42,7 @@ void Group::draw()
     
     glPopMatrix();
     
+    //printf( "drawing %i objects in group\n", objects.size() );
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
         objects[i]->draw();
@@ -56,24 +57,51 @@ void Group::add( RectangleBase* object )
                                         getName().c_str() );
     printf( "now rearranging %i objects\n", objects.size() );
     rearrange();
+    
+    for ( unsigned int i = 0; i < objects.size(); i++ )
+        objects[i]->updateName();
+    
+    updateName();
 }
 
 void Group::remove( RectangleBase* object )
 {
+    printf( "removing %s from group %s\n", object->getName().c_str(),
+                                        getName().c_str() );
     object->setGroup( NULL );
     std::vector<RectangleBase*>::iterator i = objects.begin();
     while ( *i != object ) i++;
+    printf( "in group %s, numObjects before erase: %i\n", name.c_str(),
+            objects.size() );
+    printf( "object (iterator): %s\n", (*i)->getName().c_str() );
     objects.erase( i );
+    printf( "in group %s, numObjects after erase: %i\n", name.c_str(),
+            objects.size() );
     if ( objects.size() > 0 )
         rearrange();
 }
 
 void Group::removeAll()
 {
-    for ( unsigned int i = 0; i < objects.size(); i++ )
+    for ( unsigned int i = 0; i < objects.size(); )
     {
         remove( objects[i] );
     }
+}
+
+RectangleBase* Group::operator[]( int i )
+{
+    return objects[i];
+}
+
+int Group::numObjects()
+{
+    return objects.size();
+}
+
+bool Group::isGroup()
+{
+    return true;
 }
 
 void Group::rearrange()
@@ -123,8 +151,64 @@ void Group::rearrange()
         }
     }
     
-    setScale(largestWidth * numCol + bufferSpaceX,
-            largestHeight * numRow + bufferSpaceY);
+    setScale(largestWidth * numCol + bufferSpaceX + 0.3f,
+            largestHeight * numRow + bufferSpaceY + 0.3f);
+}
+
+void Group::updateName()
+{
+    bool membersFinalized = true;
+    int shortestLength = 256;
+    for ( unsigned int i = 0; i < objects.size(); i++ )
+    {
+        membersFinalized = membersFinalized && objects[i]->usingFinalName();
+        shortestLength = std::min( shortestLength, 
+                                    (int)objects[i]->getName().length() );
+    }
+    
+    // only try to create the name if all the members have their correct
+    // names (ie, NAME vs CNAME)
+    if ( !membersFinalized ) return;
+    
+    printf( "group members names finalized, finding common string...\n" );
+    
+    // loop through the characters and find the position of the end of the
+    // first common substring
+    bool equal = true;
+    int splitPos = 0;
+    while ( equal && splitPos < shortestLength )
+    {
+        for ( unsigned int j = 1; j < objects.size(); j++ )
+        {
+            equal = equal && (objects[j-1]->getName().at(splitPos) ==
+                                objects[j]->getName().at(splitPos) );
+        }
+        splitPos++;
+    }
+    splitPos--;
+    
+    // if there are parentheses, split the strings based on the paren that
+    // matches the one nearest to the splitting position
+    int startParen = objects[0]->getName().rfind( '(', splitPos );
+    int endParen = objects[0]->getName().find( ')', splitPos );
+    printf( "startParen: %i, endParen: %i\n", startParen, endParen );
+    if ( endParen != -1 && startParen != -1 )
+        splitPos = startParen;
+        
+    // set the group's name to the common substring, and the members' names
+    // to the remainder
+    name = objects[0]->getName().substr(0, splitPos);
+    
+    printf( "common substr is %s, up to pos %i\n", name.c_str(), splitPos );
+    for ( unsigned int k = 0; k < objects.size(); k++ )
+    {
+        objects[k]->setName( objects[k]->getName().substr(splitPos, 
+                                   objects[k]->getName().length()-splitPos ) );
+        printf( "object name (remainder) set to %s\n",
+                            objects[k]->getName().c_str() );
+    }
+    
+    finalName = true;
 }
 
 void Group::move( float _x, float _y )

@@ -60,8 +60,6 @@ private:
     
     unsigned int tex_width, tex_height; // dimensions rounded up to power of 2
     GLuint texid; // GL texture identifier
-    
-    int drawCounter; // keeps track of how many times we've drawn
 
 };
 

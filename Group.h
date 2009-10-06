@@ -26,7 +26,14 @@ public:
     void remove( RectangleBase* object );
     void removeAll();
     
+    RectangleBase* operator[]( int i );
+    int numObjects();
+    
+    bool isGroup();
+    
     void rearrange();
+    
+    void updateName();
     
     void move( float _x, float _y );
     void setPos( float _x, float _y );

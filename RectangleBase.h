@@ -58,9 +58,29 @@ public:
     std::string getName();
     bool isSelected();
     void setSelect( bool select );
+    
+    /*
+     * Is this object a member of a group?
+     */
     bool isGrouped();
+    
+    /*
+     * Is this object a group itself?
+     */
+    virtual bool isGroup();
+    
     void setGroup( Group* g );
     Group* getGroup();
+    
+    /*
+     * Return whether or not the current name can be said to be 'final'.
+     * For video sources, this is the SDES_NAME as opposed to SDES_CNAME, and
+     * for groups it signifies whether or not it has figured out a common
+     * name from its members.
+     */
+    bool usingFinalName();
+    
+    virtual void updateName();
     
     /*
      * Checks whether this object intersects with another rectangle, defined
@@ -89,6 +109,7 @@ protected:
     RGBAColor destBColor;
     RGBAColor baseBColor;
     std::string name;
+    bool finalName;
     
     FTFont* font;
     
@@ -98,6 +119,8 @@ protected:
     
     bool animated;
     void animateValues();
+    
+    int drawCounter; // keeps track of how many times we've drawn
     
 };
 
