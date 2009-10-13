@@ -26,6 +26,7 @@
 <listOptionValue builtIn="false" value="dv"/>
 <listOptionValue builtIn="false" value="swscale"/>
 <listOptionValue builtIn="false" value="avcodec"/>
+<listOptionValue builtIn="false" value="png"/>
 </option>
 <option id="gnu.cpp.link.option.paths.2006448142" superClass="gnu.cpp.link.option.paths"/>
 <option id="gnu.cpp.link.option.flags.752878852" superClass="gnu.cpp.link.option.flags" value="" valueType="string"/>

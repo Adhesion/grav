@@ -213,6 +213,7 @@ static void glutDisplay(void)
 static void glutKeyboard(unsigned char key, int x, int y)
 {
   std::vector<VPMVideoBufferSink*>::iterator t;
+  std::map<std::string,Group*>::iterator mapi;
   printf( "Char pressed is %c\n", key );
   printf( "x,y in glutkeyboard is %i,%i\n", x, y );
   std::vector<VideoSource*>::const_iterator si;
@@ -238,6 +239,15 @@ static void glutKeyboard(unsigned char key, int x, int y)
         {
             g->rearrange();
         }
+    }
+    break;
+    
+  case 'u':
+    printf( "updating group names...\n" );
+    mapi = siteIDGroups.begin();
+    for ( ; mapi != siteIDGroups.end(); mapi++ )
+    {
+        mapi->second->updateName();
     }
     break;
     

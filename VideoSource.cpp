@@ -8,12 +8,6 @@
 #include "glutil.h"
 #include <cmath>
 
-static inline int pow2(int x) {
-  int i;
-  for (i = 2; i < x; i <<= 1);
-  return i;
-}
-
 VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
                             VPMVideoBufferSink* vs, float _x, float _y ) :
     session( _session ), ssrc( _ssrc ), videoSink( vs ), RectangleBase(_x,_y)

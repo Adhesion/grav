@@ -7,11 +7,19 @@
  * conversions.
  * @author Andrew Ford
  */
+ 
+#include <GL/glu.h>
 
 // pointers to the GL matrices in question
 static GLdouble modelview[16];
 static GLdouble projection[16];
 static GLint viewport[4];
+
+static inline int pow2(int x) {
+  int i;
+  for (i = 2; i < x; i <<= 1);
+  return i;
+}
 
 /**
  * Prints out the current modelview, projection and viewport matrices.

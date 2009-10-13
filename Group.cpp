@@ -157,6 +157,8 @@ void Group::rearrange()
 
 void Group::updateName()
 {
+    if ( objects.size() == 0 ) return;
+    
     bool membersFinalized = true;
     int shortestLength = 256;
     for ( unsigned int i = 0; i < objects.size(); i++ )
@@ -172,29 +174,64 @@ void Group::updateName()
     
     printf( "group members names finalized, finding common string...\n" );
     
-    // loop through the characters and find the position of the end of the
-    // first common substring
-    bool equal = true;
     int splitPos = 0;
-    while ( equal && splitPos < shortestLength )
-    {
-        for ( unsigned int j = 1; j < objects.size(); j++ )
-        {
-            equal = equal && (objects[j-1]->getName().at(splitPos) ==
-                                objects[j]->getName().at(splitPos) );
-        }
-        splitPos++;
-    }
-    splitPos--;
+    int startParen = -1;
+    int endParen = -1;
     
-    // if there are parentheses, split the strings based on the paren that
-    // matches the one nearest to the splitting position
-    int startParen = objects[0]->getName().rfind( '(', splitPos );
-    int endParen = objects[0]->getName().find( ')', splitPos );
-    printf( "startParen: %i, endParen: %i\n", startParen, endParen );
-    if ( endParen != -1 && startParen != -1 )
-        splitPos = startParen;
+    if ( objects.size() > 1 )
+    {
+        // loop through the characters and find the position of the end of the
+        // first common substring
+        bool equal = true;
+        while ( equal && splitPos < shortestLength )
+        {
+            for ( unsigned int j = 1; j < objects.size(); j++ )
+            {
+                equal = equal && (objects[j-1]->getName().at(splitPos) ==
+                                    objects[j]->getName().at(splitPos) );
+            }
+            splitPos++;
+        }
+        splitPos--;
         
+        // if there are parentheses, split the strings based on the closest
+        // left paren to the left of the difference position (if found)
+        startParen = objects[0]->getName().rfind( '(', splitPos );
+        endParen = objects[0]->getName().find( ')', splitPos );
+        printf( ">1 startParen: %i, endParen: %i\n", startParen, endParen );
+        if ( endParen != -1 && startParen != -1 )
+            splitPos = startParen;
+    }
+    else
+    {
+        // if there's only one, just split based on the rightmost & outermost
+        // matched parens
+        int i = objects[0]->getName().length()-1;
+        printf( "name is %s, length is %i, i is %i\n", 
+                objects[0]->getName().c_str(), i+1, i );
+        int balance = 0;
+        while ( i >= 0 && (balance != 0 || endParen == -1) )
+        {
+            char c = objects[0]->getName().at(i);
+            if ( c == ')' )
+            {
+                if ( i == objects[0]->getName().length()-1 )
+                    endParen = i;
+                balance++;
+            }
+            else if ( c == '(' )
+            {
+                startParen = i;
+                balance--;
+            }
+            i--;
+        }
+
+        printf( "=1 startParen: %i, endParen: %i\n", startParen, endParen );
+        if ( endParen != -1 && startParen != -1 )
+            splitPos = startParen;
+    }
+    
     // set the group's name to the common substring, and the members' names
     // to the remainder
     name = objects[0]->getName().substr(0, splitPos);
@@ -202,10 +239,25 @@ void Group::updateName()
     printf( "common substr is %s, up to pos %i\n", name.c_str(), splitPos );
     for ( unsigned int k = 0; k < objects.size(); k++ )
     {
-        objects[k]->setName( objects[k]->getName().substr(splitPos, 
-                                   objects[k]->getName().length()-splitPos ) );
+        // if we have more than one object in the group, re-find the positions
+        // of the parentheses since the text inside them may not be the same
+        // length for all objects
+        if ( objects.size() > 1 )
+        {
+            startParen = objects[k]->getName().rfind( '(', splitPos );
+            endParen = objects[k]->getName().find( ')', splitPos );
+        }
+        if ( endParen != -1 && startParen != -1 )
+        {
+            objects[k]->setSubstring( startParen+1, endParen );
+        }
+        else
+        {
+            objects[k]->setSubstring( splitPos,
+                                objects[k]->getName().length() );
+        }
         printf( "object name (remainder) set to %s\n",
-                            objects[k]->getName().c_str() );
+                            objects[k]->getSubName().c_str() );
     }
     
     finalName = true;
@@ -213,7 +265,7 @@ void Group::updateName()
 
 void Group::move( float _x, float _y )
 {
-    printf( "moving group\n" );
+    //printf( "moving group\n" );
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
         objects[i]->move( _x + objects[i]->getX() - x, 
