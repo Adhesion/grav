@@ -56,6 +56,7 @@ public:
     float getScaleX(); float getScaleY();
     void setName( std::string s );
     std::string getName();
+    std::string getSubName();
     bool isSelected();
     void setSelect( bool select );
     
@@ -81,6 +82,7 @@ public:
     bool usingFinalName();
     
     virtual void updateName();
+    void setSubstring( int start, int end );
     
     /*
      * Checks whether this object intersects with another rectangle, defined
@@ -108,10 +110,13 @@ protected:
     RGBAColor borderColor;
     RGBAColor destBColor;
     RGBAColor baseBColor;
+    
     std::string name;
+    int nameStart, nameEnd; // substring of the name to render
     bool finalName;
     
     FTFont* font;
+    GLuint borderTex;
     
     bool selected;
     bool grouped;

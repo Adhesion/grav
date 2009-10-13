@@ -6,6 +6,7 @@
 
 #include "RectangleBase.h"
 #include "Group.h"
+#include "PNGLoader.h"
 
 #include <cmath>
 
@@ -23,11 +24,14 @@ RectangleBase::RectangleBase( float _x, float _y )
     baseBColor = destBColor;
     animated = true;
     finalName = false;
+    nameStart = -1; nameEnd = -1;
     name = "";
     myGroup = NULL;
     
     font = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
     font->FaceSize(100);
+    
+    borderTex = PNGLoader::loadPNG( "border.png" );
 }
 
 RectangleBase::~RectangleBase()
@@ -106,6 +110,14 @@ std::string RectangleBase::getName()
     return name;
 }
 
+std::string RectangleBase::getSubName()
+{
+    if ( nameStart != -1 && nameEnd != -1 )
+        return name.substr( nameStart, nameEnd-nameStart );
+    else
+        return name;
+}
+
 bool RectangleBase::isSelected()
 {
     return selected;
@@ -158,6 +170,12 @@ bool RectangleBase::usingFinalName()
 void RectangleBase::updateName()
 {
     
+}
+
+void RectangleBase::setSubstring( int start, int end )
+{
+    nameStart = start;
+    nameEnd = end;
 }
 
 bool RectangleBase::intersect( float L, float R, float U, float D )
@@ -231,7 +249,10 @@ void RectangleBase::draw()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     
-    const char* nc = name.c_str();
+    printf( "name is %s\n", name.c_str() );
+    std::string sub = getSubName();
+    const char* nc = sub.c_str();
+    printf( "rendering nc: %s\n", nc );
     font->Render(nc);
 
     glDisable(GL_BLEND);

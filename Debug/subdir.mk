@@ -5,18 +5,21 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../Group.cpp \
+../PNGLoader.cpp \
 ../RectangleBase.cpp \
 ../VideoSource.cpp \
 ../glutVideo.cpp 
 
 OBJS += \
 ./Group.o \
+./PNGLoader.o \
 ./RectangleBase.o \
 ./VideoSource.o \
 ./glutVideo.o 
 
 CPP_DEPS += \
 ./Group.d \
+./PNGLoader.d \
 ./RectangleBase.d \
 ./VideoSource.d \
 ./glutVideo.d 
