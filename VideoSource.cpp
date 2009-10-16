@@ -75,8 +75,8 @@ void VideoSource::draw()
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-      unsigned char *buffer = new unsigned char[tex_width * tex_height];
-      memset(buffer, 128, tex_width * tex_height);
+      unsigned char *buffer = new unsigned char[tex_width * tex_height * 3];
+      memset(buffer, 128, tex_width * tex_height * 3);
       glTexImage2D(GL_TEXTURE_2D, 
 	     0, 
 	     GL_RGB, 

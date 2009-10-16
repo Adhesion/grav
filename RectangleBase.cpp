@@ -7,6 +7,8 @@
 #include "RectangleBase.h"
 #include "Group.h"
 #include "PNGLoader.h"
+#include "glutil.h"
+#include <GL/glu.h>
 
 #include <cmath>
 
@@ -27,11 +29,13 @@ RectangleBase::RectangleBase( float _x, float _y )
     nameStart = -1; nameEnd = -1;
     name = "";
     myGroup = NULL;
+    twidth = 0; theight = 0;
     
     font = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
     font->FaceSize(100);
     
-    borderTex = PNGLoader::loadPNG( "border.png" );
+    borderTex = PNGLoader::loadPNG( "/home/andrew/work/src/grav/Debug/border.png",
+                                    twidth, theight );
 }
 
 RectangleBase::~RectangleBase()
@@ -40,6 +44,8 @@ RectangleBase::~RectangleBase()
     if ( isGrouped() )
         myGroup->remove( this );
     printf( "removed from group\n" );
+    
+    glDeleteTextures( 1, &borderTex );
     
     delete font;
     printf( "rectanglebase destructor ending\n" );
@@ -212,21 +218,67 @@ void RectangleBase::draw()
     }
     
     // draw the border first
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBegin(GL_QUADS);
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     
+    /*printf( "DRAWPRE\n" );
+    GLenum  gl_error = glGetError();
+    for (; (gl_error); gl_error = glGetError()) {
+        fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
+    }*/
+    
+    glEnable( GL_TEXTURE_2D );
+    glBindTexture( GL_TEXTURE_2D, borderTex );
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 
+        twidth);
+    
+    /*printf( "DRAWPOSTBIND\n" );
+    gl_error = glGetError();
+    for (; (gl_error); gl_error = glGetError()) {
+        fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
+    }*/
+    
+    float s = (float)twidth / (float)pow2( twidth );
+    float t = (float)theight / (float)pow2( theight );
+    
+    glBegin( GL_QUADS );
     // set the border color
     glColor4f( borderColor.R, borderColor.G, 
                 borderColor.B, borderColor.A );
     
+    glTexCoord2f(0.0, 0.0);
     glVertex3f(-getWidth()/2.0-0.3, -getHeight()/2.0-0.3, 0.0);
+    
+    glTexCoord2f(0.0, t);
     glVertex3f(-getWidth()/2.0-0.3, getHeight()/2.0+0.3, 0.0);
+    
+    glTexCoord2f(s, t);
     glVertex3f(getWidth()/2.0+0.3, getHeight()/2.0+0.3, 0.0);
+    
+    glTexCoord2f(s, 0.0);
     glVertex3f(getWidth()/2.0+0.3, -getHeight()/2.0-0.3, 0.0);
     
+    /*printf( "DRAWPOSTCOORD\n" );
+    gl_error = glGetError();
+    for (; (gl_error); gl_error = glGetError()) {
+        fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
+    }*/
+    
     glEnd();
-    glDisable(GL_BLEND);
+    glDisable( GL_BLEND );
+    glDisable( GL_TEXTURE_2D );
+    
+    /*printf( "DRAWPOSTPOST\n" );
+    gl_error = glGetError();
+    for (; (gl_error); gl_error = glGetError()) {
+        fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
+    }*/
     
     glPushMatrix();
 
@@ -249,10 +301,10 @@ void RectangleBase::draw()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     
-    printf( "name is %s\n", name.c_str() );
+    //printf( "name is %s\n", name.c_str() );
     std::string sub = getSubName();
     const char* nc = sub.c_str();
-    printf( "rendering nc: %s\n", nc );
+    //printf( "rendering nc: %s\n", nc );
     font->Render(nc);
 
     glDisable(GL_BLEND);
