@@ -117,6 +117,8 @@ protected:
     
     FTFont* font;
     GLuint borderTex;
+    int twidth, theight; // width/height of our border/background texture in
+                         // pixels
     
     bool selected;
     bool grouped;
