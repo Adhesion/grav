@@ -19,6 +19,8 @@
 #include "glutil.h"
 #include "RectangleBase.h"
 #include "Group.h"
+#include "Earth.h"
+#include "PNGLoader.h"
 
 class listener : public VPMSessionListener {
 public:
@@ -78,6 +80,11 @@ static bool enableSiteIDGroups;
 // special input modifiers like CTRL
 static int special;
 
+// background texture for groups & video objects
+static GLuint borderTex;
+int borderWidth;
+int borderHeight;
+
 static void glutDisplay(void);
 static void glutReshape(int w, int h);
 static void glutKeyboard(unsigned char key, int x, int y);
@@ -101,6 +108,8 @@ static std::vector<RectangleBase*> drawnObjects;
 static std::vector<RectangleBase*> selectedObjects;
 static std::vector<RectangleBase*> tempSelectedObjects;
 static std::map<std::string,Group*> siteIDGroups;
+
+static Earth* earth;
 
 int main(int argc, char *argv[])
 {
@@ -132,6 +141,9 @@ int main(int argc, char *argv[])
   glutInitWindowSize(windowWidth, windowHeight);
   glutInitWindowPosition(0, 50);
   glutCreateWindow(argv[0]);
+  
+  earth = new Earth();
+  borderTex = PNGLoader::loadPNG( "border.png", borderWidth, borderHeight );
 
   glutDisplayFunc(glutDisplay);
   glutReshapeFunc(glutReshape);
@@ -148,6 +160,8 @@ int main(int argc, char *argv[])
 static void glutDisplay(void)
 {
     glClear(GL_COLOR_BUFFER_BIT);
+    
+    earth->draw();
     
     // iterate through all sources and draw here
     std::vector<RectangleBase*>::const_iterator si;
@@ -222,7 +236,7 @@ static void glutKeyboard(unsigned char key, int x, int y)
 
   switch(key) {
 
-  case 's':
+  case 'k':
     printf( "current sources selected: %i\n", selectedObjects.size() );
     for ( unsigned int i = 0; i < selectedObjects.size(); i++ )
     {
@@ -255,7 +269,7 @@ static void glutKeyboard(unsigned char key, int x, int y)
     retileVideos();
     break;
     
-  case 'w':
+  case 'l':
     printf( "We currently have %i sources.\n", sources.size() );
     printf( "We currently have %i objects in drawnObjects.\n",
                  drawnObjects.size() );
@@ -305,14 +319,6 @@ static void glutKeyboard(unsigned char key, int x, int y)
     else
         enableSiteIDGroups = true;
     break;
-
-  case ',':
-    //angle -= 5.0;
-    break;
-    
-  case '.':
-    //angle += 5.0;
-    break;
     
   case '-':
     scaleAmt *= -1.0f;
@@ -325,6 +331,19 @@ static void glutKeyboard(unsigned char key, int x, int y)
                              (*si)->getScaleY()+(*si)->getScaleY()*scaleAmt );
         }
     }
+    break;
+    
+  case 'a':
+    earth->rotate( 0.0f, 0.0f, -2.0f );
+    break;
+  case 'd':
+    earth->rotate( 0.0f, 0.0f, 2.0f );
+    break;
+  case 'w':
+    earth->rotate( -2.0f, 0.0f, 0.0f );
+    break;
+  case 's':
+    earth->rotate( 2.0f, 0.0f, 0.0f );
     break;
 
   case 'q':
@@ -367,7 +386,7 @@ void glutReshape(int w, int h)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    glFrustum(-screen_width/10.0, screen_width/10.0, -screen_height/10.0, screen_height/10.0, 0.1, 100.0);
+    glFrustum(-screen_width/10.0, screen_width/10.0, -screen_height/10.0, screen_height/10.0, 0.1, 50.0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -689,6 +708,7 @@ listener::vpmsession_source_created(VPMSession &session,
     printf( "creating new source at %f,%f\n", x, y );
 
     VideoSource* source = new VideoSource( &session, ssrc, sink, x, y );
+    source->setTexture( borderTex, borderWidth, borderHeight );
     sources.push_back( source );
     source->updateName();
     drawnObjects.push_back( source );
@@ -781,12 +801,14 @@ listener::vpmsession_source_app(VPMSession &session,
         if ( !(*i)->isGrouped() )
         {
             Group* g;
-            std::map<std::string,Group*>::iterator mapi = siteIDGroups.find(dataS);
+            std::map<std::string,Group*>::iterator mapi =
+                                            siteIDGroups.find(dataS);
             
             if ( mapi == siteIDGroups.end() )
             {
                 g = new Group(0.0f,0.0f);
                 g->setName( dataS );
+                g->setTexture( borderTex, borderWidth, borderHeight );
                 drawnObjects.push_back( g );
                 siteIDGroups.insert( std::pair<std::string,Group*>(dataS, g) );
             }

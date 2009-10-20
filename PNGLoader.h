@@ -7,6 +7,8 @@
  * @author Andrew Ford
  */
 
+#include <string>
+
 namespace PNGLoader
 {
     

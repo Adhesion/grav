@@ -52,6 +52,11 @@ public:
      */
     void setScale( float xs, float ys ); 
     
+    /*
+     * Set the background texture for this object.
+     */
+    void setTexture( GLuint tex, int width, int height );
+    
     float getX(); float getY(); float getZ();
     float getScaleX(); float getScaleY();
     void setName( std::string s );

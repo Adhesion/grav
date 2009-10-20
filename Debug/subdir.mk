@@ -4,6 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../Earth.cpp \
 ../Group.cpp \
 ../PNGLoader.cpp \
 ../RectangleBase.cpp \
@@ -11,6 +12,7 @@ CPP_SRCS += \
 ../glutVideo.cpp 
 
 OBJS += \
+./Earth.o \
 ./Group.o \
 ./PNGLoader.o \
 ./RectangleBase.o \
@@ -18,6 +20,7 @@ OBJS += \
 ./glutVideo.o 
 
 CPP_DEPS += \
+./Earth.d \
 ./Group.d \
 ./PNGLoader.d \
 ./RectangleBase.d \
