@@ -128,6 +128,7 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 
         iwidth);
+        
     glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, iwidth, iheight, GL_RGBA,
                     GL_UNSIGNED_BYTE, (GLvoid*)image );
                     

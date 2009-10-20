@@ -34,8 +34,8 @@ RectangleBase::RectangleBase( float _x, float _y )
     font = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
     font->FaceSize(100);
     
-    borderTex = PNGLoader::loadPNG( "/home/andrew/work/src/grav/Debug/border.png",
-                                    twidth, theight );
+    //borderTex = PNGLoader::loadPNG( "/home/andrew/work/src/grav/Debug/border.png",
+    //                                twidth, theight );
 }
 
 RectangleBase::~RectangleBase()
@@ -45,7 +45,9 @@ RectangleBase::~RectangleBase()
         myGroup->remove( this );
     printf( "removed from group\n" );
     
-    glDeleteTextures( 1, &borderTex );
+    // if this is set externally, then we shouldn't delete it since other
+    // things might be using it
+    //glDeleteTextures( 1, &borderTex );
     
     delete font;
     printf( "rectanglebase destructor ending\n" );
@@ -79,6 +81,12 @@ void RectangleBase::setScale( float xs, float ys )
 {
     destScaleX = xs; destScaleY = ys;
     if ( !animated) { scaleX = xs; scaleY = ys; }
+}
+
+void RectangleBase::setTexture( GLuint tex, int width, int height )
+{
+    borderTex = tex;
+    twidth = width; theight = height;
 }
 
 float RectangleBase::getX()
