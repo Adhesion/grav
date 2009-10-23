@@ -252,8 +252,8 @@ void RectangleBase::draw()
         fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
     }*/
     
-    float s = (float)twidth / (float)pow2( twidth );
-    float t = (float)theight / (float)pow2( theight );
+    float s = (float)twidth / (float)GLUtil::pow2( twidth );
+    float t = (float)theight / (float)GLUtil::pow2( theight );
     
     glBegin( GL_QUADS );
     // set the border color
