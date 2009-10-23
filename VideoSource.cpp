@@ -56,8 +56,8 @@ void VideoSource::draw()
         aspect = (float)vwidth / (float)vheight;
       else
         aspect = 1.33f;
-      tex_width = pow2(vwidth);
-      tex_height = pow2(vheight);
+      tex_width = GLUtil::pow2(vwidth);
+      tex_height = GLUtil::pow2(vheight);
       printf( "image size is %ix%i\n", vwidth, 
               vheight );
       printf( "texture size is %ix%i\n", tex_width, 
@@ -156,15 +156,16 @@ void VideoSource::scaleNative()
     // note: the weird number is because the Z of screen space does actually
     // have an effect - that's what is returned when doing a world->screen
     // conversion for any point at worldZ=0
-    screenToWorld( (double)0, (double)0, 0.990991f, &topLeftX, &topLeftY, &topLeftZ );
+    GLUtil::screenToWorld( (double)0, (double)0, 0.990991f,
+                            &topLeftX, &topLeftY, &topLeftZ );
     
     //printf( "top left of the screen in world coords is %f,%f,%f\n",
     //        topLeftX, topLeftY, topLeftZ );
     
     // now get the world space position of the video dimensions
     GLdouble dimX; GLdouble dimY; GLdouble dimZ;
-    screenToWorld( (GLdouble)vwidth, (GLdouble)vheight, 0.990991f,
-                    &dimX, &dimY, &dimZ );
+    GLUtil::screenToWorld( (GLdouble)vwidth, (GLdouble)vheight, 0.990991f,
+                            &dimX, &dimY, &dimZ );
     
     //printf( "video dims in world coords are %f,%f,%f\n",
     //        dimX, dimY, dimZ );

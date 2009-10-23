@@ -17,15 +17,18 @@ public:
     Earth();
     ~Earth();
     void draw();
-    void convertLatLong( float lat, float lon, float &x, float &y, float &z );
+    void convertLatLong( float lat, float lon, float &ex, float &ey,
+                        float &ez );
     void rotate( float x, float y, float z );
     
 private:
     GLuint earthTex;
     GLUquadric* sphereQuad;
     float x, y, z;
+    float radius;
     float xRot, yRot, zRot;
     int texWidth, texHeight;
+    float testLat;
     
 };
 

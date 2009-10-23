@@ -93,7 +93,7 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     printf( "bitDepth: %i, colorType: %i, RGBA: %i\n", bitDepth, colorType,
         PNG_COLOR_TYPE_RGBA );
     
-    int pwidth = pow2( iwidth ); int pheight = pow2( iheight );
+    int pwidth = GLUtil::pow2( iwidth ); int pheight = GLUtil::pow2( iheight );
     printf( "read in PNG: image dimensions: %ix%i, pow2 dimensions: %ix%i\n",
             iwidth, iheight, pwidth, pheight );
     
@@ -108,6 +108,7 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     for ( int i = 0; i < iheight; i++ )
         rowPointers[iheight - 1 - i] = image + (i * rowBytes);
         
+    // read in the image
     png_read_image( png, rowPointers );
     
     GLenum  gl_error = glGetError();
@@ -119,6 +120,7 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     glGenTextures( 1, &texID );
     glBindTexture( GL_TEXTURE_2D, texID );
     
+    // allocate a buffer for the pow2 size
     unsigned char *buffer = new unsigned char[pwidth * pheight * 4];
     memset(buffer, 128, pwidth * pheight * 4);
     
@@ -129,6 +131,7 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 
         iwidth);
         
+    // put the actual image in a sub-area of the pow2 memory area
     glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, iwidth, iheight, GL_RGBA,
                     GL_UNSIGNED_BYTE, (GLvoid*)image );
                     
@@ -139,11 +142,12 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     
     printf( "PNGLoader::generated ID is %i\n", texID );
     
+    
     png_destroy_read_struct( &png, &pngInfo, &pngEnd );
     delete[] image;
     delete[] rowPointers;
+    delete[] buffer;
     fclose( texfile );
     
     return texID;
-    
 }

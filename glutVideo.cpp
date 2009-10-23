@@ -284,8 +284,10 @@ static void glutKeyboard(unsigned char key, int x, int y)
                (*si)->getMetadata(VPMSession::VPMSESSION_SDES_LOC).c_str() );
         printf( "\tpos (world): %f,%f\n", (*si)->getX(), (*si)->getY() );
         GLdouble scrX; GLdouble scrY; GLdouble scrZ;
-        worldToScreen( (GLdouble)(*si)->getX(), (GLdouble)(*si)->getY(), 
-                        (GLdouble)(*si)->getZ(), &scrX, &scrY, &scrZ);
+        GLUtil::worldToScreen( (GLdouble)(*si)->getX(),
+                                (GLdouble)(*si)->getY(), 
+                                (GLdouble)(*si)->getZ(),
+                                &scrX, &scrY, &scrZ);
         printf( "\tpos (screen): %f,%f,%f\n", scrX, scrY, scrZ );
         printf( "\tis grouped? %i\n", (*si)->isGrouped() );
       }
@@ -413,8 +415,8 @@ void glutMouse( int button, int state, int x, int y )
         drawSelectionBox = false;
         
         // get world coords for current mouse pos
-        screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f, &mouseX, &mouseY,
-                        &mouseZ );
+        GLUtil::screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
+                                &mouseX, &mouseY, &mouseZ );
         
         printf( "mouse clicked at world %f,%f; screen %i,%i\n",
                 mouseX, mouseY, x, y );
@@ -488,8 +490,8 @@ void glutActiveMotion( int x, int y )
     y = windowHeight - y;
     
     // get world coords for current mouse pos
-    screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f, &mouseX, &mouseY,
-                    &mouseZ );
+    GLUtil::screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
+                            &mouseX, &mouseY, &mouseZ );
     
     dragEndX = mouseX;
     dragEndY = mouseY;
