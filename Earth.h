@@ -22,13 +22,19 @@ public:
     void rotate( float x, float y, float z );
     
 private:
+    // texture ID & info
     GLuint earthTex;
+    int texWidth, texHeight;
+    
     GLUquadric* sphereQuad;
+    
     float x, y, z;
     float radius;
     float xRot, yRot, zRot;
-    int texWidth, texHeight;
     float testLat;
+    
+    // keep track of the transformation matrix to use with lat/long conversion
+    GLdouble* matrix;
     
 };
 

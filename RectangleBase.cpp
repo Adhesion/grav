@@ -7,7 +7,7 @@
 #include "RectangleBase.h"
 #include "Group.h"
 #include "PNGLoader.h"
-#include "glutil.h"
+#include "GLUtil.h"
 #include <GL/glu.h>
 
 #include <cmath>
@@ -228,6 +228,7 @@ void RectangleBase::draw()
     // draw the border first
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    //glBlendFunc( GL_ONE, GL_ONE );
     
     /*printf( "DRAWPRE\n" );
     GLenum  gl_error = glGetError();

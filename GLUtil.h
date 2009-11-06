@@ -2,30 +2,26 @@
 #define GLUTIL_H_
 
 /**
- * @file glutil.h
+ * @file GLUtil.h
  * Miscellaneous functions for dealing with the 3d space, including coordinate
  * conversions, as well as some miscellaneous functions needed for texturing.
  * @author Andrew Ford
  */
 
 #include <GL/glu.h>
+#include <stdio.h>
 
 namespace GLUtil
 {
 
     // pointers to the GL matrices in question
-    GLdouble modelview[16];
-    GLdouble projection[16];
-    GLint viewport[4];
+    static GLdouble modelview[16];
+    static GLdouble projection[16];
+    static GLint viewport[4];
     
     // get the matrices that define the camera transforms so we can use those
     // to convert our coordinates
-    void updateMatrices()
-    {
-        glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-        glGetDoublev( GL_PROJECTION_MATRIX, projection );
-        glGetIntegerv( GL_VIEWPORT, viewport );
-    }
+    void updateMatrices();
     
     inline int pow2(int x) {
       int i;
@@ -36,60 +32,7 @@ namespace GLUtil
     /**
      * Prints out the current modelview, projection and viewport matrices.
      */
-    void printMatrices()
-    {
-        updateMatrices();
-        
-        printf( "printing modelview matrix:\n[" );
-        int c = 0;
-        for ( int i = 0; i < 16; i++ )
-        {
-            printf( "%f", modelview[c] );
-            if ( i % 4 == 3 )
-                printf( "]\n[" );
-            else
-                printf( " " );
-            if ( c >= 16 ) { c=c%16;c++; }
-            else c+=4;
-        }
-        c = 0;
-        
-        /*printf( "printing modelview matrix wrong\n[" );
-        for ( int i = 0; i < 16; i++ )
-        {
-            printf( "%f", modelview[i] );
-            if ( i % 4 == 3 )
-                printf( "]\n[" );
-            else
-                printf( " " );
-        }
-        c=0;*/
-        
-        printf( "printing projection matrix\n[" );
-        for ( int i = 0; i < 16; i++ )
-        {
-            printf( "%f", projection[c%16] );
-            if ( i % 4 == 3 )
-                printf( "]\n[" );
-            else
-                printf( " " );
-            c += 4;
-            if ( c >= 16 ) { c=c%16;c++; }
-            else c+=4;
-        }
-        c = 0;
-        
-        printf( "printing viewport matrix\n[" );
-        for ( int i = 0; i < 4; i++ )
-        {
-            printf( "%i", viewport[i] );
-            if ( i % 2 == 1 ) printf( "]\n" );
-            else if ( i == 1 ) printf( "[" );
-            else printf( " " );
-            if ( c >= 4 ) { c=c%4;c++; }
-            else c+=2;
-        }
-    }
+    void printMatrices();
      
     /**
      * Converts world coordinates to screen coordinates (ie, pixels)
@@ -100,15 +43,7 @@ namespace GLUtil
      *                              passed as pointers
      */
     void worldToScreen( GLdouble x, GLdouble y, GLdouble z,
-                                GLdouble* scrX, GLdouble* scrY, GLdouble* scrZ )
-    {
-        updateMatrices();
-        
-        GLint ret = gluProject( x, y, z, modelview, projection, viewport,
-                                scrX, scrY, scrZ );
-        if ( ret == 0 )
-            printf( "gluproject returned false\n" );
-    }
+                        GLdouble* scrX, GLdouble* scrY, GLdouble* scrZ );
     
     /**
      * Converts screen coordinates (ie, pixels) to world space
@@ -119,13 +54,7 @@ namespace GLUtil
      *                              passed as pointers
      */
     void screenToWorld( GLdouble scrX, GLdouble scrY, GLdouble scrZ,
-                                GLdouble* x, GLdouble* y, GLdouble* z )
-    {
-        updateMatrices();
-        
-        gluUnProject( scrX, scrY, scrZ, modelview, projection, viewport,
-                        x, y, z );
-    }
+                        GLdouble* x, GLdouble* y, GLdouble* z );
 
 }
 

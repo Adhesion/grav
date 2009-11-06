@@ -16,7 +16,7 @@
 #include <algorithm>
 
 #include "VideoSource.h"
-#include "glutil.h"
+#include "GLUtil.h"
 #include "RectangleBase.h"
 #include "Group.h"
 #include "Earth.h"
@@ -61,6 +61,10 @@ static float y = 5.0f;
 // mouse pos
 static GLdouble mouseX, mouseY, mouseZ;
 
+static float camX = 0.0f;
+static float camY = 0.0f;
+static float camZ = 9.0f;
+
 // start & end pos for click-and-dragging
 static float dragStartX;
 static float dragStartY;
@@ -88,6 +92,7 @@ int borderHeight;
 static void glutDisplay(void);
 static void glutReshape(int w, int h);
 static void glutKeyboard(unsigned char key, int x, int y);
+static void glutSpecialKey(int key, int x, int y);
 static void glutIdle(void);
 static void glutTimer(int v);
 static void glutMouse(int button, int state, int x, int y);
@@ -148,10 +153,13 @@ int main(int argc, char *argv[])
   glutDisplayFunc(glutDisplay);
   glutReshapeFunc(glutReshape);
   glutKeyboardFunc(glutKeyboard);
+  glutSpecialFunc(glutSpecialKey);
   glutTimerFunc(33, glutTimer, 33);
   glutIdleFunc(glutIdle);
   glutMouseFunc(glutMouse);
   glutMotionFunc(glutActiveMotion);
+  
+  glEnable( GL_DEPTH_TEST );
 
   glutMainLoop();
   return 0;
@@ -159,22 +167,60 @@ int main(int argc, char *argv[])
 
 static void glutDisplay(void)
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    
+    glLoadIdentity();
+    gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
     
     earth->draw();
     
+    // lat/long testing
+    float sx, sy, sz;
+    
+    earth->convertLatLong( 0.0f, 0.0f, sx, sy, sz );
+    glColor3f( 1.0f, 0.0f, 0.0f );
+    glBegin( GL_LINE );
+    glVertex3f( 0.0f, 0.0f, 0.0f );
+    glVertex3f( sx, sy, sz );
+    glEnd();
+    
+    earth->convertLatLong( 43.165556f, -77.611389f, sx, sy, sz );
+    glColor3f( 0.0f, 0.0f, 1.0f );
+    glBegin( GL_LINE );
+    glVertex3f( 0.0f, 0.0f, 0.0f );
+    glVertex3f( sx, sy, sz );
+    glEnd();
+    
+    earth->convertLatLong( 51.507778f, -0.128056f, sx, sy, sz );
+    glColor3f( 0.0f, 1.0f, 0.0f );
+    glBegin( GL_LINE );
+    glVertex3f( 0.0f, 0.0f, 0.0f );
+    glVertex3f( sx, sy, sz );
+    glEnd();
+    
     // iterate through all sources and draw here
+    // polygon offset to fix z-fighting of coplanar polygons (videos)
+    glEnable( GL_POLYGON_OFFSET_FILL );
+    //glPolygonOffset( 0.1, 1.0 );
+    
+    glPolygonMode( GL_FRONT, GL_FILL );
+    float pOffset = 0.1;
+    
     std::vector<RectangleBase*>::const_iterator si;
-    //printf( "drawing %i objects\n", drawnObjects.size() );
-    //printf( "there are %i video sources and %i groups\n",
-    //            sources.size(), siteIDGroups.size() );
+    
+    // this makes the depth buffer read-only for this bit - this prevents
+    // z-fighting on the videos which are coplanar
+    glDepthMask( GL_FALSE );
     for ( si = drawnObjects.begin(); si != drawnObjects.end(); si++ )
     {
         // only draw if not grouped - groups are responsible for
         // drawing their members
         if ( !(*si)->isGrouped() )
         {
+            //glDepthRange (0.1, 1.0);
+            //glPolygonOffset( 0.1, 0.9 );
 	        (*si)->draw();
+            //pOffset += 1/sources.size();
             //printf( "drawing %s\n", (*si)->getName().c_str() );
         }
         else
@@ -183,6 +229,8 @@ static void glutDisplay(void)
             //printf( "its group is %s\n", (*si)->getGroup()->getName().c_str() );
         }
     }
+    // back to writeable z-buffer for proper earth/line rendering
+    glDepthMask( GL_TRUE );
     
     // draw the click-and-drag selection box
     if ( holdCounter > 1 && drawSelectionBox )
@@ -216,6 +264,8 @@ static void glutDisplay(void)
         
 	    glDisable(GL_BLEND);
     }
+    
+    glDisable( GL_POLYGON_OFFSET_FILL );
     
     glutSwapBuffers();
     
@@ -335,17 +385,17 @@ static void glutKeyboard(unsigned char key, int x, int y)
     }
     break;
     
-  case 'a':
-    earth->rotate( 0.0f, 0.0f, -2.0f );
-    break;
-  case 'd':
-    earth->rotate( 0.0f, 0.0f, 2.0f );
-    break;
   case 'w':
-    earth->rotate( -2.0f, 0.0f, 0.0f );
+    camZ--;
     break;
   case 's':
-    earth->rotate( 2.0f, 0.0f, 0.0f );
+    camZ++;
+    break;
+  case 'a':
+    camX--;
+    break;
+  case 'd':
+    camX++;
     break;
 
   case 'q':
@@ -353,6 +403,26 @@ static void glutKeyboard(unsigned char key, int x, int y)
     exit(0);
     break;
   }
+  
+}
+
+void glutSpecialKey( int key, int x, int y )
+{
+    switch( key )
+    {
+        case GLUT_KEY_LEFT:
+            earth->rotate( 0.0f, 0.0f, -2.0f );
+            break;
+        case GLUT_KEY_RIGHT:
+            earth->rotate( 0.0f, 0.0f, 2.0f );
+            break;
+        case GLUT_KEY_UP:
+            earth->rotate( -2.0f, 0.0f, 0.0f );
+            break;
+        case GLUT_KEY_DOWN:
+            earth->rotate( 2.0f, 0.0f, 0.0f );
+            break;
+    }
 }
 
 void glutIdle(void)
@@ -387,12 +457,13 @@ void glutReshape(int w, int h)
   if (perspective_mode) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-
-    glFrustum(-screen_width/10.0, screen_width/10.0, -screen_height/10.0, screen_height/10.0, 0.1, 50.0);
+    glFrustum(-screen_width/10.0, screen_width/10.0, 
+              -screen_height/10.0, screen_height/10.0,
+              0.1, 50.0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
   } else {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -637,8 +708,8 @@ void ungroupAll()
 
 void retileVideos()
 {
-    x = -9.0f;
-    y = 7.0f;
+    x = -7.0f;
+    y = 5.5f;
     float buffer = 1.0f; // space between videos
     
     std::vector<RectangleBase*>::iterator si;
@@ -653,7 +724,7 @@ void retileVideos()
                     (*next)->getWidth()/2;
             if ( x > 8.0f )
             {
-                x = -9.0f;
+                x = -7.0f;
                 y -= (*si)->getHeight()/2 + buffer +
                         (*next)->getHeight()/2;
             }
