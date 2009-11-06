@@ -5,7 +5,7 @@
  */
 
 #include "VideoSource.h"
-#include "glutil.h"
+#include "GLUtil.h"
 #include <cmath>
 
 VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
@@ -39,7 +39,10 @@ void VideoSource::draw()
     glRotatef(angle, 0.0, 1.0, 0.0);
     glTranslatef(x,y,z);
     
+    //glDepthMask( GL_FALSE );
     RectangleBase::draw();
+    //glDepthRange (0.0, 0.9);
+    //glPolygonOffset( 0.2, 0.8 );
     
     float s = 1.0;
     float t = 1.0;

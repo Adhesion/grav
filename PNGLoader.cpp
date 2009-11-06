@@ -12,7 +12,7 @@
 #include <png.h>
 #include <GL/gl.h>
 
-#include "glutil.h"
+#include "GLUtil.h"
 #include "PNGLoader.h"
 
 GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
