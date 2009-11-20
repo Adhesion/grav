@@ -20,6 +20,7 @@ public:
     void convertLatLong( float lat, float lon, float &ex, float &ey,
                         float &ez );
     void rotate( float x, float y, float z );
+    float getX(); float getY(); float getZ();
     
 private:
     // texture ID & info

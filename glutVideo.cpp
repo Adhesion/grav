@@ -16,6 +16,7 @@
 #include <algorithm>
 
 #include "VideoSource.h"
+#include "AudioManager.h"
 #include "GLUtil.h"
 #include "RectangleBase.h"
 #include "Group.h"
@@ -46,6 +47,11 @@ public:
 static VPMSession *session;
 static uint32_t session_ts;
 static listener session_listener;
+
+static bool audioEnabled;
+static VPMSession *audioSession;
+static uint32_t audioSession_ts;
+static AudioManager audioSession_listener;
 
 static float screen_width;
 static float screen_height;
@@ -108,6 +114,9 @@ static void retileVideos();
 static void moveToTop( RectangleBase* object );
 static void moveToTop( std::vector<RectangleBase*>::iterator i );
 
+static void drawCurvedEarthLine( float lat, float lon, 
+                                float dx, float dy, float dz );
+
 static std::vector<VideoSource*> sources;
 static std::vector<RectangleBase*> drawnObjects;
 static std::vector<RectangleBase*> selectedObjects;
@@ -120,27 +129,46 @@ int main(int argc, char *argv[])
 {
   glutInit(&argc, argv);
 
-  if (argc != 2) {
-    fprintf(stderr, "error: usage %s <ipaddr/port>\n", argv[0]);
+  if (argc != 2 && argc != 3) {
+    fprintf(stderr, "error: usage %s <video ipaddr/port>\n", argv[0]);
     return -1;
   }
+  
+  if ( argc == 3 ) audioEnabled = true;
+  else audioEnabled = false;
 
   vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
 
   VPMSessionFactory *sf = VPMSessionFactory::getInstance();
 
   session = sf->createSession(argv[1], session_listener);
-
+  
   session->enableVideo(true);
   session->enableAudio(false);
-  session->enableOther(true);
-
+  session->enableOther(false);
+  
   if (!session->initialise()) {
     fprintf(stderr, "error: failed to initialise session\n");
     return -1;
   }
+  
+  if ( audioEnabled )
+  {
+      audioSession = sf->createSession(argv[2],
+                            audioSession_listener);
+      
+      audioSession->enableVideo(false);
+      audioSession->enableAudio(true);
+      audioSession->enableOther(false);
+      
+      if (!audioSession->initialise()) {
+        fprintf(stderr, "error: failed to initialise audioSession\n");
+        return -1;
+      }
+  }
 
   session_ts = random32();
+  audioSession_ts = random32();
 
   glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize(windowWidth, windowHeight);
@@ -167,6 +195,8 @@ int main(int argc, char *argv[])
 
 static void glutDisplay(void)
 {
+    //audioSession_listener.printLevels();
+    
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
     glLoadIdentity();
@@ -174,43 +204,24 @@ static void glutDisplay(void)
     
     earth->draw();
     
-    // lat/long testing
-    float sx, sy, sz;
-    
-    earth->convertLatLong( 0.0f, 0.0f, sx, sy, sz );
-    glColor3f( 1.0f, 0.0f, 0.0f );
-    glBegin( GL_LINE );
-    glVertex3f( 0.0f, 0.0f, 0.0f );
-    glVertex3f( sx, sy, sz );
-    glEnd();
-    
-    earth->convertLatLong( 43.165556f, -77.611389f, sx, sy, sz );
-    glColor3f( 0.0f, 0.0f, 1.0f );
-    glBegin( GL_LINE );
-    glVertex3f( 0.0f, 0.0f, 0.0f );
-    glVertex3f( sx, sy, sz );
-    glEnd();
-    
-    earth->convertLatLong( 51.507778f, -0.128056f, sx, sy, sz );
-    glColor3f( 0.0f, 1.0f, 0.0f );
-    glBegin( GL_LINE );
-    glVertex3f( 0.0f, 0.0f, 0.0f );
-    glVertex3f( sx, sy, sz );
-    glEnd();
+    GLUquadric* sphereQuad = gluNewQuadric();
+    gluSphere( sphereQuad, audioSession_listener.getLevelAvg()*50.0f,
+                200, 200 );
     
     // iterate through all sources and draw here
     // polygon offset to fix z-fighting of coplanar polygons (videos)
-    glEnable( GL_POLYGON_OFFSET_FILL );
+    //glEnable( GL_POLYGON_OFFSET_FILL );
     //glPolygonOffset( 0.1, 1.0 );
     
-    glPolygonMode( GL_FRONT, GL_FILL );
-    float pOffset = 0.1;
+    //glPolygonMode( GL_FRONT, GL_FILL );
+    //float pOffset = 0.1;
     
     std::vector<RectangleBase*>::const_iterator si;
     
     // this makes the depth buffer read-only for this bit - this prevents
     // z-fighting on the videos which are coplanar
     glDepthMask( GL_FALSE );
+    
     for ( si = drawnObjects.begin(); si != drawnObjects.end(); si++ )
     {
         // only draw if not grouped - groups are responsible for
@@ -219,7 +230,27 @@ static void glutDisplay(void)
         {
             //glDepthRange (0.1, 1.0);
             //glPolygonOffset( 0.1, 0.9 );
-	        (*si)->draw();
+            if ( audioEnabled )
+            {
+                if ( (*si)->getSiteID().compare("") != 0 )
+                {
+                    float level;
+                    level = audioSession_listener.getLevel( 
+                                    (*si)->getSiteID() );
+                    // -2.0f is our default value for not finding the level
+                    if ( level > -1.999f )
+                        (*si)->setEffectVal( (level*2.0f) );
+                }
+            }
+            
+            // draw line to geographical position
+            glDepthMask( GL_TRUE );
+            drawCurvedEarthLine( (*si)->getLat(), (*si)->getLon(),
+                                (*si)->getX(), (*si)->getY(), (*si)->getZ() );
+            glDepthMask( GL_FALSE );
+            
+            (*si)->draw();
+            
             //pOffset += 1/sources.size();
             //printf( "drawing %s\n", (*si)->getName().c_str() );
         }
@@ -228,6 +259,9 @@ static void glutDisplay(void)
             //printf( "%s is grouped, not drawing\n", (*si)->getName().c_str() );
             //printf( "its group is %s\n", (*si)->getGroup()->getName().c_str() );
         }
+        //printf( "glutDisplay: siteID: %s level %f\n", 
+        //        (*si)->getSiteID().c_str(),
+        //        audioSession_listener.getLevel( (*si)->getSiteID().c_str() ) );
     }
     // back to writeable z-buffer for proper earth/line rendering
     glDepthMask( GL_TRUE );
@@ -265,7 +299,7 @@ static void glutDisplay(void)
 	    glDisable(GL_BLEND);
     }
     
-    glDisable( GL_POLYGON_OFFSET_FILL );
+    //glDisable( GL_POLYGON_OFFSET_FILL );
     
     glutSwapBuffers();
     
@@ -332,6 +366,7 @@ static void glutKeyboard(unsigned char key, int x, int y)
                (*si)->getMetadata(VPMSession::VPMSESSION_SDES_CNAME).c_str() );
         printf( "loc: %s\n", 
                (*si)->getMetadata(VPMSession::VPMSESSION_SDES_LOC).c_str() );
+        printf( "ssrc 0x%08x\n", (*si)->getssrc() );
         printf( "\tpos (world): %f,%f\n", (*si)->getX(), (*si)->getY() );
         GLdouble scrX; GLdouble scrY; GLdouble scrZ;
         GLUtil::worldToScreen( (GLdouble)(*si)->getX(),
@@ -428,6 +463,7 @@ void glutSpecialKey( int key, int x, int y )
 void glutIdle(void)
 {
     session->iterate(session_ts ++);
+    if ( audioEnabled ) audioSession->iterate(audioSession_ts++);
 }
 
 void glutTimer(int ms)
@@ -756,6 +792,40 @@ void moveToTop( std::vector<RectangleBase*>::iterator i )
     }
 }
 
+void drawCurvedEarthLine( float lat, float lon, float dx, float dy, float dz )
+{
+    float sx, sy, sz;
+    earth->convertLatLong( lat, lon, sx, sy, sz );
+    float vecX = (sx - earth->getX()) * 0.1f;
+    float vecY = (sy - earth->getY()) * 0.1f;
+    float vecZ = (sz - earth->getZ()) * 0.1f;
+    float tx = vecX + sx;
+    float ty = vecY + sy;
+    float tz = vecZ + sz;
+    
+    int iter = 10;
+    
+    glColor3f( 0.0f, 1.0f, 0.0f );
+    glLineWidth( 2.0f );
+    glBegin( GL_LINE_STRIP );
+    glVertex3f( sx, sy, sz );
+    for ( int i = 0; i < iter; i++ )
+    {
+        glVertex3f( tx, ty, tz );
+        float weight = ((float)(iter-i))/(float)iter;
+        weight *= weight;
+        tx += (vecX  * weight) +
+                ((dx-tx) * (1.0f-weight));
+        ty += (vecY * weight) +
+                ((dy-ty) * (1.0f-weight));
+        tz += (vecZ * weight) +
+                ((dz-tz) * (1.0f-weight));
+    }
+    //glVertex3f( tx, ty, tz );
+    //glVertex3f( dx, dy, sz );
+    glEnd();
+}
+
 listener::listener()
 {
 }
@@ -852,10 +922,15 @@ listener::vpmsession_source_app(VPMSession &session,
     //printf( "data: %s\n", data );
     
     std::string appS( app, 4 );
-    std::string dataS( data );
+    std::string dataS( data, data_len );
+    printf( "listener::RTCP_APP: %s,%s\n", appS.c_str(), dataS.c_str() );
+    printf( "listener::RTCP_APP: data length is %i\n", data_len );
     
     if ( appS.compare( "site" ) == 0 && enableSiteIDGroups )
     {
+        // vic sends 4 nulls at the end of the rtcp_app string for some reason,
+        // so chop those off
+        dataS = std::string( dataS, 0, 32 );
         std::vector<VideoSource*>::iterator i = sources.begin();
         //printf( "in rtcp app, got %i sources\n", sources.size() );
         while ( (*i)->getssrc() != ssrc ) 
@@ -881,6 +956,7 @@ listener::vpmsession_source_app(VPMSession &session,
             {
                 g = new Group(0.0f,0.0f);
                 g->setName( dataS );
+                g->setSiteID( dataS );
                 g->setTexture( borderTex, borderWidth, borderHeight );
                 drawnObjects.push_back( g );
                 siteIDGroups.insert( std::pair<std::string,Group*>(dataS, g) );
@@ -890,6 +966,7 @@ listener::vpmsession_source_app(VPMSession &session,
                 g = mapi->second;
             }
             
+            (*i)->setSiteID( dataS );
             g->add( *i );
             retileVideos();
         }

@@ -30,7 +30,7 @@ class RectangleBase
 
 public:
     RectangleBase( float _x, float _y );
-    ~RectangleBase();
+    virtual ~RectangleBase();
 
     /*
      * Returns the width or height of the object. These are virtual because
@@ -59,11 +59,17 @@ public:
     
     float getX(); float getY(); float getZ();
     float getScaleX(); float getScaleY();
+    float getLat(); float getLon();
+    
     void setName( std::string s );
+    void setSiteID( std::string sid );
     std::string getName();
     std::string getSubName();
+    std::string getSiteID();
+    
     bool isSelected();
     void setSelect( bool select );
+    void setEffectVal( float f );
     
     /*
      * Is this object a member of a group?
@@ -112,11 +118,16 @@ protected:
     float scaleX, scaleY;
     float destScaleX, destScaleY;
     
+    float effectVal; // value for the amplitude of the audio connection
+    
+    float lat, lon; // for global positioning
+    
     RGBAColor borderColor;
     RGBAColor destBColor;
     RGBAColor baseBColor;
     
     std::string name;
+    std::string siteID;
     int nameStart, nameEnd; // substring of the name to render
     bool finalName;
     
