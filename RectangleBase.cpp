@@ -20,16 +20,21 @@ RectangleBase::RectangleBase( float _x, float _y )
     destX = _x; destY = _y;
     destScaleX = scaleX; destScaleY = scaleY;
     selected = false;
+    
     destBColor.R = 1.0f; destBColor.G = 1.0f;
     destBColor.B = 1.0f; destBColor.A = 0.7f;
     borderColor = destBColor;
     baseBColor = destBColor;
+    
     animated = true;
     finalName = false;
     nameStart = -1; nameEnd = -1;
     name = "";
     myGroup = NULL;
     twidth = 0; theight = 0;
+    effectVal = 0.0f;
+    
+    lat = 43.165556f; lon = -77.611389f;
     
     font = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
     font->FaceSize(100);
@@ -114,9 +119,24 @@ float RectangleBase::getScaleY()
     return scaleY;
 }
 
+float RectangleBase::getLat()
+{
+    return lat;
+}
+
+float RectangleBase::getLon()
+{
+    return lon;
+}
+
 void RectangleBase::setName( std::string s )
 {
     name = s;
+}
+
+void RectangleBase::setSiteID( std::string sid )
+{
+    siteID = sid;
 }
 
 std::string RectangleBase::getName()
@@ -130,6 +150,11 @@ std::string RectangleBase::getSubName()
         return name.substr( nameStart, nameEnd-nameStart );
     else
         return name;
+}
+
+std::string RectangleBase::getSiteID()
+{
+    return siteID;
 }
 
 bool RectangleBase::isSelected()
@@ -152,6 +177,11 @@ void RectangleBase::setSelect( bool select )
     
     if ( !animated )
         borderColor = destBColor;
+}
+
+void RectangleBase::setEffectVal( float f )
+{
+    effectVal = f;
 }
 
 bool RectangleBase::isGrouped()
@@ -256,10 +286,14 @@ void RectangleBase::draw()
     float s = (float)twidth / (float)GLUtil::pow2( twidth );
     float t = (float)theight / (float)GLUtil::pow2( theight );
     
+    glScalef( 1.0f+effectVal, 1.0f+effectVal, 0.0f );
+    
     glBegin( GL_QUADS );
     // set the border color
-    glColor4f( borderColor.R, borderColor.G, 
-                borderColor.B, borderColor.A );
+    glColor4f( borderColor.R-(effectVal*3.0f), 
+               borderColor.G-(effectVal*3.0f), 
+               borderColor.B+(effectVal*6.0f),
+               borderColor.A+(effectVal*3.0f) );
     
     glTexCoord2f(0.0, 0.0);
     glVertex3f(-getWidth()/2.0-0.3, -getHeight()/2.0-0.3, 0.0);

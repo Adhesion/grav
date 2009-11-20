@@ -194,3 +194,18 @@ void Earth::rotate( float x, float y, float z )
     yRot += y;
     zRot += z;
 }
+
+float Earth::getX()
+{
+    return x;
+}
+
+float Earth::getY()
+{
+    return y;
+}
+
+float Earth::getZ()
+{
+    return z;
+}

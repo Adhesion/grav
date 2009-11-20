@@ -4,6 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../AudioManager.cpp \
 ../Earth.cpp \
 ../GLUtil.cpp \
 ../Group.cpp \
@@ -13,6 +14,7 @@ CPP_SRCS += \
 ../glutVideo.cpp 
 
 OBJS += \
+./AudioManager.o \
 ./Earth.o \
 ./GLUtil.o \
 ./Group.o \
@@ -22,6 +24,7 @@ OBJS += \
 ./glutVideo.o 
 
 CPP_DEPS += \
+./AudioManager.d \
 ./Earth.d \
 ./GLUtil.d \
 ./Group.d \
