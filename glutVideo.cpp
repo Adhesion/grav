@@ -218,6 +218,18 @@ static void glutDisplay(void)
     
     std::vector<RectangleBase*>::const_iterator si;
     
+    for ( si = drawnObjects.begin(); si != drawnObjects.end(); si++ )
+    {
+        if ( !(*si)->isGrouped() )
+        {
+            // draw line to geographical position
+            //glDepthMask( GL_TRUE );
+            drawCurvedEarthLine( (*si)->getLat(), (*si)->getLon(),
+                                (*si)->getX(), (*si)->getY(), (*si)->getZ() );
+            //glDepthMask( GL_FALSE );
+        }
+    }
+    
     // this makes the depth buffer read-only for this bit - this prevents
     // z-fighting on the videos which are coplanar
     glDepthMask( GL_FALSE );
@@ -242,12 +254,6 @@ static void glutDisplay(void)
                         (*si)->setEffectVal( (level*2.0f) );
                 }
             }
-            
-            // draw line to geographical position
-            glDepthMask( GL_TRUE );
-            drawCurvedEarthLine( (*si)->getLat(), (*si)->getLon(),
-                                (*si)->getX(), (*si)->getY(), (*si)->getZ() );
-            glDepthMask( GL_FALSE );
             
             (*si)->draw();
             
@@ -923,8 +929,8 @@ listener::vpmsession_source_app(VPMSession &session,
     
     std::string appS( app, 4 );
     std::string dataS( data, data_len );
-    printf( "listener::RTCP_APP: %s,%s\n", appS.c_str(), dataS.c_str() );
-    printf( "listener::RTCP_APP: data length is %i\n", data_len );
+    //printf( "listener::RTCP_APP: %s,%s\n", appS.c_str(), dataS.c_str() );
+    //printf( "listener::RTCP_APP: data length is %i\n", data_len );
     
     if ( appS.compare( "site" ) == 0 && enableSiteIDGroups )
     {
