@@ -40,7 +40,7 @@ endif
 all: grav
 
 dependents:
-	-cd /home/andrew/work/src/VP/VPMedia && $(MAKE) clean all
+	-cd /home/andrew/work/src/VP/VPMedia && $(MAKE) all
 
 # Tool invocations
 grav: $(OBJS) $(USER_OBJS)

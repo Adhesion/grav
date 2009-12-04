@@ -372,10 +372,10 @@ void RectangleBase::draw()
 void RectangleBase::animateValues()
 {
     // movement animation
-    x += (destX-x)/10.0f;
-    y += (destY-y)/10.0f;
-    scaleX += (destScaleX-scaleX)/10.0f;
-    scaleY += (destScaleY-scaleY)/10.0f;
+    x += (destX-x)/7.5f;
+    y += (destY-y)/7.5f;
+    scaleX += (destScaleX-scaleX)/7.5f;
+    scaleY += (destScaleY-scaleY)/7.5f;
     
     borderColor.R += (destBColor.R-borderColor.R)/3.0f;
     borderColor.G += (destBColor.G-borderColor.G)/3.0f;

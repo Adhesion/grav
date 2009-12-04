@@ -20,10 +20,8 @@
 <listOptionValue builtIn="false" value="ftgl"/>
 <listOptionValue builtIn="false" value="VPMedia"/>
 <listOptionValue builtIn="false" value="m"/>
-<listOptionValue builtIn="false" value="theora"/>
 <listOptionValue builtIn="false" value="pthread"/>
 <listOptionValue builtIn="false" value="uclmmbase"/>
-<listOptionValue builtIn="false" value="dv"/>
 <listOptionValue builtIn="false" value="swscale"/>
 <listOptionValue builtIn="false" value="avcodec"/>
 <listOptionValue builtIn="false" value="png"/>

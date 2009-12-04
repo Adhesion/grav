@@ -8,6 +8,7 @@ CPP_SRCS += \
 ../Earth.cpp \
 ../GLUtil.cpp \
 ../Group.cpp \
+../InputHandler.cpp \
 ../PNGLoader.cpp \
 ../RectangleBase.cpp \
 ../VideoSource.cpp \
@@ -18,6 +19,7 @@ OBJS += \
 ./Earth.o \
 ./GLUtil.o \
 ./Group.o \
+./InputHandler.o \
 ./PNGLoader.o \
 ./RectangleBase.o \
 ./VideoSource.o \
@@ -28,6 +30,7 @@ CPP_DEPS += \
 ./Earth.d \
 ./GLUtil.d \
 ./Group.d \
+./InputHandler.d \
 ./PNGLoader.d \
 ./RectangleBase.d \
 ./VideoSource.d \
