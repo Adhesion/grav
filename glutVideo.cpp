@@ -62,17 +62,6 @@ static float screen_height;
 static float x = -7.5f;
 static float y = 5.0f;
 
-static float camX = 0.0f;
-static float camY = 0.0f;
-static float camZ = 9.0f;
-
-// for checking click-and-drag
-//static bool lastBoxed; // was our last selection a boxed selection?
-//static int holdCounter;
-
-// for enabling siteID-based groups
-//static bool enableSiteIDGroups;
-
 // background texture for groups & video objects
 static GLuint borderTex;
 int borderWidth;
@@ -169,7 +158,7 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-static void glutDisplay(void)
+void glutDisplay(void)
 {
     grav->draw();
 }
@@ -212,7 +201,9 @@ void glutReshape(int w, int h)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
+    gluLookAt(grav->getCamX(), grav->getCamY(), grav->getCamZ(),
+              0.0, 0.0, -25.0,
+              0.0, 1.0, 0.0);
   } else {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -247,6 +238,9 @@ gravManager::gravManager()
 {
     windowWidth = 800; windowHeight = 600;
     holdCounter = 0;
+    camX = 0.0f;
+    camY = 0.0f;
+    camZ = 9.0f;
 }
 
 gravManager::~gravManager()
@@ -464,8 +458,9 @@ void gravManager::moveToTop( std::vector<RectangleBase*>::iterator i )
 }
 
 void gravManager::drawCurvedEarthLine( float lat, float lon,
-                                float dx, float dy, float dz )
+                                float destx, float desty, float destz )
 {
+    // old method
     float sx, sy, sz;
     earth->convertLatLong( lat, lon, sx, sy, sz );
     float vecX = (sx - earth->getX()) * 0.1f;
@@ -487,15 +482,156 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
         float weight = ((float)(iter-i))/(float)iter;
         weight *= weight;
         tx += (vecX  * weight) +
-                ((dx-tx) * (1.0f-weight));
+                ((destx-tx) * (1.0f-weight));
         ty += (vecY * weight) +
-                ((dy-ty) * (1.0f-weight));
+                ((desty-ty) * (1.0f-weight));
         tz += (vecZ * weight) +
-                ((dz-tz) * (1.0f-weight));
+                ((destz-tz) * (1.0f-weight));
     }
     //glVertex3f( tx, ty, tz );
     //glVertex3f( dx, dy, sz );
     glEnd();
+        
+    // new method
+    /*
+    float earthx, earthy, earthz;
+    earth->convertLatLong( lat, lon, earthx, earthy, earthz );
+    
+    // this vector starts out as the one pointing into the lat/lon point,
+    // along the line to the center of the earth
+    float earthVecX = (earthx - earth->getX()) * -0.2f;
+    float earthVecY = (earthy - earth->getY()) * -0.2f;
+    float earthVecZ = (earthz - earth->getZ()) * -0.2f;
+    
+    // this assumes that the general direction between the destination points
+    // and the earth is along the z-axis
+    
+    glColor3f( 0.0f, 1.0f, 0.0f );
+    glLineWidth( 2.0f );
+    
+    float fx = earthx;
+    float fy = earthy;
+    float fz;
+    
+    // if the point isn't blocked by the earth, draw straight line
+    
+    // move the first target point towards the camera based on how far the
+    // object is from the earth point in x/y
+    float xydiff = (abs(destx-earthx)+abs(desty-earthy))/
+                                            1.5f;
+    printf( "xydiff: %f\n", xydiff );
+    if ( earthz > earth->getZ() )
+    {
+        fz = earthz;
+    }
+    else
+    {
+        printf( "behind\n" );
+        fz = earth->getZ() + abs((earthz-earth->getZ()));
+    }
+    fz = std::min( fz+xydiff, destz-1.0f );
+    
+    // shift the x/y out a bit on the edges
+    fx += destx-earthx/7.0f;
+    fy += desty-earthy/7.0f;
+    
+    // go out to the radius of the earth, then average the path
+    // to travel progressively from -Z to the vector pointing directly to the
+    // point on the earth
+
+    float zDist = earthz - destz;
+    int iter = ceil( abs(zDist/2.0f) );
+    printf( "%i iterations\n", iter );
+    //printf( "in averaging mode\n" );
+    
+    // find the radius point
+    float rx, ry, rz;
+    rz = earth->getZ();
+    float xDist = earthx - earth->getX();
+    float yDist = earthy - earth->getY();
+    float curRadius = sqrt((xDist)*(xDist) +
+                           (yDist)*(yDist));
+    printf( "radius & curradius: %f, %f\n", earth->getRadius(), curRadius );
+    rx = earth->getX() + (xDist*(earth->getRadius()*1.7f/curRadius));
+    ry = earth->getY() + (yDist*(earth->getRadius()*1.7f/curRadius));
+    printf( "radiuspoint: %f,%f,%f\n", rx,ry,rz );
+    
+    // draw & average the vectors
+    float tx = destx, ty = desty, tz = destz;
+    */  
+    //glVertex3f( destx, desty, destz );
+    /*printf( "earth x,y: %f,%f\n", earthx, earthy );
+    printf( "fx,fy,fz: %f,%f,%f\n", fx, fy, fz );
+    int numVecs = 4;
+    int vecs[numVecs][3];
+    vecs[0][0] = (fx-tx)/2.0f; vecs[0][1] = (fy-ty)/2.0f;
+                vecs[0][2] = (fz-tz)/2.0f;
+    vecs[1][0] = (rx-fx)/5.0f; vecs[1][1] = (ry-fy)/5.0f;
+                vecs[1][2] = (rz-fz)/5.0f;
+    vecs[2][0] = 0.0f;  vecs[2][1] = 0.0f;  vecs[2][2] = -0.5f;
+    vecs[3][0] = earthVecX; vecs[3][1] = earthVecY;
+                vecs[3][2] = earthVecZ;*/
+    
+    /*glBegin( GL_LINE_STRIP );
+    for ( int n = 0; n < 1; n++ )
+    {
+        for ( int i = 0; i < iter; i++ )
+        {
+            glVertex3f( tx, ty, tz );
+            float weight = ((float)(iter-i))/(float)iter;
+            weight *= weight;
+            tx += (vecs[n][0] * weight) +
+                    (vecs[n+1][0] * (1.0f-weight));
+            ty += (vecs[n][1] * weight) +
+                    (vecs[n+1][1] * (1.0f-weight));
+            tz += (vecs[n][2] * weight) +
+                    (vecs[n+1][2] * (1.0f-weight));
+        }
+    }
+    glEnd();*/
+    
+    /*
+    // method: add the start vector, averaging in the pointing-in vector, then
+    // if we get close to the earth, average in the pointing-out vector
+    float distance = sqrt(((earthx-tx)*(earthx-tx))+
+                         ((earthy-ty)*(earthy-ty))+
+                         ((earthz-tz)*(earthz-tz)));
+    //printf( "starting distance: %f\n", distance );
+    float startVecX = (fx-destx)/7.0f;
+    float startVecY = (fy-desty)/7.0f;
+    float startVecZ = (fz-destz)/7.0f;
+    float vecX = startVecX; float vecY = startVecY; float vecZ = startVecZ;
+    int count = 0;
+    
+    glColor3f( 0.0f, 0.0f, 1.0f );
+    glBegin(GL_LINE_STRIP);
+    while ( count < iter )
+    {
+        glVertex3f( tx, ty, tz );
+        tx += vecX; ty += vecY; tz += vecZ;
+        float weight = ((float)(iter-count))/(float)iter;
+        
+        vecX = (vecX*weight)+(earthVecX*(1-weight));
+        vecY = (vecY*weight)+(earthVecY*(1-weight));
+        vecZ = (vecZ*weight)+(earthVecZ*(1-weight));
+        //distance = sqrt(((earthx-tx)*(earthx-tx))+
+        //               ((earthy-ty)*(earthy-ty))+
+        //                ((earthz-tz)*(earthz-tz)));
+        //printf( "distance: %f\n", distance );
+        count++;
+    }
+    glVertex3f( earthx, earthy, earthz );
+    glEnd();
+    
+    // test render of lines with no averaging
+    glColor3f( 1.0f, 0.0f, 0.0f );
+    glBegin(GL_LINE_STRIP);
+    glVertex3f( destx, desty, destz );
+    glVertex3f( fx, fy, fz );
+    //glVertex3f( rx, ry, rz );
+    //glVertex3f( earthx, earthy, earthz );
+    glEnd();
+    */
 }
 
 void gravManager::setBoxSelectDrawing( bool draw )
@@ -536,6 +672,41 @@ void gravManager::setSiteIDGrouping( bool site )
 void gravManager::incrementHoldCounter()
 {
     if ( holdCounter < 25 ) holdCounter++;
+}
+
+int gravManager::getHoldCounter()
+{
+    return holdCounter;
+}
+
+float gravManager::getCamX()
+{
+    return camX;
+}
+
+float gravManager::getCamY()
+{
+    return camY;
+}
+
+float gravManager::getCamZ()
+{
+    return camZ;
+}
+
+void gravManager::setCamX( float x )
+{
+    camX = x;
+}
+
+void gravManager::setCamY( float y )
+{
+    camY = y;
+}
+
+void gravManager::setCamZ( float z )
+{
+    camZ = z;
 }
 
 listener::listener()

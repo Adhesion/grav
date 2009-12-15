@@ -71,12 +71,7 @@ void Group::remove( RectangleBase* object )
     object->setGroup( NULL );
     std::vector<RectangleBase*>::iterator i = objects.begin();
     while ( *i != object ) i++;
-    printf( "in group %s, numObjects before erase: %i\n", name.c_str(),
-            objects.size() );
-    printf( "object (iterator): %s\n", (*i)->getName().c_str() );
     objects.erase( i );
-    printf( "in group %s, numObjects after erase: %i\n", name.c_str(),
-            objects.size() );
     if ( objects.size() > 0 )
         rearrange();
 }
@@ -106,6 +101,10 @@ bool Group::isGroup()
 
 void Group::rearrange()
 {
+    // it doesn't make sense to rearrange 0 objects, plus having objects.size
+    // = 0 will cause div by 0 crashes later
+    if ( objects.size() == 0 ) return;
+    
     float largestWidth = 0.0f, largestHeight = 0.0f; // for finding the biggest
                                                      // object in the group
                                                      
