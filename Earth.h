@@ -21,6 +21,7 @@ public:
                         float &ez );
     void rotate( float x, float y, float z );
     float getX(); float getY(); float getZ();
+    float getRadius();
     
 private:
     // texture ID & info

@@ -209,3 +209,8 @@ float Earth::getZ()
 {
     return z;
 }
+
+float Earth::getRadius()
+{
+    return radius;
+}

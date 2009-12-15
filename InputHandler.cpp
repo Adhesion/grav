@@ -25,6 +25,8 @@ InputHandler::InputHandler( std::vector<VideoSource*>* source,
 {
     tempSelectedObjects = new std::vector<RectangleBase*>();
     dragging = false;
+    clickedInside = false;
+    leftButtonHeld = false;
 }
 
 InputHandler::~InputHandler()
@@ -150,18 +152,18 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             }
             break;
         
-          /*case 'w':
-            camZ--;
+          case 'w':
+            grav->setCamZ(grav->getCamZ()-1);
             break;
           case 's':
-            camZ++;
+            grav->setCamZ(grav->getCamZ()+1);
             break;
           case 'a':
-            camX--;
+            grav->setCamX(grav->getCamX()-1);
             break;
           case 'd':
-            camX++;
-            break;*/
+            grav->setCamX(grav->getCamX()+1);
+            break;
         
         // backspace: deselect videos
         case 8:
@@ -287,7 +289,7 @@ void InputHandler::processMouse( int button, int state, int x, int y )
         leftButtonHeld = false;
         
         // if we were doing drag movement, deselect all
-        if ( dragging )
+        if ( dragging && grav->getHoldCounter() > 10 )
         {
             grav->clearSelected();
             dragging = false;
@@ -310,12 +312,24 @@ void InputHandler::processActiveMotion( int x, int y )
     // set new position, when doing click-and-drag movement
     if ( clickedInside )
     {
+        printf( "clicked inside, dragging\n" );
         std::vector<RectangleBase*>::reverse_iterator sli;
         for ( sli = selectedObjects->rbegin(); sli != selectedObjects->rend();
                 sli++ )
         {
-            (*sli)->setPos( (dragEndX-dragPrevX) + (*sli)->getX(),
-                            (dragEndY-dragPrevY) + (*sli)->getY() );
+            // since group members are controlled by the group somewhat,
+            // calling setpos on both groups and members here will result
+            // in a double move (if they're both selected)
+            if ( !(*sli)->isGrouped() )
+            {
+                (*sli)->setPos( (dragEndX-dragPrevX) + (*sli)->getX(),
+                                (dragEndY-dragPrevY) + (*sli)->getY() );
+            }
+            else if ( !(*sli)->getGroup()->isSelected() )
+            {
+                (*sli)->setPos( (dragEndX-dragPrevX) + (*sli)->getX(),
+                                (dragEndY-dragPrevY) + (*sli)->getY() );
+            }
         }
         grav->setBoxSelectDrawing( false );
         dragging = true;

@@ -42,7 +42,7 @@ public:
     void moveToTop( std::vector<RectangleBase*>::iterator i );
     
     void drawCurvedEarthLine( float lat, float lon, 
-                                    float dx, float dy, float dz );
+                              float destx, float desty, float destz );
                                     
     void setBoxSelectDrawing( bool draw );
     int getWindowWidth(); int getWindowHeight();
@@ -58,6 +58,10 @@ public:
      * Add to the counter used to control the drawing of the selection box.
      */
     void incrementHoldCounter();
+    int getHoldCounter();
+    
+    float getCamX(); float getCamY(); float getCamZ();
+    void setCamX( float x ); void setCamY( float y ); void setCamZ( float z );
                                     
 private:
     bool drawSelectionBox;
@@ -67,6 +71,10 @@ private:
     
     int holdCounter;
     bool enableSiteIDGroups;
+    
+    float camX;
+    float camY;
+    float camZ;
     
 };
 
