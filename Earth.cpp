@@ -53,6 +53,8 @@ void Earth::draw()
     glVertex3f( x, y+10.0f, z );
     glEnd();*/
     
+    // these show the earth axes
+    /*
     glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
     glBegin( GL_LINE );
     glVertex3f( 0, 0, 0 );
@@ -70,6 +72,7 @@ void Earth::draw()
     glVertex3f( 0, 0, 0 );
     glVertex3f( 0, 0, 0+50.0f );
     glEnd();
+    */
     
     glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
     

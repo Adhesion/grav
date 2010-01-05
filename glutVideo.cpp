@@ -263,8 +263,9 @@ void gravManager::draw()
     gluSphere( sphereQuad, audioSession_listener.getLevelAvg()*50.0f,
                 200, 200 );
     
-    // iterate through all sources and draw here
     // polygon offset to fix z-fighting of coplanar polygons (videos)
+    // disabled, since making the depth buffer read-only in some area takes
+    // care of this issue
     //glEnable( GL_POLYGON_OFFSET_FILL );
     //glPolygonOffset( 0.1, 1.0 );
     
@@ -288,14 +289,17 @@ void gravManager::draw()
     glDepthMask( GL_FALSE );
     
     //printf( "glutDisplay::drawing objects\n" );
+    // iterate through all objects to be drawn, and draw
     for ( si = drawnObjects->begin(); si != drawnObjects->end(); si++ )
     {
         // only draw if not grouped - groups are responsible for
         // drawing their members
         if ( !(*si)->isGrouped() )
         {
+            // set the audio effect level
             if ( audioEnabled )
             {
+                // TODO: do a lookup with CNAME if siteIDs aren't enabled
                 if ( (*si)->getSiteID().compare("") != 0 )
                 {
                     float level;
@@ -366,7 +370,6 @@ void gravManager::draw()
 
 void gravManager::clearSelected()
 {
-    printf( "clearing\n" );
     for ( std::vector<RectangleBase*>::iterator sli = selectedObjects->begin();
             sli != selectedObjects->end(); sli++ )
         (*sli)->setSelect(false);
@@ -385,6 +388,8 @@ void gravManager::ungroupAll()
             g->removeAll();
             it = drawnObjects->erase(it);
             
+            // if the group we're removing is currently selected, remove it
+            // from the list of selected objects too
             if ( g->isSelected() )
             {
                 std::vector<RectangleBase*>::iterator j =
@@ -463,35 +468,66 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     // old method
     float sx, sy, sz;
     earth->convertLatLong( lat, lon, sx, sy, sz );
-    float vecX = (sx - earth->getX()) * 0.1f;
-    float vecY = (sy - earth->getY()) * 0.1f;
-    float vecZ = (sz - earth->getZ()) * 0.1f;
+    float vecX = (sx - earth->getX()) * 0.08f;
+    float vecY = (sy - earth->getY()) * 0.08f;
+    float vecZ = (sz - earth->getZ()) * 0.08f;
     float tx = vecX + sx;
     float ty = vecY + sy;
     float tz = vecZ + sz;
     
-    int iter = 10;
+    int iter = 15;
+    float zdist = destz-tz;
+    float maxzdist = (earth->getZ()+earth->getRadius())-destz;
+    float distanceScale = fabs(zdist/maxzdist);
+    int i = 0;
     
     glColor3f( 0.0f, 1.0f, 0.0f );
     glLineWidth( 2.0f );
     glBegin( GL_LINE_STRIP );
     glVertex3f( sx, sy, sz );
-    for ( int i = 0; i < iter; i++ )
+    
+    while ( zdist > 1.0f )
     {
         glVertex3f( tx, ty, tz );
-        float weight = ((float)(iter-i))/(float)iter;
-        weight *= weight;
-        tx += (vecX  * weight) +
-                ((destx-tx) * (1.0f-weight));
+        float weight = (((float)(iter-i))/(float)iter)*0.6f;
+        //float weight = 0.2f;
+        //weight *= weight;
+        float xpush = 0.0f;
+        float ypush = 0.0f;
+        //float curDistX = fabs(tx-earth->getX());
+        //float curDistY = fabs(ty-earth->getY());
+        
+        // this will push out the current point on the line away from the
+        // earth so it doesn't clip, scaled based on how far we are from the
+        // destination
+        xpush = 1.5f * distanceScale;
+        ypush = 1.5f * distanceScale;
+        if ( tx < earth->getX() ) xpush *= -1.0f;
+        if ( ty < earth->getY() ) ypush *= -1.0f;
+        
+        // move the current point forward, based on progressively averaging
+        // the earth-pointing-out vector with the vector pointing towards
+        // the destination point
+        tx += (vecX * weight) +
+                ((destx-tx) * (1.0f-weight))
+                + xpush;
         ty += (vecY * weight) +
-                ((desty-ty) * (1.0f-weight));
+                ((desty-ty)  * (1.0f-weight))
+                + ypush;
         tz += (vecZ * weight) +
                 ((destz-tz) * (1.0f-weight));
+                
+        zdist = destz-tz;
+        distanceScale = fabs(zdist/maxzdist);
+        i++;
     }
-    //glVertex3f( tx, ty, tz );
-    //glVertex3f( dx, dy, sz );
+    // shift the z back a bit so it doesn't overshoot the object
+    if ( tz > destz - 0.3f ) tz -= 0.3f;
+    glVertex3f( tx, ty, tz );
+    // -0.05f is so the line doesn't poke through the objects
+    glVertex3f( destx, desty, destz-0.05f );
     glEnd();
-        
+    
     // new method
     /*
     float earthx, earthy, earthz;
