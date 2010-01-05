@@ -312,7 +312,6 @@ void InputHandler::processActiveMotion( int x, int y )
     // set new position, when doing click-and-drag movement
     if ( clickedInside )
     {
-        printf( "clicked inside, dragging\n" );
         std::vector<RectangleBase*>::reverse_iterator sli;
         for ( sli = selectedObjects->rbegin(); sli != selectedObjects->rend();
                 sli++ )
@@ -334,6 +333,9 @@ void InputHandler::processActiveMotion( int x, int y )
         grav->setBoxSelectDrawing( false );
         dragging = true;
     }
+    // if we didn't click inside & we're holding the left button, do the box
+    // selection (clearing the temp selected list to allow for the box
+    // intersecting with an object at first, then not intersecting later
     else if ( leftButtonHeld )
     {
         for ( std::vector<RectangleBase*>::iterator sli = 
