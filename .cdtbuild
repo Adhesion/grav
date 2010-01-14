@@ -7,7 +7,7 @@
 <toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.1689193004" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.exe.debug">
 <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.354023516" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
 <option id="gnu.cpp.compiler.exe.debug.option.optimization.level.1402714218" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
-<option id="gnu.cpp.compiler.option.other.other.1695020194" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 `freetype-config --cflags` `vpmedia-config --cppflags`" valueType="string"/>
+<option id="gnu.cpp.compiler.option.other.other.1695020194" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 `freetype-config --cflags` `vpmedia-config --cppflags` `wx-config --cppflags`" valueType="string"/>
 <option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1624274799" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.977599646" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
@@ -20,20 +20,15 @@
 <listOptionValue builtIn="false" value="GLU"/>
 <listOptionValue builtIn="false" value="glut"/>
 <listOptionValue builtIn="false" value="ftgl"/>
+<listOptionValue builtIn="false" value="png"/>
 <listOptionValue builtIn="false" value="VPMedia"/>
-<listOptionValue builtIn="false" value="m"/>
-<listOptionValue builtIn="false" value="pthread"/>
 <listOptionValue builtIn="false" value="uclmmbase"/>
 <listOptionValue builtIn="false" value="swscale"/>
-<listOptionValue builtIn="false" value="avcodec"/>
-<listOptionValue builtIn="false" value="png"/>
 </option>
 <option id="gnu.cpp.link.option.paths.2006448142" superClass="gnu.cpp.link.option.paths"/>
-<option id="gnu.cpp.link.option.flags.752878852" superClass="gnu.cpp.link.option.flags" value="" valueType="string"/>
+<option id="gnu.cpp.link.option.flags.752878852" superClass="gnu.cpp.link.option.flags" value="`vpmedia-config --ldflags` `wx-config --libs --gl-libs`" valueType="string"/>
 <option id="gnu.cpp.link.option.shared.1964853397" superClass="gnu.cpp.link.option.shared" value="false" valueType="boolean"/>
-<option id="gnu.cpp.link.option.other.2042352830" superClass="gnu.cpp.link.option.other" valueType="stringList">
-<listOptionValue builtIn="false" value="`vpmedia-config --ldflags`"/>
-</option>
+<option id="gnu.cpp.link.option.other.2042352830" superClass="gnu.cpp.link.option.other" valueType="stringList"/>
 <option id="gnu.cpp.link.option.userobjs.1432963266" superClass="gnu.cpp.link.option.userobjs"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1386925177" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug"/>

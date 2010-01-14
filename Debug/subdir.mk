@@ -6,42 +6,51 @@
 CPP_SRCS += \
 ../AudioManager.cpp \
 ../Earth.cpp \
+../GLCanvas.cpp \
 ../GLUtil.cpp \
 ../Group.cpp \
 ../InputHandler.cpp \
 ../PNGLoader.cpp \
 ../RectangleBase.cpp \
+../VideoListener.cpp \
 ../VideoSource.cpp \
-../glutVideo.cpp 
+../glutVideo.cpp \
+../grav.cpp 
 
 OBJS += \
 ./AudioManager.o \
 ./Earth.o \
+./GLCanvas.o \
 ./GLUtil.o \
 ./Group.o \
 ./InputHandler.o \
 ./PNGLoader.o \
 ./RectangleBase.o \
+./VideoListener.o \
 ./VideoSource.o \
-./glutVideo.o 
+./glutVideo.o \
+./grav.o 
 
 CPP_DEPS += \
 ./AudioManager.d \
 ./Earth.d \
+./GLCanvas.d \
 ./GLUtil.d \
 ./Group.d \
 ./InputHandler.d \
 ./PNGLoader.d \
 ./RectangleBase.d \
+./VideoListener.d \
 ./VideoSource.d \
-./glutVideo.d 
+./glutVideo.d \
+./grav.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
 %.o: ../%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -O3 -g3 -Wall -c -fmessage-length=0 `freetype-config --cflags` `vpmedia-config --cppflags` -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	g++ -O3 -g3 -Wall -c -fmessage-length=0 `freetype-config --cflags` `vpmedia-config --cppflags` `wx-config --cppflags` -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

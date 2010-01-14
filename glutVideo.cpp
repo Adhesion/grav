@@ -23,44 +23,12 @@
 #include "Earth.h"
 #include "PNGLoader.h"
 #include "InputHandler.h"
+#include "VideoListener.h"
 
 #include "glutVideo.h"
 
-class listener : public VPMSessionListener {
-public:
-  listener();
-  virtual void vpmsession_source_created( VPMSession &session,
-                                          uint32_t ssrc,
-                                          uint32_t pt,
-                                          VPMPayload type,
-                                          VPMPayloadDecoder *decoder );
-  virtual void vpmsession_source_deleted( VPMSession &session,
-                                          uint32_t ssrc,
-                                          const char *reason );
-  virtual void vpmsession_source_description( VPMSession &session,
-                                              uint32_t ssrc );
-  virtual void vpmsession_source_app(VPMSession &session, 
-                                     uint32_t ssrc, 
-                                     const char *app, 
-                                     const char *data, 
-                                     uint32_t data_len);
-};
-
-static VPMSession *session;
-static uint32_t session_ts;
-static listener session_listener;
-
-static bool audioEnabled;
-static VPMSession *audioSession;
-static uint32_t audioSession_ts;
-static AudioManager audioSession_listener;
-
 static float screen_width;
 static float screen_height;
-
-// initial starting position for the first video
-static float x = -7.5f;
-static float y = 5.0f;
 
 // background texture for groups & video objects
 static GLuint borderTex;
@@ -68,17 +36,10 @@ int borderWidth;
 int borderHeight;
 
 gravManager* grav;
-
-std::vector<VideoSource*>* sources;
-std::vector<RectangleBase*>* drawnObjects;
-std::vector<RectangleBase*>* selectedObjects;
-std::map<std::string,Group*>* siteIDGroups;
-
 Earth* earth;
-
 InputHandler* input;
 
-int main(int argc, char *argv[])
+/*int main(int argc, char *argv[])
 {
   glutInit(&argc, argv);
   grav = new gravManager();
@@ -93,41 +54,9 @@ int main(int argc, char *argv[])
 
   vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
 
-  VPMSessionFactory *sf = VPMSessionFactory::getInstance();
-
-  session = sf->createSession(argv[1], session_listener);
   
-  session->enableVideo(true);
-  session->enableAudio(false);
-  session->enableOther(false);
   
-  if (!session->initialise()) {
-    fprintf(stderr, "error: failed to initialise session\n");
-    return -1;
-  }
   
-  if ( audioEnabled )
-  {
-      audioSession = sf->createSession(argv[2],
-                            audioSession_listener);
-      
-      audioSession->enableVideo(false);
-      audioSession->enableAudio(true);
-      audioSession->enableOther(false);
-      
-      if (!audioSession->initialise()) {
-        fprintf(stderr, "error: failed to initialise audioSession\n");
-        return -1;
-      }
-  }
-
-  session_ts = random32();
-  audioSession_ts = random32();
-  
-  sources = new std::vector<VideoSource*>();
-  drawnObjects = new std::vector<RectangleBase*>();
-  selectedObjects = new std::vector<RectangleBase*>();
-  siteIDGroups = new std::map<std::string,Group*>();
 
   glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
   printf( "init window to %i,%i\n", grav->getWindowWidth(), grav->getWindowHeight() );
@@ -156,7 +85,7 @@ int main(int argc, char *argv[])
 
   glutMainLoop();
   return 0;
-}
+}*/
 
 void glutDisplay(void)
 {
@@ -165,8 +94,7 @@ void glutDisplay(void)
 
 void glutIdle(void)
 {
-    session->iterate(session_ts ++);
-    if ( audioEnabled ) audioSession->iterate(audioSession_ts++);
+    
 }
 
 void glutTimer(int ms)
@@ -241,16 +169,76 @@ gravManager::gravManager()
     camX = 0.0f;
     camY = 0.0f;
     camZ = 9.0f;
+    
+    sources = new std::vector<VideoSource*>();
+    drawnObjects = new std::vector<RectangleBase*>();
+    selectedObjects = new std::vector<RectangleBase*>();
+    siteIDGroups = new std::map<std::string,Group*>();
+    
+    sf = VPMSessionFactory::getInstance();
+    videoSession_listener = new VideoListener( this );
+    audioSession_listener = new AudioManager();
 }
 
 gravManager::~gravManager()
 {
+    delete sources;
+    delete drawnObjects;
+    delete selectedObjects;
+    delete siteIDGroups;
+}
+
+bool gravManager::initSession( std::string address, bool audio )
+{
+    if ( !audio )
+    {
+        videoSession = sf->createSession( address.c_str(),
+                                        *videoSession_listener );
+      
+        videoSession->enableVideo(true);
+        videoSession->enableAudio(false);
+        videoSession->enableOther(false);
+      
+        if ( !videoSession->initialise() ) {
+            fprintf( stderr, "error: failed to initialise session\n" );
+            return false;
+        }
+        
+        videoSession_ts = random32();
+    }
+  
+    else
+    {
+        audioSession = sf->createSession( address.c_str(),
+                                        *audioSession_listener);
+      
+        audioSession->enableVideo(false);
+        audioSession->enableAudio(true);
+        audioSession->enableOther(false);
+      
+        if (!audioSession->initialise()) {
+            fprintf(stderr, "error: failed to initialise audioSession\n");
+            return false;
+        }
+        
+        audioSession_ts = random32();
+    }
     
+    return true;
+}
+
+void gravManager::iterateSessions()
+{
+    videoSession->iterate(videoSession_ts ++);
+    if ( audioEnabled ) audioSession->iterate(audioSession_ts++);
 }
 
 void gravManager::draw()
 {
     //audioSession_listener.printLevels();
+    
+    // don't draw if either of these objects haven't been initialized yet
+    if ( !earth || !input ) return;
     
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
@@ -260,7 +248,7 @@ void gravManager::draw()
     earth->draw();
     
     GLUquadric* sphereQuad = gluNewQuadric();
-    gluSphere( sphereQuad, audioSession_listener.getLevelAvg()*50.0f,
+    gluSphere( sphereQuad, audioSession_listener->getLevelAvg()*50.0f,
                 200, 200 );
     
     // polygon offset to fix z-fighting of coplanar polygons (videos)
@@ -303,14 +291,14 @@ void gravManager::draw()
                 if ( (*si)->getSiteID().compare("") != 0 )
                 {
                     float level;
-                    level = audioSession_listener.getLevel( 
+                    level = audioSession_listener->getLevel( 
                                     (*si)->getSiteID() );
                     // -2.0f is our default value for not finding the level
                     if ( level > -1.999f )
                         (*si)->setEffectVal( (level*2.0f) );
                 }
             }
-            //printf( "glutDisplay::drawing object %s\n", (*si)->getName().c_str());
+            printf( "glutDisplay::drawing object %s\n", (*si)->getName().c_str());
             (*si)->draw();
         }
         else
@@ -324,7 +312,7 @@ void gravManager::draw()
     }
     // back to writeable z-buffer for proper earth/line rendering
     glDepthMask( GL_TRUE );
-    //printf( "glutDisplay::done drawing objects\n" );
+    printf( "glutDisplay::done drawing objects\n" );
     
     // draw the click-and-drag selection box
     if ( holdCounter > 1 && drawSelectionBox )
@@ -361,9 +349,10 @@ void gravManager::draw()
     
     //glDisable( GL_POLYGON_OFFSET_FILL );
     
-    glutSwapBuffers();
+    //glutSwapBuffers(); // TODO: change this with wx's buffer-swapping? done?
+    // works in glcanvas's draw?
     
-    //printf( "holdcounter is %i\n", holdCounter );
+    printf( "holdcounter is %i\n", holdCounter );
     if ( !input->isLeftButtonHeld() && holdCounter > 0 )
         holdCounter-=2;
 }
@@ -414,8 +403,8 @@ void gravManager::ungroupAll()
 
 void gravManager::retileVideos()
 {
-    x = -7.0f;
-    y = 5.5f;
+    float x = -7.0f;
+    float y = 5.5f;
     float buffer = 1.0f; // space between videos
     
     std::vector<RectangleBase*>::iterator si;
@@ -715,6 +704,75 @@ int gravManager::getHoldCounter()
     return holdCounter;
 }
 
+std::vector<VideoSource*>* gravManager::getSources()
+{
+    return sources;
+}
+
+std::vector<RectangleBase*>* gravManager::getDrawnObjects()
+{
+    return drawnObjects;
+}
+
+std::vector<RectangleBase*>* gravManager::getSelectedObjects()
+{
+    return selectedObjects;
+}
+
+std::map<std::string,Group*>* gravManager::getSiteIDGroups()
+{
+    return siteIDGroups;
+}
+
+void gravManager::addNewSource( VideoSource* s )
+{
+    s->setTexture( borderTex, borderWidth, borderHeight );
+    sources->push_back( s );
+    drawnObjects->push_back( s );
+    s->updateName();
+}
+
+void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
+{
+    printf( "source is %s\n", (*si)->getName().c_str() );
+    RectangleBase* temp = (RectangleBase*)(*si);
+    VideoSource* s = (*si);
+    
+    sources->erase( si );
+    
+    // remove it from drawnobjects, if it is being drawn
+    std::vector<RectangleBase*>::iterator i = drawnObjects->begin();
+    while ( (*i) != temp ) i++;
+    
+    // TODO: confirm this (checking whether it actually is in drawnobjects
+    //                      or not)
+    if ( i != drawnObjects->end() )
+        drawnObjects->erase( i );
+    
+    if ( temp->isSelected() )
+    {
+        std::vector<RectangleBase*>::iterator j =
+            selectedObjects->begin();
+        while ( (*j) != temp ) j++;
+        selectedObjects->erase( j );
+    }
+    
+    delete s;
+}
+
+Group* gravManager::createSiteIDGroup( std::string data )
+{
+    Group* g = new Group( 0.0f, 0.0f );
+    g->setName( data );
+    g->setSiteID( data );
+    g->setTexture( borderTex, borderWidth, borderHeight );
+    
+    drawnObjects->push_back( g );
+    siteIDGroups->insert( std::pair<std::string,Group*>(data, g) );
+    
+    return g;
+}
+
 float gravManager::getCamX()
 {
     return camX;
@@ -745,149 +803,12 @@ void gravManager::setCamZ( float z )
     camZ = z;
 }
 
-listener::listener()
+void gravManager::setEarth( Earth* e )
 {
+    earth = e;
 }
 
-void 
-listener::vpmsession_source_created(VPMSession &session,
-				    uint32_t ssrc,
-				    uint32_t pt,
-				    VPMPayload type,
-				    VPMPayloadDecoder *decoder)
+void gravManager::setInput( InputHandler* i )
 {
-  VPMVideoDecoder *d = dynamic_cast<VPMVideoDecoder*>(decoder);
-
-  if (d) {
-    VPMVideoBufferSink *sink = new VPMVideoBufferSink(VIDEO_FORMAT_RGB24);
-    if (!sink->initialise()) {
-      fprintf(stderr, "Failed to initialise video sink\n");
-      return;
-    }
-
-    d->connectVideoProcessor(sink);
-
-    printf( "creating new source at %f,%f\n", x, y );
-
-    VideoSource* source = new VideoSource( &session, ssrc, sink, x, y );
-    source->setTexture( borderTex, borderWidth, borderHeight );
-    sources->push_back( source );
-    source->updateName();
-    drawnObjects->push_back( source );
-    
-    // do some basic grid positions
-    x += 6.0f;
-    if ( x > 9.0f )
-    {
-        x = -7.5f;
-        y -= 6.0f;
-    }
-    
-    //printf( "size of sources is %i\n", sources->size() );
-
-    //session_sinks.push_back(sink);
-    //session_sink_current = session_sinks.begin();
-  }
-}
-
-void 
-listener::vpmsession_source_deleted(VPMSession &session,
-				    uint32_t ssrc,
-				    const char *reason)
-{
-    std::vector<VideoSource*>::iterator si;
-    printf( "grav: deleting ssrc 0x%08x\n", ssrc );
-    for ( si = sources->begin(); si != sources->end(); si++ )
-    {
-        if ( (*si)->getssrc() == ssrc )
-        {
-            printf( "source is %s\n", (*si)->getName().c_str() );
-            RectangleBase* temp = (RectangleBase*)(*si);
-            std::vector<RectangleBase*>::iterator i = drawnObjects->begin();
-            while ( (*i) != temp ) i++;
-            drawnObjects->erase( i );
-            
-            if ( temp->isSelected() )
-            {
-                std::vector<RectangleBase*>::iterator j =
-                    selectedObjects->begin();
-                while ( (*j) != temp ) j++;
-                selectedObjects->erase( j );
-            }
-            
-            delete (*si);
-            sources->erase( si );
-            return;
-        }
-    }
-}
-
-void 
-listener::vpmsession_source_description(VPMSession &session,
-					uint32_t ssrc)
-{
-  // Ignore
-}
-
-void 
-listener::vpmsession_source_app(VPMSession &session, 
-				uint32_t ssrc, 
-				const char *app , 
-				const char *data, 
-				uint32_t data_len)
-{
-    //printf( "RTP app data received\n" );
-    //printf( "app: %s\n", app );
-    //printf( "data: %s\n", data );
-    
-    std::string appS( app, 4 );
-    std::string dataS( data, data_len );
-    //printf( "listener::RTCP_APP: %s,%s\n", appS.c_str(), dataS.c_str() );
-    //printf( "listener::RTCP_APP: data length is %i\n", data_len );
-    
-    if ( appS.compare( "site" ) == 0 && grav->usingSiteIDGroups() )
-    {
-        // vic sends 4 nulls at the end of the rtcp_app string for some reason,
-        // so chop those off
-        dataS = std::string( dataS, 0, 32 );
-        std::vector<VideoSource*>::iterator i = sources->begin();
-        printf( "in rtcp app, got %i sources\n", sources->size() );
-        
-        // sometimes, if groups are enabled by default, we can get RTCP APP
-        // before we get any sources added, resulting in a crash when we try
-        // and dereference the sources pointer - so skip this if we don't have
-        // any sources yet
-        if ( sources->size() == 0 ) return;
-        while ( (*i)->getssrc() != ssrc )
-        {
-            i++;
-            
-            if ( i == sources->end() ) return;
-        }
-        
-        if ( !(*i)->isGrouped() )
-        {
-            Group* g;
-            std::map<std::string,Group*>::iterator mapi =
-                                            siteIDGroups->find(dataS);
-            
-            if ( mapi == siteIDGroups->end() )
-            {
-                g = new Group( 0.0f, 0.0f );
-                g->setName( dataS );
-                g->setSiteID( dataS );
-                g->setTexture( borderTex, borderWidth, borderHeight );
-                drawnObjects->push_back( g );
-                siteIDGroups->insert( std::pair<std::string,Group*>(dataS, g) );
-            }
-            else
-            {
-                g = mapi->second;
-            }
-            
-            (*i)->setSiteID( dataS );
-            g->add( *i );
-            grav->retileVideos();
-        }
-    }
+    input = i;
 }
