@@ -25,16 +25,23 @@ bool gravApp::OnInit()
                                 grav->getWindowHeight() ) );
     frame->Show( true );
     
+    //wxBoxSizer* sizer = new wxBoxSizer( wxVERTICAL );
+    
     int attribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 
                             0 };
     
     canvas = new GLCanvas( frame, grav, attribList );
+    
+    //sizer->Add( canvas, 1, wxEXPAND );
+    //frame->SetSizer( sizer );
+    //frame->SetAutoLayout( true );
+    
     Timer* t = new Timer( canvas );
     t->Start();
     
-    /*char* argv[1] = { "test" };
+    char* argv[1] = { "test" };
     int argc = 1;
-    glutInit( &argc, argv );*/
+    glutInit( &argc, argv );
     
     Earth* earth = new Earth();
     InputHandler* input = new InputHandler( grav->getSources(),
@@ -44,7 +51,8 @@ bool gravApp::OnInit()
                                             earth, grav );
     grav->setEarth( earth );
     grav->setInput( input );
-    grav->initSession( "224.2.224.225/20002", false );
+    bool res = grav->initSession( "224.2.224.225/20002", false );
+    if ( res ) printf( "session initialized\n" );
     
     return true;
 }

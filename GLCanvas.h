@@ -19,11 +19,19 @@ class GLCanvas : public wxGLCanvas
 public:
     GLCanvas( wxWindow* parent, gravManager* g, int* attributes );
     void draw( wxPaintEvent& evt );
+    void resize( wxSizeEvent& evt );
     
 private:
     gravManager* grav;
     wxGLContext* glContext;
     DECLARE_EVENT_TABLE()
+    
+    void testDraw();
+    void GLreshape( int w, int h );
+    void idle( wxIdleEvent& evt );
+    
+    // tracks the aspect ratio of the screen for reshaping
+    float screen_width, screen_height;
 
 };
 
