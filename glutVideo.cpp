@@ -229,8 +229,8 @@ bool gravManager::initSession( std::string address, bool audio )
 
 void gravManager::iterateSessions()
 {
-    videoSession->iterate(videoSession_ts ++);
-    if ( audioEnabled ) audioSession->iterate(audioSession_ts++);
+    videoSession->iterate( videoSession_ts++ );
+    if ( audioEnabled ) audioSession->iterate( audioSession_ts++ );
 }
 
 void gravManager::draw()
@@ -298,7 +298,7 @@ void gravManager::draw()
                         (*si)->setEffectVal( (level*2.0f) );
                 }
             }
-            printf( "glutDisplay::drawing object %s\n", (*si)->getName().c_str());
+            //printf( "glutDisplay::drawing object %s\n", (*si)->getName().c_str());
             (*si)->draw();
         }
         else
@@ -312,7 +312,7 @@ void gravManager::draw()
     }
     // back to writeable z-buffer for proper earth/line rendering
     glDepthMask( GL_TRUE );
-    printf( "glutDisplay::done drawing objects\n" );
+    //printf( "glutDisplay::done drawing objects\n" );
     
     // draw the click-and-drag selection box
     if ( holdCounter > 1 && drawSelectionBox )
@@ -347,12 +347,14 @@ void gravManager::draw()
         glDisable(GL_BLEND);
     }
     
+    glFlush();
+    
     //glDisable( GL_POLYGON_OFFSET_FILL );
     
     //glutSwapBuffers(); // TODO: change this with wx's buffer-swapping? done?
     // works in glcanvas's draw?
     
-    printf( "holdcounter is %i\n", holdCounter );
+    //printf( "holdcounter is %i\n", holdCounter );
     if ( !input->isLeftButtonHeld() && holdCounter > 0 )
         holdCounter-=2;
 }
