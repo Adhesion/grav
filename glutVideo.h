@@ -7,6 +7,12 @@
  * @author Andrew Ford
  */
 
+#include <wx/wx.h>
+#include <vector>
+#include <map>
+
+#include "GLCanvas.h"
+
 static void glutDisplay(void);
 static void glutReshape(int w, int h);
 static void glutIdle(void);
@@ -17,12 +23,31 @@ static void glutSpecialKey(int key, int x, int y);
 static void glutMouse(int button, int state, int x, int y);
 static void glutActiveMotion(int x, int y);
 
+class RectangleBase;
+class VideoSource;
+class Group;
+class VideoListener;
+class AudioManager;
+class VPMSession;
+class VPMSessionFactory;
+class Earth;
+class InputHandler;
+
 class gravManager
 {
     
 public:
     gravManager();
     ~gravManager();
+    
+    /*
+     * Create a new RTP session and attach it to the proper listener. If
+     * audio is true it's an audio session; video if false.
+     * Returns false if session creation fails, true otherwise.
+     */
+    bool initSession( std::string address, bool audio );
+    
+    void iterateSessions();
 
     /*
      * The main draw function: draws all objects in drawnObjects, as well as
@@ -60,10 +85,60 @@ public:
     void incrementHoldCounter();
     int getHoldCounter();
     
+    /*
+     * Getters for accessing sources/objects.
+     */
+    std::vector<VideoSource*>* getSources();
+    std::vector<RectangleBase*>* getDrawnObjects();
+    std::vector<RectangleBase*>* getSelectedObjects();
+    std::map<std::string,Group*>* getSiteIDGroups();
+    
+    /* 
+     * Manage sources in the main list of sources as well as in the lists of
+     * drawn & selected objects.
+     * Latter is an iterator so as not to have to loop through the list of
+     * sources twice - mainly because the delete-by-ssrc in videolistener
+     * needs to find its target that way.
+     * I.e., delete expects that the caller will find the source in the
+     * sources list itself.
+     */
+    void addNewSource( VideoSource* s );
+    void deleteSource( std::vector<VideoSource*>::iterator si );
+    
+    /* 
+     * Creates a group for siteID-based grouping, with the data string as the
+     * name, adds it to the list, and returns a pointer to it.
+     */
+    Group* createSiteIDGroup( std::string data );
+    
     float getCamX(); float getCamY(); float getCamZ();
     void setCamX( float x ); void setCamY( float y ); void setCamZ( float z );
+    
+    void setEarth( Earth* e );
+    void setInput( InputHandler* i );
                                     
 private:
+    
+    std::vector<VideoSource*>* sources;
+    std::vector<RectangleBase*>* drawnObjects;
+    std::vector<RectangleBase*>* selectedObjects;
+    std::map<std::string,Group*>* siteIDGroups;
+    
+    Earth* earth;
+
+    InputHandler* input;
+    
+    VPMSessionFactory *sf;
+    
+    VPMSession *videoSession;
+    uint32_t videoSession_ts;
+    VideoListener* videoSession_listener;
+    
+    bool audioEnabled;
+    VPMSession *audioSession;
+    uint32_t audioSession_ts;
+    AudioManager* audioSession_listener;
+
     bool drawSelectionBox;
     
     // dimensions of the glut window in pixels

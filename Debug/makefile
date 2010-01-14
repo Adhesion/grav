@@ -46,7 +46,7 @@ dependents:
 grav: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -Xlinker `vpmedia-config --ldflags` -o"grav" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ `vpmedia-config --ldflags` `wx-config --libs --gl-libs` -o"grav" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
