@@ -27,6 +27,7 @@ private:
     DECLARE_EVENT_TABLE()
     
     void testDraw();
+    void testKey( wxKeyEvent& evt );
     void GLreshape( int w, int h );
     void idle( wxIdleEvent& evt );
     

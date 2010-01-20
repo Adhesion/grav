@@ -49,10 +49,17 @@ bool gravApp::OnInit()
                                             grav->getSelectedObjects(),
                                             grav->getSiteIDGroups(),
                                             earth, grav );
+    
+    // add the input handler to the chain of things that can handle
+    // events & give the canvas focus so we don't have to click on it to
+    // start sending key events
+    canvas->PushEventHandler( input );
+    canvas->SetFocus();
+    
     grav->setEarth( earth );
     grav->setInput( input );
     bool res = grav->initSession( "224.2.224.225/20002", false );
-    if ( res ) printf( "session initialized\n" );
+    //if ( res ) printf( "session initialized\n" );
     
     return true;
 }

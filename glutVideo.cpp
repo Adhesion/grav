@@ -229,8 +229,10 @@ bool gravManager::initSession( std::string address, bool audio )
 
 void gravManager::iterateSessions()
 {
-    videoSession->iterate( videoSession_ts++ );
-    if ( audioEnabled ) audioSession->iterate( audioSession_ts++ );
+    if ( videoSession )
+        videoSession->iterate( videoSession_ts++ );
+    if ( audioEnabled && audioSession )
+        audioSession->iterate( audioSession_ts++ );
 }
 
 void gravManager::draw()
