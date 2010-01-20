@@ -8,11 +8,13 @@
 #include "GLCanvas.h"
 #include "glutVideo.h"
 #include <GL/glut.h>
+#include "InputHandler.h"
 
 BEGIN_EVENT_TABLE(GLCanvas, wxGLCanvas)
 EVT_PAINT(GLCanvas::draw)
 EVT_SIZE(GLCanvas::resize)
 EVT_IDLE(GLCanvas::idle)
+//EVT_KEY_DOWN(GLCanvas::testKey)
 END_EVENT_TABLE()
 
 GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes ) :
@@ -81,6 +83,12 @@ void GLCanvas::testDraw()
  
     glFlush();
     
+}
+
+void GLCanvas::testKey( wxKeyEvent& evt )
+{
+    printf( "GLCanvas::testKey: pressed key %c\n",
+            (unsigned char)evt.GetKeyCode() );
 }
 
 void GLCanvas::GLreshape( int w, int h )

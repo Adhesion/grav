@@ -12,6 +12,8 @@
 #include <map>
 #include <string>
 
+#include <wx/wx.h>
+
 class VideoSource;
 class RectangleBase;
 class Earth;
@@ -20,7 +22,7 @@ class gravManager;
 
 typedef double GLdouble;
 
-class InputHandler
+class InputHandler : public wxEvtHandler
 {
     
 public:
@@ -31,10 +33,19 @@ public:
                   Earth* e, gravManager* g );
     ~InputHandler();
     
+    void wxKeyPress( wxKeyEvent& evt );
+    void wxMouseMove( wxMouseEvent& evt );
+    void wxMouseLDown( wxMouseEvent& evt );
+    void wxMouseLUp( wxMouseEvent& evt );
+    
     void processKeyboard( unsigned char key, int x, int y );
     void processSpecialKey( int key, int x, int y );
     void processMouse( int button, int state, int x, int y );
     void processActiveMotion( int x, int y );
+    
+    void leftClick( int x, int y );
+    void leftRelease( int x, int y );
+    void mouseLeftHeldMove( int x, int y );
     
     bool selectVideos();
     
@@ -74,6 +85,8 @@ private:
     bool leftButtonHeld;
     bool clickedInside;
     bool dragging;
+    
+    DECLARE_EVENT_TABLE()
     
 };
 

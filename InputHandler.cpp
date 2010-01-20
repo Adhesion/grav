@@ -15,6 +15,13 @@
 
 #include <VPMedia/random_helper.h>
 
+BEGIN_EVENT_TABLE(InputHandler, wxEvtHandler)
+EVT_CHAR(InputHandler::wxKeyPress)
+EVT_MOTION(InputHandler::wxMouseMove)
+EVT_LEFT_DOWN(InputHandler::wxMouseLDown)
+EVT_LEFT_UP(InputHandler::wxMouseLUp)
+END_EVENT_TABLE()
+
 InputHandler::InputHandler( std::vector<VideoSource*>* source,
                             std::vector<RectangleBase*>* drawn,
                             std::vector<RectangleBase*>* selected,
@@ -35,12 +42,40 @@ InputHandler::~InputHandler()
     // all other pointers are owned by the main class
 }
 
+void InputHandler::wxKeyPress( wxKeyEvent& evt )
+{
+    // TODO: replace 0,0 with stored mouse pos
+    //printf( "keypress\n" );
+    processKeyboard( (unsigned char)evt.GetKeyCode(), 0, 0 );
+}
+
+void InputHandler::wxMouseMove( wxMouseEvent& evt )
+{
+    //printf( "mousemove\n" );
+    if ( leftButtonHeld )
+        mouseLeftHeldMove( evt.GetPosition().x, evt.GetPosition().y );
+}
+
+void InputHandler::wxMouseLDown( wxMouseEvent& evt )
+{
+    //printf( "mouseldown\n" );
+    leftClick( evt.GetPosition().x, evt.GetPosition().y );
+    evt.Skip();
+}
+
+void InputHandler::wxMouseLUp( wxMouseEvent& evt )
+{
+    //printf( "mouselup\n" );
+    leftRelease( evt.GetPosition().x, evt.GetPosition().y );
+    evt.Skip();
+}
+
 void InputHandler::processKeyboard( unsigned char key, int x, int y )
 {
     std::vector<VPMVideoBufferSink*>::iterator t;
     std::map<std::string,Group*>::iterator mapi;
     printf( "Char pressed is %c (%i)\n", key, key );
-    printf( "x,y in glutkeyboard is %i,%i\n", x, y );
+    printf( "x,y in processKeyboard is %i,%i\n", x, y );
     std::vector<VideoSource*>::const_iterator si;
     // how much to scale when doing -/+: flipped in the former case
     float scaleAmt = 0.25f;
@@ -152,16 +187,16 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             }
             break;
         
-          case 'w':
+        case 'w':
             grav->setCamZ(grav->getCamZ()-1);
             break;
-          case 's':
+        case 's':
             grav->setCamZ(grav->getCamZ()+1);
             break;
-          case 'a':
+        case 'a':
             grav->setCamX(grav->getCamX()-1);
             break;
-          case 'd':
+        case 'd':
             grav->setCamX(grav->getCamX()+1);
             break;
         
@@ -202,102 +237,117 @@ void InputHandler::processMouse( int button, int state, int x, int y )
     
     if ( state == GLUT_DOWN && button == GLUT_LEFT_BUTTON )
     {
-        // glut screen coords are y-flipped relative to GL screen coords
-        //printf( "window height? %i\n", grav->getWindowHeight() );
-        y = grav->getWindowHeight() - y;
-        
-        grav->setBoxSelectDrawing( false );
-        
-        // get world coords for current mouse pos
-        GLUtil::screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
-                                &mouseX, &mouseY, &mouseZ );
-        
-        //printf( "mouse clicked at world %f,%f; screen %i,%i\n",
-        //        mouseX, mouseY, x, y );
-        
-        // on click, any potential dragging afterwards must start here
-        dragStartX = mouseX;
-        dragStartY = mouseY;
-        dragPrevX = mouseX;
-        dragPrevY = mouseY;
-        
-        // if we didn't click on a video, and we're not holding down ctrl to
-        // begin a multi selection, so move the selected video(s) to the
-        // clicked position in empty space
-        selectVideos();
-        if ( !clickedInside && special != GLUT_ACTIVE_CTRL )
-        {
-            if ( !selectedObjects->empty() )
-            {
-                float movePosX = mouseX; float movePosY = mouseY;
-                std::vector<RectangleBase*>::const_iterator sli;
-                
-                float avgX = 0.0f, avgY = 0.0f;
-                int num = selectedObjects->size();
-                
-                if ( num == 1 )
-                {
-                    (*selectedObjects)[0]->move( movePosX, movePosY );
-                    (*selectedObjects)[0]->setSelect( false );
-                }
-                // if moving >1, center the videos around the click point
-                // we need to find the average pos beforehand
-                else
-                {
-                    // average the vals
-                    for ( sli = selectedObjects->begin(); 
-                           sli != selectedObjects->end();
-                           sli++ )
-                    {
-                        avgX += (*sli)->getX();
-                        avgY += (*sli)->getY();
-                    }
-                    avgX = avgX / num;
-                    avgY = avgY / num;
-                
-                    // move and set them to be unselected
-                    for ( sli = selectedObjects->begin(); 
-                           sli != selectedObjects->end();
-                           sli++ )
-                    {
-                        (*sli)->move( movePosX + ((*sli)->getX()-avgX),
-                                       movePosY + ((*sli)->getY()-avgY) );
-                        (*sli)->setSelect( false );
-                    }
-                }
-                selectedObjects->clear();
-            }
-        }
-        // or if we did click on a video...
-        else
-        {
-            // suppress the box selection
-            //leftButtonHeld = false;
-            //clickedInside = true;
-        }
-        
-        // either way the left button is now held
-        leftButtonHeld = true;
+        leftClick( x, y );
     }
     else if ( state == GLUT_UP )
     {
-        // shift the temporary list of selected objects to the main list to
-        // allow for multiple box selection
-        for ( unsigned int i = 0; i < tempSelectedObjects->size(); i++ )
-            selectedObjects->push_back( (*tempSelectedObjects)[i] );
-        tempSelectedObjects->clear();
-        leftButtonHeld = false;
-        
-        // if we were doing drag movement, deselect all
-        if ( dragging && grav->getHoldCounter() > 10 )
-        {
-            grav->clearSelected();
-            dragging = false;
-        }
+        leftRelease( x, y );
     }
 }
 
 void InputHandler::processActiveMotion( int x, int y )
+{
+    mouseLeftHeldMove( x, y );
+}
+
+void InputHandler::leftClick( int x, int y )
+{
+    // glut screen coords are y-flipped relative to GL screen coords
+    //printf( "window height? %i\n", grav->getWindowHeight() );
+    y = grav->getWindowHeight() - y;
+    
+    grav->setBoxSelectDrawing( false );
+    
+    // get world coords for current mouse pos
+    GLUtil::screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
+                            &mouseX, &mouseY, &mouseZ );
+    
+    //printf( "mouse clicked at world %f,%f; screen %i,%i\n",
+    //        mouseX, mouseY, x, y );
+    
+    // on click, any potential dragging afterwards must start here
+    dragStartX = mouseX;
+    dragStartY = mouseY;
+    dragPrevX = mouseX;
+    dragPrevY = mouseY;
+    
+    // if we didn't click on a video, and we're not holding down ctrl to
+    // begin a multi selection, so move the selected video(s) to the
+    // clicked position in empty space
+    selectVideos();
+    if ( !clickedInside && special != GLUT_ACTIVE_CTRL )
+    {
+        if ( !selectedObjects->empty() )
+        {
+            float movePosX = mouseX; float movePosY = mouseY;
+            std::vector<RectangleBase*>::const_iterator sli;
+            
+            float avgX = 0.0f, avgY = 0.0f;
+            int num = selectedObjects->size();
+            
+            if ( num == 1 )
+            {
+                (*selectedObjects)[0]->move( movePosX, movePosY );
+                (*selectedObjects)[0]->setSelect( false );
+            }
+            // if moving >1, center the videos around the click point
+            // we need to find the average pos beforehand
+            else
+            {
+                // average the vals
+                for ( sli = selectedObjects->begin(); 
+                       sli != selectedObjects->end();
+                       sli++ )
+                {
+                    avgX += (*sli)->getX();
+                    avgY += (*sli)->getY();
+                }
+                avgX = avgX / num;
+                avgY = avgY / num;
+            
+                // move and set them to be unselected
+                for ( sli = selectedObjects->begin(); 
+                       sli != selectedObjects->end();
+                       sli++ )
+                {
+                    (*sli)->move( movePosX + ((*sli)->getX()-avgX),
+                                   movePosY + ((*sli)->getY()-avgY) );
+                    (*sli)->setSelect( false );
+                }
+            }
+            selectedObjects->clear();
+        }
+    }
+    // or if we did click on a video...
+    else
+    {
+        // suppress the box selection
+        //leftButtonHeld = false;
+        //clickedInside = true;
+    }
+    
+    // either way the left button is now held
+    leftButtonHeld = true;
+}
+
+void InputHandler::leftRelease( int x, int y )
+{
+    // shift the temporary list of selected objects to the main list to
+    // allow for multiple box selection
+    for ( unsigned int i = 0; i < tempSelectedObjects->size(); i++ )
+        selectedObjects->push_back( (*tempSelectedObjects)[i] );
+    tempSelectedObjects->clear();
+    leftButtonHeld = false;
+    
+    // if we were doing drag movement, deselect all
+    if ( dragging && grav->getHoldCounter() > 10 )
+    {
+        grav->clearSelected();
+        dragging = false;
+    }
+}
+
+void InputHandler::mouseLeftHeldMove( int x, int y )
 {
     // glut screen coords are y-flipped relative to GL screen coords
     y = grav->getWindowHeight() - y;
