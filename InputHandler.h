@@ -26,11 +26,7 @@ class InputHandler : public wxEvtHandler
 {
     
 public:
-    InputHandler( std::vector<VideoSource*>* source,
-                  std::vector<RectangleBase*>* drawn,
-                  std::vector<RectangleBase*>* selected,
-                  std::map<std::string,Group*>* sites,
-                  Earth* e, gravManager* g );
+    InputHandler( Earth* e, gravManager* g );
     ~InputHandler();
     
     void wxKeyPress( wxKeyEvent& evt );
@@ -56,12 +52,8 @@ public:
     float getDragStartX(); float getDragStartY();
     float getDragEndX(); float getDragEndY();
     
-private:
-    std::vector<VideoSource*>* sources;
-    std::vector<RectangleBase*>* drawnObjects;
-    std::vector<RectangleBase*>* selectedObjects;
+private:   
     std::vector<RectangleBase*>* tempSelectedObjects;
-    std::map<std::string,Group*>* siteIDGroups;
     Earth* earth;
     
     // parent class
