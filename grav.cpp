@@ -56,7 +56,7 @@ bool gravApp::OnInit()
     grav->setInput( input );
     grav->setBorderTex( "border.png" );
     bool res = grav->initSession( "224.2.224.225/20002", false );
-    if ( res ) printf( "session initialized\n" );
+    if ( res ) printf( "grav::session initialized\n" );
     
     return true;
 }
