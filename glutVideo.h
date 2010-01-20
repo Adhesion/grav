@@ -105,6 +105,13 @@ public:
     void addNewSource( VideoSource* s );
     void deleteSource( std::vector<VideoSource*>::iterator si );
     
+    /*
+     * This would be done in the constructor, but it has to be done after
+     * the GL context is set up (and in the WX case, the constructor for this
+     * class has to be done before that).
+     */
+    void setBorderTex( std::string border );
+    
     /* 
      * Creates a group for siteID-based grouping, with the data string as the
      * name, adds it to the list, and returns a pointer to it.
@@ -141,8 +148,13 @@ private:
 
     bool drawSelectionBox;
     
-    // dimensions of the glut window in pixels
+    // dimensions of the drawing window in pixels
     int windowWidth, windowHeight;
+    
+    // background texture for groups & video objects
+    GLuint borderTex;
+    int borderWidth;
+    int borderHeight;
     
     int holdCounter;
     bool enableSiteIDGroups;

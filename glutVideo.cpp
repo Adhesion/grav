@@ -30,11 +30,6 @@
 static float screen_width;
 static float screen_height;
 
-// background texture for groups & video objects
-static GLuint borderTex;
-int borderWidth;
-int borderHeight;
-
 gravManager* grav;
 Earth* earth;
 InputHandler* input;
@@ -762,6 +757,12 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
     }
     
     delete s;
+}
+
+void gravManager::setBorderTex( std::string border )
+{
+    borderTex = PNGLoader::loadPNG( "border.png",
+                                    borderWidth, borderHeight );
 }
 
 Group* gravManager::createSiteIDGroup( std::string data )

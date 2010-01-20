@@ -22,13 +22,8 @@ EVT_LEFT_DOWN(InputHandler::wxMouseLDown)
 EVT_LEFT_UP(InputHandler::wxMouseLUp)
 END_EVENT_TABLE()
 
-InputHandler::InputHandler( std::vector<VideoSource*>* source,
-                            std::vector<RectangleBase*>* drawn,
-                            std::vector<RectangleBase*>* selected,
-                            std::map<std::string,Group*>* sites,
-                            Earth* e, gravManager* g )
-    : sources( source ), drawnObjects( drawn ), selectedObjects( selected ),
-        siteIDGroups( sites ), earth( e ), grav( g )
+InputHandler::InputHandler( Earth* e, gravManager* g )
+    : earth( e ), grav( g )
 {
     tempSelectedObjects = new std::vector<RectangleBase*>();
     dragging = false;
@@ -84,18 +79,22 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
     
         case 'k':
             printf( "current sources selected: %i\n", 
-                        selectedObjects->size() );
-            for ( unsigned int i = 0; i < selectedObjects->size(); i++ )
+                        grav->getSelectedObjects()->size() );
+            for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
+                    i++ )
             {
-                printf( "%s\n", (*selectedObjects)[i]->getName().c_str() );
+                printf( "%s\n",
+                    (*(grav->getSelectedObjects()))[i]->getName().c_str() );
             }
             break;
       
         case 't':
             printf( "rearranging groups...\n" );
-            for ( unsigned int i = 0; i < selectedObjects->size(); i++ )
+            for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
+                    i++ )
             {
-                Group* g = dynamic_cast<Group*>((*selectedObjects)[i]);
+                Group* g = dynamic_cast<Group*>(
+                                (*(grav->getSelectedObjects()))[i] );
                 if ( g != NULL )
                 {
                     g->rearrange();
@@ -105,8 +104,8 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
         
         case 'u':
             printf( "updating group names...\n" );
-            mapi = siteIDGroups->begin();
-            for ( ; mapi != siteIDGroups->end(); mapi++ )
+            mapi = grav->getSiteIDGroups()->begin();
+            for ( ; mapi != grav->getSiteIDGroups()->end(); mapi++ )
             {
                 mapi->second->updateName();
             }
@@ -117,11 +116,13 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             break;
         
         case 'l':
-            printf( "We currently have %i sources.\n", sources->size() );
+            printf( "We currently have %i sources.\n",
+                     grav->getSources()->size() );
             printf( "We currently have %i objects in drawnObjects.\n",
-                     drawnObjects->size() );
+                     grav->getDrawnObjects()->size() );
     
-            for ( si = sources->begin(); si != sources->end(); si++ )
+            for ( si = grav->getSources()->begin();
+                    si != grav->getSources()->end(); si++ )
             {
                 printf( "name: %s\n", 
                     (*si)->getMetadata(
@@ -150,7 +151,8 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             printf( "random32max: %i\n", random32_max() );
         
         case 'n':
-            for ( si = sources->begin(); si != sources->end(); si++ )
+            for ( si = grav->getSources()->begin();
+                    si != grav->getSources()->end(); si++ )
             {
                 if ( (*si)->isSelected() )
                     (*si)->scaleNative();
@@ -158,7 +160,8 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             break;
         
         case '0':
-            for ( si = sources->begin(); si != sources->end(); si++ )
+            for ( si = grav->getSources()->begin();
+                    si != grav->getSources()->end(); si++ )
             {
                 (*si)->move(0.0f,0.0f);
             }
@@ -177,7 +180,8 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
         case '-':
             scaleAmt *= -1.0f;
         case '+':
-            for ( si = sources->begin(); si != sources->end(); si++ )
+            for ( si = grav->getSources()->begin();
+                    si != grav->getSources()->end(); si++ )
             {
                 if ( (*si)->isSelected() )
                 {
@@ -277,26 +281,26 @@ void InputHandler::leftClick( int x, int y )
     selectVideos();
     if ( !clickedInside && special != GLUT_ACTIVE_CTRL )
     {
-        if ( !selectedObjects->empty() )
+        if ( !grav->getSelectedObjects()->empty() )
         {
             float movePosX = mouseX; float movePosY = mouseY;
             std::vector<RectangleBase*>::const_iterator sli;
             
             float avgX = 0.0f, avgY = 0.0f;
-            int num = selectedObjects->size();
+            int num = grav->getSelectedObjects()->size();
             
             if ( num == 1 )
             {
-                (*selectedObjects)[0]->move( movePosX, movePosY );
-                (*selectedObjects)[0]->setSelect( false );
+                (*(grav->getSelectedObjects()))[0]->move( movePosX, movePosY );
+                (*(grav->getSelectedObjects()))[0]->setSelect( false );
             }
             // if moving >1, center the videos around the click point
             // we need to find the average pos beforehand
             else
             {
                 // average the vals
-                for ( sli = selectedObjects->begin(); 
-                       sli != selectedObjects->end();
+                for ( sli = grav->getSelectedObjects()->begin(); 
+                       sli != grav->getSelectedObjects()->end();
                        sli++ )
                 {
                     avgX += (*sli)->getX();
@@ -306,8 +310,8 @@ void InputHandler::leftClick( int x, int y )
                 avgY = avgY / num;
             
                 // move and set them to be unselected
-                for ( sli = selectedObjects->begin(); 
-                       sli != selectedObjects->end();
+                for ( sli = grav->getSelectedObjects()->begin(); 
+                       sli != grav->getSelectedObjects()->end();
                        sli++ )
                 {
                     (*sli)->move( movePosX + ((*sli)->getX()-avgX),
@@ -315,7 +319,7 @@ void InputHandler::leftClick( int x, int y )
                     (*sli)->setSelect( false );
                 }
             }
-            selectedObjects->clear();
+            grav->getSelectedObjects()->clear();
         }
     }
     // or if we did click on a video...
@@ -335,7 +339,7 @@ void InputHandler::leftRelease( int x, int y )
     // shift the temporary list of selected objects to the main list to
     // allow for multiple box selection
     for ( unsigned int i = 0; i < tempSelectedObjects->size(); i++ )
-        selectedObjects->push_back( (*tempSelectedObjects)[i] );
+        grav->getSelectedObjects()->push_back( (*tempSelectedObjects)[i] );
     tempSelectedObjects->clear();
     leftButtonHeld = false;
     
@@ -363,7 +367,8 @@ void InputHandler::mouseLeftHeldMove( int x, int y )
     if ( clickedInside )
     {
         std::vector<RectangleBase*>::reverse_iterator sli;
-        for ( sli = selectedObjects->rbegin(); sli != selectedObjects->rend();
+        for ( sli = grav->getSelectedObjects()->rbegin();
+                sli != grav->getSelectedObjects()->rend();
                 sli++ )
         {
             // since group members are controlled by the group somewhat,
@@ -411,7 +416,8 @@ bool InputHandler::selectVideos()
     // later in the list will render on top of previous ones
     std::vector<RectangleBase*>::const_iterator sli;
     
-    for ( si = drawnObjects->rbegin(); si != drawnObjects->rend(); si++ )
+    for ( si = grav->getDrawnObjects()->rbegin();
+            si != grav->getDrawnObjects()->rend(); si++ )
     {
         // rectangle that defines the selection area
         float selectL, selectR, selectU, selectD;
@@ -452,7 +458,7 @@ bool InputHandler::selectVideos()
                 if ( leftButtonHeld )
                     tempSelectedObjects->push_back( *si );
                 else
-                    selectedObjects->push_back( *si );
+                    grav->getSelectedObjects()->push_back( *si );
             }
             
             // take the selected video and put it at the end of the list so
@@ -462,8 +468,8 @@ bool InputHandler::selectVideos()
                 // since we can only delete a normal iterator (not a reverse
                 // one) we have to calculate our current position
                 std::vector<RectangleBase*>::iterator current =
-                    drawnObjects->begin() - 1 + 
-                    distance( si, drawnObjects->rend() );
+                    grav->getDrawnObjects()->begin() - 1 + 
+                    distance( si, grav->getDrawnObjects()->rend() );
                 grav->moveToTop( current );
                 
                 break; // so we only select one video per click
