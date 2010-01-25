@@ -294,7 +294,7 @@ void gravManager::draw()
             {
                 std::string oldName = (*si)->getName();
                 (*si)->updateName();
-                // only bother updating it on the tree if it's actually
+                // only bother updating it on the tree if it actually
                 // changes - to suppress "" from getting shown
                 if ( oldName != (*si)->getName() )
                     tree->updateObjectName( (*si) );
@@ -807,6 +807,8 @@ Group* gravManager::createSiteIDGroup( std::string data )
     drawnObjects->push_back( g );
     siteIDGroups->insert( std::pair<std::string,Group*>(data, g) );
     
+    tree->addObject( g );
+    
     return g;
 }
 
@@ -853,4 +855,9 @@ void gravManager::setInput( InputHandler* i )
 void gravManager::setTree( TreeControl* t )
 {
     tree = t;
+}
+
+TreeControl* gravManager::getTree()
+{
+    return tree;
 }

@@ -125,6 +125,8 @@ public:
     void setEarth( Earth* e );
     void setInput( InputHandler* i );
     void setTree( TreeControl* t );
+    
+    TreeControl* getTree();
                                     
 private:
     
