@@ -10,6 +10,7 @@
 #include "glutVideo.h"
 #include "Earth.h"
 #include "InputHandler.h"
+#include "TreeControl.h"
 
 #include <GL/glut.h>
 
@@ -19,22 +20,24 @@ bool gravApp::OnInit()
 {   
     grav = new gravManager();
     
-    frame = new wxFrame( (wxFrame*)NULL, -1, _("grav WX branch"),
-                        wxPoint( 50, 50 ),
+    mainFrame = new wxFrame( (wxFrame*)NULL, -1, _("grav WX branch"),
+                        wxPoint( 10, 50 ),
                         wxSize( grav->getWindowWidth(),
                                 grav->getWindowHeight() ) );
-    frame->Show( true );
+    mainFrame->Show( true );
     
-    //wxBoxSizer* sizer = new wxBoxSizer( wxVERTICAL );
+    treeFrame = new wxFrame( (wxFrame*)NULL, -1, _("grav menu"),
+                        wxPoint( 860, 50 ),
+                        wxSize( 300, 700 ) );
+    treeFrame->Show( true );
     
     int attribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 
                             0 };
     
-    canvas = new GLCanvas( frame, grav, attribList );
+    canvas = new GLCanvas( mainFrame, grav, attribList );
+    tree = new TreeControl( treeFrame, grav );
     
-    //sizer->Add( canvas, 1, wxEXPAND );
-    //frame->SetSizer( sizer );
-    //frame->SetAutoLayout( true );
+    printf( "hide root? %i\n", tree->HasFlag( wxTR_HIDE_ROOT ) );
     
     Timer* t = new Timer( canvas );
     t->Start();
@@ -54,9 +57,12 @@ bool gravApp::OnInit()
     
     grav->setEarth( earth );
     grav->setInput( input );
+    grav->setTree( tree );
     grav->setBorderTex( "border.png" );
+    
     bool res = grav->initSession( "224.2.224.225/20002", false );
     if ( res ) printf( "grav::session initialized\n" );
+    //tree->addSession( std::string( "224.2.224.225/20002" ) );
     
     return true;
 }

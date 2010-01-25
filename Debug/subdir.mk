@@ -12,6 +12,8 @@ CPP_SRCS += \
 ../InputHandler.cpp \
 ../PNGLoader.cpp \
 ../RectangleBase.cpp \
+../TreeControl.cpp \
+../TreeNode.cpp \
 ../VideoListener.cpp \
 ../VideoSource.cpp \
 ../glutVideo.cpp \
@@ -26,6 +28,8 @@ OBJS += \
 ./InputHandler.o \
 ./PNGLoader.o \
 ./RectangleBase.o \
+./TreeControl.o \
+./TreeNode.o \
 ./VideoListener.o \
 ./VideoSource.o \
 ./glutVideo.o \
@@ -40,6 +44,8 @@ CPP_DEPS += \
 ./InputHandler.d \
 ./PNGLoader.d \
 ./RectangleBase.d \
+./TreeControl.d \
+./TreeNode.d \
 ./VideoListener.d \
 ./VideoSource.d \
 ./glutVideo.d \

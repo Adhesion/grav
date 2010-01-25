@@ -14,7 +14,6 @@ BEGIN_EVENT_TABLE(GLCanvas, wxGLCanvas)
 EVT_PAINT(GLCanvas::draw)
 EVT_SIZE(GLCanvas::resize)
 EVT_IDLE(GLCanvas::idle)
-//EVT_KEY_DOWN(GLCanvas::testKey)
 END_EVENT_TABLE()
 
 GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes ) :
