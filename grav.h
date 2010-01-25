@@ -13,6 +13,7 @@
 
 class GLCanvas;
 class gravManager;
+class TreeControl;
 
 class gravApp : public wxApp
 {
@@ -21,8 +22,11 @@ private:
 
     virtual bool OnInit();
     
-    wxFrame* frame;
+    wxFrame* mainFrame;
+    wxFrame* treeFrame;
+    
     GLCanvas* canvas;
+    TreeControl* tree;
     
     gravManager* grav;
     

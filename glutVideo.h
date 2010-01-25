@@ -32,6 +32,7 @@ class VPMSession;
 class VPMSessionFactory;
 class Earth;
 class InputHandler;
+class TreeControl;
 
 class gravManager
 {
@@ -123,6 +124,7 @@ public:
     
     void setEarth( Earth* e );
     void setInput( InputHandler* i );
+    void setTree( TreeControl* t );
                                     
 private:
     
@@ -134,6 +136,9 @@ private:
     Earth* earth;
 
     InputHandler* input;
+    
+    TreeControl* tree; // we need a reference to the GUI tree so we can
+                       // update the names and add new objects
     
     VPMSessionFactory *sf;
     
@@ -157,6 +162,7 @@ private:
     int borderHeight;
     
     int holdCounter;
+    int drawCounter;
     bool enableSiteIDGroups;
     
     float camX;

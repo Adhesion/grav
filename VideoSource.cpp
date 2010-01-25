@@ -17,7 +17,6 @@ VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
     aspect = (float)vwidth / (float)vheight;
     tex_width = 0; tex_height = 0;
     texid = 0;
-    drawCounter = 0;
 }
 
 VideoSource::~VideoSource()

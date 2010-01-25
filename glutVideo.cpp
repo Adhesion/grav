@@ -24,6 +24,7 @@
 #include "PNGLoader.h"
 #include "InputHandler.h"
 #include "VideoListener.h"
+#include "TreeControl.h"
 
 #include "glutVideo.h"
 
@@ -160,7 +161,7 @@ void glutActiveMotion( int x, int y )
 gravManager::gravManager()
 {
     windowWidth = 800; windowHeight = 600;
-    holdCounter = 0;
+    holdCounter = 0; drawCounter = 0;
     camX = 0.0f;
     camY = 0.0f;
     camZ = 9.0f;
@@ -248,6 +249,14 @@ void gravManager::draw()
     gluSphere( sphereQuad, audioSession_listener->getLevelAvg()*50.0f,
                 200, 200 );
     
+    // set it to update names only every 30 frames
+    bool updateNames = false;
+    if ( drawCounter > 29 )
+    {
+        updateNames = true;
+        drawCounter = 0;
+    }
+    
     // polygon offset to fix z-fighting of coplanar polygons (videos)
     // disabled, since making the depth buffer read-only in some area takes
     // care of this issue
@@ -277,6 +286,21 @@ void gravManager::draw()
     // iterate through all objects to be drawn, and draw
     for ( si = drawnObjects->begin(); si != drawnObjects->end(); si++ )
     {
+        // do things we only want to do every X frames,
+        // like updating the name
+        if ( updateNames )
+        {
+            if ( !(*si)->usingFinalName() )
+            {
+                std::string oldName = (*si)->getName();
+                (*si)->updateName();
+                // only bother updating it on the tree if it's actually
+                // changes - to suppress "" from getting shown
+                if ( oldName != (*si)->getName() )
+                    tree->updateObjectName( (*si) );
+            }
+        }
+        
         // only draw if not grouped - groups are responsible for
         // drawing their members
         if ( !(*si)->isGrouped() )
@@ -354,6 +378,7 @@ void gravManager::draw()
     //printf( "holdcounter is %i\n", holdCounter );
     if ( !input->isLeftButtonHeld() && holdCounter > 0 )
         holdCounter-=2;
+    drawCounter++;
 }
 
 void gravManager::clearSelected()
@@ -412,8 +437,10 @@ void gravManager::retileVideos()
         if ( !(*si)->isGrouped() )
         {
             (*si)->move(x,y);
+            
             std::vector<RectangleBase*>::iterator next = si + 1;
             if ( next == drawnObjects->end() ) next = drawnObjects->begin();
+            
             x += (*si)->getWidth()/2 + buffer +
                     (*next)->getWidth()/2;
             if ( x > 8.0f )
@@ -725,10 +752,15 @@ std::map<std::string,Group*>* gravManager::getSiteIDGroups()
 
 void gravManager::addNewSource( VideoSource* s )
 {
+    if ( s == NULL ) return;
+    
     s->setTexture( borderTex, borderWidth, borderHeight );
     sources->push_back( s );
     drawnObjects->push_back( s );
     s->updateName();
+    
+    if ( tree != NULL )
+        tree->addObject( (RectangleBase*)s );
 }
 
 void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
@@ -816,4 +848,9 @@ void gravManager::setEarth( Earth* e )
 void gravManager::setInput( InputHandler* i )
 {
     input = i;
+}
+
+void gravManager::setTree( TreeControl* t )
+{
+    tree = t;
 }

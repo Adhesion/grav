@@ -143,8 +143,6 @@ protected:
     bool animated;
     void animateValues();
     
-    int drawCounter; // keeps track of how many times we've drawn
-    
 };
 
 #endif /*RECTANGLEBASE_H_*/

@@ -248,13 +248,6 @@ void RectangleBase::draw()
 {
     // note that the position should be set before calling this
     
-    // do things we only want to do every X frames, like updating the name
-    if ( drawCounter > 29 )
-    {
-        if ( !usingFinalName() ) updateName();
-        drawCounter = 0;
-    }
-    
     // draw the border first
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
@@ -365,8 +358,6 @@ void RectangleBase::draw()
         i++;
     }
     //glutStrokeString(GLUT_STROKE_MONO_ROMAN, uc);*/
-    
-    drawCounter++;
 }
 
 void RectangleBase::animateValues()

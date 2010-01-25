@@ -14,6 +14,8 @@
 VideoListener::VideoListener( gravManager* g ) :
     grav( g )
 {
+    x = -7.0f;
+    y = 5.5f;
 }
 
 void 
