@@ -39,7 +39,9 @@ void TreeControl::addObject( RectangleBase* obj )
     else
     {
         RectangleBase* parent = (RectangleBase*)obj->getGroup();
-        wxTreeItemId parentID = findObject( rootID, parent );
+        printf( "TreeControl::addObject: finding parent: %s for grouped obj %s\n",
+            parent->getName().c_str(), obj->getName().c_str() );
+        parentID = findObject( rootID, parent );
     }
     
     if ( parentID.IsOk() )
@@ -49,6 +51,10 @@ void TreeControl::addObject( RectangleBase* obj )
                         -1, -1, new TreeNode( obj, false ) );
         if ( obj->getName() == "" )
             SetItemText( newItem, _( "(waiting for name...)" ) );
+    }
+    else
+    {
+        printf( "TreeControl::addObject: parent NOT found\n" );
     }
 }
 
@@ -63,12 +69,18 @@ wxTreeItemId TreeControl::findObject( wxTreeItemId root, RectangleBase* obj )
     wxTreeItemId targetItem;
     wxTreeItemId current = GetFirstChild( root, temp );
     
+    printf( "TreeControl::findObject: looking for %s (%p)\n",
+            obj->getName().c_str(), obj );
+    
     while ( current.IsOk() )
     {
         TreeNode* data = dynamic_cast<TreeNode*>( GetItemData( current ) );
         if ( data != NULL )
         {
             RectangleBase* target = data->getObject();
+            printf( "TreeControl::findObject: looking at %s (%p)\n",
+                    target->getName().c_str(), target );
+            if ( target == obj ) printf ( "BLHRHBRHLRHBRLHLRHBLHRBHLRB\n" );
             if ( target == obj ) return current;
         }
         if ( ItemHasChildren( current ) )

@@ -7,6 +7,7 @@
 #include "VideoSource.h"
 #include "glutVideo.h"
 #include "Group.h"
+#include "TreeControl.h"
 
 #include <VPMedia/video/VPMVideoDecoder.h>
 #include <VPMedia/video/VPMVideoBufferSink.h>
@@ -99,8 +100,8 @@ VideoListener::vpmsession_source_app(VPMSession &session,
     
     if ( appS.compare( "site" ) == 0 && grav->usingSiteIDGroups() )
     {
-        // vic sends 4 nulls at the end of the rtcp_app string for some reason,
-        // so chop those off
+        // vic sends 4 nulls at the end of the rtcp_app string for some
+        // reason, so chop those off
         dataS = std::string( dataS, 0, 32 );
         std::vector<VideoSource*>::iterator i = grav->getSources()->begin();
         printf( "in rtcp app, got %i sources\n", grav->getSources()->size() );
@@ -130,6 +131,13 @@ VideoListener::vpmsession_source_app(VPMSession &session,
             
             (*i)->setSiteID( dataS );
             g->add( *i );
+            
+            // adding & removing will replace the object under its group
+            grav->getTree()->removeObject( (*i) );
+            grav->getTree()->addObject( (*i) );
+            
+            grav->getTree()->updateObjectName( g );
+            
             grav->retileVideos();
         }
     }
