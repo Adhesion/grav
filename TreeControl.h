@@ -16,9 +16,11 @@ class RectangleBase;
 
 class TreeControl : public wxTreeCtrl
 {
+    DECLARE_DYNAMIC_CLASS( TreeControl )
 
 public:
-    TreeControl( wxFrame* parent, gravManager* g );
+    TreeControl();
+    TreeControl( wxFrame* parent );
     
     /*
      * Adds a new entry to represent a video or audio session. Sessions will
@@ -32,9 +34,15 @@ public:
     
     void updateObjectName( RectangleBase* obj );
     
+    /*
+     * Overrides the wxTreeCtrl's compare function to implement a custom
+     * sort.
+     */
+    int OnCompareItems( const wxTreeItemId& item1,
+                            const wxTreeItemId& item2 );
+    
 private:
     wxTreeItemId rootID;
-    gravManager* grav;
     
 };
 

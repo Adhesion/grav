@@ -35,7 +35,7 @@ bool gravApp::OnInit()
                             0 };
     
     canvas = new GLCanvas( mainFrame, grav, attribList );
-    tree = new TreeControl( treeFrame, grav );
+    tree = new TreeControl( treeFrame );
     
     printf( "hide root? %i\n", tree->HasFlag( wxTR_HIDE_ROOT ) );
     
