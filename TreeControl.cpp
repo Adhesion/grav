@@ -12,10 +12,16 @@
 
 #include <wx/wx.h>
 
-TreeControl::TreeControl( wxFrame* parent, gravManager* g ) :
-    wxTreeCtrl( parent, wxID_ANY ), grav( g )
+IMPLEMENT_DYNAMIC_CLASS( TreeControl, wxTreeCtrl )
+
+TreeControl::TreeControl() :
+    wxTreeCtrl( NULL, wxID_ANY )
+{ }
+
+TreeControl::TreeControl( wxFrame* parent ) :
+    wxTreeCtrl( parent, wxID_ANY )
 {
-    rootID = AddRoot(_("grav::Groups"), -1, -1, new wxTreeItemData() );
+    rootID = AddRoot(_("Groups"), -1, -1, new wxTreeItemData() );
     SetSize( parent->GetSize() );
     //SetWindowStyle( GetWindowStyle() | wxTR_HIDE_ROOT );
 }
@@ -39,8 +45,6 @@ void TreeControl::addObject( RectangleBase* obj )
     else
     {
         RectangleBase* parent = (RectangleBase*)obj->getGroup();
-        printf( "TreeControl::addObject: finding parent: %s for grouped obj %s\n",
-            parent->getName().c_str(), obj->getName().c_str() );
         parentID = findObject( rootID, parent );
     }
     
@@ -51,6 +55,14 @@ void TreeControl::addObject( RectangleBase* obj )
                         -1, -1, new TreeNode( obj, false ) );
         if ( obj->getName() == "" )
             SetItemText( newItem, _( "(waiting for name...)" ) );
+        SortChildren( parentID );
+        
+        // if we're going from 1 to 2 objects (1 to 2 objects in the tree
+        // means 0 to 1 sources since the root node counts as an object)
+        // expand the root level automatically so it'll be expanded by
+        // default, but also if the number goes back to 0 and up again
+        if ( GetCount() == 2 )
+            Expand( rootID );
     }
     else
     {
@@ -100,4 +112,28 @@ void TreeControl::updateObjectName( RectangleBase* obj )
 {
     wxTreeItemId item = findObject( rootID, obj );
     SetItemText( item, wxString( obj->getName().c_str(), wxConvUTF8 ) );
+    SortChildren( GetItemParent( item ) );
+}
+
+int TreeControl::OnCompareItems( const wxTreeItemId& item1,
+                                    const wxTreeItemId& item2 )
+{
+    TreeNode* node1 = dynamic_cast<TreeNode*>(GetItemData( item1 ));
+    TreeNode* node2 = dynamic_cast<TreeNode*>(GetItemData( item2 ));
+    if ( node1 == NULL || node2 == NULL )
+        return 0;
+    
+    RectangleBase* obj1 = node1->getObject();
+    RectangleBase* obj2 = node2->getObject();
+    bool group1 = obj1->isGroup();
+    bool group2 = obj2->isGroup();
+    
+    // sort groups higher than non-groups, and if they're the same type,
+    // just sort alphabetically by name
+    if ( group1 && !group2 )
+        return -1;
+    else if ( !group1 && group2 )
+        return 1;
+    else
+        return obj1->getName().compare( obj2->getName() );
 }
