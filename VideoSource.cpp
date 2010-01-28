@@ -47,69 +47,78 @@ void VideoSource::draw()
     float t = 1.0;
     // if the texture id hasn't been initialized yet, this must be the
     // first draw call
-    bool init = (texid == 0);
+    init = (texid == 0);
 
     // allocate the buffer if it's the first time or if it's been resized
     if ( init || vwidth != videoSink->getImageWidth() ||
-        vheight != videoSink->getImageHeight() ) {
-      vwidth = videoSink->getImageWidth();
-      vheight = videoSink->getImageHeight();
-      if ( vheight > 0 )
-        aspect = (float)vwidth / (float)vheight;
-      else
-        aspect = 1.33f;
-      tex_width = GLUtil::pow2(vwidth);
-      tex_height = GLUtil::pow2(vheight);
-      printf( "image size is %ix%i\n", vwidth, 
-              vheight );
-      printf( "texture size is %ix%i\n", tex_width, 
-              tex_height );
-
-      // if it's not the first time we're allocating a texture
-      // (ie, it's a resize) delete the previous texture
-      if ( !init ) glDeleteTextures( 1, &texid );
-      glGenTextures(1, &texid);
-
-      glBindTexture(GL_TEXTURE_2D, texid);
-
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-      unsigned char *buffer = new unsigned char[tex_width * tex_height * 3];
-      memset(buffer, 128, tex_width * tex_height * 3);
-      glTexImage2D(GL_TEXTURE_2D, 
-	     0, 
-	     GL_RGB, 
-	     tex_width, 
-	     tex_height, 
-	     0,
-	     GL_LUMINANCE,
-	     GL_UNSIGNED_BYTE,
-	     buffer);
-      delete [] buffer;
+         vheight != videoSink->getImageHeight() )
+    {
+        resizeBuffer();
     }
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texid);
 
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 
-	    videoSink->getImageWidth());
+    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+    glPixelStorei( GL_UNPACK_ROW_LENGTH, vwidth );
     
-    glTexSubImage2D(GL_TEXTURE_2D,
-	      0,
-	      0, 
-	      0,
-	      vwidth,
-	      vheight,
-	      GL_RGB,
-	      GL_UNSIGNED_BYTE,
-	      videoSink->getImageData());
+    if ( videoSink->getImageFormat() == VIDEO_FORMAT_RGB24 )
+    {
+        glTexSubImage2D( GL_TEXTURE_2D,
+    	      0,
+    	      0,
+    	      0,
+    	      vwidth,
+    	      vheight,
+    	      GL_RGB,
+    	      GL_UNSIGNED_BYTE,
+    	      videoSink->getImageData() );
+    }
+    
+    // if we're doing yuv420, do the texture mapping for all 3 channels so the
+    // shader can properly work its magic
+    else if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
+    {
+        glTexSubImage2D( GL_TEXTURE_2D,
+              0,
+              0,
+              0,
+              vwidth,
+              vheight,
+              GL_LUMINANCE,
+              GL_UNSIGNED_BYTE,
+              videoSink->getImageData() );
+        
+        // now map the U & V to the bottom chunk of the image
+        // each is 1/4 of the size of the Y (half width, half height)
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, vwidth/2);
+        
+        glTexSubImage2D( GL_TEXTURE_2D,
+              0,
+              0,
+              vheight,
+              vwidth/2,
+              vheight/2,
+              GL_LUMINANCE,
+              GL_UNSIGNED_BYTE,
+              (GLubyte*)videoSink->getImageData() + (vwidth*vheight) );
+              
+        glTexSubImage2D( GL_TEXTURE_2D,
+              0,
+              vwidth/2,
+              vheight,
+              vwidth/2,
+              vheight/2,
+              GL_LUMINANCE,
+              GL_UNSIGNED_BYTE,
+              (GLubyte*)videoSink->getImageData() + 5*(vwidth*vheight)/4 );
+    }
 
     s = (float)vwidth/(float)tex_width;
-    t = (float)vheight/(float)tex_height;
+    if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
+        t = (float)(3*vheight/2)/(float)tex_height;
+    else
+        t = (float)vheight/(float)tex_height;
     
     // X & Y distances from center to edge
     float Xdist = getWidth()/2;
@@ -148,6 +157,51 @@ void VideoSource::draw()
     }
     
     glPopMatrix();
+}
+
+void VideoSource::resizeBuffer()
+{
+    vwidth = videoSink->getImageWidth();
+    vheight = videoSink->getImageHeight();
+    
+    if ( vheight > 0 )
+        aspect = (float)vwidth / (float)vheight;
+    else
+        aspect = 1.33f;
+    
+    tex_width = GLUtil::pow2(vwidth);
+    if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
+        tex_height = GLUtil::pow2( 3*vheight/2 );
+    else
+        tex_height = GLUtil::pow2( vheight );
+    
+    printf( "image size is %ix%i\n", vwidth, vheight );
+    printf( "texture size is %ix%i\n", tex_width, tex_height );
+    
+    // if it's not the first time we're allocating a texture
+    // (ie, it's a resize) delete the previous texture
+    if ( !init ) glDeleteTextures( 1, &texid );
+        glGenTextures(1, &texid);
+    
+    glBindTexture(GL_TEXTURE_2D, texid);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    
+    unsigned char *buffer = new unsigned char[tex_width * tex_height * 3];
+    memset(buffer, 128, tex_width * tex_height * 3);
+    glTexImage2D( GL_TEXTURE_2D,
+                  0,
+                  GL_RGB,
+                  tex_width,
+                  tex_height,
+                  0,
+                  GL_LUMINANCE,
+                  GL_UNSIGNED_BYTE,
+                  buffer);
+    delete [] buffer;
 }
 
 void VideoSource::scaleNative()
