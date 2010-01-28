@@ -58,8 +58,11 @@ private:
     unsigned int vwidth, vheight; // original dimensions of the video
     float aspect; // aspect ratio of the video
     
+    void resizeBuffer(); // remake the buffer when the video gets resized
+    
     unsigned int tex_width, tex_height; // dimensions rounded up to power of 2
     GLuint texid; // GL texture identifier
+    bool init;
 
 };
 

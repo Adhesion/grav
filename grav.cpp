@@ -12,6 +12,8 @@
 #include "InputHandler.h"
 #include "TreeControl.h"
 
+#include <VPMedia/VPMLog.h>
+
 #include <GL/glut.h>
 
 IMPLEMENT_APP( gravApp )
@@ -28,7 +30,7 @@ bool gravApp::OnInit()
     
     treeFrame = new wxFrame( (wxFrame*)NULL, -1, _("grav menu"),
                         wxPoint( 860, 50 ),
-                        wxSize( 300, 700 ) );
+                        wxSize( 300, 600 ) );
     treeFrame->Show( true );
     
     int attribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 
@@ -59,6 +61,8 @@ bool gravApp::OnInit()
     grav->setInput( input );
     grav->setTree( tree );
     grav->setBorderTex( "border.png" );
+    
+    vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
     
     bool res = grav->initSession( "224.2.224.225/20002", false );
     if ( res ) printf( "grav::session initialized\n" );

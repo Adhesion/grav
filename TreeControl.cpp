@@ -81,18 +81,12 @@ wxTreeItemId TreeControl::findObject( wxTreeItemId root, RectangleBase* obj )
     wxTreeItemId targetItem;
     wxTreeItemId current = GetFirstChild( root, temp );
     
-    printf( "TreeControl::findObject: looking for %s (%p)\n",
-            obj->getName().c_str(), obj );
-    
     while ( current.IsOk() )
     {
         TreeNode* data = dynamic_cast<TreeNode*>( GetItemData( current ) );
         if ( data != NULL )
         {
             RectangleBase* target = data->getObject();
-            printf( "TreeControl::findObject: looking at %s (%p)\n",
-                    target->getName().c_str(), target );
-            if ( target == obj ) printf ( "BLHRHBRHLRHBRLHLRHBLHRBHLRB\n" );
             if ( target == obj ) return current;
         }
         if ( ItemHasChildren( current ) )
