@@ -8,6 +8,11 @@
 #include "GLUtil.h"
 #include <cmath>
 
+GLuint VideoSource::YUV420program = 0;
+GLuint VideoSource::YUV420xOffsetID = 0;
+GLuint VideoSource::YUV420yOffsetID = 0;
+bool VideoSource::YUV420shaderInit = false;
+
 VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
                             VPMVideoBufferSink* vs, float _x, float _y ) :
     session( _session ), ssrc( _ssrc ), videoSink( vs ), RectangleBase(_x,_y)
@@ -55,7 +60,19 @@ void VideoSource::draw()
     {
         resizeBuffer();
     }
-
+    
+    s = (float)vwidth/(float)tex_width;
+    //if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
+    //    t = (float)(3*vheight/2)/(float)tex_height;
+    //else
+        t = (float)vheight/(float)tex_height;
+    
+#ifdef HAVE_GLEW
+    glUseProgram( YUV420program );
+    glUniform1f( YUV420xOffsetID, s );
+    glUniform1f( YUV420yOffsetID, t );
+#endif
+    
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texid);
 
@@ -113,12 +130,6 @@ void VideoSource::draw()
               GL_UNSIGNED_BYTE,
               (GLubyte*)videoSink->getImageData() + 5*(vwidth*vheight)/4 );
     }
-
-    s = (float)vwidth/(float)tex_width;
-    if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
-        t = (float)(3*vheight/2)/(float)tex_height;
-    else
-        t = (float)vheight/(float)tex_height;
     
     // X & Y distances from center to edge
     float Xdist = getWidth()/2;
@@ -145,6 +156,10 @@ void VideoSource::draw()
     
     glDisable(GL_TEXTURE_2D);
     
+#ifdef HAVE_GLEW
+    glUseProgram( 0 );
+#endif
+    
     if ( vwidth == 0 || vheight == 0 )
     {      
         glPushMatrix();
@@ -157,6 +172,22 @@ void VideoSource::draw()
     }
     
     glPopMatrix();
+
+}
+
+void VideoSource::setYUV420Program( GLuint p )
+{
+#ifdef HAVE_GLEW
+    YUV420program = p;
+    
+    YUV420xOffsetID = glGetUniformLocation( YUV420program, "xOffset" );
+    YUV420yOffsetID = glGetUniformLocation( YUV420program, "yOffset" );
+#endif
+}
+
+bool VideoSource::isYUV420shaderInit()
+{
+    return YUV420shaderInit;
 }
 
 void VideoSource::resizeBuffer()

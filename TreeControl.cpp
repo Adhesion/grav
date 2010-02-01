@@ -5,10 +5,10 @@
  * @author Andrew Ford
  */
 
+#include "RectangleBase.h"
 #include "TreeControl.h"
 #include "glutVideo.h"
 #include "TreeNode.h"
-#include "RectangleBase.h"
 
 #include <wx/wx.h>
 

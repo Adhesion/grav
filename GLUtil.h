@@ -8,8 +8,13 @@
  * @author Andrew Ford
  */
 
+#ifdef HAVE_GLEW
+#include <GL/glew.h>
+#else
 #include <GL/glu.h>
-#include <stdio.h>
+#endif
+
+#include <iostream>
 
 namespace GLUtil
 {
@@ -23,10 +28,11 @@ namespace GLUtil
     // to convert our coordinates
     void updateMatrices();
     
-    inline int pow2(int x) {
-      int i;
-      for (i = 2; i < x; i <<= 1);
-      return i;
+    inline int pow2( int x )
+    {
+        int i;
+        for (i = 2; i < x; i <<= 1);
+        return i;
     }
     
     /**
@@ -55,6 +61,12 @@ namespace GLUtil
      */
     void screenToWorld( GLdouble scrX, GLdouble scrY, GLdouble scrZ,
                         GLdouble* x, GLdouble* y, GLdouble* z );
+    
+    /**
+     * Uses GLEW to load a shader (.vert and .frag) from files and returns a
+     * reference to the program.
+     */
+    GLuint loadShaders( const char* location );
 
 }
 

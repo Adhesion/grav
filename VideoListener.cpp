@@ -8,6 +8,7 @@
 #include "glutVideo.h"
 #include "Group.h"
 #include "TreeControl.h"
+#include "GLUtil.h"
 
 #include <VPMedia/video/VPMVideoDecoder.h>
 #include <VPMedia/video/VPMVideoBufferSink.h>
@@ -19,7 +20,7 @@ VideoListener::VideoListener( gravManager* g ) :
     y = 5.5f;
 }
 
-void 
+void
 VideoListener::vpmsession_source_created(VPMSession &session,
                     uint32_t ssrc,
                     uint32_t pt,
@@ -27,9 +28,10 @@ VideoListener::vpmsession_source_created(VPMSession &session,
                     VPMPayloadDecoder *decoder)
 {
   VPMVideoDecoder *d = dynamic_cast<VPMVideoDecoder*>(decoder);
+  VPMVideoFormat format = VIDEO_FORMAT_YUV420;
 
   if (d) {
-    VPMVideoBufferSink *sink = new VPMVideoBufferSink(VIDEO_FORMAT_RGB24);
+    VPMVideoBufferSink *sink = new VPMVideoBufferSink(format);
     if (!sink->initialise()) {
       fprintf(stderr, "Failed to initialise video sink\n");
       return;

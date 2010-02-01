@@ -5,12 +5,14 @@
  * @author Andrew Ford
  */
 
+#include "Earth.h"
 #include "grav.h"
 #include "GLCanvas.h"
 #include "glutVideo.h"
-#include "Earth.h"
 #include "InputHandler.h"
 #include "TreeControl.h"
+#include "GLUtil.h"
+#include "VideoSource.h"
 
 #include <VPMedia/VPMLog.h>
 
@@ -33,7 +35,7 @@ bool gravApp::OnInit()
                         wxSize( 300, 600 ) );
     treeFrame->Show( true );
     
-    int attribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 
+    int attribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16,
                             0 };
     
     canvas = new GLCanvas( mainFrame, grav, attribList );
@@ -47,6 +49,13 @@ bool gravApp::OnInit()
     char* argv[1] = { "test" };
     int argc = 1;
     glutInit( &argc, argv );
+    
+#ifdef HAVE_GLEW
+    glewInit();
+
+    GLuint yuv420Program = GLUtil::loadShaders( "GLSL/YUV420toRGB24" );
+    VideoSource::setYUV420Program( yuv420Program );
+#endif
     
     Earth* earth = new Earth();
     InputHandler* input = new InputHandler( earth, grav );

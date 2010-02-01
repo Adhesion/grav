@@ -8,7 +8,6 @@
 #include "Group.h"
 #include "PNGLoader.h"
 #include "GLUtil.h"
-#include <GL/glu.h>
 
 #include <cmath>
 

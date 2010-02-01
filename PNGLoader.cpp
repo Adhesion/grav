@@ -10,7 +10,6 @@
 #include <string>
 #include <cstdio>
 #include <png.h>
-#include <GL/gl.h>
 
 #include "GLUtil.h"
 #include "PNGLoader.h"
