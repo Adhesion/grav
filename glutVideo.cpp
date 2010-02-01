@@ -1,7 +1,3 @@
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
-
 #include <VPMedia/VPMSession.h>
 #include <VPMedia/VPMSessionFactory.h>
 #include <VPMedia/video/VPMVideoDecoder.h>
@@ -25,6 +21,10 @@
 #include "InputHandler.h"
 #include "VideoListener.h"
 #include "TreeControl.h"
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
 
 #include "glutVideo.h"
 

@@ -11,8 +11,13 @@
 
 #include <string>
 
-#include <FTGL/ftgl.h>
+#ifdef HAVE_GLEW
+#include <GL/glew.h>
+#else
 #include <GL/gl.h>
+#endif
+
+#include <FTGL/ftgl.h>
 
 typedef struct {
     float R;
