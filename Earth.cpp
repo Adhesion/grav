@@ -127,8 +127,10 @@ void Earth::convertLatLong( float lat, float lon, float &ex, float &ey,
     glRotatef( zRot, 0.0f, 1.0f, 0.0f );
     glGetDoublev( GL_MODELVIEW_MATRIX, matrix );
     glPopMatrix();
-    
+
+    //
     //printf( "xRot: %f\n", xRot );
+    //
     
     /*printf( "printing earth rotation matrix:\n[" );
     int c = 0;
