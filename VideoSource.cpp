@@ -8,11 +8,6 @@
 #include "GLUtil.h"
 #include <cmath>
 
-GLuint VideoSource::YUV420program = 0;
-GLuint VideoSource::YUV420xOffsetID = 0;
-GLuint VideoSource::YUV420yOffsetID = 0;
-bool VideoSource::YUV420shaderInit = false;
-
 VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
                             VPMVideoBufferSink* vs, float _x, float _y ) :
     session( _session ), ssrc( _ssrc ), videoSink( vs ), RectangleBase(_x,_y)
@@ -64,13 +59,13 @@ void VideoSource::draw()
     //if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
     //    t = (float)(3*vheight/2)/(float)tex_height;
     //else
-        t = (float)vheight/(float)tex_height;
+    t = (float)vheight/(float)tex_height;
     
     if ( GLUtil::getInstance()->haveShaders() )
     {
-        glUseProgram( YUV420program );
-        glUniform1f( YUV420xOffsetID, s );
-        glUniform1f( YUV420yOffsetID, t );
+        glUseProgram( GLUtil::getInstance()->getYUV420Program() );
+        glUniform1f( GLUtil::getInstance()->getYUV420xOffsetID(), s );
+        glUniform1f( GLUtil::getInstance()->getYUV420yOffsetID(), t );
     }
     
     glEnable(GL_TEXTURE_2D);
@@ -172,22 +167,6 @@ void VideoSource::draw()
     
     glPopMatrix();
 
-}
-
-void VideoSource::setYUV420Program( GLuint p )
-{
-    if ( GLUtil::getInstance()->haveShaders() )
-    {
-        YUV420program = p;
-        
-        YUV420xOffsetID = glGetUniformLocation( YUV420program, "xOffset" );
-        YUV420yOffsetID = glGetUniformLocation( YUV420program, "yOffset" );
-    }
-}
-
-bool VideoSource::isYUV420shaderInit()
-{
-    return YUV420shaderInit;
 }
 
 void VideoSource::resizeBuffer()

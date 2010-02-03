@@ -29,12 +29,6 @@ public:
     void draw();
     
     /*
-     * If we have GLEW, set the GLSL shader program.
-     */
-    static void setYUV420Program( GLuint p );
-    static bool isYUV420shaderInit();
-    
-    /*
      * Change the scale of the video to be native size
      * relative to the screen size.
      */
@@ -69,11 +63,6 @@ private:
     unsigned int tex_width, tex_height; // dimensions rounded up to power of 2
     GLuint texid; // GL texture identifier
     bool init;
-    
-    static GLuint YUV420program;    
-    static GLuint YUV420xOffsetID;
-    static GLuint YUV420yOffsetID;
-    static bool YUV420shaderInit;
     
 };
 
