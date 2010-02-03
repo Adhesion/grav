@@ -68,6 +68,10 @@ public:
      */
     GLuint loadShaders( const char* location );
     
+    GLuint getYUV420Program();
+    GLuint getYUV420xOffsetID();
+    GLuint getYUV420yOffsetID();
+    
     /*
      * Returns whether shaders are available to use or not.
      */
@@ -88,6 +92,10 @@ private:
     const GLchar* vert420;
     
     bool shaders;
+    
+    GLuint YUV420Program;
+    GLuint YUV420xOffsetID;
+    GLuint YUV420yOffsetID;
 
 };
 

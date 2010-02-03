@@ -34,8 +34,9 @@ bool GLUtil::initGL()
     sscanf( glVer, "%d.%d", &glMajorVer, &glMinorVer );
     if ( glMajorVer >= 2 )
     {
-        GLuint yuv420Program = GLUtil::loadShaders( "GLSL/YUV420toRGB24" );
-        VideoSource::setYUV420Program( yuv420Program );
+        YUV420Program = GLUtil::loadShaders( "GLSL/YUV420toRGB24" );
+        YUV420xOffsetID = glGetUniformLocation( YUV420Program, "xOffset" );
+        YUV420yOffsetID = glGetUniformLocation( YUV420Program, "yOffset" );
         shaders = true;
         printf( "GLUtil::initGL(): shaders are available (GL v%s)\n", glVer );
     }
@@ -201,10 +202,25 @@ GLuint GLUtil::loadShaders( const char* location )
         printf( "GLUtil::loadShaders: shaders failed to link\n" );
         return 0;
     }
-    printf( "GLUtil::loadShaders: linked (status: %i), returning program\n",
-                linked );
+    printf( "GLUtil::loadShaders: linked (status: %i), returning program %i\n",
+                linked, program );
     
     return program;
+}
+
+GLuint GLUtil::getYUV420Program()
+{
+    return YUV420Program;
+}
+
+GLuint GLUtil::getYUV420xOffsetID()
+{
+    return YUV420xOffsetID;
+}
+
+GLuint GLUtil::getYUV420yOffsetID()
+{
+    return YUV420yOffsetID;
 }
 
 bool GLUtil::haveShaders()
@@ -251,7 +267,7 @@ GLUtil::GLUtil()
     "    yCoord.t = yOffset - gl_MultiTexCoord0.t;\n"
     "\n"
     "    uCoord.s = (gl_MultiTexCoord0.s/2.0);\n"
-    "    uCoord.t = (3*yOffset/2) - (gl_MultiTexCoord0.t/2.0);\n"
+    "    uCoord.t = (3.0*yOffset/2.0) - (gl_MultiTexCoord0.t/2.0);\n"
     "\n"
     "    vCoord.s = uCoord.s + xOffset/2.0;\n"
     "    vCoord.t = uCoord.t;\n"

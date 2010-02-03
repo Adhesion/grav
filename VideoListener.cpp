@@ -32,6 +32,9 @@ VideoListener::vpmsession_source_created(VPMSession &session,
 
   if (d) {
     VPMVideoBufferSink *sink;
+    printf( "VideoListener::vpmsession_source_created: "
+            "creating source, have shaders? %i format? %i (yuv420p: %i)\n",
+            GLUtil::getInstance()->haveShaders(), format, VIDEO_FORMAT_YUV420 );
     if ( GLUtil::getInstance()->haveShaders() && format == VIDEO_FORMAT_YUV420 )
         sink = new VPMVideoBufferSink( format );
     else
