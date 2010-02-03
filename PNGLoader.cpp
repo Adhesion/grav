@@ -30,7 +30,12 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
         return 0;
     }
     
-    fread( PNGheader, 1, 8, texfile );
+    size_t retval = fread( PNGheader, 1, 8, texfile );
+    if ( retval == 0 )
+    {
+        printf( "PNGLoader::error reading file %s?\n", filename.c_str() );
+        return 0;
+    }
     
     // check the header
     int pngTest = !png_sig_cmp( PNGheader, 0, 8 );
@@ -92,9 +97,11 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     printf( "bitDepth: %i, colorType: %i, RGBA: %i\n", bitDepth, colorType,
         PNG_COLOR_TYPE_RGBA );
     
-    int pwidth = GLUtil::pow2( iwidth ); int pheight = GLUtil::pow2( iheight );
-    printf( "read in PNG: image dimensions: %ix%i, pow2 dimensions: %ix%i\n",
-            iwidth, iheight, pwidth, pheight );
+    int pwidth = GLUtil::getInstance()->pow2( iwidth );
+    int pheight = GLUtil::getInstance()->pow2( iheight );
+    printf( "read in PNG: image dimensions: %ux%u, pow2 dimensions: %ux%u\n",
+            (unsigned int)iwidth, (unsigned int)iheight,
+            (unsigned int)pwidth, (unsigned int)pheight );
     
     // update the info struct
     png_read_update_info( png, pngInfo );
@@ -104,7 +111,7 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     
     // set the pointers for libpng to read the image row-by-row
     png_bytep* rowPointers = new png_bytep[ iheight ];
-    for ( int i = 0; i < iheight; i++ )
+    for ( unsigned int i = 0; i < iheight; i++ )
         rowPointers[iheight - 1 - i] = image + (i * rowBytes);
         
     // read in the image

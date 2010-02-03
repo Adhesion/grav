@@ -5,52 +5,48 @@
  */
 
 #include "GLUtil.h"
+#include "VideoSource.h"
 #include <string>
+#include <GL/glut.h>
 
-GLchar* frag420 =
-"uniform sampler2D texture;\n"
-"\n"
-"varying vec2 yCoord;\n"
-"varying vec2 uCoord;\n"
-"varying vec2 vCoord;\n"
-"\n"
-"void main( void )\n"
-"{\n"
-"    float y = texture2D( texture, yCoord ).r;\n"
-"    float u = texture2D( texture, uCoord ).r;\n"
-"    float v = texture2D( texture, vCoord ).r;\n"
-"\n"
-"    float cb = u - 0.5;\n"
-"    float cr = v - 0.5;\n"
-"\n"
-"    vec3 rgb = vec3( y + (cr*1.3874),\n"
-"                     y - (cb*0.7109) - (cr*0.3438),\n"
-"                     y + (cb*1.7734) );\n"
-"\n"
-"    gl_FragColor = vec4( rgb, 1.0 );\n"
-"}\n";
+GLUtil* GLUtil::instance = NULL;
 
-GLchar* vert420 =
-"uniform float xOffset;\n"
-"uniform float yOffset;\n"
-"\n"
-"varying vec2 yCoord;\n"
-"varying vec2 uCoord;\n"
-"varying vec2 vCoord;\n"
-"\n"
-"void main( void )\n"
-"{\n"
-"    yCoord.s = gl_MultiTexCoord0.s;\n"
-"    yCoord.t = yOffset - gl_MultiTexCoord0.t;\n"
-"\n"
-"    uCoord.s = (gl_MultiTexCoord0.s/2.0);\n"
-"    uCoord.t = (3*yOffset/2) - (gl_MultiTexCoord0.t/2.0);\n"
-"\n"
-"    vCoord.s = uCoord.s + xOffset/2.0;\n"
-"    vCoord.t = uCoord.t;\n"
-"\n"
-"    gl_Position = ftransform();\n"
-"}\n";
+GLUtil* GLUtil::getInstance()
+{
+    if ( instance == NULL )
+    {
+        instance = new GLUtil();
+    }
+    return instance;
+}
+
+bool GLUtil::initGL()
+{
+    char* argv[1] = { "GLUT" };
+    int argc = 1;
+    glutInit( &argc, argv );
+    
+    glewInit();
+    
+    // check GL version and use shaders if 2.0 or higher
+    const char* glVer = (const char*)glGetString( GL_VERSION );
+    int glMajorVer, glMinorVer;
+    sscanf( glVer, "%d.%d", &glMajorVer, &glMinorVer );
+    if ( glMajorVer >= 2 )
+    {
+        GLuint yuv420Program = GLUtil::loadShaders( "GLSL/YUV420toRGB24" );
+        VideoSource::setYUV420Program( yuv420Program );
+        shaders = true;
+        printf( "GLUtil::initGL(): shaders are available (GL v%s)\n", glVer );
+    }
+    else
+    {
+        shaders = false;
+        printf( "GLUtil::initGL(): shaders NOT available (GL v%s)\n", glVer );
+    }
+    
+    return true;
+}
 
 void GLUtil::updateMatrices()
 {
@@ -67,7 +63,7 @@ void GLUtil::printMatrices()
     int c = 0;
     for ( int i = 0; i < 16; i++ )
     {
-        printf( "%f", modelview[c] );
+        printf( "%f", modelview[c%16] );
         if ( i % 4 == 3 )
             printf( "]\n[" );
         else
@@ -209,4 +205,57 @@ GLuint GLUtil::loadShaders( const char* location )
                 linked );
     
     return program;
+}
+
+bool GLUtil::haveShaders()
+{
+    return shaders;
+}
+
+GLUtil::GLUtil()
+{
+    frag420 =
+    "uniform sampler2D texture;\n"
+    "\n"
+    "varying vec2 yCoord;\n"
+    "varying vec2 uCoord;\n"
+    "varying vec2 vCoord;\n"
+    "\n"
+    "void main( void )\n"
+    "{\n"
+    "    float y = texture2D( texture, yCoord ).r;\n"
+    "    float u = texture2D( texture, uCoord ).r;\n"
+    "    float v = texture2D( texture, vCoord ).r;\n"
+    "\n"
+    "    float cb = u - 0.5;\n"
+    "    float cr = v - 0.5;\n"
+    "\n"
+    "    vec3 rgb = vec3( y + (cr*1.3874),\n"
+    "                     y - (cb*0.7109) - (cr*0.3438),\n"
+    "                     y + (cb*1.7734) );\n"
+    "\n"
+    "    gl_FragColor = vec4( rgb, 1.0 );\n"
+    "}\n";
+    
+    vert420 =
+    "uniform float xOffset;\n"
+    "uniform float yOffset;\n"
+    "\n"
+    "varying vec2 yCoord;\n"
+    "varying vec2 uCoord;\n"
+    "varying vec2 vCoord;\n"
+    "\n"
+    "void main( void )\n"
+    "{\n"
+    "    yCoord.s = gl_MultiTexCoord0.s;\n"
+    "    yCoord.t = yOffset - gl_MultiTexCoord0.t;\n"
+    "\n"
+    "    uCoord.s = (gl_MultiTexCoord0.s/2.0);\n"
+    "    uCoord.t = (3*yOffset/2) - (gl_MultiTexCoord0.t/2.0);\n"
+    "\n"
+    "    vCoord.s = uCoord.s + xOffset/2.0;\n"
+    "    vCoord.t = uCoord.t;\n"
+    "\n"
+    "    gl_Position = ftransform();\n"
+    "}\n";
 }

@@ -275,8 +275,8 @@ void RectangleBase::draw()
         fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
     }*/
     
-    float s = (float)twidth / (float)GLUtil::pow2( twidth );
-    float t = (float)theight / (float)GLUtil::pow2( theight );
+    float s = (float)twidth / (float)GLUtil::getInstance()->pow2( twidth );
+    float t = (float)theight / (float)GLUtil::getInstance()->pow2( theight );
     
     glScalef( 1.0f+effectVal, 1.0f+effectVal, 0.0f );
     

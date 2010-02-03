@@ -8,11 +8,7 @@
  * @author Andrew Ford
  */
 
-#ifdef HAVE_GLEW
 #include <GL/glew.h>
-#else
-#include <GL/glu.h>
-#endif
 
 class Earth
 {

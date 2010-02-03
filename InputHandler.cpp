@@ -137,7 +137,7 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
                 printf( "\tpos (world): %f,%f\n",
                         (*si)->getX(), (*si)->getY() );
                 GLdouble scrX; GLdouble scrY; GLdouble scrZ;
-                GLUtil::worldToScreen( (GLdouble)(*si)->getX(),
+                GLUtil::getInstance()->worldToScreen( (GLdouble)(*si)->getX(),
                                 (GLdouble)(*si)->getY(), 
                                 (GLdouble)(*si)->getZ(),
                                 &scrX, &scrY, &scrZ);
@@ -204,6 +204,20 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             grav->setCamX(grav->getCamX()+1);
             break;
         
+        // u/d/l/r arrow keys, for WX
+        case ':':
+            earth->rotate( 0.0f, 0.0f, -2.0f );
+            break;
+        case '<':
+            earth->rotate( 0.0f, 0.0f, 2.0f );
+            break;
+        case ';':
+            earth->rotate( -2.0f, 0.0f, 0.0f );
+            break;
+        case '=':
+            earth->rotate( 2.0f, 0.0f, 0.0f );
+            break;
+        
         // backspace: deselect videos
         case 8:
             grav->clearSelected();
@@ -221,15 +235,19 @@ void InputHandler::processSpecialKey( int key, int x, int y )
     switch( key )
     {
         case GLUT_KEY_LEFT:
+        case ':':
             earth->rotate( 0.0f, 0.0f, -2.0f );
             break;
         case GLUT_KEY_RIGHT:
+        case '<':
             earth->rotate( 0.0f, 0.0f, 2.0f );
             break;
         case GLUT_KEY_UP:
+        case ';':
             earth->rotate( -2.0f, 0.0f, 0.0f );
             break;
         case GLUT_KEY_DOWN:
+        case '=':
             earth->rotate( 2.0f, 0.0f, 0.0f );
             break;
     }
@@ -263,7 +281,7 @@ void InputHandler::leftClick( int x, int y )
     grav->setBoxSelectDrawing( false );
     
     // get world coords for current mouse pos
-    GLUtil::screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
+    GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
                             &mouseX, &mouseY, &mouseZ );
     
     //printf( "mouse clicked at world %f,%f; screen %i,%i\n",
@@ -357,7 +375,7 @@ void InputHandler::mouseLeftHeldMove( int x, int y )
     y = grav->getWindowHeight() - y;
     
     // get world coords for current mouse pos
-    GLUtil::screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
+    GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
                             &mouseX, &mouseY, &mouseZ );
     
     dragEndX = mouseX;
