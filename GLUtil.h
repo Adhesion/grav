@@ -8,21 +8,21 @@
  * @author Andrew Ford
  */
 
-#ifdef HAVE_GLEW
 #include <GL/glew.h>
-#else
-#include <GL/glu.h>
-#endif
 
 #include <iostream>
 
-namespace GLUtil
+class GLUtil
 {
 
-    // pointers to the GL matrices in question
-    static GLdouble modelview[16];
-    static GLdouble projection[16];
-    static GLint viewport[4];
+public:
+    static GLUtil* getInstance();
+       
+    /*
+     * Call glut and glew init functions, check for shaders, and load them if
+     * we can.
+     */
+    bool initGL();
     
     // get the matrices that define the camera transforms so we can use those
     // to convert our coordinates
@@ -67,7 +67,28 @@ namespace GLUtil
      * reference to the program.
      */
     GLuint loadShaders( const char* location );
+    
+    /*
+     * Returns whether shaders are available to use or not.
+     */
+    bool haveShaders();
+    
+protected:
+    GLUtil();
 
-}
+private:
+    static GLUtil* instance;
+
+    // pointers to the GL matrices
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLint viewport[4];
+    
+    const GLchar* frag420;
+    const GLchar* vert420;
+    
+    bool shaders;
+
+};
 
 #endif /*GLUTIL_H_*/

@@ -46,16 +46,8 @@ bool gravApp::OnInit()
     Timer* t = new Timer( canvas );
     t->Start();
     
-    char* argv[1] = { "test" };
-    int argc = 1;
-    glutInit( &argc, argv );
-    
-#ifdef HAVE_GLEW
-    glewInit();
-
-    GLuint yuv420Program = GLUtil::loadShaders( "GLSL/YUV420toRGB24" );
-    VideoSource::setYUV420Program( yuv420Program );
-#endif
+    // initialize GL stuff (+ shaders)
+    GLUtil::getInstance()->initGL();
     
     Earth* earth = new Earth();
     InputHandler* input = new InputHandler( earth, grav );

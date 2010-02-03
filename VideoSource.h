@@ -9,21 +9,14 @@
  * @author Andrew Ford
  */
 
-#ifdef HAVE_GLEW
 #include <GL/glew.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
 
-#include <GL/freeglut.h>
+#include <GL/glut.h>
 
 #include "RectangleBase.h"
 
 #include <VPMedia/video/VPMVideoBufferSink.h>
 #include <VPMedia/VPMSession.h>
-
-
 
 class VideoSource : public RectangleBase
 {

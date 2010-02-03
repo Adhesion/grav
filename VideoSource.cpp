@@ -26,8 +26,7 @@ VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
 
 VideoSource::~VideoSource()
 {
-    // the videoSink comes from the session, and ours is just a reference to its
-    // so we can let it delete it when it itself needs to
+    delete videoSink;
     
     // gl destructors
     glDeleteTextures( 1, &texid );
@@ -67,11 +66,12 @@ void VideoSource::draw()
     //else
         t = (float)vheight/(float)tex_height;
     
-#ifdef HAVE_GLEW
-    glUseProgram( YUV420program );
-    glUniform1f( YUV420xOffsetID, s );
-    glUniform1f( YUV420yOffsetID, t );
-#endif
+    if ( GLUtil::getInstance()->haveShaders() )
+    {
+        glUseProgram( YUV420program );
+        glUniform1f( YUV420xOffsetID, s );
+        glUniform1f( YUV420yOffsetID, t );
+    }
     
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texid);
@@ -156,12 +156,11 @@ void VideoSource::draw()
     
     glDisable(GL_TEXTURE_2D);
     
-#ifdef HAVE_GLEW
-    glUseProgram( 0 );
-#endif
+    if ( GLUtil::getInstance()->haveShaders() )
+        glUseProgram( 0 );
     
     if ( vwidth == 0 || vheight == 0 )
-    {      
+    {
         glPushMatrix();
         glTranslatef( -2.0f, 1.5f, 0.0f );
         float scaleFactor = 0.001f * scaleX;
@@ -177,12 +176,13 @@ void VideoSource::draw()
 
 void VideoSource::setYUV420Program( GLuint p )
 {
-#ifdef HAVE_GLEW
-    YUV420program = p;
-    
-    YUV420xOffsetID = glGetUniformLocation( YUV420program, "xOffset" );
-    YUV420yOffsetID = glGetUniformLocation( YUV420program, "yOffset" );
-#endif
+    if ( GLUtil::getInstance()->haveShaders() )
+    {
+        YUV420program = p;
+        
+        YUV420xOffsetID = glGetUniformLocation( YUV420program, "xOffset" );
+        YUV420yOffsetID = glGetUniformLocation( YUV420program, "yOffset" );
+    }
 }
 
 bool VideoSource::isYUV420shaderInit()
@@ -200,11 +200,11 @@ void VideoSource::resizeBuffer()
     else
         aspect = 1.33f;
     
-    tex_width = GLUtil::pow2(vwidth);
+    tex_width = GLUtil::getInstance()->pow2(vwidth);
     if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
-        tex_height = GLUtil::pow2( 3*vheight/2 );
+        tex_height = GLUtil::getInstance()->pow2( 3*vheight/2 );
     else
-        tex_height = GLUtil::pow2( vheight );
+        tex_height = GLUtil::getInstance()->pow2( vheight );
     
     printf( "image size is %ix%i\n", vwidth, vheight );
     printf( "texture size is %ix%i\n", tex_width, tex_height );
@@ -243,7 +243,7 @@ void VideoSource::scaleNative()
     // note: the weird number is because the Z of screen space does actually
     // have an effect - that's what is returned when doing a world->screen
     // conversion for any point at worldZ=0
-    GLUtil::screenToWorld( (double)0, (double)0, 0.990991f,
+    GLUtil::getInstance()->screenToWorld( (double)0, (double)0, 0.990991f,
                             &topLeftX, &topLeftY, &topLeftZ );
     
     //printf( "top left of the screen in world coords is %f,%f,%f\n",
@@ -251,8 +251,9 @@ void VideoSource::scaleNative()
     
     // now get the world space position of the video dimensions
     GLdouble dimX; GLdouble dimY; GLdouble dimZ;
-    GLUtil::screenToWorld( (GLdouble)vwidth, (GLdouble)vheight, 0.990991f,
-                            &dimX, &dimY, &dimZ );
+    GLUtil::getInstance()->screenToWorld( (GLdouble)vwidth, (GLdouble)vheight,
+                                                0.990991f,
+                                            &dimX, &dimY, &dimZ );
     
     //printf( "video dims in world coords are %f,%f,%f\n",
     //        dimX, dimY, dimZ );

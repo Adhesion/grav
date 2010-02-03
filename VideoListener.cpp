@@ -28,10 +28,15 @@ VideoListener::vpmsession_source_created(VPMSession &session,
                     VPMPayloadDecoder *decoder)
 {
   VPMVideoDecoder *d = dynamic_cast<VPMVideoDecoder*>(decoder);
-  VPMVideoFormat format = VIDEO_FORMAT_YUV420;
+  VPMVideoFormat format = d->getOutputFormat();
 
   if (d) {
-    VPMVideoBufferSink *sink = new VPMVideoBufferSink(format);
+    VPMVideoBufferSink *sink;
+    if ( GLUtil::getInstance()->haveShaders() && format == VIDEO_FORMAT_YUV420 )
+        sink = new VPMVideoBufferSink( format );
+    else
+        sink = new VPMVideoBufferSink( VIDEO_FORMAT_RGB24 );
+        
     if (!sink->initialise()) {
       fprintf(stderr, "Failed to initialise video sink\n");
       return;
