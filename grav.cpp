@@ -80,7 +80,9 @@ void gravApp::mapRTP()
     VPMPayloadDecoderFactory* decoderFactory =
                             VPMPayloadDecoderFactory::getInstance();
     decoderFactory->mapPayloadType( RTP_PAYLOAD_MPEG4, "MPEG4" );
-                                        
+    
+    // TODO: change these to mapPayloadType and add all PCM formats that rat
+    // supports
     /*MAPSTATIC( RTP_PAYLOAD_MPEG4,
         VPM_PAYLOAD_VIDEO,
         "MPEG4",
