@@ -15,6 +15,7 @@
 #include "VideoSource.h"
 
 #include <VPMedia/VPMLog.h>
+#include <VPMedia/VPMPayloadDecoderFactory.h>
 
 #include <GL/glut.h>
 
@@ -65,9 +66,53 @@ bool gravApp::OnInit()
     
     vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
     
+    mapRTP();
+    
     bool res = grav->initSession( "224.2.224.225/20002", false );
     if ( res ) printf( "grav::session initialized\n" );
     //tree->addSession( std::string( "224.2.224.225/20002" ) );
     
     return true;
+}
+
+void gravApp::mapRTP()
+{
+    VPMPayloadDecoderFactory* decoderFactory =
+                            VPMPayloadDecoderFactory::getInstance();
+    decoderFactory->mapPayloadType( RTP_PAYLOAD_MPEG4, "MPEG4" );
+                                        
+    /*MAPSTATIC( RTP_PAYLOAD_MPEG4,
+        VPM_PAYLOAD_VIDEO,
+        "MPEG4",
+        "video/mpeg4",
+        "MPEG4",
+        VPMMPEG4Decoder );
+
+    MAPSTATIC( RTP_PAYLOAD_L16_48K_MONO,
+        VPM_PAYLOAD_AUDIO,
+        "L16_48k_mono",
+        "audio/l16_48k_mono",
+        "Linear16 48kHz Mono",
+        VPMLinear16Decoder_48k_mono );
+        
+    MAPSTATIC( RTP_PAYLOAD_L16_48K_STEREO,
+        VPM_PAYLOAD_AUDIO,
+        "L16_48k_stereo",
+        "audio/l16_48k_stereo",
+        "Linear16 48kHz STEREO",
+        VPMLinear16Decoder_48k_stereo );
+        
+    MAPSTATIC( RTP_PAYLOAD_L16_16K_MONO,
+        VPM_PAYLOAD_AUDIO,
+        "L16_16k_mono",
+        "audio/l16_16k_mono",
+        "Linear16 16kHz Mono",
+        VPMLinear16Decoder_16k_mono );
+        
+    MAPSTATIC( RTP_PAYLOAD_L16_16K_STEREO,
+        VPM_PAYLOAD_AUDIO,
+        "L16_16k_stereo",
+        "audio/l16_16k_stereo",
+        "Linear16 16kHz STEREO",
+        VPMLinear16Decoder_16k_stereo );*/
 }
