@@ -4,7 +4,7 @@
  * methods for converting lat/long coordinates to X/Y/Z 3d world space.
  * @author Andrew Ford
  */
-
+// test
 #include "Earth.h"
 #include "PNGLoader.h"
 #include "GLUtil.h"
