@@ -28,9 +28,9 @@ VideoListener::vpmsession_source_created(VPMSession &session,
                     VPMPayloadDecoder *decoder)
 {
   VPMVideoDecoder *d = dynamic_cast<VPMVideoDecoder*>(decoder);
-  VPMVideoFormat format = d->getOutputFormat();
 
   if (d) {
+    VPMVideoFormat format = d->getOutputFormat();
     VPMVideoBufferSink *sink;
     printf( "VideoListener::vpmsession_source_created: "
             "creating source, have shaders? %i format? %i (yuv420p: %i)\n",
