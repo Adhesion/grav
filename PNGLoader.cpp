@@ -128,14 +128,17 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     
     // allocate a buffer for the pow2 size
     unsigned char *buffer = new unsigned char[pwidth * pheight * 4];
+    printf( "made buffer, allocating texture\n" );
     memset(buffer, 128, pwidth * pheight * 4);
     
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, pwidth, pheight, 0, GL_RGBA,
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, pwidth, pheight, 0, GL_LUMINANCE,
                     GL_UNSIGNED_BYTE, (GLvoid*)buffer );
                     
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 
         iwidth);
+    
+    printf( "putting PNG in texture area\n" );
         
     // put the actual image in a sub-area of the pow2 memory area
     glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, iwidth, iheight, GL_RGBA,
@@ -147,7 +150,6 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     }
     
     printf( "PNGLoader::generated ID is %i\n", texID );
-    
     
     png_destroy_read_struct( &png, &pngInfo, &pngEnd );
     delete[] image;
