@@ -87,6 +87,16 @@ void RectangleBase::setScale( float xs, float ys )
     if ( !animated) { scaleX = xs; scaleY = ys; }
 }
 
+void RectangleBase::setWidth( float w )
+{
+    setScale( w, getScaleY()*w/getScaleX() );
+}
+
+void RectangleBase::setHeight( float h )
+{
+    setScale( getScaleX()*h/getScaleY(), h );
+}
+
 void RectangleBase::setTexture( GLuint tex, int width, int height )
 {
     borderTex = tex;
@@ -245,7 +255,14 @@ bool RectangleBase::intersect( RectangleBase* other )
 
 void RectangleBase::draw()
 {
+    animateValues();
     // note that the position should be set before calling this
+    
+    // set up our position
+    glPushMatrix();
+
+    glRotatef(angle, 0.0, 1.0, 0.0);
+    glTranslatef(x,y,z);
     
     // draw the border first
     glEnable( GL_BLEND );
@@ -346,6 +363,8 @@ void RectangleBase::draw()
     glDisable(GL_LINE_SMOOTH);
     
     glPopMatrix();
+    
+    glPopMatrix(); // from initial position setup
     
     /*float spacing = 0.20f;
     //float i = -name.length()*spacing/2.0f;

@@ -29,7 +29,9 @@ VideoSource::~VideoSource()
 
 void VideoSource::draw()
 {
-    animateValues();
+    //animateValues();
+    // to draw the border/text/common stuff
+    RectangleBase::draw();
     
     // set up our position
     glPushMatrix();
@@ -38,7 +40,6 @@ void VideoSource::draw()
     glTranslatef(x,y,z);
     
     //glDepthMask( GL_FALSE );
-    RectangleBase::draw();
     //glDepthRange (0.0, 0.9);
     //glPolygonOffset( 0.2, 0.8 );
     

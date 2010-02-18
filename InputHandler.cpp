@@ -16,7 +16,7 @@
 #include <VPMedia/random_helper.h>
 
 BEGIN_EVENT_TABLE(InputHandler, wxEvtHandler)
-EVT_CHAR(InputHandler::wxKeyPress)
+EVT_KEY_DOWN(InputHandler::wxKeyPress)
 EVT_MOTION(InputHandler::wxMouseMove)
 EVT_LEFT_DOWN(InputHandler::wxMouseLDown)
 EVT_LEFT_UP(InputHandler::wxMouseLUp)
@@ -29,6 +29,8 @@ InputHandler::InputHandler( Earth* e, gravManager* g )
     dragging = false;
     clickedInside = false;
     leftButtonHeld = false;
+    ctrlHeld = false;
+    shiftHeld = false;
 }
 
 InputHandler::~InputHandler()
@@ -39,6 +41,12 @@ InputHandler::~InputHandler()
 
 void InputHandler::wxKeyPress( wxKeyEvent& evt )
 {
+    // the above cast for compatibility will lose these special cases
+    if ( evt.GetModifiers() == wxMOD_SHIFT )
+        shiftHeld = true;
+    else
+        shiftHeld = false;
+    
     // TODO: replace 0,0 with stored mouse pos
     //printf( "keypress\n" );
     processKeyboard( (unsigned char)evt.GetKeyCode(), 0, 0 );
@@ -111,6 +119,12 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             }
             break;
         
+        case 'P':
+        case 'p':
+            grav->perimeterArrange( -5.0f, 5.0f, 5.0f, -5.0f );
+            break;
+        
+        case 'R':
         case 'r':
             grav->retileVideos();
             break;
@@ -150,12 +164,17 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             printf( "random32: %i\n", random32() );
             printf( "random32max: %i\n", random32_max() );
         
+        case 'N':
         case 'n':
             for ( si = grav->getSources()->begin();
                     si != grav->getSources()->end(); si++ )
             {
-                if ( (*si)->isSelected() )
+                if ( shiftHeld || (*si)->isSelected() )
+                {
                     (*si)->scaleNative();
+                    if ( (*si)->isGrouped() )
+                        (*si)->getGroup()->rearrange();
+                }
             }
             break;
         
@@ -167,6 +186,7 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             }
             break;
         
+        case 'G':
         case 'g':
             if ( grav->usingSiteIDGroups() )
             {
@@ -223,6 +243,17 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             grav->clearSelected();
             break;
         
+        // space
+        case 32:
+            grav->addTestObject();
+            break;
+        
+        // shift
+        case WXK_SHIFT:
+            printf( "shift held\n" );
+            break;
+        
+        case 'Q':
         case 'q':
         case 27:
             exit(0);
@@ -284,8 +315,8 @@ void InputHandler::leftClick( int x, int y )
     GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
                             &mouseX, &mouseY, &mouseZ );
     
-    //printf( "mouse clicked at world %f,%f; screen %i,%i\n",
-    //        mouseX, mouseY, x, y );
+    printf( "mouse clicked at world %f,%f; screen %i,%i\n",
+            mouseX, mouseY, x, y );
     
     // on click, any potential dragging afterwards must start here
     dragStartX = mouseX;

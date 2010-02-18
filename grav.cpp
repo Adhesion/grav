@@ -42,6 +42,10 @@ bool gravApp::OnInit()
     canvas = new GLCanvas( mainFrame, grav, attribList );
     tree = new TreeControl( treeFrame );
     
+    
+    parser.SetCmdLine( argc, argv );
+    handleArgs();
+    
     printf( "hide root? %i\n", tree->HasFlag( wxTR_HIDE_ROOT ) );
     
     Timer* t = new Timer( canvas );
@@ -68,9 +72,43 @@ bool gravApp::OnInit()
     
     mapRTP();
     
-    bool res = grav->initSession( "224.2.224.225/20002", false );
-    if ( res ) printf( "grav::session initialized\n" );
+    //
     //tree->addSession( std::string( "224.2.224.225/20002" ) );
+    
+    return true;
+}
+
+int gravApp::OnExit()
+{
+    // TODO: deconstructors, etc
+    return 0;
+}
+
+bool gravApp::handleArgs()
+{
+    parser.SetDesc( cmdLineDesc );
+    int result = parser.Parse();
+    
+    // if parse returns -1 then it spit out the help message, so exit
+    if ( result == -1 )
+    {
+        exit(0);
+    }
+    
+    wxString videoAddress = parser.GetParam( 0 );
+    printf( "videoaddress length %i: %s\n", videoAddress.Len(),
+        (char*)videoAddress.char_str() );
+    bool res = grav->initSession( std::string((char*)videoAddress.char_str()),
+        false );
+    if ( res ) printf( "grav::video session initialized\n" );
+    
+    wxString audioAddress;
+    if ( parser.Found( _("audio"), &audioAddress ) )
+    {
+        bool aRes = grav->initSession(
+                    std::string((char*)audioAddress.char_str()), true );
+        if ( aRes ) printf( "grav::audio session initialized\n" );
+    }
     
     return true;
 }
@@ -80,6 +118,7 @@ void gravApp::mapRTP()
     VPMPayloadDecoderFactory* decoderFactory =
                             VPMPayloadDecoderFactory::getInstance();
     decoderFactory->mapPayloadType( 45, "MPEG4" );
+    decoderFactory->mapPayloadType( 96, "H264" );
     
     // TODO: change these to mapPayloadType and add all PCM formats that rat
     // supports

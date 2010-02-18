@@ -59,6 +59,13 @@ public:
     void clearSelected();
     void ungroupAll();
     void retileVideos();
+    void perimeterArrange( float boundL, float boundR, float boundU,
+                            float boundD );
+    bool gridArrange( float boundL, float boundR, float boundU, float boundD,
+                        int numX, int numY, bool horiz,
+                        std::vector<RectangleBase*> objects );
+    
+    void addTestObject();
     
     /*
      * For moving videos to the top of the drawnObject (for both drawing and
@@ -147,11 +154,13 @@ private:
     VPMSession *videoSession;
     uint32_t videoSession_ts;
     VideoListener* videoSession_listener;
+    bool videoInitialized;
     
     bool audioEnabled;
     VPMSession *audioSession;
     uint32_t audioSession_ts;
     AudioManager* audioSession_listener;
+    bool audioInitialized;
 
     bool drawSelectionBox;
     

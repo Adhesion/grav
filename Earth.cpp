@@ -16,7 +16,7 @@ const float PI = 3.1415926535;
 Earth::Earth()
 {
     x = 0.0f; y = 0.0f, z = -25.0f;
-    radius = 20.0f;
+    radius = 15.0f;
     xRot = 0.0f; yRot = 0.0f; zRot = 0.0f;
     earthTex = PNGLoader::loadPNG( "earth.png", texWidth, texHeight );
     sphereQuad = gluNewQuadric();
