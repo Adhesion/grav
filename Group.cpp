@@ -29,18 +29,10 @@ Group::~Group()
 
 void Group::draw()
 {
-    animateValues();
+    //animateValues();
     //printf( "drawing group at %f,%f\n", x, y );
     
-    // set up our position
-    glPushMatrix();
-
-    glRotatef(angle, 0.0, 1.0, 0.0);
-    glTranslatef(x,y,z);
-    
     RectangleBase::draw();
-    
-    glPopMatrix();
     
     //printf( "drawing %i objects in group\n", objects.size() );
     for ( unsigned int i = 0; i < objects.size(); i++ )

@@ -51,7 +51,14 @@ public:
     /*
      * Change the size of the object.
      */
-    void setScale( float xs, float ys ); 
+    void setScale( float xs, float ys );
+    
+    /*
+     * Change the selected size to be equal to the argument given, preserving
+     * aspect ratio.
+     */
+    void setWidth( float w );
+    void setHeight( float h );
     
     /*
      * Set the background texture for this object.

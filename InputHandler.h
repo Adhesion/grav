@@ -75,6 +75,8 @@ private:
     float dragPrevY;
     
     bool leftButtonHeld;
+    bool ctrlHeld;
+    bool shiftHeld;
     bool clickedInside;
     bool dragging;
     
