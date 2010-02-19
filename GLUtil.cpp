@@ -46,6 +46,8 @@ bool GLUtil::initGL()
         printf( "GLUtil::initGL(): shaders NOT available (GL v%s)\n", glVer );
     }
     
+    glEnable( GL_DEPTH_TEST );
+    
     return true;
 }
 
