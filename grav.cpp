@@ -32,11 +32,11 @@ bool gravApp::OnInit()
     mainFrame->Show( true );
     
     treeFrame = new wxFrame( (wxFrame*)NULL, -1, _("grav menu"),
-                        wxPoint( 860, 50 ),
+                        wxPoint( 960, 50 ),
                         wxSize( 300, 600 ) );
     treeFrame->Show( true );
     
-    int attribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16,
+    int attribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24,
                             0 };
     
     canvas = new GLCanvas( mainFrame, grav, attribList );

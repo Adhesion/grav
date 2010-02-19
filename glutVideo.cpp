@@ -160,7 +160,7 @@ void glutActiveMotion( int x, int y )
 
 gravManager::gravManager()
 {
-    windowWidth = 800; windowHeight = 450; // TODO: move this to gravApp
+    windowWidth = 900; windowHeight = 550; // TODO: move this to gravApp
     holdCounter = 0; drawCounter = 0;
     camX = 0.0f;
     camY = 0.0f;
@@ -246,8 +246,6 @@ void gravManager::draw()
     glLoadIdentity();
     gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
     
-    earth->draw();
-    
     GLUquadric* sphereQuad = gluNewQuadric();
     gluSphere( sphereQuad, audioSession_listener->getLevelAvg()*50.0f,
                 200, 200 );
@@ -280,6 +278,8 @@ void gravManager::draw()
                                 (*si)->getX(), (*si)->getY(), (*si)->getZ() );
         }
     }
+    
+    earth->draw();
     
     // this makes the depth buffer read-only for this bit - this prevents
     // z-fighting on the videos which are coplanar
