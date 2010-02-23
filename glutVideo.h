@@ -33,6 +33,7 @@ class VPMSessionFactory;
 class Earth;
 class InputHandler;
 class TreeControl;
+class LayoutManager;
 
 class gravManager
 {
@@ -59,11 +60,7 @@ public:
     void clearSelected();
     void ungroupAll();
     void retileVideos();
-    void perimeterArrange( float boundL, float boundR, float boundU,
-                            float boundD );
-    bool gridArrange( float boundL, float boundR, float boundU, float boundD,
-                        int numX, int numY, bool horiz,
-                        std::vector<RectangleBase*> objects );
+    void perimeterAllVideos();
     
     void addTestObject();
     
@@ -80,6 +77,7 @@ public:
     void setBoxSelectDrawing( bool draw );
     int getWindowWidth(); int getWindowHeight();
     void setWindowWidth( int w ); void setWindowHeight( int h );
+    void setWindowSize( int w, int h );
     
     /*
      * Are siteID groups being used? (getter/setter)
@@ -149,6 +147,8 @@ private:
     TreeControl* tree; // we need a reference to the GUI tree so we can
                        // update the names and add new objects
     
+    LayoutManager* layouts;
+    
     VPMSessionFactory *sf;
     
     VPMSession *videoSession;
@@ -166,6 +166,8 @@ private:
     
     // dimensions of the drawing window in pixels
     int windowWidth, windowHeight;
+    // boundaries of the drawing area in world space
+    GLdouble screenL, screenR, screenU, screenD;
     
     // background texture for groups & video objects
     GLuint borderTex;

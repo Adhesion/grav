@@ -29,7 +29,8 @@ public:
     InputHandler( Earth* e, gravManager* g );
     ~InputHandler();
     
-    void wxKeyPress( wxKeyEvent& evt );
+    void wxKeyDown( wxKeyEvent& evt );
+    void wxCharEvt( wxKeyEvent& evt );
     void wxMouseMove( wxMouseEvent& evt );
     void wxMouseLDown( wxMouseEvent& evt );
     void wxMouseLUp( wxMouseEvent& evt );

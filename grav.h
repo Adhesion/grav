@@ -50,6 +50,8 @@ private:
     
     gravManager* grav;
     
+    int windowWidth, windowHeight;
+    
 };
 
 static const wxCmdLineEntryDesc cmdLineDesc[] =

@@ -22,13 +22,17 @@
 IMPLEMENT_APP( gravApp )
 
 bool gravApp::OnInit()
-{   
+{
     grav = new gravManager();
+    windowWidth = 900; windowHeight = 550; // defaults - should be command line
+    // grav's windowwidth/height will be set by the glcanvas's resize callback
+    
+    parser.SetCmdLine( argc, argv );
+    handleArgs();
     
     mainFrame = new wxFrame( (wxFrame*)NULL, -1, _("grav WX branch"),
                         wxPoint( 10, 50 ),
-                        wxSize( grav->getWindowWidth(),
-                                grav->getWindowHeight() ) );
+                        wxSize( windowWidth, windowHeight ) );
     mainFrame->Show( true );
     
     treeFrame = new wxFrame( (wxFrame*)NULL, -1, _("grav menu"),
@@ -39,20 +43,18 @@ bool gravApp::OnInit()
     int attribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24,
                             0 };
     
-    canvas = new GLCanvas( mainFrame, grav, attribList );
+    canvas = new GLCanvas( mainFrame, grav, attribList, windowWidth,
+                            windowHeight );
     tree = new TreeControl( treeFrame );
     
+    // initialize GL stuff (+ shaders) needs to be done AFTER attriblist is
+    // used in making the canvas
+    GLUtil::getInstance()->initGL();
     
-    parser.SetCmdLine( argc, argv );
-    handleArgs();
-    
-    printf( "hide root? %i\n", tree->HasFlag( wxTR_HIDE_ROOT ) );
+    //printf( "hide root? %i\n", tree->HasFlag( wxTR_HIDE_ROOT ) );
     
     Timer* t = new Timer( canvas );
     t->Start();
-    
-    // initialize GL stuff (+ shaders)
-    GLUtil::getInstance()->initGL();
     
     Earth* earth = new Earth();
     InputHandler* input = new InputHandler( earth, grav );
@@ -99,14 +101,14 @@ bool gravApp::handleArgs()
     printf( "videoaddress length %i: %s\n", videoAddress.Len(),
         (char*)videoAddress.char_str() );
     bool res = grav->initSession( std::string((char*)videoAddress.char_str()),
-        false );
+                                    false );
     if ( res ) printf( "grav::video session initialized\n" );
     
     wxString audioAddress;
     if ( parser.Found( _("audio"), &audioAddress ) )
     {
         bool aRes = grav->initSession(
-                    std::string((char*)audioAddress.char_str()), true );
+                            std::string((char*)audioAddress.char_str()), true );
         if ( aRes ) printf( "grav::audio session initialized\n" );
     }
     
