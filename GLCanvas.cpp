@@ -16,12 +16,12 @@ EVT_SIZE(GLCanvas::resize)
 EVT_IDLE(GLCanvas::idle)
 END_EVENT_TABLE()
 
-GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes ) :
+GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
+                        int width, int height ) :
     wxGLCanvas( parent, wxID_ANY, attributes, wxDefaultPosition, 
                 wxDefaultSize, 0, wxT("grav GLCanvas")), grav( g )
 {
-    SetSize( wxSize( grav->getWindowWidth(),
-                     grav->getWindowHeight() ) );
+    SetSize( wxSize( width, height ) );
     glContext = new wxGLContext( this );
     SetCurrent( *glContext );
 }
@@ -42,6 +42,8 @@ void GLCanvas::draw( wxPaintEvent& evt )
 
 void GLCanvas::resize( wxSizeEvent& evt )
 {
+    printf( "resize callback: to %ix%i\n", evt.GetSize().GetWidth(),
+                                            evt.GetSize().GetHeight() );
     OnSize( evt );
     Refresh( false );
     GLreshape( evt.GetSize().GetWidth(), evt.GetSize().GetHeight() );
@@ -91,12 +93,8 @@ void GLCanvas::testKey( wxKeyEvent& evt )
 }
 
 void GLCanvas::GLreshape( int w, int h )
-{
-    printf( "reshaping to %ix%i\n", w, h );
-    
+{    
     glViewport(0, 0, w, h);
-    grav->setWindowWidth( w );
-    grav->setWindowHeight( h );
   
     if (w > h)
     {
@@ -120,6 +118,11 @@ void GLCanvas::GLreshape( int w, int h )
     gluLookAt(grav->getCamX(), grav->getCamY(), grav->getCamZ(),
               0.0, 0.0, -25.0,
               0.0, 1.0, 0.0);
+    
+    // note this should be done last since stuff inside setwindowsize
+    // (finding the world space bounds for the screen) depends on the matrices
+    // above being accurate
+    grav->setWindowSize( w, h );
 }
 
 void GLCanvas::idle( wxIdleEvent& evt )

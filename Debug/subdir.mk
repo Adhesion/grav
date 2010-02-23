@@ -10,6 +10,7 @@ CPP_SRCS += \
 ../GLUtil.cpp \
 ../Group.cpp \
 ../InputHandler.cpp \
+../LayoutManager.cpp \
 ../PNGLoader.cpp \
 ../RectangleBase.cpp \
 ../TreeControl.cpp \
@@ -26,6 +27,7 @@ OBJS += \
 ./GLUtil.o \
 ./Group.o \
 ./InputHandler.o \
+./LayoutManager.o \
 ./PNGLoader.o \
 ./RectangleBase.o \
 ./TreeControl.o \
@@ -42,6 +44,7 @@ CPP_DEPS += \
 ./GLUtil.d \
 ./Group.d \
 ./InputHandler.d \
+./LayoutManager.d \
 ./PNGLoader.d \
 ./RectangleBase.d \
 ./TreeControl.d \

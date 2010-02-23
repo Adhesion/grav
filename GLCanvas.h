@@ -17,9 +17,11 @@ class GLCanvas : public wxGLCanvas
 {
 
 public:
-    GLCanvas( wxWindow* parent, gravManager* g, int* attributes );
+    GLCanvas( wxWindow* parent, gravManager* g, int* attributes, int width,
+                int height );
     void draw( wxPaintEvent& evt );
     void resize( wxSizeEvent& evt );
+    void GLreshape( int w, int h );
     
 private:
     gravManager* grav;
@@ -28,7 +30,6 @@ private:
     
     void testDraw();
     void testKey( wxKeyEvent& evt );
-    void GLreshape( int w, int h );
     void idle( wxIdleEvent& evt );
     
     // tracks the aspect ratio of the screen for reshaping

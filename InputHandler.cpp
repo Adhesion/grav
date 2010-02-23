@@ -16,7 +16,8 @@
 #include <VPMedia/random_helper.h>
 
 BEGIN_EVENT_TABLE(InputHandler, wxEvtHandler)
-EVT_KEY_DOWN(InputHandler::wxKeyPress)
+EVT_KEY_DOWN(InputHandler::wxKeyDown)
+EVT_CHAR(InputHandler::wxCharEvt)
 EVT_MOTION(InputHandler::wxMouseMove)
 EVT_LEFT_DOWN(InputHandler::wxMouseLDown)
 EVT_LEFT_UP(InputHandler::wxMouseLUp)
@@ -39,16 +40,18 @@ InputHandler::~InputHandler()
     // all other pointers are owned by the main class
 }
 
-void InputHandler::wxKeyPress( wxKeyEvent& evt )
+void InputHandler::wxKeyDown( wxKeyEvent& evt )
 {
-    // the above cast for compatibility will lose these special cases
     if ( evt.GetModifiers() == wxMOD_SHIFT )
         shiftHeld = true;
     else
         shiftHeld = false;
-    
+    evt.Skip(); // so now the char event can grab this
+}
+
+void InputHandler::wxCharEvt( wxKeyEvent& evt )
+{
     // TODO: replace 0,0 with stored mouse pos
-    //printf( "keypress\n" );
     processKeyboard( (unsigned char)evt.GetKeyCode(), 0, 0 );
 }
 
@@ -119,9 +122,9 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             }
             break;
         
-        case 'P':
+        //case 'P':
         case 'p':
-            grav->perimeterArrange( -5.0f, 5.0f, 5.0f, -5.0f );
+            grav->perimeterAllVideos();
             break;
         
         case 'R':
