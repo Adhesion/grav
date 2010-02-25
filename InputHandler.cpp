@@ -12,6 +12,7 @@
 #include "Group.h"
 #include "glutVideo.h"
 #include "Earth.h"
+#include "LayoutManager.h"
 
 #include <VPMedia/random_helper.h>
 
@@ -46,6 +47,7 @@ void InputHandler::wxKeyDown( wxKeyEvent& evt )
         shiftHeld = true;
     else
         shiftHeld = false;
+
     evt.Skip(); // so now the char event can grab this
 }
 
@@ -82,6 +84,7 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
     std::map<std::string,Group*>::iterator mapi;
     printf( "Char pressed is %c (%i)\n", key, key );
     printf( "x,y in processKeyboard is %i,%i\n", x, y );
+    printf( "is shift held? %i\n", shiftHeld );
     std::vector<VideoSource*>::const_iterator si;
     // how much to scale when doing -/+: flipped in the former case
     float scaleAmt = 0.25f;
@@ -127,7 +130,6 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             grav->perimeterAllVideos();
             break;
         
-        case 'R':
         case 'r':
             grav->retileVideos();
             break;
@@ -189,7 +191,20 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             }
             break;
         
-        case 'G':
+        case 'F':
+        case 'f':
+            if ( grav->getSelectedObjects()->size() == 1 )
+            {
+                if ( shiftHeld )
+                {
+                    // TODO: change this, it sucks
+                    LayoutManager* layouts = new LayoutManager();
+                    layouts->fullscreen( grav->getScreenL(), grav->getScreenR(),
+                                         grav->getScreenU(), grav->getScreenD(),
+                                         (*grav->getSelectedObjects())[0] );
+                }
+            }
+        
         case 'g':
             if ( grav->usingSiteIDGroups() )
             {

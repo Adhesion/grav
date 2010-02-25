@@ -65,7 +65,7 @@ public:
     void addTestObject();
     
     /*
-     * For moving videos to the top of the drawnObject (for both drawing and
+     * For moving videos to the top of the drawnObjects (for both drawing and
      * selection)
      */
     void moveToTop( RectangleBase* object );
@@ -126,6 +126,9 @@ public:
     
     float getCamX(); float getCamY(); float getCamZ();
     void setCamX( float x ); void setCamY( float y ); void setCamZ( float z );
+    
+    float getScreenL(); float getScreenR(); float getScreenU();
+        float getScreenD();
     
     void setEarth( Earth* e );
     void setInput( InputHandler* i );

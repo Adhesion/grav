@@ -889,6 +889,26 @@ void gravManager::setCamZ( float z )
     camZ = z;
 }
 
+float gravManager::getScreenL()
+{
+    return screenL;
+}
+
+float gravManager::getScreenR()
+{
+    return screenR;
+}
+
+float gravManager::getScreenU()
+{
+    return screenU;
+}
+
+float gravManager::getScreenD()
+{
+    return screenD;
+}
+
 void gravManager::setEarth( Earth* e )
 {
     earth = e;
