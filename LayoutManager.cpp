@@ -72,56 +72,53 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
             obj->setHeight( maxY );
         
         if ( turnCount % 2 == 0 )
-        {
-            // increment the X direction
-            curX += (nextObj->getWidth()/2.0f + obj->getWidth()/2.0f + buffer)
-                        * Xdir;
-            
-            if ( turnCount == 0 )
-                numU++;
-            else if ( turnCount == 2 )
-                numD++;
-            
+        {         
             // if we've gone over the side, change directions
             //if ( ( curX > (screenR-(nextObj->getWidth()/2.0f)) && Xdir == 1.0f ) ||
             //     ( curX < (screenL+(nextObj->getWidth()/2.0f)) && Xdir == -1.0f ) )
-            if ( ( curX > midRight && Xdir == 1.0f ) ||
-                 ( curX < midLeft && Xdir == -1.0f ) )
+            if ( ( curX+obj->getWidth() > screenR && Xdir == 1.0f ) ||
+                 ( curX-obj->getWidth() < screenL && Xdir == -1.0f ) )
             {
+                // we're turning, so place the current object on the next area
+                // and set the next object to go past that
                 turnCount++;
                 turnPoint = i;
-                printf( "gravManager::perimeter: TURN\n" );
+                printf( "gravManager::perimeter: TURN X to Y\n" );
                 Ydir *= -1.0f;
                 if ( turnCount == 1 )
                 {
                     curX = midRight;
-                    curY = boundU - buffer - nextObj->getHeight()/2.0f;
+                    curY = boundU - (buffer*2.0f) - nextObj->getHeight()/2.0f
+                            - obj->getHeight();
+                    numR++;
                 }
                 else if ( turnCount == 3 )
                 {
                     curX = midLeft;
-                    curY = boundD + buffer + nextObj->getHeight()/2.0f;
+                    curY = boundD + (buffer*2.0f) + nextObj->getHeight()/2.0f
+                            + obj->getHeight();
+                    numL++;
                 }
+            }
+            else
+            {
+                // otherwise this spot is valid, so increment the X direction
+                curX += (nextObj->getWidth()/2.0f + obj->getWidth()/2.0f
+                            + buffer) * Xdir;
+                
+                if ( turnCount == 0 )
+                    numU++;
+                else if ( turnCount == 2 )
+                    numD++;
             }
         }
         else if ( turnCount % 2 == 1 )
         {
-            // increment Y
-            curY += (obj->getHeight()/2.0f + nextObj->getHeight()/2.0f + buffer)
-                        * Ydir;
-            
-            if ( turnCount == 1 )
-                numR++;
-            else if ( turnCount == 3 )
-                numL++;
-            
-            float bottomThresh = boundD+(nextObj->getHeight()/2.0f);
-            printf( "checking Y: bottom threshold is %f\n", bottomThresh );
             // if we've gone over the side, change directions
             //if ( ( curY > (boundU-(nextObj->getHeight()/2.0f)) && Ydir == 1.0f ) ||
             //     ( curY < (boundD+(nextObj->getHeight()/2.0f)) && Ydir == -1.0f ) )
-            if ( ( curY > midUp && Ydir == 1.0f ) ||
-                 ( curY < bottomThresh && Ydir == -1.0f ) )
+            if ( ( curY+obj->getHeight() > boundU && Ydir == 1.0f ) ||
+                 ( curY-obj->getHeight() < boundD && Ydir == -1.0f ) )
             {
                 turnCount++;
                 turnPoint = i;
@@ -129,14 +126,29 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
                 Xdir *= -1.0f;
                 if ( turnCount == 2 )
                 {
-                    curX = midRight;
+                    curX = midRight - (buffer*2.0f) - obj->getWidth();
                     curY = midDown;
+                    numD++;
                 }
                 else if ( turnCount == 4 ) // meaning we've gone over?
                 {
-                    curX = midLeft;
+                    curX = midLeft + (buffer*2.0f) + obj->getWidth();
                     curY = midUp;
+                    numU++;
                 }
+            }
+            else
+            {
+                printf( "valid y preincrement is %f,%f\n", curX, curY );
+                // this pos is valid so increment Y
+                curY += (obj->getHeight()/2.0f + nextObj->getHeight()/2.0f + buffer)
+                            * Ydir;
+                printf( "on y, valid, incremented, at %f,%f\n", curX, curY );
+                
+                if ( turnCount == 1 )
+                    numR++;
+                else if ( turnCount == 3 )
+                    numL++;
             }
         }
     }
@@ -149,11 +161,18 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
     if ( turnCount > 3 && turnPoint != numObjects-1 ) 
                         // AND, there was at least one more video to analyze
     {
+        float sizeAvg = 0.0f;
         float scaleAmt = -0.05f * (turnCount-2.0f);
         for ( unsigned int i = 0; i < numObjects; i++ )
         {
+            sizeAvg += (objects[i]->getWidth()*objects[i]->getHeight());
+        }
+        sizeAvg /= numObjects;
+        for ( unsigned int i = 0; i < numObjects; i++ )
+        {
             RectangleBase* obj = objects[i];
-            obj->setScale( obj->getScaleX()+obj->getScaleX()*scaleAmt,
+            if ( obj->getWidth()*obj->getHeight() > sizeAvg )
+                obj->setScale( obj->getScaleX()+obj->getScaleX()*scaleAmt,
                            obj->getScaleY()+obj->getScaleY()*scaleAmt );
         }
     }
@@ -164,27 +183,27 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
         // to be arranged
         std::vector<RectangleBase*> topObjs, rightObjs, bottomObjs, leftObjs;
         
-        printf( "arranging objects %d to %d to top\n", 0, numU-1 );
         if ( numU > 0 )
         {
+            printf( "arranging objects %d to %d to top\n", 0, numU-1 );
             for ( int i = 0; i < numU; i++ )
                 topObjs.push_back( objects[i] );
             gridArrange( screenL, screenR, screenU-0.8f, boundU, numU, 1, true,
                             topObjs ); // constant on top is for space for text
         }
         
-        printf( "arranging objects %d to %d to right\n", numU, numU+numR-1 );
         if ( numR > 0 )
         {
+            printf( "arranging objects %d to %d to right\n", numU, numU+numR-1 );
             for ( int i = numU; i < numU+numR; i++ )
                 rightObjs.push_back( objects[i] );
             gridArrange( boundR, screenR, boundU, boundD, 1, numR, false,
                             rightObjs );
         }
         
-        printf( "arranging objects %d to %d to bottom\n", numU+numR, numU+numR+numD-1 );
         if ( numD > 0 )
         {
+            printf( "arranging objects %d to %d to bottom\n", numU+numR, numU+numR+numD-1 );
             for ( int i = numU+numR+numD-1; i >= numU+numR; i-- )
                 bottomObjs.push_back( objects[i] );
             gridArrange( screenL, screenR, boundD, screenD, numD, 1, true,
@@ -219,17 +238,28 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
     if ( horiz )
     {
         span = (boundU-boundD)/numY;
-        stride = (boundR-boundL)/(numX+1);
+        float edgeL = boundL + 0.2f + objects[0]->getWidth();
+        float edgeR = boundR - 0.2f - objects[numX-1]->getWidth();
+        stride = (edgeR-edgeL)/(numX-1);
         curY = boundU - (span/2.0f);
-        curX = boundL + stride;
+        if ( numX > 1 )
+            curX = edgeL;
+        else
+            curX = (boundR+boundL)/2.0f;
     }
     else
     {
         span = (boundR-boundL)/numX;
-        stride = (boundU-boundD)/(numY+1);
-        curY = boundU - stride;
+        float edgeU = boundU - 0.2f - objects[0]->getHeight();
+        float edgeD = boundD + 0.2f + objects[numY-1]->getHeight();
+        stride = (edgeU-edgeD)/(numY-1);
         curX = boundL + (span/2.0f);
+        if ( numY > 1 )
+            curY = edgeU;
+        else
+            curY = (boundU+boundD)/2.0f;
     }
+    printf( "grid: starting at %f,%f\n", curX, curY );
     
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
@@ -254,6 +284,26 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
             }
         }
     }
+    
+    return true;
+}
+
+bool LayoutManager::fullscreen( float boundL, float boundR, float boundU,
+                                float boundD, RectangleBase* object )
+{
+    float spaceAspect = fabs((boundR-boundL)/(boundU-boundD));
+    float objectAspect = object->getWidth()/object->getHeight();
+    
+    if ( spaceAspect > objectAspect )
+    {
+        object->setHeight( boundU-boundD-1.0f );
+    }
+    else
+    {
+        object->setWidth( boundR-boundL-0.5f );
+    }
+    
+    object->move( (boundR-boundL)/2.0f, (boundU-boundD)/2.0f );
     
     return true;
 }
