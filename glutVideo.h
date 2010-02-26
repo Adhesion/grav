@@ -23,7 +23,8 @@ static void glutSpecialKey(int key, int x, int y);
 static void glutMouse(int button, int state, int x, int y);
 static void glutActiveMotion(int x, int y);
 
-class RectangleBase;
+#include "RectangleBase.h"
+
 class VideoSource;
 class Group;
 class VideoListener;
@@ -127,8 +128,7 @@ public:
     float getCamX(); float getCamY(); float getCamZ();
     void setCamX( float x ); void setCamY( float y ); void setCamZ( float z );
     
-    float getScreenL(); float getScreenR(); float getScreenU();
-        float getScreenD();
+    RectangleBase getScreenRect();
     
     void setEarth( Earth* e );
     void setInput( InputHandler* i );
@@ -169,8 +169,9 @@ private:
     
     // dimensions of the drawing window in pixels
     int windowWidth, windowHeight;
-    // boundaries of the drawing area in world space
-    GLdouble screenL, screenR, screenU, screenD;
+    // rectangle that represents the boundaries of the drawing area in world
+    // space
+    RectangleBase screenRect;
     
     // background texture for groups & video objects
     GLuint borderTex;

@@ -30,8 +30,13 @@ class RectangleBase
 {
 
 public:
+    RectangleBase();
     RectangleBase( float _x, float _y );
+    RectangleBase( const RectangleBase& other );
     virtual ~RectangleBase();
+    
+    void setDefaults();
+    void makeFont();
 
     /*
      * Returns the width or height of the object. These are virtual because
@@ -40,6 +45,7 @@ public:
      * aspect ratio, these will most likely be equal to the scale factors.
      */
     virtual float getWidth(); virtual float getHeight();
+    float getLBound(); float getRBound(); float getUBound(); float getDBound();
     
     /*
      * Change the position of the object. Move may or may not have animation
@@ -78,6 +84,7 @@ public:
     bool isSelected();
     void setSelect( bool select );
     void setEffectVal( float f );
+    void setAnimation( bool anim );
     
     /*
      * Is this object a member of a group?

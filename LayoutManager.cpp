@@ -14,10 +14,29 @@
 LayoutManager::LayoutManager()
 { }
 
+void LayoutManager::perimeterArrange( RectangleBase screenRect,
+                                        RectangleBase boundRect,
+                                        std::vector<RectangleBase*> objects )
+{
+    float screenL = screenRect.getLBound();
+    float screenR = screenRect.getRBound();
+    float screenU = screenRect.getUBound();
+    float screenD = screenRect.getDBound();
+    
+    float boundL = boundRect.getLBound();
+    float boundR = boundRect.getRBound();
+    float boundU = boundRect.getUBound();
+    float boundD = boundRect.getDBound();
+    
+    perimeterArrange( screenL, screenR, screenU, screenD, boundL, boundR,
+                        boundU, boundD, objects );
+}
+
 void LayoutManager::perimeterArrange( float screenL, float screenR,
-                        float screenU, float screenD,
-                        float boundL, float boundR, float boundU, float boundD,
-                        std::vector<RectangleBase*> objects )
+                                        float screenU, float screenD,
+                                        float boundL, float boundR,
+                                        float boundU, float boundD,
+                                        std::vector<RectangleBase*> objects )
 {
     // TODO: replace this with arguments - should be able to call on an
     //       arbitrary area
@@ -26,9 +45,9 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
     glUtil->screenToWorld( (GLdouble)windowWidth, (GLdouble)windowHeight,
                           0.990991f, &screenR, &screenU, &screenZ );
     glUtil->screenToWorld( (GLdouble)0.0f, (GLdouble)0.0f,
-                          0.990991f, &screenL, &screenD, &screenZ );
+                          0.990991f, &screenL, &screenD, &screenZ );*/
     printf( "gravManager::perimeter: screen bounds: %f,%f %f,%f\n",
-            screenL, screenR, screenU, screenD );*/
+            screenL, screenR, screenU, screenD );
     
     float midLeft = screenL + ( fabs( boundL - screenL ) / 2.0f );
     float midUp = screenU - ( fabs( screenU - boundU ) / 2.0f );
@@ -188,8 +207,9 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
             printf( "arranging objects %d to %d to top\n", 0, numU-1 );
             for ( int i = 0; i < numU; i++ )
                 topObjs.push_back( objects[i] );
+            // constant on top is for space for text
             gridArrange( screenL, screenR, screenU-0.8f, boundU, numU, 1, true,
-                            topObjs ); // constant on top is for space for text
+                         false, topObjs );
         }
         
         if ( numR > 0 )
@@ -197,7 +217,7 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
             printf( "arranging objects %d to %d to right\n", numU, numU+numR-1 );
             for ( int i = numU; i < numU+numR; i++ )
                 rightObjs.push_back( objects[i] );
-            gridArrange( boundR, screenR, boundU, boundD, 1, numR, false,
+            gridArrange( boundR, screenR, boundU, boundD, 1, numR, false, true,
                             rightObjs );
         }
         
@@ -207,22 +227,36 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
             for ( int i = numU+numR+numD-1; i >= numU+numR; i-- )
                 bottomObjs.push_back( objects[i] );
             gridArrange( screenL, screenR, boundD, screenD, numD, 1, true,
-                            bottomObjs );
+                            false, bottomObjs );
         }
         
         if ( numL > 0 )
         {
             for ( int i = numObjects-1; i >= numU+numR+numD; i-- )
                 leftObjs.push_back( objects[i] );
-            gridArrange( screenL, boundL, boundU, boundD, 1, numL, false,
+            gridArrange( screenL, boundL, boundU, boundD, 1, numL, false, true,
                             leftObjs );
         }
     }
 }
 
+bool LayoutManager::gridArrange( RectangleBase boundRect, int numX, int numY,
+                                    bool horiz, bool edge,
+                                    std::vector<RectangleBase*> objects )
+{
+    float boundL = boundRect.getLBound();
+    float boundR = boundRect.getRBound();
+    float boundU = boundRect.getUBound();
+    float boundD = boundRect.getDBound();
+    
+    return gridArrange( boundL, boundR, boundU, boundD, numX, numY, horiz, edge,
+                    objects );
+}
+
 bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
-                                float boundD, int numX, int numY, bool horiz,
-                                std::vector<RectangleBase*> objects )
+                                    float boundD, int numX, int numY,
+                                    bool horiz, bool edge,
+                                    std::vector<RectangleBase*> objects )
 {
     // if there's too many objects, fail
     if ( (unsigned int)(numX * numY) > objects.size() )
@@ -288,8 +322,18 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
     return true;
 }
 
+bool LayoutManager::fullscreen( RectangleBase boundRect, RectangleBase* object )
+{
+    float boundL = boundRect.getLBound();
+    float boundR = boundRect.getRBound();
+    float boundU = boundRect.getUBound();
+    float boundD = boundRect.getDBound();
+    
+    return fullscreen( boundL, boundR, boundU, boundD, object );
+}
+
 bool LayoutManager::fullscreen( float boundL, float boundR, float boundU,
-                                float boundD, RectangleBase* object )
+                                    float boundD, RectangleBase* object )
 {
     float spaceAspect = fabs((boundR-boundL)/(boundU-boundD));
     float objectAspect = object->getWidth()/object->getHeight();
@@ -303,7 +347,7 @@ bool LayoutManager::fullscreen( float boundL, float boundR, float boundU,
         object->setWidth( boundR-boundL-0.5f );
     }
     
-    object->move( (boundR-boundL)/2.0f, (boundU-boundD)/2.0f );
+    object->move( (boundR+boundL)/2.0f, (boundU+boundD)/2.0f );
     
     return true;
 }

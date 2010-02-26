@@ -163,7 +163,6 @@ gravManager::gravManager()
 {
     windowWidth = 0; windowHeight = 0; // this should be set immediately
                                            // after init
-    screenL = 0.0f; screenR = 0.0f; screenU = 0.0f; screenD = 0.0f;
     holdCounter = 0; drawCounter = 0;
     camX = 0.0f;
     camY = 0.0f;
@@ -180,6 +179,8 @@ gravManager::gravManager()
     videoInitialized = false; audioInitialized = false;
     
     layouts = new LayoutManager();
+    screenRect.setName( "screen rectangle" );
+    screenRect.setAnimation( false );
 }
 
 gravManager::~gravManager()
@@ -487,9 +488,16 @@ void gravManager::perimeterAllVideos()
             objectList.push_back( (*drawnObjects)[i] );
         }
     }
-    
-    layouts->perimeterArrange( screenL, screenR, screenU, screenD,
-                                -5.0f, 5.0f, 5.0f, -5.0f, objectList );
+    RectangleBase boundRect;
+    boundRect.setAnimation( false );
+    boundRect.setPos( 0.0f, 0.0f );
+    boundRect.setScale( 10.0f, 10.0f );
+    boundRect.setName( "bhlbrlhbrlh" );
+    printf( "starting to perimeter: bounds of %f,%f %f,%f\n", boundRect.getLBound(),
+                 boundRect.getRBound(),  boundRect.getUBound(),  boundRect.getDBound() );
+    printf( "width, scale: %f,%f %f,%f\n", boundRect.getWidth(), boundRect.getHeight(),
+                                boundRect.getScaleX(), boundRect.getScaleY() );
+    layouts->perimeterArrange( screenRect, boundRect, objectList );
 }
 
 void gravManager::addTestObject()
@@ -497,6 +505,7 @@ void gravManager::addTestObject()
     RectangleBase* obj = new RectangleBase( 0.0f, 0.0f );
     drawnObjects->push_back( obj );
     obj->setName( "TEST" );
+    obj->makeFont();
 }
 
 void gravManager::moveToTop( RectangleBase* object )
@@ -747,6 +756,7 @@ void gravManager::setWindowSize( int w, int h )
 {
     windowWidth = w;
     windowHeight = h;
+    GLdouble screenL, screenR, screenU, screenD;
     
     GLUtil* glUtil = GLUtil::getInstance();
     GLdouble dummy; // for Z which we don't need
@@ -755,6 +765,9 @@ void gravManager::setWindowSize( int w, int h )
                           (GLdouble)0.990991f, &screenR, &screenU, &dummy );
     glUtil->screenToWorld( (GLdouble)0.0f, (GLdouble)0.0f,
                           (GLdouble)0.990991f, &screenL, &screenD, &dummy );
+    
+    screenRect.setPos( (screenL+screenR)/2.0f, (screenU+screenD)/2.0f);
+    screenRect.setScale( screenR-screenL, screenU-screenD );
 }
 
 bool gravManager::usingSiteIDGroups()
@@ -802,6 +815,7 @@ void gravManager::addNewSource( VideoSource* s )
     if ( s == NULL ) return;
     
     s->setTexture( borderTex, borderWidth, borderHeight );
+    s->makeFont();
     sources->push_back( s );
     drawnObjects->push_back( s );
     s->updateName();
@@ -889,24 +903,9 @@ void gravManager::setCamZ( float z )
     camZ = z;
 }
 
-float gravManager::getScreenL()
+RectangleBase gravManager::getScreenRect()
 {
-    return screenL;
-}
-
-float gravManager::getScreenR()
-{
-    return screenR;
-}
-
-float gravManager::getScreenU()
-{
-    return screenU;
-}
-
-float gravManager::getScreenD()
-{
-    return screenD;
+    return screenRect;
 }
 
 void gravManager::setEarth( Earth* e )

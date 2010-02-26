@@ -19,13 +19,18 @@ class LayoutManager
 public:
     LayoutManager();
     
+    void perimeterArrange( RectangleBase screenRect, RectangleBase boundRect,
+                            std::vector<RectangleBase*> objects );
     void perimeterArrange( float screenL, float screenR, float screenU,
-                            float screenD,
-                            float boundL, float boundR, float boundU,
-                            float boundD, std::vector<RectangleBase*> objects );
+                            float screenD, float boundL, float boundR,
+                            float boundU, float boundD,
+                            std::vector<RectangleBase*> objects );
+    bool gridArrange( RectangleBase boundRect, int numX, int numY, bool horiz,
+                        bool edge, std::vector<RectangleBase*> objects );
     bool gridArrange( float boundL, float boundR, float boundU, float boundD,
-                        int numX, int numY, bool horiz,
+                        int numX, int numY, bool horiz, bool edge,
                         std::vector<RectangleBase*> objects );
+    bool fullscreen( RectangleBase boundRect, RectangleBase* object );
     bool fullscreen( float boundL, float boundR, float boundU, float boundD,
                         RectangleBase* object );
     
