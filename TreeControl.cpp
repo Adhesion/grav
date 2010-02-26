@@ -72,7 +72,31 @@ void TreeControl::addObject( RectangleBase* obj )
 
 void TreeControl::removeObject( RectangleBase* obj )
 {
-    Delete( findObject( rootID, obj ) );
+    wxTreeItemId item = findObject( rootID, obj );
+    
+    // if we're removing a group, take all of its children and add them to
+    // root
+    if ( obj->isGroup() )
+    {
+        wxTreeItemId parent = rootID;
+        wxTreeItemIdValue temp;
+        wxTreeItemId current = GetFirstChild( item, temp );
+        
+        while ( current.IsOk() )
+        {
+            TreeNode* data = dynamic_cast<TreeNode*>( GetItemData( current ) );
+            if ( data != NULL )
+            {
+                RectangleBase* obj = data->getObject();
+                addObject( obj );
+            }
+            current = GetNextChild( item, temp );
+        }
+        
+        DeleteChildren( item );
+    }
+    
+    Delete( item );
 }
 
 wxTreeItemId TreeControl::findObject( wxTreeItemId root, RectangleBase* obj )
@@ -119,6 +143,7 @@ int TreeControl::OnCompareItems( const wxTreeItemId& item1,
     
     RectangleBase* obj1 = node1->getObject();
     RectangleBase* obj2 = node2->getObject();
+    if ( obj1 == NULL || obj2 == NULL ) return 0;
     bool group1 = obj1->isGroup();
     bool group2 = obj2->isGroup();
     

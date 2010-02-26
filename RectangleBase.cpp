@@ -11,12 +11,75 @@
 
 #include <cmath>
 
+RectangleBase::RectangleBase()
+{
+    setDefaults();
+}
+
 RectangleBase::RectangleBase( float _x, float _y )
 {
-    scaleX = 5.0f; scaleY = 5.0f;
+    setDefaults();
     x = -15.0f; y = 15.0f; z = 0.0f;
-    angle = 0.0f;
     destX = _x; destY = _y;
+}
+
+RectangleBase::RectangleBase( const RectangleBase& other )
+{
+    x = other.x; y = other.y; z = other.z;
+    destX = other.destX; destY = other.destY;
+    scaleX = other.scaleX; scaleY = other.scaleY;
+    destScaleX = other.destScaleX; destScaleY = other.destScaleY;
+    angle = other.angle;
+    
+    effectVal = other.effectVal;
+    
+    lat = other.lat; lon = other.lon;
+    
+    borderColor = other.borderColor;
+    destBColor = other.destBColor;
+    baseBColor = other.baseBColor;
+    
+    name = other.name;
+    siteID = other.siteID;
+    nameStart = other.nameStart; nameEnd = other.nameEnd;
+    finalName = other.finalName;
+    
+    if ( other.font != NULL ) makeFont();
+    else font = NULL;
+    
+    borderTex = other.borderTex;
+    twidth = other.twidth; theight = other.theight;
+    
+    selected = other.selected;
+    grouped = other.grouped;
+    myGroup = other.myGroup;
+    animated = other.animated;
+}
+
+RectangleBase::~RectangleBase()
+{
+    printf( "RectangleBase::~RectangleBase (%s)\n", name.c_str() );
+    if ( isGrouped() )
+        myGroup->remove( this );
+    
+    // if this is set externally, then we shouldn't delete it since other
+    // things might be using it
+    //glDeleteTextures( 1, &borderTex );
+    
+    if ( font != NULL )
+    {
+        printf( "rectanglebase destructor, font is %p\n", font );
+        delete font;
+        font = NULL;
+    }
+}
+
+void RectangleBase::setDefaults()
+{
+    scaleX = 5.0f; scaleY = 5.0f;
+    angle = 0.0f;
+    x = 0.0f; y = 0.0f; z = 0.0f;
+    destX = x; destY = y;
     destScaleX = scaleX; destScaleY = scaleY;
     selected = false;
     
@@ -33,28 +96,21 @@ RectangleBase::RectangleBase( float _x, float _y )
     twidth = 0; theight = 0;
     effectVal = 0.0f;
     
+    // TODO: this should be dynamic
     lat = 43.165556f; lon = -77.611389f;
     
-    font = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
-    font->FaceSize(100);
+    font = NULL;
     
     //borderTex = PNGLoader::loadPNG( "/home/andrew/work/src/grav/Debug/border.png",
     //                                twidth, theight );
 }
 
-RectangleBase::~RectangleBase()
+void RectangleBase::makeFont()
 {
-    printf( "rectanglebase destructor for %s\n", name.c_str() );
-    if ( isGrouped() )
-        myGroup->remove( this );
-    printf( "removed from group\n" );
-    
-    // if this is set externally, then we shouldn't delete it since other
-    // things might be using it
-    //glDeleteTextures( 1, &borderTex );
-    
-    delete font;
-    printf( "rectanglebase destructor ending\n" );
+    // TODO: check whether we can redistribute a font instead of looking in
+    //       a system spot, which would have to be different per-platform
+    font = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
+    font->FaceSize(100);
 }
 
 float RectangleBase::getWidth()
@@ -65,6 +121,26 @@ float RectangleBase::getWidth()
 float RectangleBase::getHeight()
 {
     return scaleY;
+}
+
+float RectangleBase::getLBound()
+{
+    return destX - (getWidth()/2.0f);
+}
+
+float RectangleBase::getRBound()
+{
+    return destX + (getWidth()/2.0f);
+}
+
+float RectangleBase::getUBound()
+{
+    return destY + (getHeight()/2.0f);
+}
+
+float RectangleBase::getDBound()
+{
+    return destY - (getHeight()/2.0f);
 }
 
 void RectangleBase::move( float _x, float _y )
@@ -84,7 +160,7 @@ void RectangleBase::setPos( float _x, float _y )
 void RectangleBase::setScale( float xs, float ys )
 {
     destScaleX = xs; destScaleY = ys;
-    if ( !animated) { scaleX = xs; scaleY = ys; }
+    if ( !animated ) { scaleX = xs; scaleY = ys; }
 }
 
 void RectangleBase::setWidth( float w )
@@ -191,6 +267,11 @@ void RectangleBase::setSelect( bool select )
 void RectangleBase::setEffectVal( float f )
 {
     effectVal = f;
+}
+
+void RectangleBase::setAnimation( bool anim )
+{
+    animated = anim;
 }
 
 bool RectangleBase::isGrouped()
@@ -357,7 +438,7 @@ void RectangleBase::draw()
     std::string sub = getSubName();
     const char* nc = sub.c_str();
     //printf( "rendering nc: %s\n", nc );
-    font->Render(nc);
+    if ( font ) font->Render(nc);
 
     glDisable(GL_BLEND);
     glDisable(GL_LINE_SMOOTH);

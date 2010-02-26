@@ -198,9 +198,8 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
                 if ( shiftHeld )
                 {
                     // TODO: change this, it sucks
-                    LayoutManager* layouts = new LayoutManager();
-                    layouts->fullscreen( grav->getScreenL(), grav->getScreenR(),
-                                         grav->getScreenU(), grav->getScreenD(),
+                    LayoutManager layouts;
+                    layouts.fullscreen( grav->getScreenRect(),
                                          (*grav->getSelectedObjects())[0] );
                 }
             }
