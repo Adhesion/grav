@@ -434,12 +434,10 @@ void RectangleBase::draw()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     
-    //printf( "name is %s\n", name.c_str() );
     std::string sub = getSubName();
     const char* nc = sub.c_str();
-    //printf( "rendering nc: %s\n", nc );
     if ( font ) font->Render(nc);
-
+    
     glDisable(GL_BLEND);
     glDisable(GL_LINE_SMOOTH);
     

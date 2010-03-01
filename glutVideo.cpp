@@ -431,6 +431,7 @@ void gravManager::ungroupAll()
                 selectedObjects->erase( j );
             }
             
+            tree->removeObject( g );
             delete g;
             
             printf( "single group deleted\n" );
@@ -864,6 +865,7 @@ Group* gravManager::createSiteIDGroup( std::string data )
     g->setName( data );
     g->setSiteID( data );
     g->setTexture( borderTex, borderWidth, borderHeight );
+    g->makeFont();
     
     drawnObjects->push_back( g );
     siteIDGroups->insert( std::pair<std::string,Group*>(data, g) );

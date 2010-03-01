@@ -38,14 +38,6 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
                                         float boundU, float boundD,
                                         std::vector<RectangleBase*> objects )
 {
-    // TODO: replace this with arguments - should be able to call on an
-    //       arbitrary area
-    /*GLUtil* glUtil = GLUtil::getInstance();
-    GLdouble screenL, screenR, screenU, screenD, screenZ; // screenZ is unused
-    glUtil->screenToWorld( (GLdouble)windowWidth, (GLdouble)windowHeight,
-                          0.990991f, &screenR, &screenU, &screenZ );
-    glUtil->screenToWorld( (GLdouble)0.0f, (GLdouble)0.0f,
-                          0.990991f, &screenL, &screenD, &screenZ );*/
     printf( "gravManager::perimeter: screen bounds: %f,%f %f,%f\n",
             screenL, screenR, screenU, screenD );
     
