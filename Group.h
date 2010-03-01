@@ -23,7 +23,7 @@ public:
     void draw();
     
     void add( RectangleBase* object );
-    void remove( RectangleBase* object );
+    void remove( RectangleBase* object, bool move = true );
     void removeAll();
     
     RectangleBase* operator[]( int i );

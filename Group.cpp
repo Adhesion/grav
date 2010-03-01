@@ -56,15 +56,16 @@ void Group::add( RectangleBase* object )
     updateName();
 }
 
-void Group::remove( RectangleBase* object )
+void Group::remove( RectangleBase* object, bool move )
 {
     printf( "removing %s from group %s\n", object->getName().c_str(),
                                         getName().c_str() );
     object->setGroup( NULL );
+    object->setSubstring( -1, -1 );
     std::vector<RectangleBase*>::iterator i = objects.begin();
     while ( *i != object ) i++;
     objects.erase( i );
-    if ( objects.size() > 0 )
+    if ( objects.size() > 0 && move )
         rearrange();
 }
 
@@ -72,7 +73,7 @@ void Group::removeAll()
 {
     for ( unsigned int i = 0; i < objects.size(); )
     {
-        remove( objects[i] );
+        remove( objects[i], false );
     }
 }
 
@@ -197,7 +198,7 @@ void Group::updateName()
     {
         // if there's only one, just split based on the rightmost & outermost
         // matched parens
-        int i = objects[0]->getName().length()-1;
+        unsigned int i = objects[0]->getName().length()-1;
         printf( "name is %s, length is %i, i is %i\n", 
                 objects[0]->getName().c_str(), i+1, i );
         int balance = 0;
