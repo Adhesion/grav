@@ -261,31 +261,47 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
                 // width of columns if going vertically
     float stride; // distance to move each time
     float curX, curY;
+    
     if ( horiz )
     {
         span = (boundU-boundD)/numY;
         float edgeL = boundL + 0.2f + objects[0]->getWidth();
         float edgeR = boundR - 0.2f - objects[numX-1]->getWidth();
-        stride = (edgeR-edgeL)/(numX-1);
+        if ( edge ) stride = (edgeR-edgeL) / std::min(1, (numX-1));
+        else stride = (boundR-boundL) / (numX+1);
         curY = boundU - (span/2.0f);
-        if ( numX > 1 )
-            curX = edgeL;
-        else
+        
+        if ( numX == 1 )
             curX = (boundR+boundL)/2.0f;
+        else
+        {
+            if ( edge )
+                curX = edgeL;
+            else
+                curX = boundL + stride;
+        }
     }
     else
     {
         span = (boundR-boundL)/numX;
         float edgeU = boundU - 0.2f - objects[0]->getHeight();
         float edgeD = boundD + 0.2f + objects[numY-1]->getHeight();
-        stride = (edgeU-edgeD)/(numY-1);
+        if ( edge ) stride = (edgeU-edgeD) / std::min(1, (numY-1));
+        else stride = boundU-boundD / (numY+1);
         curX = boundL + (span/2.0f);
-        if ( numY > 1 )
-            curY = edgeU;
-        else
+        
+        if ( numY == 1 )
             curY = (boundU+boundD)/2.0f;
+        else
+        {
+            if ( edge )
+                curY = edgeU;
+            else
+                curY = boundU - stride;
+        }
     }
     printf( "grid: starting at %f,%f\n", curX, curY );
+    printf( "grid: stride is %f\n", stride );
     
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
@@ -306,7 +322,7 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
             if ( i+1 % numY == 0 )
             {
                 curX += span;
-                curY = boundU + stride;
+                curY = boundU - stride;
             }
         }
     }
