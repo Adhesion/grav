@@ -122,6 +122,16 @@ void gravApp::mapRTP()
     decoderFactory->mapPayloadType( 45, "MPEG4" );
     decoderFactory->mapPayloadType( 96, "H264" );
     
+    // map audio codecs
+    decoderFactory->mapPayloadType( 122, "L16_8k_mono" );
+    decoderFactory->mapPayloadType( 111, "L16_8k_stereo" );
+    decoderFactory->mapPayloadType( 112, "L16_16k_mono" );
+    decoderFactory->mapPayloadType( 113, "L16_16k_stereo" );
+    decoderFactory->mapPayloadType( 114, "L16_32k_mono" );
+    decoderFactory->mapPayloadType( 115, "L16_32k_stereo" );
+    decoderFactory->mapPayloadType( 116, "L16_48k_mono" );
+    decoderFactory->mapPayloadType( 117, "L16_48k_stereo" );
+    
     // TODO: change these to mapPayloadType and add all PCM formats that rat
     // supports
     /*MAPSTATIC( RTP_PAYLOAD_MPEG4,
