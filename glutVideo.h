@@ -11,8 +11,6 @@
 #include <vector>
 #include <map>
 
-#include "GLCanvas.h"
-
 static void glutDisplay(void);
 static void glutReshape(int w, int h);
 static void glutIdle(void);
@@ -24,6 +22,7 @@ static void glutMouse(int button, int state, int x, int y);
 static void glutActiveMotion(int x, int y);
 
 #include "RectangleBase.h"
+#include "GLCanvas.h"
 
 class VideoSource;
 class Group;

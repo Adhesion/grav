@@ -9,6 +9,7 @@
 <option id="gnu.cpp.compiler.exe.debug.option.optimization.level.1402714218" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 <option id="gnu.cpp.compiler.option.other.other.1695020194" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 `freetype-config --cflags` `vpmedia-config --cppflags` `wx-config --cppflags`" valueType="string"/>
 <option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1624274799" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+<option id="gnu.cpp.compiler.option.debugging.other.605119311" superClass="gnu.cpp.compiler.option.debugging.other" value="" valueType="string"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.977599646" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
 <option id="gnu.c.compiler.exe.debug.option.optimization.level.1842990608" superClass="gnu.c.compiler.exe.debug.option.optimization.level" value="gnu.c.optimization.level.most" valueType="enumerated"/>
