@@ -23,8 +23,6 @@
 #include "TreeControl.h"
 #include "LayoutManager.h"
 
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <GL/glut.h>
 
 #include "glutVideo.h"
@@ -105,8 +103,8 @@ void glutReshape(int w, int h)
   // Work out coordinates so that 1.0x1.0 fits into window and maintains
   // aspect ratio.
   glViewport(0, 0, w, h);
-  grav->setWindowWidth( w );
-  grav->setWindowHeight( h );
+  //grav->setWindowWidth( w );
+  //grav->setWindowHeight( h );
   
   if (w > h) {
     screen_height = 1.0;

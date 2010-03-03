@@ -40,6 +40,10 @@ VideoListener::vpmsession_source_created(VPMSession &session,
     else
         sink = new VPMVideoBufferSink( VIDEO_FORMAT_RGB24 );
         
+    // note that the buffer sink will be deleted when the decoder for the source
+    // is (inside VPMedia), so that's why it isn't deleted here or in
+    // videosource
+        
     if (!sink->initialise()) {
       fprintf(stderr, "Failed to initialise video sink\n");
       return;

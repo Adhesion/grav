@@ -5,10 +5,11 @@
  * @author Andrew Ford
  */
 
-#include "GLCanvas.h"
 #include "glutVideo.h"
-#include <GL/glut.h>
+#include "GLCanvas.h"
 #include "InputHandler.h"
+
+#include <GL/glut.h>
 
 BEGIN_EVENT_TABLE(GLCanvas, wxGLCanvas)
 EVT_PAINT(GLCanvas::draw)
