@@ -165,12 +165,15 @@ void RectangleBase::setScale( float xs, float ys )
 
 void RectangleBase::setWidth( float w )
 {
-    setScale( w, getScaleY()*w/getScaleX() );
+    // this has to be a little different since a video's aspect ratio will
+    // affect how wide it is
+    float aspect = getWidth() / getHeight();
+    setScale( w / aspect, (getScaleY() * w / getScaleX()) / aspect );
 }
 
 void RectangleBase::setHeight( float h )
 {
-    setScale( getScaleX()*h/getScaleY(), h );
+    setScale( getScaleX() * h / getScaleY(), h );
 }
 
 void RectangleBase::setTexture( GLuint tex, int width, int height )
