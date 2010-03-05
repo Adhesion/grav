@@ -517,6 +517,7 @@ void gravManager::moveToTop( RectangleBase* object )
 void gravManager::moveToTop( std::vector<RectangleBase*>::iterator i )
 {
     RectangleBase* temp = (*i);
+    printf( "gravManager: moving %s to top\n", temp->getName().c_str() );
     drawnObjects->erase( i );
     drawnObjects->push_back( temp );
     

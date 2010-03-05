@@ -30,6 +30,9 @@ public:
     int numObjects();
     
     bool isGroup();
+    bool isLocked();
+    
+    void changeLock();
     
     void rearrange();
     
@@ -41,6 +44,7 @@ public:
 private:
     std::vector<RectangleBase*> objects;
     float buffer;
+    bool locked;
     
 };
 

@@ -118,7 +118,6 @@ VideoListener::vpmsession_source_app(VPMSession &session,
         // reason, so chop those off
         dataS = std::string( dataS, 0, 32 );
         std::vector<VideoSource*>::iterator i = grav->getSources()->begin();
-        printf( "in rtcp app, got %i sources\n", grav->getSources()->size() );
         
         // sometimes, if groups are enabled by default, we can get RTCP APP
         // before we get any sources added, resulting in a crash when we try
