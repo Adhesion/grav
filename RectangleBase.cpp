@@ -386,16 +386,16 @@ void RectangleBase::draw()
                borderColor.A+(effectVal*3.0f) );
     
     glTexCoord2f(0.0, 0.0);
-    glVertex3f(-getWidth()/2.0-0.3, -getHeight()/2.0-0.3, 0.0);
+    glVertex3f((-getWidth()/2.0)-0.3, (-getHeight()/2.0)-0.3, 0.0);
     
     glTexCoord2f(0.0, t);
-    glVertex3f(-getWidth()/2.0-0.3, getHeight()/2.0+0.3, 0.0);
+    glVertex3f((-getWidth()/2.0)-0.3, (getHeight()/2.0)+0.3, 0.0);
     
     glTexCoord2f(s, t);
-    glVertex3f(getWidth()/2.0+0.3, getHeight()/2.0+0.3, 0.0);
+    glVertex3f((getWidth()/2.0)+0.3, (getHeight()/2.0)+0.3, 0.0);
     
     glTexCoord2f(s, 0.0);
-    glVertex3f(getWidth()/2.0+0.3, -getHeight()/2.0-0.3, 0.0);
+    glVertex3f((getWidth()/2.0)+0.3, (-getHeight()/2.0)-0.3, 0.0);
     
     /*printf( "DRAWPOSTCOORD\n" );
     gl_error = glGetError();

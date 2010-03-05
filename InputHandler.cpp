@@ -89,6 +89,7 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
     // how much to scale when doing -/+: flipped in the former case
     float scaleAmt = 0.25f;
     
+    // TODO reorder this to make some sort of sense
     switch(key) {
     
         case 'k':
@@ -134,7 +135,7 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             grav->retileVideos();
             break;
         
-        case 'l':
+        case 'i':
             printf( "We currently have %i sources.\n",
                      grav->getSources()->size() );
             printf( "We currently have %i objects in drawnObjects.\n",
@@ -163,11 +164,34 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
                 printf( "\tpos (screen): %f,%f,%f\n", scrX, scrY, scrZ );
                 printf( "\tis grouped? %i\n", (*si)->isGrouped() );
             }
+            printf( "DrawnObjects:\n" );
+            for ( unsigned int i = 0; i < grav->getDrawnObjects()->size(); i++ )
+            {
+                RectangleBase* temp = (*(grav->getDrawnObjects()))[i];
+                printf( "%s\n", temp->getName().c_str() );
+            }
+            break;
+        
+        case 'l':
+            for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
+                    i++ )
+            {
+                RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
+                if ( temp->isGroup() )
+                {
+                    Group* g = dynamic_cast<Group*>(temp);
+                    printf( "InputHandler::l:group %s locked? %i\n",
+                                g->getName().c_str(), g->isLocked() );
+                    g->changeLock();
+                    printf( "after: %i\n", g->isLocked() );
+                }
+            }
             break;
         
         case 'o':
             printf( "random32: %i\n", random32() );
             printf( "random32max: %i\n", random32_max() );
+            break;
         
         case 'N':
         case 'n':
@@ -203,6 +227,7 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
                                          (*grav->getSelectedObjects())[0] );
                 }
             }
+            break;
         
         case 'g':
             if ( grav->usingSiteIDGroups() )
@@ -516,27 +541,38 @@ bool InputHandler::selectVideos()
                 grav->clearSelected();
             
             videoSelected = true;
+            RectangleBase* temp = (*si);
             
-            if ( !(*si)->isSelected() )
+            if ( !temp->isSelected() )
             {
-                (*si)->setSelect( true );
+                if ( temp->isGrouped() )
+                {
+                    // TODO change this to a loop to work for nested groups
+                    Group* g = temp->getGroup();
+                    if ( g->isLocked() )
+                        temp = (RectangleBase*)g;
+                }
+                
+                temp->setSelect( true );
                 // if we're doing a box selection, add it to the temp list
                 if ( leftButtonHeld )
-                    tempSelectedObjects->push_back( *si );
+                    tempSelectedObjects->push_back( temp );
                 else
-                    grav->getSelectedObjects()->push_back( *si );
+                    grav->getSelectedObjects()->push_back( temp );
             }
             
             // take the selected video and put it at the end of the list so
             // it'll be rendered on top - but only if we just clicked on it
             if ( !leftButtonHeld )
-            {   
+            {
+                printf( "putting selected video to end\n" );
                 // since we can only delete a normal iterator (not a reverse
                 // one) we have to calculate our current position
-                std::vector<RectangleBase*>::iterator current =
-                    grav->getDrawnObjects()->begin() - 1 + 
+                /*std::vector<RectangleBase*>::iterator current =
+                    grav->getDrawnObjects()->begin() - 1 +
                     distance( si, grav->getDrawnObjects()->rend() );
-                grav->moveToTop( current );
+                grav->moveToTop( current );*/
+                grav->moveToTop( temp );
                 
                 break; // so we only select one video per click
                        // when single-clicking
