@@ -57,14 +57,19 @@ public:
     /*
      * Change the size of the object.
      */
-    void setScale( float xs, float ys );
+    virtual void setScale( float xs, float ys );
+    /*
+     * The bool is so we can have a different version for groups, so they can
+     * resize their members or not.
+     */
+    virtual void setScale( float xs, float ys, bool resizeMembers );
     
     /*
      * Change the selected size to be equal to the argument given, preserving
      * aspect ratio.
      */
-    void setWidth( float w );
-    void setHeight( float h );
+    virtual void setWidth( float w );
+    virtual void setHeight( float h );
     
     /*
      * Set the background texture for this object.
@@ -72,6 +77,7 @@ public:
     void setTexture( GLuint tex, int width, int height );
     
     float getX(); float getY(); float getZ();
+    float getDestX(); float getDestY();
     float getScaleX(); float getScaleY();
     float getLat(); float getLon();
     

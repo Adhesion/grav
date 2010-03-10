@@ -26,9 +26,10 @@ public:
                             float boundU, float boundD,
                             std::vector<RectangleBase*> objects );
     bool gridArrange( RectangleBase boundRect, int numX, int numY, bool horiz,
-                        bool edge, std::vector<RectangleBase*> objects );
+                        bool edge, bool resize,
+                        std::vector<RectangleBase*> objects );
     bool gridArrange( float boundL, float boundR, float boundU, float boundD,
-                        int numX, int numY, bool horiz, bool edge,
+                        int numX, int numY, bool horiz, bool edge, bool resize,
                         std::vector<RectangleBase*> objects );
     bool fullscreen( RectangleBase boundRect, RectangleBase* object );
     bool fullscreen( float boundL, float boundR, float boundU, float boundD,
