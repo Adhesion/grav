@@ -10,6 +10,7 @@
  */
 
 #include "RectangleBase.h"
+#include "LayoutManager.h"
 
 #include <vector>
 
@@ -40,11 +41,15 @@ public:
     
     void move( float _x, float _y );
     void setPos( float _x, float _y );
+    void setScale( float xs, float ys, bool resizeMembers );
+    void setWidth( float w );
+    void setHeight( float h );
     
 private:
     std::vector<RectangleBase*> objects;
     float buffer;
     bool locked;
+    LayoutManager layouts;
     
 };
 

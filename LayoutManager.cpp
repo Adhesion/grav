@@ -201,7 +201,7 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
                 topObjs.push_back( objects[i] );
             // constant on top is for space for text
             gridArrange( screenL, screenR, screenU-0.8f, boundU, numU, 1, true,
-                         false, topObjs );
+                         false, false, topObjs );
         }
         
         if ( numR > 0 )
@@ -210,7 +210,7 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
             for ( int i = numU; i < numU+numR; i++ )
                 rightObjs.push_back( objects[i] );
             gridArrange( boundR, screenR, boundU, boundD, 1, numR, false, true,
-                            rightObjs );
+                            false, rightObjs );
         }
         
         if ( numD > 0 )
@@ -219,7 +219,7 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
             for ( int i = numU+numR+numD-1; i >= numU+numR; i-- )
                 bottomObjs.push_back( objects[i] );
             gridArrange( screenL, screenR, boundD, screenD, numD, 1, true,
-                            false, bottomObjs );
+                            false, false, bottomObjs );
         }
         
         if ( numL > 0 )
@@ -227,13 +227,13 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
             for ( int i = numObjects-1; i >= numU+numR+numD; i-- )
                 leftObjs.push_back( objects[i] );
             gridArrange( screenL, boundL, boundU, boundD, 1, numL, false, true,
-                            leftObjs );
+                            false, leftObjs );
         }
     }
 }
 
 bool LayoutManager::gridArrange( RectangleBase boundRect, int numX, int numY,
-                                    bool horiz, bool edge,
+                                    bool horiz, bool edge, bool resize,
                                     std::vector<RectangleBase*> objects )
 {
     float boundL = boundRect.getLBound();
@@ -242,33 +242,45 @@ bool LayoutManager::gridArrange( RectangleBase boundRect, int numX, int numY,
     float boundD = boundRect.getDBound();
     
     return gridArrange( boundL, boundR, boundU, boundD, numX, numY, horiz, edge,
-                    objects );
+                            resize, objects );
 }
 
 bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
                                     float boundD, int numX, int numY,
-                                    bool horiz, bool edge,
+                                    bool horiz, bool edge, bool resize,
                                     std::vector<RectangleBase*> objects )
 {
     // if there's too many objects, fail
-    if ( (unsigned int)(numX * numY) > objects.size() )
+    if (  objects.size() > (unsigned int)(numX * numY) )
         return false;
     
-    // TODO: potentially add resizing of videos if they're bigger than span
-    // or stride    
+    // if we only have one object, just fullscreen it to the area
+    if ( objects.size() == 1 )
+    {
+        fullscreen( boundL, boundR, boundU, boundD, objects[0] );
+        return true;
+    }
+    
+    printf( "grid:bounds: %f,%f %f,%f\n", boundL, boundR, boundU, boundD );
     
     float span; // height of rows if going horizontally,
                 // width of columns if going vertically
     float stride; // distance to move each time
     float curX, curY;
+    float edgeL = boundL, edgeR = boundR, edgeU = boundU, edgeD = boundD;
     
+    // set up span and stride, etc differently for horizontal vs vertical
+    // arrangement
     if ( horiz )
     {
-        span = (boundU-boundD)/numY;
-        float edgeL = boundL + 0.2f + objects[0]->getWidth();
-        float edgeR = boundR - 0.2f - objects[numX-1]->getWidth();
-        if ( edge ) stride = (edgeR-edgeL) / std::min(1, (numX-1));
-        else stride = (boundR-boundL) / (numX+1);
+        span = (boundU-boundD) / numY;
+        stride = (boundR-boundL) / numX;
+        
+        edgeL = boundL + 0.2f + (stride / 2);
+        edgeR = boundR - 0.2f - (stride / 2);
+        printf( "grid: edges are %f,%f\n", edgeL, edgeR );
+        if ( edge ) stride = (edgeR-edgeL) / std::max(1, (numX-1));
+        
         curY = boundU - (span/2.0f);
         
         if ( numX == 1 )
@@ -278,16 +290,18 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
             if ( edge )
                 curX = edgeL;
             else
-                curX = boundL + stride;
+                curX = boundL + (stride/2.0f);
         }
     }
     else
     {
         span = (boundR-boundL)/numX;
-        float edgeU = boundU - 0.2f - objects[0]->getHeight();
-        float edgeD = boundD + 0.2f + objects[numY-1]->getHeight();
-        if ( edge ) stride = (edgeU-edgeD) / std::min(1, (numY-1));
-        else stride = boundU-boundD / (numY+1);
+        stride = boundU-boundD / numY;
+        
+        edgeU = boundU - 0.2f - (stride / 2);
+        edgeD = boundD + 0.2f + (stride / 2);
+        if ( edge ) stride = (edgeU-edgeD) / std::max(1, (numY-1));
+
         curX = boundL + (span/2.0f);
         
         if ( numY == 1 )
@@ -297,32 +311,88 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
             if ( edge )
                 curY = edgeU;
             else
-                curY = boundU - stride;
+                curY = boundU - (stride/2.0f);
         }
     }
+    
     printf( "grid: starting at %f,%f\n", curX, curY );
     printf( "grid: stride is %f\n", stride );
+    printf( "grid: span is %f\n", span );
+    
+    // if we're resizing them, do it on a first pass so the calculations later
+    // are correct
+    if ( resize )
+    {
+        for ( unsigned int i = 0; i < objects.size(); i++ )
+        {
+            float objectAspect = objects[i]->getWidth()/objects[i]->getHeight();
+            float aspect = 1.0f;
+            float newWidth = 1.0f;
+            float newHeight = 1.0f;
+            if ( horiz )
+            {
+                aspect = stride / span;
+                newHeight = span * 0.85f;
+                newWidth = stride * 0.85f;
+            }
+            else
+            {
+                aspect = span / stride;
+                newHeight = stride * 0.85f;
+                newWidth = span * 0.85f;
+            }
+            if ( aspect > objectAspect )
+            {
+                objects[i]->setHeight( newHeight );
+            }
+            else
+            {
+                objects[i]->setWidth( newWidth );
+            }
+        }
+    }
     
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
+        printf( "grid: moving object %i to %f,%f\n", i, curX, curY );
         objects[i]->move( curX, curY );
+        int objectsLeft = (int)objects.size() - i - 1;
         
         if ( horiz )
         {
             curX += stride;
-            if ( i+1 % numX == 0 )
+            if ( (i+1) % numX == 0 )
             {
-                curY += span;
-                curX = boundL + stride;
+                printf( "grid: changing to new row\n" );
+                curY -= span;
+                // if the number of objects we have left is less than a full
+                // row/column, change stride such that it's evenly spaced
+                if ( objectsLeft < numX )
+                {
+                    if ( edge )
+                        stride = (edgeR-edgeL) / std::max(1, (objectsLeft-1));
+                    else
+                        stride = (boundR-boundL) / (objectsLeft);
+                }
+                curX = boundL + (stride/2.0f);
             }
         }
         else
         {
             curY -= stride;
-            if ( i+1 % numY == 0 )
+            if ( (i+1) % numY == 0 )
             {
                 curX += span;
-                curY = boundU - stride;
+                // if the number of objects we have left is less than a full
+                // row/column, change stride such that it's evenly spaced
+                if ( objectsLeft < numY )
+                {
+                    if ( edge )
+                        stride = (edgeU-edgeD) / std::max(1, (objectsLeft-1));
+                    else
+                        stride = boundU-boundD / (objectsLeft+1);
+                }
+                curY = boundU - (stride/2.0f);
             }
         }
     }

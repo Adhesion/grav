@@ -446,6 +446,24 @@ void gravManager::ungroupAll()
 
 void gravManager::retileVideos()
 {
+    std::vector<RectangleBase*> objects;
+    for ( unsigned int i = 0; i < drawnObjects->size(); i++ )
+    {
+        if ( !(*drawnObjects)[i]->isGrouped() )
+        {
+            objects.push_back( (*drawnObjects)[i] );
+        }
+    }
+    
+    int numCol = ceil( sqrt( objects.size() ) );
+    int numRow = objects.size() / numCol + ( objects.size() % numCol > 0 );
+    printf( "gravManager: doing grid arrangement with %i objects (%ix%i)\n",
+                objects.size(), numCol, numRow );
+    bool res = layouts->gridArrange( screenRect, numCol, numRow, true, false,
+                                        true, objects );
+    if ( !res ) printf( "gravManager: grid arrangement failed\n" );
+    // old method:
+    /*
     float x = -7.0f;
     float y = 5.5f;
     float buffer = 1.0f; // space between videos
@@ -473,6 +491,7 @@ void gravManager::retileVideos()
         if ( g != NULL )
             g->rearrange();
     }
+    */
 }
 
 void gravManager::perimeterAllVideos()

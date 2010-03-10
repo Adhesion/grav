@@ -145,6 +145,7 @@ float RectangleBase::getDBound()
 
 void RectangleBase::move( float _x, float _y )
 {
+    printf( "RectangleBase:: %s moving\n", name.c_str() );
     destX = _x;
     if ( !animated ) x = _x;
     destY = _y;
@@ -161,6 +162,11 @@ void RectangleBase::setScale( float xs, float ys )
 {
     destScaleX = xs; destScaleY = ys;
     if ( !animated ) { scaleX = xs; scaleY = ys; }
+}
+
+void RectangleBase::setScale( float xs, float ys, bool resizeMembers )
+{
+    setScale( xs, ys );
 }
 
 void RectangleBase::setWidth( float w )
@@ -187,9 +193,19 @@ float RectangleBase::getX()
     return x;
 }
 
+float RectangleBase::getDestX()
+{
+    return destX;
+}
+
 float RectangleBase::getY()
 {
     return y;
+}
+
+float RectangleBase::getDestY()
+{
+    return destY;
 }
 
 float RectangleBase::getZ()

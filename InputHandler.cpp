@@ -153,7 +153,8 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
                 printf( "loc: %s\n", 
                     (*si)->getMetadata(
                         VPMSession::VPMSESSION_SDES_LOC).c_str() );
-                printf( "ssrc 0x%08x\n", (*si)->getssrc() );
+                printf( "ssrc 0x%08x (%d)\n", (*si)->getssrc(),
+                            (*si)->getssrc() );
                 printf( "\tpos (world): %f,%f\n",
                         (*si)->getX(), (*si)->getY() );
                 GLdouble scrX; GLdouble scrY; GLdouble scrZ;
@@ -242,13 +243,14 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
         case '-':
             scaleAmt *= -1.0f;
         case '+':
-            for ( si = grav->getSources()->begin();
-                    si != grav->getSources()->end(); si++ )
+            for ( unsigned int i = 0; i < grav->getDrawnObjects()->size();
+                    i++ )
             {
-                if ( (*si)->isSelected() )
+                RectangleBase* temp = (*(grav->getDrawnObjects()))[i];
+                if ( temp->isSelected() )
                 {
-                    (*si)->setScale( (*si)->getScaleX()+(*si)->getScaleX()*scaleAmt,
-                                     (*si)->getScaleY()+(*si)->getScaleY()*scaleAmt );
+                    temp->setScale( temp->getScaleX()+temp->getScaleX()*scaleAmt,
+                                     temp->getScaleY()+temp->getScaleY()*scaleAmt );
                 }
             }
             break;
