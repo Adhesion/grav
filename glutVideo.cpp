@@ -849,6 +849,9 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
     RectangleBase* temp = (RectangleBase*)(*si);
     VideoSource* s = (*si);
     
+    // remove it from the tree
+    tree->removeObject( temp );
+    
     sources->erase( si );
     
     // remove it from drawnobjects, if it is being drawn

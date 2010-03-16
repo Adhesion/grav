@@ -325,7 +325,8 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
     {
         for ( unsigned int i = 0; i < objects.size(); i++ )
         {
-            float objectAspect = objects[i]->getWidth()/objects[i]->getHeight();
+            float objectAspect =
+                        objects[i]->getDestWidth()/objects[i]->getDestHeight();
             float aspect = 1.0f;
             float newWidth = 1.0f;
             float newHeight = 1.0f;
@@ -343,10 +344,12 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
             }
             if ( aspect > objectAspect )
             {
+                printf( "layout setting height to %f\n", newHeight );
                 objects[i]->setHeight( newHeight );
             }
             else
             {
+                printf( "layout setting width to %f\n", newWidth );
                 objects[i]->setWidth( newWidth );
             }
         }
@@ -413,16 +416,17 @@ bool LayoutManager::fullscreen( RectangleBase boundRect, RectangleBase* object )
 bool LayoutManager::fullscreen( float boundL, float boundR, float boundU,
                                     float boundD, RectangleBase* object )
 {
+    printf( "LayoutManager::fullscreen\n" );
     float spaceAspect = fabs((boundR-boundL)/(boundU-boundD));
     float objectAspect = object->getWidth()/object->getHeight();
     
     if ( spaceAspect > objectAspect )
     {
-        object->setHeight( boundU-boundD-1.0f );
+        object->setHeight( boundU-boundD );
     }
     else
     {
-        object->setWidth( boundR-boundL-0.5f );
+        object->setWidth( boundR-boundL );
     }
     
     object->move( (boundR+boundL)/2.0f, (boundU+boundD)/2.0f );
