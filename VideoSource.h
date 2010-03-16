@@ -50,6 +50,8 @@ public:
     
     // overrides the functions from RectangleBase to account for aspect ratio
     float getWidth(); float getHeight();
+    float getDestWidth(); float getDestHeight();
+    void setWidth( float w ); void setHeight( float h );
 
 private:
     VPMSession* session; // reference to the session that this video comes from

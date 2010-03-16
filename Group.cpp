@@ -49,6 +49,7 @@ void Group::add( RectangleBase* object )
     object->setGroup( this );
     printf( "added %s to group %s\n", object->getName().c_str(),
                                         getName().c_str() );
+    
     printf( "now rearranging %i objects\n", objects.size() );
     rearrange();
     
@@ -138,6 +139,26 @@ void Group::rearrange()
     int numRow = objects.size() / numCol + ( objects.size() % numCol > 0 );
     printf( "Group:: group %s (%fx%f, %f,%f) rearranging\n", name.c_str(),
                 getWidth(), getHeight(), destX, destY );
+    
+    // resize the group based on the aspect ratios of the current member(s)
+    if ( objects.size() == 1 )
+    {
+        float objAspect =
+                objects[0]->getDestWidth() / objects[0]->getDestHeight();
+        float diff = objAspect / ( getDestWidth() / getDestHeight() );
+        RectangleBase::setScale( destScaleX * diff, destScaleY );
+    }
+    else
+    {
+        float aspect = getDestWidth() / getDestHeight();
+        float newAspect = (numCol*1.33f) / numRow;
+        if ( newAspect > aspect )
+            RectangleBase::setScale( destScaleX * (newAspect/aspect),
+                                        destScaleY );
+        else
+            RectangleBase::setScale( destScaleX,
+                                        destScaleY * (aspect/newAspect) );
+    }
     
     layouts.gridArrange( getLBound(), getRBound(), getUBound(), getDBound(),
                             numCol, numRow, true, false, true, objects );
@@ -308,14 +329,24 @@ void Group::setPos( float _x, float _y )
     RectangleBase::setPos( _x, _y );
 }
 
+void Group::setScale( float xs, float ys )
+{
+    if ( locked )
+        setScale( xs, ys, true );
+    else
+        setScale( xs, ys, false );
+}
+
 void Group::setScale( float xs, float ys, bool resizeMembers )
 {
+    RectangleBase::setScale( xs, ys );
     if ( resizeMembers )
     {
-        float Xratio = xs / scaleX;
-        float Yratio = ys / scaleY;
-        printf( "Group::setScale: scaling group %s, ratio is %f/%f\n",
-                    name.c_str(), Xratio, Yratio );
+        rearrange();
+        /*float Xratio = xs / destScaleX;
+        float Yratio = ys / destScaleY;
+        printf( "Group::setScale: scaling group %s to %f,%f, ratio is %f/%f\n",
+                    name.c_str(), xs, ys, Xratio, Yratio );
         float min = std::min( Xratio, Yratio );
         
         for ( unsigned int i = 0; i < objects.size(); i++ )
@@ -324,8 +355,8 @@ void Group::setScale( float xs, float ys, bool resizeMembers )
             float objScaleY = (objects[i]->getScaleY() * min);
             float Xdist = objects[i]->getDestX() - destX;
             float Ydist = objects[i]->getDestY() - destY;
-            Xdist *= min;
-            Ydist *= min;
+            Xdist *= Xratio;
+            Ydist *= Yratio;
             
             // if the object scale values are close to the group's scale values,
             // then make it a bit smaller
@@ -335,17 +366,6 @@ void Group::setScale( float xs, float ys, bool resizeMembers )
             }
             objects[i]->setScale( objScaleX, objScaleY );
             objects[i]->move( destX+Xdist, destY+Ydist );
-        }
+        }*/
     }
-    RectangleBase::setScale( xs, ys );
-}
-
-void Group::setWidth( float w )
-{
-    
-}
-
-void Group::setHeight( float h )
-{
-    
 }

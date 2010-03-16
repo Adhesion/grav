@@ -123,24 +123,34 @@ float RectangleBase::getHeight()
     return scaleY;
 }
 
+float RectangleBase::getDestWidth()
+{
+    return destScaleX;
+}
+
+float RectangleBase::getDestHeight()
+{
+    return destScaleY;
+}
+
 float RectangleBase::getLBound()
 {
-    return destX - (getWidth()/2.0f);
+    return destX - (getDestWidth()/2.0f);
 }
 
 float RectangleBase::getRBound()
 {
-    return destX + (getWidth()/2.0f);
+    return destX + (getDestWidth()/2.0f);
 }
 
 float RectangleBase::getUBound()
 {
-    return destY + (getHeight()/2.0f);
+    return destY + (getDestHeight()/2.0f);
 }
 
 float RectangleBase::getDBound()
 {
-    return destY - (getHeight()/2.0f);
+    return destY - (getDestHeight()/2.0f);
 }
 
 void RectangleBase::move( float _x, float _y )
@@ -160,6 +170,7 @@ void RectangleBase::setPos( float _x, float _y )
 
 void RectangleBase::setScale( float xs, float ys )
 {
+    printf( "RectangleBase %s scaling to %f,%f\n", name.c_str(), xs, ys );
     destScaleX = xs; destScaleY = ys;
     if ( !animated ) { scaleX = xs; scaleY = ys; }
 }
@@ -171,15 +182,14 @@ void RectangleBase::setScale( float xs, float ys, bool resizeMembers )
 
 void RectangleBase::setWidth( float w )
 {
-    // this has to be a little different since a video's aspect ratio will
-    // affect how wide it is
-    float aspect = getWidth() / getHeight();
-    setScale( w / aspect, (getScaleY() * w / getScaleX()) / aspect );
+    printf( "RectangleBase setwidth to %f\n", w );
+    setScale( w, destScaleY * w / destScaleX );
 }
 
 void RectangleBase::setHeight( float h )
 {
-    setScale( getScaleX() * h / getScaleY(), h );
+    printf( "RectangleBase setheight to %f\n", h );
+    setScale( destScaleX * h / destScaleY, h );
 }
 
 void RectangleBase::setTexture( GLuint tex, int width, int height )
@@ -397,6 +407,10 @@ void RectangleBase::draw()
     
     glScalef( 1.0f+effectVal, 1.0f+effectVal, 0.0f );
     
+    // X & Y distances from center to edge
+    float Xdist = getWidth()/2.0f + 0.3f;
+    float Ydist = getHeight()/2.0f + 0.3f;
+    
     glBegin( GL_QUADS );
     // set the border color
     glColor4f( borderColor.R-(effectVal*3.0f), 
@@ -405,16 +419,16 @@ void RectangleBase::draw()
                borderColor.A+(effectVal*3.0f) );
     
     glTexCoord2f(0.0, 0.0);
-    glVertex3f((-getWidth()/2.0)-0.3, (-getHeight()/2.0)-0.3, 0.0);
+    glVertex3f(-Xdist, -Ydist, 0.0);
     
     glTexCoord2f(0.0, t);
-    glVertex3f((-getWidth()/2.0)-0.3, (getHeight()/2.0)+0.3, 0.0);
-    
+    glVertex3f(-Xdist, Ydist, 0.0);
+
     glTexCoord2f(s, t);
-    glVertex3f((getWidth()/2.0)+0.3, (getHeight()/2.0)+0.3, 0.0);
-    
+    glVertex3f(Xdist, Ydist, 0.0);
+
     glTexCoord2f(s, 0.0);
-    glVertex3f((getWidth()/2.0)+0.3, (-getHeight()/2.0)-0.3, 0.0);
+    glVertex3f(Xdist, -Ydist, 0.0);
     
     /*printf( "DRAWPOSTCOORD\n" );
     gl_error = glGetError();

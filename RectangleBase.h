@@ -45,6 +45,7 @@ public:
      * aspect ratio, these will most likely be equal to the scale factors.
      */
     virtual float getWidth(); virtual float getHeight();
+    virtual float getDestWidth(); virtual float getDestHeight();
     float getLBound(); float getRBound(); float getUBound(); float getDBound();
     
     /*

@@ -27,11 +27,13 @@
 <listOptionValue builtIn="false" value="uclmmbase"/>
 <listOptionValue builtIn="false" value="swscale"/>
 </option>
-<option id="gnu.cpp.link.option.paths.2006448142" superClass="gnu.cpp.link.option.paths"/>
+<option id="gnu.cpp.link.option.paths.2006448142" superClass="gnu.cpp.link.option.paths" valueType="stringList">
+<listOptionValue builtIn="false" value="."/>
+</option>
 <option id="gnu.cpp.link.option.flags.752878852" superClass="gnu.cpp.link.option.flags" value="`vpmedia-config --ldflags` `wx-config --libs --gl-libs`" valueType="string"/>
 <option id="gnu.cpp.link.option.shared.1964853397" superClass="gnu.cpp.link.option.shared" value="false" valueType="boolean"/>
 <option id="gnu.cpp.link.option.other.2042352830" superClass="gnu.cpp.link.option.other"/>
-<option id="gnu.cpp.link.option.userobjs.1432963266" superClass="gnu.cpp.link.option.userobjs"/>
+<option id="gnu.cpp.link.option.userobjs.1432963266" superClass="gnu.cpp.link.option.userobjs" valueType="userObjs"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1386925177" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug"/>
 <macros/>
