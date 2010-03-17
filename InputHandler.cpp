@@ -10,7 +10,7 @@
 #include "VideoSource.h"
 #include "RectangleBase.h"
 #include "Group.h"
-#include "glutVideo.h"
+#include "gravManager.h"
 #include "Earth.h"
 #include "LayoutManager.h"
 

@@ -11,16 +11,6 @@
 #include <vector>
 #include <map>
 
-static void glutDisplay(void);
-static void glutReshape(int w, int h);
-static void glutIdle(void);
-static void glutTimer(int v);
-
-static void glutKeyboard(unsigned char key, int x, int y);
-static void glutSpecialKey(int key, int x, int y);
-static void glutMouse(int button, int state, int x, int y);
-static void glutActiveMotion(int x, int y);
-
 #include "RectangleBase.h"
 #include "GLCanvas.h"
 
