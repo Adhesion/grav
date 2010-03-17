@@ -8,7 +8,7 @@
 #include "Earth.h"
 #include "grav.h"
 #include "GLCanvas.h"
-#include "glutVideo.h"
+#include "gravManager.h"
 #include "InputHandler.h"
 #include "TreeControl.h"
 #include "GLUtil.h"
@@ -30,7 +30,7 @@ bool gravApp::OnInit()
     parser.SetCmdLine( argc, argv );
     handleArgs();
     
-    mainFrame = new wxFrame( (wxFrame*)NULL, -1, _("grav WX branch"),
+    mainFrame = new wxFrame( (wxFrame*)NULL, -1, _("grav"),
                         wxPoint( 10, 50 ),
                         wxSize( windowWidth, windowHeight ) );
     mainFrame->Show( true );

@@ -5,7 +5,7 @@
 
 #include "VideoListener.h"
 #include "VideoSource.h"
-#include "glutVideo.h"
+#include "gravManager.h"
 #include "Group.h"
 #include "TreeControl.h"
 #include "GLUtil.h"

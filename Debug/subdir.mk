@@ -17,8 +17,8 @@ CPP_SRCS += \
 ../TreeNode.cpp \
 ../VideoListener.cpp \
 ../VideoSource.cpp \
-../glutVideo.cpp \
-../grav.cpp 
+../grav.cpp \
+../gravManager.cpp 
 
 OBJS += \
 ./AudioManager.o \
@@ -34,8 +34,8 @@ OBJS += \
 ./TreeNode.o \
 ./VideoListener.o \
 ./VideoSource.o \
-./glutVideo.o \
-./grav.o 
+./grav.o \
+./gravManager.o 
 
 CPP_DEPS += \
 ./AudioManager.d \
@@ -51,8 +51,8 @@ CPP_DEPS += \
 ./TreeNode.d \
 ./VideoListener.d \
 ./VideoSource.d \
-./glutVideo.d \
-./grav.d 
+./grav.d \
+./gravManager.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

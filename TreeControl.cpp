@@ -7,7 +7,7 @@
 
 #include "RectangleBase.h"
 #include "TreeControl.h"
-#include "glutVideo.h"
+#include "gravManager.h"
 #include "TreeNode.h"
 
 #include <wx/wx.h>

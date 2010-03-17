@@ -10,6 +10,7 @@
 #include <VPMedia/VPMPayloadDecoder.h>
 #include <VPMedia/audio/linear/VPMLinear16Decoder.h>
 #include <VPMedia/audio/VPMAudioMeter.h>
+#include <cstdio>
 
 AudioManager::AudioManager()
 {
@@ -100,7 +101,7 @@ void AudioManager::vpmsession_source_deleted( VPMSession &session,
                                           uint32_t ssrc,
                                           const char *reason )
 {
-    
+    // TODO fix this...
 }
 
 void AudioManager::vpmsession_source_description( VPMSession &session,

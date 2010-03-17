@@ -5,7 +5,7 @@
  * @author Andrew Ford
  */
 
-#include <iostream>
+#include <cstdio>
 #include <cmath>
 
 #include "LayoutManager.h"

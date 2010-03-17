@@ -1,8 +1,8 @@
-#ifndef GLUTVIDEO_H_
-#define GLUTVIDEO_H_
+#ifndef GRAVMANAGER_H_
+#define GRAVMANAGER_H_
 
 /**
- * @file glutVideo.h
+ * @file gravManager.h
  * Header file for main grav functions.
  * @author Andrew Ford
  */
@@ -187,4 +187,4 @@ private:
     
 };
 
-#endif /*GLUTVIDEO_H_*/
+#endif /*GRAVMANAGER_H_*/

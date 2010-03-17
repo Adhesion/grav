@@ -5,7 +5,7 @@
  * @author Andrew Ford
  */
 
-#include "glutVideo.h"
+#include "gravManager.h"
 #include "GLCanvas.h"
 #include "InputHandler.h"
 
