@@ -18,6 +18,8 @@ Group::Group( float _x, float _y ) :
     destBColor = baseBColor;
     name = std::string( "Group" );
     
+    locked = true;
+    
     buffer = 1.0f;
 }
 
@@ -29,18 +31,10 @@ Group::~Group()
 
 void Group::draw()
 {
-    animateValues();
+    //animateValues();
     //printf( "drawing group at %f,%f\n", x, y );
     
-    // set up our position
-    glPushMatrix();
-
-    glRotatef(angle, 0.0, 1.0, 0.0);
-    glTranslatef(x,y,z);
-    
     RectangleBase::draw();
-    
-    glPopMatrix();
     
     //printf( "drawing %i objects in group\n", objects.size() );
     for ( unsigned int i = 0; i < objects.size(); i++ )
@@ -55,6 +49,7 @@ void Group::add( RectangleBase* object )
     object->setGroup( this );
     printf( "added %s to group %s\n", object->getName().c_str(),
                                         getName().c_str() );
+    
     printf( "now rearranging %i objects\n", objects.size() );
     rearrange();
     
@@ -64,15 +59,16 @@ void Group::add( RectangleBase* object )
     updateName();
 }
 
-void Group::remove( RectangleBase* object )
+void Group::remove( RectangleBase* object, bool move )
 {
     printf( "removing %s from group %s\n", object->getName().c_str(),
                                         getName().c_str() );
     object->setGroup( NULL );
+    object->setSubstring( -1, -1 );
     std::vector<RectangleBase*>::iterator i = objects.begin();
     while ( *i != object ) i++;
     objects.erase( i );
-    if ( objects.size() > 0 )
+    if ( objects.size() > 0 && move )
         rearrange();
 }
 
@@ -80,7 +76,7 @@ void Group::removeAll()
 {
     for ( unsigned int i = 0; i < objects.size(); )
     {
-        remove( objects[i] );
+        remove( objects[i], false );
     }
 }
 
@@ -97,6 +93,31 @@ int Group::numObjects()
 bool Group::isGroup()
 {
     return true;
+}
+
+bool Group::isLocked()
+{
+    return locked;
+}
+
+void Group::changeLock()
+{
+    locked = !locked;
+    
+    // append string to name if we're unlocking, remove string if locking
+    std::string unlockString = " (unlocked)";
+    if ( locked )
+    {
+        size_t found = name.find( unlockString );
+        if ( found != std::string::npos )
+        {
+            name.erase( found, unlockString.length() );
+        }
+    }
+    else
+    {
+        name += unlockString;
+    }
 }
 
 void Group::rearrange()
@@ -116,8 +137,33 @@ void Group::rearrange()
     
     int numCol = ceil( sqrt( objects.size() ) );
     int numRow = objects.size() / numCol + ( objects.size() % numCol > 0 );
+    printf( "Group:: group %s (%fx%f, %f,%f) rearranging\n", name.c_str(),
+                getWidth(), getHeight(), destX, destY );
     
-    float bufferSpaceX = (numCol-1) * buffer;
+    // resize the group based on the aspect ratios of the current member(s)
+    if ( objects.size() == 1 )
+    {
+        float objAspect =
+                objects[0]->getDestWidth() / objects[0]->getDestHeight();
+        float diff = objAspect / ( getDestWidth() / getDestHeight() );
+        RectangleBase::setScale( destScaleX * diff, destScaleY );
+    }
+    else
+    {
+        float aspect = getDestWidth() / getDestHeight();
+        float newAspect = (numCol*1.33f) / numRow;
+        if ( newAspect > aspect )
+            RectangleBase::setScale( destScaleX * (newAspect/aspect),
+                                        destScaleY );
+        else
+            RectangleBase::setScale( destScaleX,
+                                        destScaleY * (aspect/newAspect) );
+    }
+    
+    layouts.gridArrange( getLBound(), getRBound(), getUBound(), getDBound(),
+                            numCol, numRow, true, false, true, objects );
+    // old version for without layout manager
+    /*float bufferSpaceX = (numCol-1) * buffer;
     float bufferSpaceY = (numRow-1) * buffer;
     printf( "rearranging %s...\n", name.c_str() );
     printf( "grid is %i x %i\n", numCol, numRow );
@@ -151,7 +197,7 @@ void Group::rearrange()
     }
     
     setScale(largestWidth * numCol + bufferSpaceX + 0.3f,
-            largestHeight * numRow + bufferSpaceY + 0.3f);
+            largestHeight * numRow + bufferSpaceY + 0.3f);*/
 }
 
 void Group::updateName()
@@ -205,7 +251,7 @@ void Group::updateName()
     {
         // if there's only one, just split based on the rightmost & outermost
         // matched parens
-        int i = objects[0]->getName().length()-1;
+        unsigned int i = objects[0]->getName().length()-1;
         printf( "name is %s, length is %i, i is %i\n", 
                 objects[0]->getName().c_str(), i+1, i );
         int balance = 0;
@@ -267,8 +313,8 @@ void Group::move( float _x, float _y )
     //printf( "moving group\n" );
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
-        objects[i]->move( _x + objects[i]->getX() - x, 
-                          _y + objects[i]->getY() - y );
+        objects[i]->move( _x + objects[i]->getDestX() - destX, 
+                          _y + objects[i]->getDestY() - destY );
     }
     RectangleBase::move( _x, _y );
 }
@@ -277,8 +323,49 @@ void Group::setPos( float _x, float _y )
 {
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
-        objects[i]->setPos( _x + objects[i]->getX() - x, 
-                            _y + objects[i]->getY() - y );
+        objects[i]->setPos( _x + objects[i]->getDestX() - destX, 
+                            _y + objects[i]->getDestY() - destY );
     }
     RectangleBase::setPos( _x, _y );
+}
+
+void Group::setScale( float xs, float ys )
+{
+    if ( locked )
+        setScale( xs, ys, true );
+    else
+        setScale( xs, ys, false );
+}
+
+void Group::setScale( float xs, float ys, bool resizeMembers )
+{
+    RectangleBase::setScale( xs, ys );
+    if ( resizeMembers )
+    {
+        rearrange();
+        /*float Xratio = xs / destScaleX;
+        float Yratio = ys / destScaleY;
+        printf( "Group::setScale: scaling group %s to %f,%f, ratio is %f/%f\n",
+                    name.c_str(), xs, ys, Xratio, Yratio );
+        float min = std::min( Xratio, Yratio );
+        
+        for ( unsigned int i = 0; i < objects.size(); i++ )
+        {
+            float objScaleX = (objects[i]->getScaleX() * min);
+            float objScaleY = (objects[i]->getScaleY() * min);
+            float Xdist = objects[i]->getDestX() - destX;
+            float Ydist = objects[i]->getDestY() - destY;
+            Xdist *= Xratio;
+            Ydist *= Yratio;
+            
+            // if the object scale values are close to the group's scale values,
+            // then make it a bit smaller
+            if ( (objScaleX >= (xs-0.5f)) || (objScaleY >= (ys-0.5f)) )
+            {
+                objScaleX -= 0.3f; objScaleY -= 0.3f;
+            }
+            objects[i]->setScale( objScaleX, objScaleY );
+            objects[i]->move( destX+Xdist, destY+Ydist );
+        }*/
+    }
 }

@@ -11,8 +11,9 @@
 
 #include <string>
 
+#include <GL/glew.h>
+
 #include <FTGL/ftgl.h>
-#include <GL/gl.h>
 
 typedef struct {
     float R;
@@ -29,8 +30,13 @@ class RectangleBase
 {
 
 public:
+    RectangleBase();
     RectangleBase( float _x, float _y );
+    RectangleBase( const RectangleBase& other );
     virtual ~RectangleBase();
+    
+    void setDefaults();
+    void makeFont();
 
     /*
      * Returns the width or height of the object. These are virtual because
@@ -39,6 +45,8 @@ public:
      * aspect ratio, these will most likely be equal to the scale factors.
      */
     virtual float getWidth(); virtual float getHeight();
+    virtual float getDestWidth(); virtual float getDestHeight();
+    float getLBound(); float getRBound(); float getUBound(); float getDBound();
     
     /*
      * Change the position of the object. Move may or may not have animation
@@ -50,7 +58,19 @@ public:
     /*
      * Change the size of the object.
      */
-    void setScale( float xs, float ys ); 
+    virtual void setScale( float xs, float ys );
+    /*
+     * The bool is so we can have a different version for groups, so they can
+     * resize their members or not.
+     */
+    virtual void setScale( float xs, float ys, bool resizeMembers );
+    
+    /*
+     * Change the selected size to be equal to the argument given, preserving
+     * aspect ratio.
+     */
+    virtual void setWidth( float w );
+    virtual void setHeight( float h );
     
     /*
      * Set the background texture for this object.
@@ -58,6 +78,7 @@ public:
     void setTexture( GLuint tex, int width, int height );
     
     float getX(); float getY(); float getZ();
+    float getDestX(); float getDestY();
     float getScaleX(); float getScaleY();
     float getLat(); float getLon();
     
@@ -70,6 +91,7 @@ public:
     bool isSelected();
     void setSelect( bool select );
     void setEffectVal( float f );
+    void setAnimation( bool anim );
     
     /*
      * Is this object a member of a group?
@@ -142,8 +164,6 @@ protected:
     
     bool animated;
     void animateValues();
-    
-    int drawCounter; // keeps track of how many times we've drawn
     
 };
 

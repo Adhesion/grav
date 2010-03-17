@@ -10,7 +10,6 @@
 #include <string>
 #include <cstdio>
 #include <png.h>
-#include <GL/gl.h>
 
 #include "GLUtil.h"
 #include "PNGLoader.h"
@@ -31,7 +30,12 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
         return 0;
     }
     
-    fread( PNGheader, 1, 8, texfile );
+    size_t retval = fread( PNGheader, 1, 8, texfile );
+    if ( retval == 0 )
+    {
+        printf( "PNGLoader::error reading file %s?\n", filename.c_str() );
+        return 0;
+    }
     
     // check the header
     int pngTest = !png_sig_cmp( PNGheader, 0, 8 );
@@ -93,9 +97,11 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     printf( "bitDepth: %i, colorType: %i, RGBA: %i\n", bitDepth, colorType,
         PNG_COLOR_TYPE_RGBA );
     
-    int pwidth = GLUtil::pow2( iwidth ); int pheight = GLUtil::pow2( iheight );
-    printf( "read in PNG: image dimensions: %ix%i, pow2 dimensions: %ix%i\n",
-            iwidth, iheight, pwidth, pheight );
+    int pwidth = GLUtil::getInstance()->pow2( iwidth );
+    int pheight = GLUtil::getInstance()->pow2( iheight );
+    printf( "read in PNG: image dimensions: %ux%u, pow2 dimensions: %ux%u\n",
+            (unsigned int)iwidth, (unsigned int)iheight,
+            (unsigned int)pwidth, (unsigned int)pheight );
     
     // update the info struct
     png_read_update_info( png, pngInfo );
@@ -105,7 +111,7 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     
     // set the pointers for libpng to read the image row-by-row
     png_bytep* rowPointers = new png_bytep[ iheight ];
-    for ( int i = 0; i < iheight; i++ )
+    for ( unsigned int i = 0; i < iheight; i++ )
         rowPointers[iheight - 1 - i] = image + (i * rowBytes);
         
     // read in the image
@@ -122,14 +128,17 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     
     // allocate a buffer for the pow2 size
     unsigned char *buffer = new unsigned char[pwidth * pheight * 4];
+    printf( "made buffer, allocating texture\n" );
     memset(buffer, 128, pwidth * pheight * 4);
     
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, pwidth, pheight, 0, GL_RGBA,
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, pwidth, pheight, 0, GL_LUMINANCE,
                     GL_UNSIGNED_BYTE, (GLvoid*)buffer );
                     
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 
         iwidth);
+    
+    printf( "putting PNG in texture area\n" );
         
     // put the actual image in a sub-area of the pow2 memory area
     glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, iwidth, iheight, GL_RGBA,
@@ -141,7 +150,6 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     }
     
     printf( "PNGLoader::generated ID is %i\n", texID );
-    
     
     png_destroy_read_struct( &png, &pngInfo, &pngEnd );
     delete[] image;

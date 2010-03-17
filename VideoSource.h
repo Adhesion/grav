@@ -9,14 +9,14 @@
  * @author Andrew Ford
  */
 
+#include <GL/glew.h>
+
+#include <GL/glut.h>
+
 #include "RectangleBase.h"
 
 #include <VPMedia/video/VPMVideoBufferSink.h>
 #include <VPMedia/VPMSession.h>
-
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/freeglut.h>
 
 class VideoSource : public RectangleBase
 {
@@ -50,6 +50,8 @@ public:
     
     // overrides the functions from RectangleBase to account for aspect ratio
     float getWidth(); float getHeight();
+    float getDestWidth(); float getDestHeight();
+    void setWidth( float w ); void setHeight( float h );
 
 private:
     VPMSession* session; // reference to the session that this video comes from
@@ -58,9 +60,12 @@ private:
     unsigned int vwidth, vheight; // original dimensions of the video
     float aspect; // aspect ratio of the video
     
+    void resizeBuffer(); // remake the buffer when the video gets resized
+    
     unsigned int tex_width, tex_height; // dimensions rounded up to power of 2
     GLuint texid; // GL texture identifier
-
+    bool init;
+    
 };
 
 #endif /* VIDEOSOURCE_H_ */

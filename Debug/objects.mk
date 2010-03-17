@@ -4,4 +4,4 @@
 
 USER_OBJS :=
 
-LIBS := -lGL -lGLU -lglut -lftgl -lVPMedia -lm -lpthread -luclmmbase -lswscale -lavcodec -lpng
+LIBS := -lGL -lGLU -lglut -lGLEW -lftgl -lpng -lVPMedia -luclmmbase -lswscale

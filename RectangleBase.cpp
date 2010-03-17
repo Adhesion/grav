@@ -8,16 +8,78 @@
 #include "Group.h"
 #include "PNGLoader.h"
 #include "GLUtil.h"
-#include <GL/glu.h>
 
 #include <cmath>
 
+RectangleBase::RectangleBase()
+{
+    setDefaults();
+}
+
 RectangleBase::RectangleBase( float _x, float _y )
 {
-    scaleX = 5.0f; scaleY = 5.0f;
+    setDefaults();
     x = -15.0f; y = 15.0f; z = 0.0f;
-    angle = 0.0f;
     destX = _x; destY = _y;
+}
+
+RectangleBase::RectangleBase( const RectangleBase& other )
+{
+    x = other.x; y = other.y; z = other.z;
+    destX = other.destX; destY = other.destY;
+    scaleX = other.scaleX; scaleY = other.scaleY;
+    destScaleX = other.destScaleX; destScaleY = other.destScaleY;
+    angle = other.angle;
+    
+    effectVal = other.effectVal;
+    
+    lat = other.lat; lon = other.lon;
+    
+    borderColor = other.borderColor;
+    destBColor = other.destBColor;
+    baseBColor = other.baseBColor;
+    
+    name = other.name;
+    siteID = other.siteID;
+    nameStart = other.nameStart; nameEnd = other.nameEnd;
+    finalName = other.finalName;
+    
+    if ( other.font != NULL ) makeFont();
+    else font = NULL;
+    
+    borderTex = other.borderTex;
+    twidth = other.twidth; theight = other.theight;
+    
+    selected = other.selected;
+    grouped = other.grouped;
+    myGroup = other.myGroup;
+    animated = other.animated;
+}
+
+RectangleBase::~RectangleBase()
+{
+    printf( "RectangleBase::~RectangleBase (%s)\n", name.c_str() );
+    if ( isGrouped() )
+        myGroup->remove( this );
+    
+    // if this is set externally, then we shouldn't delete it since other
+    // things might be using it
+    //glDeleteTextures( 1, &borderTex );
+    
+    if ( font != NULL )
+    {
+        printf( "rectanglebase destructor, font is %p\n", font );
+        delete font;
+        font = NULL;
+    }
+}
+
+void RectangleBase::setDefaults()
+{
+    scaleX = 5.0f; scaleY = 5.0f;
+    angle = 0.0f;
+    x = 0.0f; y = 0.0f; z = 0.0f;
+    destX = x; destY = y;
     destScaleX = scaleX; destScaleY = scaleY;
     selected = false;
     
@@ -34,28 +96,21 @@ RectangleBase::RectangleBase( float _x, float _y )
     twidth = 0; theight = 0;
     effectVal = 0.0f;
     
+    // TODO: this should be dynamic
     lat = 43.165556f; lon = -77.611389f;
     
-    font = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
-    font->FaceSize(100);
+    font = NULL;
     
     //borderTex = PNGLoader::loadPNG( "/home/andrew/work/src/grav/Debug/border.png",
     //                                twidth, theight );
 }
 
-RectangleBase::~RectangleBase()
+void RectangleBase::makeFont()
 {
-    printf( "rectanglebase destructor for %s\n", name.c_str() );
-    if ( isGrouped() )
-        myGroup->remove( this );
-    printf( "removed from group\n" );
-    
-    // if this is set externally, then we shouldn't delete it since other
-    // things might be using it
-    //glDeleteTextures( 1, &borderTex );
-    
-    delete font;
-    printf( "rectanglebase destructor ending\n" );
+    // TODO: check whether we can redistribute a font instead of looking in
+    //       a system spot, which would have to be different per-platform
+    font = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
+    font->FaceSize(100);
 }
 
 float RectangleBase::getWidth()
@@ -68,8 +123,39 @@ float RectangleBase::getHeight()
     return scaleY;
 }
 
+float RectangleBase::getDestWidth()
+{
+    return destScaleX;
+}
+
+float RectangleBase::getDestHeight()
+{
+    return destScaleY;
+}
+
+float RectangleBase::getLBound()
+{
+    return destX - (getDestWidth()/2.0f);
+}
+
+float RectangleBase::getRBound()
+{
+    return destX + (getDestWidth()/2.0f);
+}
+
+float RectangleBase::getUBound()
+{
+    return destY + (getDestHeight()/2.0f);
+}
+
+float RectangleBase::getDBound()
+{
+    return destY - (getDestHeight()/2.0f);
+}
+
 void RectangleBase::move( float _x, float _y )
 {
+    printf( "RectangleBase:: %s moving\n", name.c_str() );
     destX = _x;
     if ( !animated ) x = _x;
     destY = _y;
@@ -84,8 +170,26 @@ void RectangleBase::setPos( float _x, float _y )
 
 void RectangleBase::setScale( float xs, float ys )
 {
+    printf( "RectangleBase %s scaling to %f,%f\n", name.c_str(), xs, ys );
     destScaleX = xs; destScaleY = ys;
-    if ( !animated) { scaleX = xs; scaleY = ys; }
+    if ( !animated ) { scaleX = xs; scaleY = ys; }
+}
+
+void RectangleBase::setScale( float xs, float ys, bool resizeMembers )
+{
+    setScale( xs, ys );
+}
+
+void RectangleBase::setWidth( float w )
+{
+    printf( "RectangleBase setwidth to %f\n", w );
+    setScale( w, destScaleY * w / destScaleX );
+}
+
+void RectangleBase::setHeight( float h )
+{
+    printf( "RectangleBase setheight to %f\n", h );
+    setScale( destScaleX * h / destScaleY, h );
 }
 
 void RectangleBase::setTexture( GLuint tex, int width, int height )
@@ -99,9 +203,19 @@ float RectangleBase::getX()
     return x;
 }
 
+float RectangleBase::getDestX()
+{
+    return destX;
+}
+
 float RectangleBase::getY()
 {
     return y;
+}
+
+float RectangleBase::getDestY()
+{
+    return destY;
 }
 
 float RectangleBase::getZ()
@@ -184,6 +298,11 @@ void RectangleBase::setEffectVal( float f )
     effectVal = f;
 }
 
+void RectangleBase::setAnimation( bool anim )
+{
+    animated = anim;
+}
+
 bool RectangleBase::isGrouped()
 {
     return ( myGroup != NULL );
@@ -246,14 +365,14 @@ bool RectangleBase::intersect( RectangleBase* other )
 
 void RectangleBase::draw()
 {
+    animateValues();
     // note that the position should be set before calling this
     
-    // do things we only want to do every X frames, like updating the name
-    if ( drawCounter > 29 )
-    {
-        if ( !usingFinalName() ) updateName();
-        drawCounter = 0;
-    }
+    // set up our position
+    glPushMatrix();
+
+    glRotatef(angle, 0.0, 1.0, 0.0);
+    glTranslatef(x,y,z);
     
     // draw the border first
     glEnable( GL_BLEND );
@@ -283,10 +402,14 @@ void RectangleBase::draw()
         fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
     }*/
     
-    float s = (float)twidth / (float)GLUtil::pow2( twidth );
-    float t = (float)theight / (float)GLUtil::pow2( theight );
+    float s = (float)twidth / (float)GLUtil::getInstance()->pow2( twidth );
+    float t = (float)theight / (float)GLUtil::getInstance()->pow2( theight );
     
     glScalef( 1.0f+effectVal, 1.0f+effectVal, 0.0f );
+    
+    // X & Y distances from center to edge
+    float Xdist = getWidth()/2.0f + 0.3f;
+    float Ydist = getHeight()/2.0f + 0.3f;
     
     glBegin( GL_QUADS );
     // set the border color
@@ -296,16 +419,16 @@ void RectangleBase::draw()
                borderColor.A+(effectVal*3.0f) );
     
     glTexCoord2f(0.0, 0.0);
-    glVertex3f(-getWidth()/2.0-0.3, -getHeight()/2.0-0.3, 0.0);
+    glVertex3f(-Xdist, -Ydist, 0.0);
     
     glTexCoord2f(0.0, t);
-    glVertex3f(-getWidth()/2.0-0.3, getHeight()/2.0+0.3, 0.0);
-    
+    glVertex3f(-Xdist, Ydist, 0.0);
+
     glTexCoord2f(s, t);
-    glVertex3f(getWidth()/2.0+0.3, getHeight()/2.0+0.3, 0.0);
-    
+    glVertex3f(Xdist, Ydist, 0.0);
+
     glTexCoord2f(s, 0.0);
-    glVertex3f(getWidth()/2.0+0.3, -getHeight()/2.0-0.3, 0.0);
+    glVertex3f(Xdist, -Ydist, 0.0);
     
     /*printf( "DRAWPOSTCOORD\n" );
     gl_error = glGetError();
@@ -344,16 +467,16 @@ void RectangleBase::draw()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     
-    //printf( "name is %s\n", name.c_str() );
     std::string sub = getSubName();
     const char* nc = sub.c_str();
-    //printf( "rendering nc: %s\n", nc );
-    font->Render(nc);
-
+    if ( font ) font->Render(nc);
+    
     glDisable(GL_BLEND);
     glDisable(GL_LINE_SMOOTH);
     
     glPopMatrix();
+    
+    glPopMatrix(); // from initial position setup
     
     /*float spacing = 0.20f;
     //float i = -name.length()*spacing/2.0f;
@@ -365,8 +488,6 @@ void RectangleBase::draw()
         i++;
     }
     //glutStrokeString(GLUT_STROKE_MONO_ROMAN, uc);*/
-    
-    drawCounter++;
 }
 
 void RectangleBase::animateValues()

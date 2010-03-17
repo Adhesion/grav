@@ -12,6 +12,8 @@
 #include <map>
 #include <string>
 
+#include <wx/wx.h>
+
 class VideoSource;
 class RectangleBase;
 class Earth;
@@ -20,21 +22,27 @@ class gravManager;
 
 typedef double GLdouble;
 
-class InputHandler
+class InputHandler : public wxEvtHandler
 {
     
 public:
-    InputHandler( std::vector<VideoSource*>* source,
-                  std::vector<RectangleBase*>* drawn,
-                  std::vector<RectangleBase*>* selected,
-                  std::map<std::string,Group*>* sites,
-                  Earth* e, gravManager* g );
+    InputHandler( Earth* e, gravManager* g );
     ~InputHandler();
+    
+    void wxKeyDown( wxKeyEvent& evt );
+    void wxCharEvt( wxKeyEvent& evt );
+    void wxMouseMove( wxMouseEvent& evt );
+    void wxMouseLDown( wxMouseEvent& evt );
+    void wxMouseLUp( wxMouseEvent& evt );
     
     void processKeyboard( unsigned char key, int x, int y );
     void processSpecialKey( int key, int x, int y );
     void processMouse( int button, int state, int x, int y );
     void processActiveMotion( int x, int y );
+    
+    void leftClick( int x, int y );
+    void leftRelease( int x, int y );
+    void mouseLeftHeldMove( int x, int y );
     
     bool selectVideos();
     
@@ -45,12 +53,8 @@ public:
     float getDragStartX(); float getDragStartY();
     float getDragEndX(); float getDragEndY();
     
-private:
-    std::vector<VideoSource*>* sources;
-    std::vector<RectangleBase*>* drawnObjects;
-    std::vector<RectangleBase*>* selectedObjects;
+private:   
     std::vector<RectangleBase*>* tempSelectedObjects;
-    std::map<std::string,Group*>* siteIDGroups;
     Earth* earth;
     
     // parent class
@@ -72,8 +76,12 @@ private:
     float dragPrevY;
     
     bool leftButtonHeld;
+    bool ctrlHeld;
+    bool shiftHeld;
     bool clickedInside;
     bool dragging;
+    
+    DECLARE_EVENT_TABLE()
     
 };
 

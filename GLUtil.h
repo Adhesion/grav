@@ -8,25 +8,31 @@
  * @author Andrew Ford
  */
 
-#include <GL/glu.h>
-#include <stdio.h>
+#include <GL/glew.h>
 
-namespace GLUtil
+#include <iostream>
+
+class GLUtil
 {
 
-    // pointers to the GL matrices in question
-    static GLdouble modelview[16];
-    static GLdouble projection[16];
-    static GLint viewport[4];
+public:
+    static GLUtil* getInstance();
+       
+    /*
+     * Call glut and glew init functions, check for shaders, and load them if
+     * we can.
+     */
+    bool initGL();
     
     // get the matrices that define the camera transforms so we can use those
     // to convert our coordinates
     void updateMatrices();
     
-    inline int pow2(int x) {
-      int i;
-      for (i = 2; i < x; i <<= 1);
-      return i;
+    inline int pow2( int x )
+    {
+        int i;
+        for (i = 2; i < x; i <<= 1);
+        return i;
     }
     
     /**
@@ -55,7 +61,42 @@ namespace GLUtil
      */
     void screenToWorld( GLdouble scrX, GLdouble scrY, GLdouble scrZ,
                         GLdouble* x, GLdouble* y, GLdouble* z );
+    
+    /**
+     * Uses GLEW to load a shader (.vert and .frag) from files and returns a
+     * reference to the program.
+     */
+    GLuint loadShaders( const char* location );
+    
+    GLuint getYUV420Program();
+    GLuint getYUV420xOffsetID();
+    GLuint getYUV420yOffsetID();
+    
+    /*
+     * Returns whether shaders are available to use or not.
+     */
+    bool haveShaders();
+    
+protected:
+    GLUtil();
 
-}
+private:
+    static GLUtil* instance;
+
+    // pointers to the GL matrices
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLint viewport[4];
+    
+    const GLchar* frag420;
+    const GLchar* vert420;
+    
+    bool shaders;
+    
+    GLuint YUV420Program;
+    GLuint YUV420xOffsetID;
+    GLuint YUV420yOffsetID;
+
+};
 
 #endif /*GLUTIL_H_*/
