@@ -179,15 +179,12 @@ void gravManager::draw()
         // like updating the name
         if ( updateNames )
         {
-            if ( !(*si)->usingFinalName() )
-            {
-                std::string oldName = (*si)->getName();
-                (*si)->updateName();
-                // only bother updating it on the tree if it actually
-                // changes - to suppress "" from getting shown
-                if ( oldName != (*si)->getName() )
-                    tree->updateObjectName( (*si) );
-            }
+            std::string oldName = (*si)->getName();
+            (*si)->updateName();
+            // only bother updating it on the tree if it actually
+            // changes - to suppress "" from getting shown
+            if ( oldName != (*si)->getName() )
+                tree->updateObjectName( (*si) );
         }
         
         // only draw if not grouped - groups are responsible for

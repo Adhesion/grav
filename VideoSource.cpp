@@ -271,6 +271,16 @@ void VideoSource::updateName()
         finalName = true;
         //printf( "in updateName, got name: %s\n", name.c_str() );
     }
+    
+    std::string loc = getMetadata( VPMSession::VPMSESSION_SDES_LOC );
+    size_t pos = loc.find( ',' );
+    if ( pos != std::string::npos )
+    {
+        std::string latS = loc.substr( 0, pos );
+        std::string lonS = loc.substr( pos+1 );
+        lat = strtod( latS.c_str(), NULL );
+        lon = strtod( lonS.c_str(), NULL );
+    }
 }
 
 float VideoSource::getWidth()
