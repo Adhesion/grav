@@ -47,33 +47,36 @@ void InputHandler::wxKeyDown( wxKeyEvent& evt )
         shiftHeld = true;
     else
         shiftHeld = false;
+    
+    processKeyboard( (unsigned char)evt.GetKeyCode(), 0, 0 );
 
-    evt.Skip(); // so now the char event can grab this
+    evt.Skip(); // so now the char event can grab this, if need be
 }
 
 void InputHandler::wxCharEvt( wxKeyEvent& evt )
 {
-    // TODO: replace 0,0 with stored mouse pos
-    processKeyboard( (unsigned char)evt.GetKeyCode(), 0, 0 );
+    // disabled temporarily - using keydown for everything
 }
 
 void InputHandler::wxMouseMove( wxMouseEvent& evt )
 {
-    //printf( "mousemove\n" );
     if ( leftButtonHeld )
         mouseLeftHeldMove( evt.GetPosition().x, evt.GetPosition().y );
 }
 
 void InputHandler::wxMouseLDown( wxMouseEvent& evt )
 {
-    //printf( "mouseldown\n" );
+    if ( evt.CmdDown() )
+        ctrlHeld = true;
+    else
+        ctrlHeld = false;
+    
     leftClick( evt.GetPosition().x, evt.GetPosition().y );
     evt.Skip();
 }
 
 void InputHandler::wxMouseLUp( wxMouseEvent& evt )
 {
-    //printf( "mouselup\n" );
     leftRelease( evt.GetPosition().x, evt.GetPosition().y );
     evt.Skip();
 }
@@ -85,6 +88,7 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
     printf( "Char pressed is %c (%i)\n", key, key );
     printf( "x,y in processKeyboard is %i,%i\n", x, y );
     printf( "is shift held? %i\n", shiftHeld );
+    printf( "is ctrl held? %i\n", ctrlHeld );
     std::vector<VideoSource*>::const_iterator si;
     // how much to scale when doing -/+: flipped in the former case
     float scaleAmt = 0.25f;
@@ -92,7 +96,7 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
     // TODO reorder this to make some sort of sense
     switch(key) {
     
-        case 'k':
+        case 'K':
             printf( "current sources selected: %i\n", 
                         grav->getSelectedObjects()->size() );
             for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
@@ -103,7 +107,7 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             }
             break;
       
-        case 't':
+        case 'T':
             printf( "rearranging groups...\n" );
             for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
                     i++ )
@@ -117,7 +121,7 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             }
             break;
         
-        case 'u':
+        case 'U':
             printf( "updating group names...\n" );
             mapi = grav->getSiteIDGroups()->begin();
             for ( ; mapi != grav->getSiteIDGroups()->end(); mapi++ )
@@ -126,16 +130,15 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             }
             break;
         
-        //case 'P':
-        case 'p':
+        case 'P':
             grav->perimeterAllVideos();
             break;
         
-        case 'r':
+        case 'R':
             grav->retileVideos();
             break;
         
-        case 'i':
+        case 'I':
             printf( "We currently have %i sources.\n",
                      grav->getSources()->size() );
             printf( "We currently have %i objects in drawnObjects.\n",
@@ -175,7 +178,7 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             }
             break;
         
-        case 'l':
+        case 'L':
             for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
                     i++ )
             {
@@ -191,13 +194,12 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             }
             break;
         
-        case 'o':
+        case 'O':
             printf( "random32: %i\n", random32() );
             printf( "random32max: %i\n", random32_max() );
             break;
         
         case 'N':
-        case 'n':
             for ( si = grav->getSources()->begin();
                     si != grav->getSources()->end(); si++ )
             {
@@ -219,7 +221,6 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             break;
         
         case 'F':
-        case 'f':
             if ( grav->getSelectedObjects()->size() == 1 )
             {
                 if ( shiftHeld )
@@ -232,7 +233,7 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             }
             break;
         
-        case 'g':
+        case 'G':
             if ( grav->usingSiteIDGroups() )
             {
                 grav->setSiteIDGrouping( false );
@@ -257,16 +258,16 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
             }
             break;
         
-        case 'w':
+        case 'W':
             grav->setCamZ(grav->getCamZ()-1);
             break;
-        case 's':
+        case 'S':
             grav->setCamZ(grav->getCamZ()+1);
             break;
-        case 'a':
+        case 'A':
             grav->setCamX(grav->getCamX()-1);
             break;
-        case 'd':
+        case 'D':
             grav->setCamX(grav->getCamX()+1);
             break;
         
@@ -292,11 +293,6 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
         // space
         case 32:
             grav->addTestObject();
-            break;
-        
-        // shift
-        case WXK_SHIFT:
-            printf( "shift held\n" );
             break;
         
         case 'Q':
@@ -374,7 +370,7 @@ void InputHandler::leftClick( int x, int y )
     // begin a multi selection, so move the selected video(s) to the
     // clicked position in empty space
     selectVideos();
-    if ( !clickedInside && special != GLUT_ACTIVE_CTRL )
+    if ( !clickedInside && !ctrlHeld )
     {
         if ( !grav->getSelectedObjects()->empty() )
         {
@@ -540,8 +536,7 @@ bool InputHandler::selectVideos()
         if ( intersect )
         {
             // clear the list of selected if we're clicking on a new video
-            if ( !leftButtonHeld && !(*si)->isSelected() &&
-                    special != GLUT_ACTIVE_CTRL )
+            if ( !leftButtonHeld && !(*si)->isSelected() && !ctrlHeld )
                 grav->clearSelected();
             
             videoSelected = true;
@@ -563,6 +558,17 @@ bool InputHandler::selectVideos()
                     tempSelectedObjects->push_back( temp );
                 else
                     grav->getSelectedObjects()->push_back( temp );
+            }
+            // if what we just clicked on is selected and we're holding ctrl,
+            // deselect
+            else if ( ctrlHeld && !leftButtonHeld )
+            {
+                temp->setSelect( false );
+                std::vector<RectangleBase*>::iterator sli =
+                                    grav->getSelectedObjects()->begin();
+                while ( (*sli) != temp )
+                    sli++;
+                grav->getSelectedObjects()->erase( sli );
             }
             
             // take the selected video and put it at the end of the list so
