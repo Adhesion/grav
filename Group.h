@@ -37,7 +37,7 @@ public:
     
     void rearrange();
     
-    void updateName();
+    bool updateName();
     
     void move( float _x, float _y );
     void setPos( float _x, float _y );

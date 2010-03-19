@@ -257,21 +257,31 @@ std::string VideoSource::getMetadata( VPMSession::VPMSession_SDES type )
     return temp;
 }
 
-void VideoSource::updateName()
+bool VideoSource::updateName()
 {
-    std::string tempName = getMetadata( VPMSession::VPMSESSION_SDES_NAME );
-    if ( tempName == "" )
+    bool nameChanged = false;
+    std::string sdesName = getMetadata( VPMSession::VPMSESSION_SDES_NAME );
+    std::string sdesCname = getMetadata( VPMSession::VPMSESSION_SDES_CNAME );
+    
+    if ( sdesName != "" && sdesName != name )
     {
-        name = getMetadata( VPMSession::VPMSESSION_SDES_CNAME );
-        //printf( "in updateName, got cname: %s\n", name.c_str() );
-    }
-    else
-    {
-        name = tempName;
+        name = sdesName;
+        nameChanged = true;
         finalName = true;
-        //printf( "in updateName, got name: %s\n", name.c_str() );
+        printf( "in updateName, got name: %s\n", name.c_str() );
+    }
+    if ( sdesCname != "" && sdesCname != altName )
+    {
+        altName = sdesCname;
+        nameChanged = true;
+        printf( "in updateName, got cname: %s\n", altName.c_str() );
     }
     
+    // if we don't have a proper name yet just use cname
+    if ( name == "" && sdesCname != "" )
+        name = sdesCname;
+    
+    // also update the location info
     std::string loc = getMetadata( VPMSession::VPMSESSION_SDES_LOC );
     size_t pos = loc.find( ',' );
     if ( pos != std::string::npos )
@@ -281,6 +291,8 @@ void VideoSource::updateName()
         lat = strtod( latS.c_str(), NULL );
         lon = strtod( lonS.c_str(), NULL );
     }
+    
+    return nameChanged;
 }
 
 float VideoSource::getWidth()

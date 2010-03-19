@@ -86,6 +86,7 @@ public:
     void setSiteID( std::string sid );
     std::string getName();
     std::string getSubName();
+    std::string getAltName();
     std::string getSiteID();
     
     bool isSelected();
@@ -114,7 +115,7 @@ public:
      */
     bool usingFinalName();
     
-    virtual void updateName();
+    virtual bool updateName();
     void setSubstring( int start, int end );
     
     /*
@@ -149,6 +150,7 @@ protected:
     RGBAColor baseBColor;
     
     std::string name;
+    std::string altName;
     std::string siteID;
     int nameStart, nameEnd; // substring of the name to render
     bool finalName;

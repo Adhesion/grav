@@ -147,9 +147,11 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
                 printf( "name: %s\n", 
                     (*si)->getMetadata(
                         VPMSession::VPMSESSION_SDES_NAME).c_str() );
+                printf( "stored name: %s\n", (*si)->getName().c_str() );
                 printf( "cname: %s\n", 
                     (*si)->getMetadata(
                         VPMSession::VPMSESSION_SDES_CNAME).c_str() );
+                printf( "stored altname: %s\n", (*si)->getAltName().c_str() );
                 printf( "loc: %s\n", 
                     (*si)->getMetadata(
                         VPMSession::VPMSESSION_SDES_LOC).c_str() );

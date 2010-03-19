@@ -200,9 +200,9 @@ void Group::rearrange()
             largestHeight * numRow + bufferSpaceY + 0.3f);*/
 }
 
-void Group::updateName()
+bool Group::updateName()
 {
-    if ( objects.size() == 0 ) return;
+    if ( objects.size() == 0 ) return false;
     
     bool membersFinalized = true;
     int shortestLength = 256;
@@ -215,7 +215,7 @@ void Group::updateName()
     
     // only try to create the name if all the members have their correct
     // names (ie, NAME vs CNAME)
-    if ( !membersFinalized ) return;
+    if ( !membersFinalized ) return false;
     
     printf( "group members names finalized, finding common string...\n" );
     
@@ -306,6 +306,7 @@ void Group::updateName()
     }
     
     finalName = true;
+    return true;
 }
 
 void Group::move( float _x, float _y )

@@ -92,6 +92,7 @@ void RectangleBase::setDefaults()
     finalName = false;
     nameStart = -1; nameEnd = -1;
     name = "";
+    altName = "";
     myGroup = NULL;
     twidth = 0; theight = 0;
     effectVal = 0.0f;
@@ -266,6 +267,11 @@ std::string RectangleBase::getSubName()
         return name;
 }
 
+std::string RectangleBase::getAltName()
+{
+    return altName;
+}
+
 std::string RectangleBase::getSiteID()
 {
     return siteID;
@@ -330,9 +336,9 @@ bool RectangleBase::usingFinalName()
     return finalName;
 }
 
-void RectangleBase::updateName()
+bool RectangleBase::updateName()
 {
-    
+    return false;
 }
 
 void RectangleBase::setSubstring( int start, int end )
@@ -467,9 +473,12 @@ void RectangleBase::draw()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     
-    std::string sub = getSubName();
-    const char* nc = sub.c_str();
-    if ( font ) font->Render(nc);
+    if ( font )
+    {
+        std::string renderedName = getSubName();
+        const char* nc = renderedName.c_str();
+        font->Render(nc);
+    }
     
     glDisable(GL_BLEND);
     glDisable(GL_LINE_SMOOTH);

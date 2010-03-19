@@ -179,11 +179,9 @@ void gravManager::draw()
         // like updating the name
         if ( updateNames )
         {
-            std::string oldName = (*si)->getName();
-            (*si)->updateName();
             // only bother updating it on the tree if it actually
             // changes - to suppress "" from getting shown
-            if ( oldName != (*si)->getName() )
+            if ( (*si)->updateName() )
                 tree->updateObjectName( (*si) );
         }
         

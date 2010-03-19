@@ -42,8 +42,9 @@ public:
     /*
      * Updates the overall name label of the source from the SDES metadata:
      * SDES_NAME if it's available, SDES_CNAME if not.
+     * Also set the alternate name to CNAME if it's available.
      */
-    void updateName();
+    bool updateName();
     
     uint32_t getssrc();
     std::string getName();
