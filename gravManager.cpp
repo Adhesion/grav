@@ -319,6 +319,7 @@ void gravManager::retileVideos()
             objects.push_back( (*drawnObjects)[i] );
         }
     }
+    if ( objects.size() == 0 ) return;
     
     int numCol = ceil( sqrt( objects.size() ) );
     int numRow = objects.size() / numCol + ( objects.size() % numCol > 0 );
