@@ -24,7 +24,7 @@ VideoSource::~VideoSource()
     // note that the buffer sink will be deleted when the decoder for the source
     // is (inside VPMedia), so that's why it isn't deleted here or in
     // videolistener
-    
+
     // gl destructors
     glDeleteTextures( 1, &texid );
 }
