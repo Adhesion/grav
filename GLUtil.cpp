@@ -46,9 +46,19 @@ bool GLUtil::initGL()
         printf( "GLUtil::initGL(): shaders NOT available (GL v%s)\n", glVer );
     }
     
+    // TODO: check whether we can redistribute a font instead of looking in
+    //       a system spot, which would have to be different per-platform
+    mainFont = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
+    mainFont->FaceSize(100);
+
     glEnable( GL_DEPTH_TEST );
     
     return true;
+}
+
+void GLUtil::cleanupGL()
+{
+    delete this;
 }
 
 void GLUtil::updateMatrices()
@@ -225,6 +235,11 @@ GLuint GLUtil::getYUV420yOffsetID()
     return YUV420yOffsetID;
 }
 
+FTFont* GLUtil::getMainFont()
+{
+    return mainFont;
+}
+
 bool GLUtil::haveShaders()
 {
     return shaders;
@@ -276,4 +291,9 @@ GLUtil::GLUtil()
     "\n"
     "    gl_Position = ftransform();\n"
     "}\n";
+}
+
+GLUtil::~GLUtil()
+{
+    delete mainFont;
 }

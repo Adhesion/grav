@@ -90,6 +90,7 @@ bool gravApp::OnInit()
 int gravApp::OnExit()
 {
     // TODO: deconstructors, etc
+    GLUtil::getInstance()->cleanupGL();
     return 0;
 }
 

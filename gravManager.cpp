@@ -389,7 +389,6 @@ void gravManager::addTestObject()
     RectangleBase* obj = new RectangleBase( 0.0f, 0.0f );
     drawnObjects->push_back( obj );
     obj->setName( "TEST" );
-    obj->makeFont();
 }
 
 void gravManager::moveToTop( RectangleBase* object )
@@ -700,7 +699,6 @@ void gravManager::addNewSource( VideoSource* s )
     if ( s == NULL ) return;
     
     s->setTexture( borderTex, borderWidth, borderHeight );
-    s->makeFont();
     sources->push_back( s );
     drawnObjects->push_back( s );
     s->updateName();
@@ -752,7 +750,6 @@ Group* gravManager::createSiteIDGroup( std::string data )
     g->setName( data );
     g->setSiteID( data );
     g->setTexture( borderTex, borderWidth, borderHeight );
-    g->makeFont();
     
     drawnObjects->push_back( g );
     siteIDGroups->insert( std::pair<std::string,Group*>(data, g) );

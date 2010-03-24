@@ -9,6 +9,7 @@
  */
 
 #include <GL/glew.h>
+#include <FTGL/ftgl.h>
 
 #include <iostream>
 
@@ -17,12 +18,13 @@ class GLUtil
 
 public:
     static GLUtil* getInstance();
-       
+
     /*
      * Call glut and glew init functions, check for shaders, and load them if
      * we can.
      */
     bool initGL();
+    void cleanupGL();
     
     // get the matrices that define the camera transforms so we can use those
     // to convert our coordinates
@@ -72,6 +74,8 @@ public:
     GLuint getYUV420xOffsetID();
     GLuint getYUV420yOffsetID();
     
+    FTFont* getMainFont();
+
     /*
      * Returns whether shaders are available to use or not.
      */
@@ -79,6 +83,7 @@ public:
     
 protected:
     GLUtil();
+    ~GLUtil();
 
 private:
     static GLUtil* instance;
@@ -96,6 +101,8 @@ private:
     GLuint YUV420Program;
     GLuint YUV420xOffsetID;
     GLuint YUV420yOffsetID;
+
+    FTFont* mainFont;
 
 };
 

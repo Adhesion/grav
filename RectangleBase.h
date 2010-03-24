@@ -36,7 +36,6 @@ public:
     virtual ~RectangleBase();
     
     void setDefaults();
-    void makeFont();
 
     /*
      * Returns the width or height of the object. These are virtual because

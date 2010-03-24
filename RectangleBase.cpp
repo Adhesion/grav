@@ -44,8 +44,7 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     nameStart = other.nameStart; nameEnd = other.nameEnd;
     finalName = other.finalName;
     
-    if ( other.font != NULL ) makeFont();
-    else font = NULL;
+    font = other.font;
     
     borderTex = other.borderTex;
     twidth = other.twidth; theight = other.theight;
@@ -66,12 +65,8 @@ RectangleBase::~RectangleBase()
     // things might be using it
     //glDeleteTextures( 1, &borderTex );
     
-    if ( font != NULL )
-    {
-        printf( "rectanglebase destructor, font is %p\n", font );
-        delete font;
-        font = NULL;
-    }
+    // font is not deleted here since the default is to use the global one from
+    // GLUtil, and that will delete it
 }
 
 void RectangleBase::setDefaults()
@@ -100,18 +95,10 @@ void RectangleBase::setDefaults()
     // TODO: this should be dynamic
     lat = 43.165556f; lon = -77.611389f;
     
-    font = NULL;
+    font = GLUtil::getInstance()->getMainFont();
     
     //borderTex = PNGLoader::loadPNG( "/home/andrew/work/src/grav/Debug/border.png",
     //                                twidth, theight );
-}
-
-void RectangleBase::makeFont()
-{
-    // TODO: check whether we can redistribute a font instead of looking in
-    //       a system spot, which would have to be different per-platform
-    font = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
-    font->FaceSize(100);
 }
 
 float RectangleBase::getWidth()
