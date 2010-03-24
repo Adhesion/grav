@@ -11,6 +11,7 @@
 
 #include <wx/wx.h>
 #include <wx/cmdline.h>
+#include <VPMedia/thread_helper.h>
 
 class GLCanvas;
 class gravManager;
@@ -25,11 +26,15 @@ private:
      * Init function for WX - acts as the main
      */
     virtual bool OnInit();
-    
     virtual int OnExit();
     
+    DECLARE_EVENT_TABLE()
+    
+    void idleHandler( wxIdleEvent& evt );
+    void iterate();
+
     /**
-     * Parse the command line arguements and set options accordingly.
+     * Parse the command line arguments and set options accordingly.
      * Primarily for setting the video/audio/etc addresses.
      */
     bool handleArgs();
@@ -40,6 +45,8 @@ private:
      */
     void mapRTP();
     
+    static void* threadTest( void* args );
+
     wxCmdLineParser parser;
     
     wxFrame* mainFrame;
@@ -50,6 +57,9 @@ private:
     
     gravManager* grav;
     
+    bool usingThreads;
+    thread* VPMthread;
+
     int windowWidth, windowHeight;
     
 };
@@ -59,6 +69,9 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     { wxCMD_LINE_SWITCH, _("h"), _("help"), _("displays the help message"),
         wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
     
+    { wxCMD_LINE_SWITCH, _("t"), _("threads"), _("enables threading separation"
+            " of graphics and network/decoding") },
+
     { wxCMD_LINE_OPTION, _("a"), _("audio"), _("RTP audio session address"),
         wxCMD_LINE_VAL_STRING },
     

@@ -21,6 +21,10 @@
 
 IMPLEMENT_APP( gravApp )
 
+BEGIN_EVENT_TABLE(gravApp, wxApp)
+EVT_IDLE(gravApp::idleHandler)
+END_EVENT_TABLE()
+
 bool gravApp::OnInit()
 {
     grav = new gravManager();
@@ -74,6 +78,9 @@ bool gravApp::OnInit()
     
     mapRTP();
     
+    if ( usingThreads )
+        VPMthread = thread_start( threadTest, this );
+
     //
     //tree->addSession( std::string( "224.2.224.225/20002" ) );
     
@@ -84,6 +91,17 @@ int gravApp::OnExit()
 {
     // TODO: deconstructors, etc
     return 0;
+}
+
+void gravApp::idleHandler( wxIdleEvent& evt )
+{
+    if ( !usingThreads )
+        iterate();
+}
+
+void gravApp::iterate()
+{
+    grav->iterateSessions();
 }
 
 bool gravApp::handleArgs()
@@ -98,8 +116,6 @@ bool gravApp::handleArgs()
     }
     
     wxString videoAddress = parser.GetParam( 0 );
-    printf( "videoaddress length %i: %s\n", videoAddress.Len(),
-        (char*)videoAddress.char_str() );
     bool res = grav->initSession( std::string((char*)videoAddress.char_str()),
                                     false );
     if ( res ) printf( "grav::video session initialized\n" );
@@ -112,6 +128,8 @@ bool gravApp::handleArgs()
         if ( aRes ) printf( "grav::audio session initialized\n" );
     }
     
+    usingThreads = parser.Found( _("threads") );
+
     return true;
 }
 
@@ -168,4 +186,19 @@ void gravApp::mapRTP()
         "audio/l16_16k_stereo",
         "Linear16 16kHz STEREO",
         VPMLinear16Decoder_16k_stereo );*/
+}
+
+void* gravApp::threadTest( void* args )
+{
+    printf( "gravApp::starting thread...\n" );
+    gravApp* g = (gravApp*)args;
+    sleep( 1 );
+    while ( true )
+    {
+        printf( "gravApp::thread sleeping...\n" );
+        usleep( 20000 );
+        printf( "gravApp::thread iterating\n" );
+        g->iterate();
+    }
+    return 0;
 }

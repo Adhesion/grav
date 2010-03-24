@@ -30,7 +30,6 @@ private:
     
     void testDraw();
     void testKey( wxKeyEvent& evt );
-    void idle( wxIdleEvent& evt );
     
     // tracks the aspect ratio of the screen for reshaping
     float screen_width, screen_height;

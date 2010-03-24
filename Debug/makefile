@@ -39,7 +39,6 @@ endif
 # All Target
 all: grav
 
-
 # Tool invocations
 grav: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'

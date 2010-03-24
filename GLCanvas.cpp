@@ -14,7 +14,6 @@
 BEGIN_EVENT_TABLE(GLCanvas, wxGLCanvas)
 EVT_PAINT(GLCanvas::draw)
 EVT_SIZE(GLCanvas::resize)
-EVT_IDLE(GLCanvas::idle)
 END_EVENT_TABLE()
 
 GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
@@ -124,11 +123,6 @@ void GLCanvas::GLreshape( int w, int h )
     // (finding the world space bounds for the screen) depends on the matrices
     // above being accurate
     grav->setWindowSize( w, h );
-}
-
-void GLCanvas::idle( wxIdleEvent& evt )
-{
-    grav->iterateSessions();
 }
 
 Timer::Timer( GLCanvas* c ) :
