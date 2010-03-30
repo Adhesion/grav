@@ -48,7 +48,7 @@ void InputHandler::wxKeyDown( wxKeyEvent& evt )
     else
         shiftHeld = false;
     
-    processKeyboard( (unsigned char)evt.GetKeyCode(), 0, 0 );
+    processKeyboard( evt.GetKeyCode(), 0, 0 );
 
     evt.Skip(); // so now the char event can grab this, if need be
 }
@@ -81,11 +81,15 @@ void InputHandler::wxMouseLUp( wxMouseEvent& evt )
     evt.Skip();
 }
 
-void InputHandler::processKeyboard( unsigned char key, int x, int y )
+void InputHandler::processKeyboard( int keyCode, int x, int y )
 {
     std::vector<VPMVideoBufferSink*>::iterator t;
     std::map<std::string,Group*>::iterator mapi;
+    unsigned char key = (unsigned char)keyCode;
     printf( "Char pressed is %c (%i)\n", key, key );
+    printf( "keycode is %i\n", keyCode );
+    printf( "add is %i\n", WXK_ADD );
+    printf( "space is %i\n", WXK_SPACE );
     printf( "x,y in processKeyboard is %i,%i\n", x, y );
     printf( "is shift held? %i\n", shiftHeld );
     printf( "is ctrl held? %i\n", ctrlHeld );
@@ -94,212 +98,212 @@ void InputHandler::processKeyboard( unsigned char key, int x, int y )
     float scaleAmt = 0.25f;
     
     // TODO reorder this to make some sort of sense
-    switch(key) {
+    switch( key ) {
     
-        case 'K':
-            printf( "current sources selected: %i\n", 
-                        grav->getSelectedObjects()->size() );
-            for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
-                    i++ )
+    case 'K':
+        printf( "current sources selected: %i\n",
+                    grav->getSelectedObjects()->size() );
+        for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
+                i++ )
+        {
+            printf( "%s\n",
+                (*(grav->getSelectedObjects()))[i]->getName().c_str() );
+        }
+        break;
+
+    case 'T':
+        printf( "rearranging groups...\n" );
+        for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
+                i++ )
+        {
+            Group* g = dynamic_cast<Group*>(
+                            (*(grav->getSelectedObjects()))[i] );
+            if ( g != NULL )
             {
-                printf( "%s\n",
-                    (*(grav->getSelectedObjects()))[i]->getName().c_str() );
+                g->rearrange();
             }
-            break;
-      
-        case 'T':
-            printf( "rearranging groups...\n" );
-            for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
-                    i++ )
+        }
+        break;
+
+    case 'U':
+        printf( "updating group names...\n" );
+        mapi = grav->getSiteIDGroups()->begin();
+        for ( ; mapi != grav->getSiteIDGroups()->end(); mapi++ )
+        {
+            mapi->second->updateName();
+        }
+        break;
+
+    case 'P':
+        grav->perimeterAllVideos();
+        break;
+
+    case 'R':
+        grav->retileVideos();
+        break;
+
+    case 'I':
+        printf( "We currently have %i sources.\n",
+                 grav->getSources()->size() );
+        printf( "We currently have %i objects in drawnObjects.\n",
+                 grav->getDrawnObjects()->size() );
+
+        for ( si = grav->getSources()->begin();
+                si != grav->getSources()->end(); si++ )
+        {
+            printf( "name: %s\n",
+                (*si)->getMetadata(
+                    VPMSession::VPMSESSION_SDES_NAME).c_str() );
+            printf( "stored name: %s\n", (*si)->getName().c_str() );
+            printf( "cname: %s\n",
+                (*si)->getMetadata(
+                    VPMSession::VPMSESSION_SDES_CNAME).c_str() );
+            printf( "stored altname: %s\n", (*si)->getAltName().c_str() );
+            printf( "loc: %s\n",
+                (*si)->getMetadata(
+                    VPMSession::VPMSESSION_SDES_LOC).c_str() );
+            printf( "ssrc 0x%08x (%d)\n", (*si)->getssrc(),
+                        (*si)->getssrc() );
+            printf( "\tpos (world): %f,%f\n",
+                    (*si)->getX(), (*si)->getY() );
+            GLdouble scrX; GLdouble scrY; GLdouble scrZ;
+            GLUtil::getInstance()->worldToScreen( (GLdouble)(*si)->getX(),
+                            (GLdouble)(*si)->getY(),
+                            (GLdouble)(*si)->getZ(),
+                            &scrX, &scrY, &scrZ);
+            printf( "\tpos (screen): %f,%f,%f\n", scrX, scrY, scrZ );
+            printf( "\tis grouped? %i\n", (*si)->isGrouped() );
+        }
+        printf( "DrawnObjects:\n" );
+        for ( unsigned int i = 0; i < grav->getDrawnObjects()->size(); i++ )
+        {
+            RectangleBase* temp = (*(grav->getDrawnObjects()))[i];
+            printf( "%s\n", temp->getName().c_str() );
+        }
+        break;
+
+    case 'L':
+        for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
+                i++ )
+        {
+            RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
+            if ( temp->isGroup() )
             {
-                Group* g = dynamic_cast<Group*>(
-                                (*(grav->getSelectedObjects()))[i] );
-                if ( g != NULL )
-                {
-                    g->rearrange();
-                }
+                Group* g = dynamic_cast<Group*>(temp);
+                printf( "InputHandler::l:group %s locked? %i\n",
+                            g->getName().c_str(), g->isLocked() );
+                g->changeLock();
+                printf( "after: %i\n", g->isLocked() );
             }
-            break;
-        
-        case 'U':
-            printf( "updating group names...\n" );
-            mapi = grav->getSiteIDGroups()->begin();
-            for ( ; mapi != grav->getSiteIDGroups()->end(); mapi++ )
+        }
+        break;
+
+    case 'O':
+        printf( "random32: %i\n", random32() );
+        printf( "random32max: %i\n", random32_max() );
+        break;
+
+    case 'N':
+        for ( si = grav->getSources()->begin();
+                si != grav->getSources()->end(); si++ )
+        {
+            if ( shiftHeld || (*si)->isSelected() )
             {
-                mapi->second->updateName();
+                (*si)->scaleNative();
+                if ( (*si)->isGrouped() )
+                    (*si)->getGroup()->rearrange();
             }
-            break;
-        
-        case 'P':
-            grav->perimeterAllVideos();
-            break;
-        
-        case 'R':
-            grav->retileVideos();
-            break;
-        
-        case 'I':
-            printf( "We currently have %i sources.\n",
-                     grav->getSources()->size() );
-            printf( "We currently have %i objects in drawnObjects.\n",
-                     grav->getDrawnObjects()->size() );
+        }
+        break;
+
+    case '0':
+        for ( si = grav->getSources()->begin();
+                si != grav->getSources()->end(); si++ )
+        {
+            (*si)->move(0.0f,0.0f);
+        }
+        break;
     
-            for ( si = grav->getSources()->begin();
-                    si != grav->getSources()->end(); si++ )
+    case 'F':
+        if ( grav->getSelectedObjects()->size() == 1 )
+        {
+            if ( shiftHeld )
             {
-                printf( "name: %s\n", 
-                    (*si)->getMetadata(
-                        VPMSession::VPMSESSION_SDES_NAME).c_str() );
-                printf( "stored name: %s\n", (*si)->getName().c_str() );
-                printf( "cname: %s\n", 
-                    (*si)->getMetadata(
-                        VPMSession::VPMSESSION_SDES_CNAME).c_str() );
-                printf( "stored altname: %s\n", (*si)->getAltName().c_str() );
-                printf( "loc: %s\n", 
-                    (*si)->getMetadata(
-                        VPMSession::VPMSESSION_SDES_LOC).c_str() );
-                printf( "ssrc 0x%08x (%d)\n", (*si)->getssrc(),
-                            (*si)->getssrc() );
-                printf( "\tpos (world): %f,%f\n",
-                        (*si)->getX(), (*si)->getY() );
-                GLdouble scrX; GLdouble scrY; GLdouble scrZ;
-                GLUtil::getInstance()->worldToScreen( (GLdouble)(*si)->getX(),
-                                (GLdouble)(*si)->getY(), 
-                                (GLdouble)(*si)->getZ(),
-                                &scrX, &scrY, &scrZ);
-                printf( "\tpos (screen): %f,%f,%f\n", scrX, scrY, scrZ );
-                printf( "\tis grouped? %i\n", (*si)->isGrouped() );
+                // TODO: change this, it sucks
+                LayoutManager layouts;
+                layouts.fullscreen( grav->getScreenRect(),
+                                     (*grav->getSelectedObjects())[0] );
             }
-            printf( "DrawnObjects:\n" );
-            for ( unsigned int i = 0; i < grav->getDrawnObjects()->size(); i++ )
-            {
-                RectangleBase* temp = (*(grav->getDrawnObjects()))[i];
-                printf( "%s\n", temp->getName().c_str() );
-            }
-            break;
-        
-        case 'L':
-            for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
-                    i++ )
-            {
-                RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
-                if ( temp->isGroup() )
-                {
-                    Group* g = dynamic_cast<Group*>(temp);
-                    printf( "InputHandler::l:group %s locked? %i\n",
-                                g->getName().c_str(), g->isLocked() );
-                    g->changeLock();
-                    printf( "after: %i\n", g->isLocked() );
-                }
-            }
-            break;
-        
-        case 'O':
-            printf( "random32: %i\n", random32() );
-            printf( "random32max: %i\n", random32_max() );
-            break;
-        
-        case 'N':
-            for ( si = grav->getSources()->begin();
-                    si != grav->getSources()->end(); si++ )
-            {
-                if ( shiftHeld || (*si)->isSelected() )
-                {
-                    (*si)->scaleNative();
-                    if ( (*si)->isGrouped() )
-                        (*si)->getGroup()->rearrange();
-                }
-            }
-            break;
-        
-        case '0':
-            for ( si = grav->getSources()->begin();
-                    si != grav->getSources()->end(); si++ )
-            {
-                (*si)->move(0.0f,0.0f);
-            }
-            break;
-        
-        case 'F':
-            if ( grav->getSelectedObjects()->size() == 1 )
-            {
-                if ( shiftHeld )
-                {
-                    // TODO: change this, it sucks
-                    LayoutManager layouts;
-                    layouts.fullscreen( grav->getScreenRect(),
-                                         (*grav->getSelectedObjects())[0] );
-                }
-            }
-            break;
-        
-        case 'G':
-            if ( grav->usingSiteIDGroups() )
-            {
-                grav->setSiteIDGrouping( false );
-                grav->ungroupAll();
-            }
-            else
-                grav->setSiteIDGrouping( true );
-            break;
-        
-        case '-':
-            scaleAmt *= -1.0f;
-        case '+':
-            for ( unsigned int i = 0; i < grav->getDrawnObjects()->size();
-                    i++ )
-            {
-                RectangleBase* temp = (*(grav->getDrawnObjects()))[i];
-                if ( temp->isSelected() )
-                {
-                    temp->setScale( temp->getScaleX()+temp->getScaleX()*scaleAmt,
-                                     temp->getScaleY()+temp->getScaleY()*scaleAmt );
-                }
-            }
-            break;
-        
-        case 'W':
-            grav->setCamZ(grav->getCamZ()-1);
-            break;
-        case 'S':
-            grav->setCamZ(grav->getCamZ()+1);
-            break;
-        case 'A':
-            grav->setCamX(grav->getCamX()-1);
-            break;
-        case 'D':
-            grav->setCamX(grav->getCamX()+1);
-            break;
-        
-        // u/d/l/r arrow keys, for WX
-        case ':':
-            earth->rotate( 0.0f, 0.0f, -2.0f );
-            break;
-        case '<':
-            earth->rotate( 0.0f, 0.0f, 2.0f );
-            break;
-        case ';':
-            earth->rotate( -2.0f, 0.0f, 0.0f );
-            break;
-        case '=':
-            earth->rotate( 2.0f, 0.0f, 0.0f );
-            break;
-        
-        // backspace: deselect videos
-        case 8:
-            grav->clearSelected();
-            break;
-        
-        // space
-        case 32:
-            grav->addTestObject();
-            break;
-        
-        case 'Q':
-        case 'q':
-        case 27:
-            exit(0);
-            break;
+        }
+        break;
+
+    case 'G':
+        if ( grav->usingSiteIDGroups() )
+        {
+            grav->setSiteIDGrouping( false );
+            grav->ungroupAll();
+        }
+        else
+            grav->setSiteIDGrouping( true );
+        break;
+
+    case 'W':
+        grav->setCamZ(grav->getCamZ()-1);
+        break;
+    case 'S':
+        grav->setCamZ(grav->getCamZ()+1);
+        break;
+    case 'A':
+        grav->setCamX(grav->getCamX()-1);
+        break;
+    case 'D':
+        grav->setCamX(grav->getCamX()+1);
+        break;
+
+    case '-':
+        grav->scaleSelectedObjects( scaleAmt * -1.0f );
+        break;
+    case '+':
+        grav->scaleSelectedObjects( scaleAmt );
+        break;
+    case '=':
+        if ( shiftHeld )
+            grav->scaleSelectedObjects( scaleAmt );
+        break;
+
+    case 'Q':
+    case 'q':
+    case 27:
+        exit(0);
+        break;
+    }
+
+    switch ( keyCode )
+    {
+    // u/d/l/r arrow keys, for WX
+    // TODO: are these axes backwards?
+    case WXK_UP:
+        earth->rotate( -2.0f, 0.0f, 0.0f );
+        break;
+    case WXK_DOWN:
+        earth->rotate( 2.0f, 0.0f, 0.0f );
+        break;
+    case WXK_LEFT:
+        earth->rotate( 0.0f, 0.0f, -2.0f );
+        break;
+    case WXK_RIGHT:
+        earth->rotate( 0.0f, 0.0f, 2.0f );
+        break;
+
+    // backspace: deselect videos
+    case WXK_BACK:
+        grav->clearSelected();
+        break;
+
+    // space
+    case WXK_SPACE:
+        grav->addTestObject();
+        break;
     }
 }
 
@@ -357,8 +361,8 @@ void InputHandler::leftClick( int x, int y )
     GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
                             &mouseX, &mouseY, &mouseZ );
     
-    printf( "mouse clicked at world %f,%f; screen %i,%i\n",
-            mouseX, mouseY, x, y );
+    //printf( "mouse clicked at world %f,%f; screen %i,%i\n",
+    //        mouseX, mouseY, x, y );
     
     // on click, any potential dragging afterwards must start here
     dragStartX = mouseX;
@@ -575,7 +579,7 @@ bool InputHandler::selectVideos()
             // it'll be rendered on top - but only if we just clicked on it
             if ( !leftButtonHeld )
             {
-                printf( "putting selected video to end\n" );
+                //printf( "putting selected video to end\n" );
                 // since we can only delete a normal iterator (not a reverse
                 // one) we have to calculate our current position
                 /*std::vector<RectangleBase*>::iterator current =

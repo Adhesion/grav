@@ -196,9 +196,7 @@ void* gravApp::threadTest( void* args )
     sleep( 1 );
     while ( true )
     {
-        printf( "gravApp::thread sleeping...\n" );
-        usleep( 20000 );
-        printf( "gravApp::thread iterating\n" );
+        usleep( 16000 );
         g->iterate();
     }
     return 0;

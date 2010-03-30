@@ -82,6 +82,11 @@ public:
     int getHoldCounter();
     
     /*
+     * Scale selected objects by a certian amount.
+     */
+    void scaleSelectedObjects( float scaleAmt );
+
+    /*
      * Getters for accessing sources/objects.
      */
     std::vector<VideoSource*>* getSources();

@@ -35,7 +35,7 @@ public:
     void wxMouseLDown( wxMouseEvent& evt );
     void wxMouseLUp( wxMouseEvent& evt );
     
-    void processKeyboard( unsigned char key, int x, int y );
+    void processKeyboard( int keyCode, int x, int y );
     void processSpecialKey( int key, int x, int y );
     void processMouse( int button, int state, int x, int y );
     void processActiveMotion( int x, int y );
@@ -45,7 +45,7 @@ public:
     void mouseLeftHeldMove( int x, int y );
     
     bool selectVideos();
-    
+
     /*
      * Various accessors.
      */

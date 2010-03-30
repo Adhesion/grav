@@ -401,7 +401,6 @@ void gravManager::moveToTop( RectangleBase* object )
 void gravManager::moveToTop( std::vector<RectangleBase*>::iterator i )
 {
     RectangleBase* temp = (*i);
-    printf( "gravManager: moving %s to top\n", temp->getName().c_str() );
     drawnObjects->erase( i );
     drawnObjects->push_back( temp );
     
@@ -672,6 +671,16 @@ void gravManager::incrementHoldCounter()
 int gravManager::getHoldCounter()
 {
     return holdCounter;
+}
+
+void gravManager::scaleSelectedObjects( float scaleAmt )
+{
+    for ( unsigned int i = 0; i < selectedObjects->size(); i++ )
+    {
+        RectangleBase* temp = (*selectedObjects)[i];
+        temp->setScale( temp->getScaleX()+temp->getScaleX()*scaleAmt,
+                         temp->getScaleY()+temp->getScaleY()*scaleAmt );
+    }
 }
 
 std::vector<VideoSource*>* gravManager::getSources()
