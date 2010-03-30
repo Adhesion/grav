@@ -416,7 +416,6 @@ bool LayoutManager::fullscreen( RectangleBase boundRect, RectangleBase* object )
 bool LayoutManager::fullscreen( float boundL, float boundR, float boundU,
                                     float boundD, RectangleBase* object )
 {
-    printf( "LayoutManager::fullscreen\n" );
     float spaceAspect = fabs((boundR-boundL)/(boundU-boundD));
     float objectAspect = object->getWidth()/object->getHeight();
     

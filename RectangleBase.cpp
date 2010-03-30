@@ -57,7 +57,6 @@ RectangleBase::RectangleBase( const RectangleBase& other )
 
 RectangleBase::~RectangleBase()
 {
-    printf( "RectangleBase::~RectangleBase (%s)\n", name.c_str() );
     if ( isGrouped() )
         myGroup->remove( this );
     
@@ -143,7 +142,6 @@ float RectangleBase::getDBound()
 
 void RectangleBase::move( float _x, float _y )
 {
-    printf( "RectangleBase:: %s moving\n", name.c_str() );
     destX = _x;
     if ( !animated ) x = _x;
     destY = _y;
@@ -158,7 +156,6 @@ void RectangleBase::setPos( float _x, float _y )
 
 void RectangleBase::setScale( float xs, float ys )
 {
-    printf( "RectangleBase %s scaling to %f,%f\n", name.c_str(), xs, ys );
     destScaleX = xs; destScaleY = ys;
     if ( !animated ) { scaleX = xs; scaleY = ys; }
 }
@@ -170,13 +167,11 @@ void RectangleBase::setScale( float xs, float ys, bool resizeMembers )
 
 void RectangleBase::setWidth( float w )
 {
-    printf( "RectangleBase setwidth to %f\n", w );
     setScale( w, destScaleY * w / destScaleX );
 }
 
 void RectangleBase::setHeight( float h )
 {
-    printf( "RectangleBase setheight to %f\n", h );
     setScale( destScaleX * h / destScaleY, h );
 }
 

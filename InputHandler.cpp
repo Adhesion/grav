@@ -86,13 +86,11 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     std::vector<VPMVideoBufferSink*>::iterator t;
     std::map<std::string,Group*>::iterator mapi;
     unsigned char key = (unsigned char)keyCode;
-    printf( "Char pressed is %c (%i)\n", key, key );
+    /*printf( "Char pressed is %c (%i)\n", key, key );
     printf( "keycode is %i\n", keyCode );
-    printf( "add is %i\n", WXK_ADD );
-    printf( "space is %i\n", WXK_SPACE );
     printf( "x,y in processKeyboard is %i,%i\n", x, y );
     printf( "is shift held? %i\n", shiftHeld );
-    printf( "is ctrl held? %i\n", ctrlHeld );
+    printf( "is ctrl held? %i\n", ctrlHeld );*/
     std::vector<VideoSource*>::const_iterator si;
     // how much to scale when doing -/+: flipped in the former case
     float scaleAmt = 0.25f;

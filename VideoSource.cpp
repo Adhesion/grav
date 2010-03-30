@@ -317,18 +317,12 @@ float VideoSource::getDestHeight()
 
 void VideoSource::setWidth( float w )
 {
-    printf( "VIDEOSOURCE: setwidth %f\n", w );
     setScale( w/aspect, destScaleY * (w/(destScaleX*aspect)) );
-    printf( "\tAFTER SETWIDTH: now %fx%f\n", getDestWidth(), getDestHeight() );
 }
 
 void VideoSource::setHeight( float h )
 {
-    printf( "VIDEOSOURCE: setheight %f\n", h );
-    printf( "BEFORE: %fx%f (%fx%f width)\n", getDestWidth(), getDestHeight(),
-                destScaleX, aspect );
     setScale( destScaleX * (h/destScaleY), h );
-    printf( "\tAFTER SETHEIGHT: now %fx%f\n", getDestWidth(), getDestHeight() );
 }
 
 uint32_t VideoSource::getssrc()

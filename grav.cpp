@@ -141,6 +141,8 @@ void gravApp::mapRTP()
     decoderFactory->mapPayloadType( 45, "MPEG4" );
     decoderFactory->mapPayloadType( 96, "H264" );
     
+    decoderFactory->mapPayloadType( 77, "H261AS" );
+
     // map audio codecs
     decoderFactory->mapPayloadType( 122, "L16_8k_mono" );
     decoderFactory->mapPayloadType( 111, "L16_8k_stereo" );
