@@ -79,7 +79,10 @@ bool gravApp::OnInit()
     mapRTP();
     
     if ( usingThreads )
+    {
+        grav->setThreads( usingThreads );
         VPMthread = thread_start( threadTest, this );
+    }
 
     //
     //tree->addSession( std::string( "224.2.224.225/20002" ) );
@@ -195,10 +198,9 @@ void* gravApp::threadTest( void* args )
 {
     printf( "gravApp::starting thread...\n" );
     gravApp* g = (gravApp*)args;
-    sleep( 1 );
     while ( true )
     {
-        usleep( 16000 );
+        usleep( 30000 );
         g->iterate();
     }
     return 0;

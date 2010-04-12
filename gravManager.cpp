@@ -41,6 +41,8 @@ gravManager::gravManager()
     selectedObjects = new std::vector<RectangleBase*>();
     siteIDGroups = new std::map<std::string,Group*>();
     
+    sourcesToDelete = new std::vector<VideoSource*>();
+
     sf = VPMSessionFactory::getInstance();
     videoSession_listener = new VideoListener( this );
     audioSession_listener = new AudioManager();
@@ -49,6 +51,10 @@ gravManager::gravManager()
     layouts = new LayoutManager();
     screenRect.setName( "screen rectangle" );
     screenRect.setAnimation( false );
+
+    usingThreads = false;
+
+    sourceMutex = mutex_create();
 }
 
 gravManager::~gravManager()
@@ -57,6 +63,10 @@ gravManager::~gravManager()
     delete drawnObjects;
     delete selectedObjects;
     delete siteIDGroups;
+
+    delete sourcesToDelete;
+
+    mutex_free( sourceMutex );
 }
 
 bool gravManager::initSession( std::string address, bool audio )
@@ -83,16 +93,16 @@ bool gravManager::initSession( std::string address, bool audio )
     {
         audioSession = sf->createSession( address.c_str(),
                                         *audioSession_listener);
-      
+
         audioSession->enableVideo(false);
         audioSession->enableAudio(true);
         audioSession->enableOther(false);
-      
+
         if (!audioSession->initialise()) {
             fprintf(stderr, "error: failed to initialise audioSession\n");
             return false;
         }
-        
+
         audioSession_ts = random32();
         audioInitialized = true;
     }
@@ -120,9 +130,9 @@ void gravManager::draw()
     glLoadIdentity();
     gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
     
-    GLUquadric* sphereQuad = gluNewQuadric();
-    gluSphere( sphereQuad, audioSession_listener->getLevelAvg()*50.0f,
-                200, 200 );
+    //GLUquadric* sphereQuad = gluNewQuadric();
+    //gluSphere( sphereQuad, audioSession_listener->getLevelAvg()*50.0f,
+    //            200, 200 );
     
     // test text drawing
     /*glPushMatrix();
@@ -155,6 +165,18 @@ void gravManager::draw()
     
     std::vector<RectangleBase*>::const_iterator si;
     
+    lockSources();
+
+    // delete sources that need to be deleted - see deleteSource for the reason
+    if ( sourcesToDelete->size() > 0 )
+    {
+        for ( int i = 0; i < sourcesToDelete->size(); i++ )
+        {
+            delete (*sourcesToDelete)[0];
+        }
+        sourcesToDelete->clear();
+    }
+
     // draw line to geographical position
     for ( si = drawnObjects->begin(); si != drawnObjects->end(); si++ )
     {
@@ -219,6 +241,8 @@ void gravManager::draw()
     glDepthMask( GL_TRUE );
     //printf( "glutDisplay::done drawing objects\n" );
     
+    unlockSources();
+
     // draw the click-and-drag selection box
     if ( holdCounter > 1 && drawSelectionBox )
     {
@@ -274,6 +298,8 @@ void gravManager::clearSelected()
 
 void gravManager::ungroupAll()
 {
+    lockSources();
+
     printf( "deleting %i groups\n", siteIDGroups->size() );
     std::vector<RectangleBase*>::iterator it;
     for ( it = drawnObjects->begin(); it != drawnObjects->end(); )
@@ -307,6 +333,8 @@ void gravManager::ungroupAll()
     }
     siteIDGroups->clear();
     printf( "siteIDgroups cleared\n" );
+
+    unlockSources();
 }
 
 void gravManager::retileVideos()
@@ -376,7 +404,6 @@ void gravManager::perimeterAllVideos()
     boundRect.setAnimation( false );
     boundRect.setPos( 0.0f, 0.0f );
     boundRect.setScale( 10.0f, 10.0f );
-    boundRect.setName( "bhlbrlhbrlh" );
     printf( "starting to perimeter: bounds of %f,%f %f,%f\n", boundRect.getLBound(),
                  boundRect.getRBound(),  boundRect.getUBound(),  boundRect.getDBound() );
     printf( "width, scale: %f,%f %f,%f\n", boundRect.getWidth(), boundRect.getHeight(),
@@ -708,20 +735,26 @@ void gravManager::addNewSource( VideoSource* s )
     if ( s == NULL ) return;
     
     s->setTexture( borderTex, borderWidth, borderHeight );
+
+    lockSources();
+
     sources->push_back( s );
     drawnObjects->push_back( s );
     s->updateName();
     
     if ( tree != NULL )
         tree->addObject( (RectangleBase*)s );
+
+    unlockSources();
 }
 
 void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
 {
-    printf( "source is %s\n", (*si)->getName().c_str() );
     RectangleBase* temp = (RectangleBase*)(*si);
     VideoSource* s = (*si);
     
+    lockSources();
+
     // remove it from the tree
     tree->removeObject( temp );
     
@@ -744,7 +777,13 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
         selectedObjects->erase( j );
     }
     
-    delete s;
+    // we need to do videosource's delete somewhere else, since this function
+    // might be on a second thread, which would crash since the videosource
+    // delete needs to do a GL call to delete its texture and GL calls can only
+    // be on the main thread
+    sourcesToDelete->push_back( s );
+
+    unlockSources();
 }
 
 void gravManager::setBorderTex( std::string border )
@@ -760,11 +799,15 @@ Group* gravManager::createSiteIDGroup( std::string data )
     g->setSiteID( data );
     g->setTexture( borderTex, borderWidth, borderHeight );
     
+    lockSources();
+
     drawnObjects->push_back( g );
     siteIDGroups->insert( std::pair<std::string,Group*>(data, g) );
     
     tree->addObject( g );
     
+    unlockSources();
+
     return g;
 }
 
@@ -821,4 +864,21 @@ void gravManager::setTree( TreeControl* t )
 TreeControl* gravManager::getTree()
 {
     return tree;
+}
+
+void gravManager::lockSources()
+{
+    if ( usingThreads )
+        mutex_lock( sourceMutex );
+}
+
+void gravManager::unlockSources()
+{
+    if ( usingThreads )
+        mutex_unlock( sourceMutex );
+}
+
+void gravManager::setThreads( bool threads )
+{
+    usingThreads = threads;
 }

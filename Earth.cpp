@@ -10,6 +10,7 @@
 #include "GLUtil.h"
 
 #include <cmath>
+#include <GL/glut.h>
 
 const float PI = 3.1415926535;
 
@@ -19,8 +20,30 @@ Earth::Earth()
     radius = 15.0f;
     xRot = 0.0f; yRot = 0.0f; zRot = 0.0f;
     earthTex = PNGLoader::loadPNG( "earth.png", texWidth, texHeight );
+
     sphereQuad = gluNewQuadric();
     gluQuadricTexture( sphereQuad, GL_TRUE );
+
+    // create the display list for rendering the sphere
+    sphereIndex = glGenLists( 1 );
+    glNewList( sphereIndex, GL_COMPILE );
+    glEnable( GL_TEXTURE_2D );
+    glBindTexture( GL_TEXTURE_2D, earthTex );
+
+    glEnable( GL_CULL_FACE );
+    glCullFace( GL_BACK );
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    gluSphere( sphereQuad, radius, 40, 40 );
+
+    glDisable( GL_CULL_FACE );
+    glDisable( GL_TEXTURE_2D );
+    glEndList();
+
     matrix = new GLdouble[16];
 }
 
@@ -28,6 +51,8 @@ Earth::~Earth()
 {
     glDeleteTextures( 1, &earthTex );
     gluDeleteQuadric( sphereQuad );
+    delete matrix;
+    glDeleteLists( sphereIndex, 1 );
 }
 
 void Earth::draw()
@@ -73,22 +98,9 @@ void Earth::draw()
     */
     
     glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-    
-    glEnable( GL_TEXTURE_2D );
-    glBindTexture( GL_TEXTURE_2D, earthTex );
-    
-    glEnable( GL_CULL_FACE );
-    glCullFace( GL_BACK );
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    
-    gluSphere( sphereQuad, radius, 200, 200 );
-    
-    glDisable( GL_CULL_FACE );
-    glDisable( GL_TEXTURE_2D );
+
+    // render the sphere using its display list
+    glCallList( sphereIndex );
     
     glPopMatrix();
     
@@ -125,31 +137,6 @@ void Earth::convertLatLong( float lat, float lon, float &ex, float &ey,
     glRotatef( zRot, 0.0f, 1.0f, 0.0f );
     glGetDoublev( GL_MODELVIEW_MATRIX, matrix );
     glPopMatrix();
-
-    //printf( "xRot: %f\n", xRot );
-
-    /*printf( "printing earth rotation matrix:\n[" );
-    int c = 0;
-    for ( int i = 0; i < 16; i++ )
-    {
-        printf( "%i: %f", c, matrix[c] );
-        if ( i % 4 == 3 )
-            printf( "]\n[" );
-        else
-            printf( " " );
-        if ( c+4 >= 16 ) { c=(c+5)%16; }
-        else c+=4;
-    }*/
-    /*printf( "printing earth rotation matrix wrong (rowmajor):\n[" );
-    for ( int i = 0; i < 16; i++ )
-    {
-        printf( "%f", matrix[i] );
-        if ( i % 4 == 3 )
-            printf( "]\n[" );
-        else
-            printf( " " );
-    }
-    c=0;*/
     
     float rlat = lat;//-90.0f); //-xRot
     float rlon = lon; //+zRot

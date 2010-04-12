@@ -14,6 +14,8 @@
 #include "RectangleBase.h"
 #include "GLCanvas.h"
 
+#include <VPMedia/thread_helper.h>
+
 class VideoSource;
 class Group;
 class VideoListener;
@@ -129,7 +131,12 @@ public:
     void setTree( TreeControl* t );
     
     TreeControl* getTree();
-                                    
+
+    void lockSources();
+    void unlockSources();
+
+    void setThreads( bool threads );
+
 private:
     
     std::vector<VideoSource*>* sources;
@@ -137,6 +144,8 @@ private:
     std::vector<RectangleBase*>* selectedObjects;
     std::map<std::string,Group*>* siteIDGroups;
     
+    std::vector<VideoSource*>* sourcesToDelete;
+
     Earth* earth;
 
     InputHandler* input;
@@ -180,6 +189,9 @@ private:
     float camY;
     float camZ;
     
+    bool usingThreads;
+    mutex* sourceMutex;
+
 };
 
 #endif /*GRAVMANAGER_H_*/

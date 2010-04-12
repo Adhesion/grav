@@ -29,6 +29,7 @@ private:
     int texWidth, texHeight;
     
     GLUquadric* sphereQuad;
+    GLuint sphereIndex;
     
     float x, y, z;
     float radius;

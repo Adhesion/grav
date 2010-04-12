@@ -194,7 +194,7 @@ void VideoSource::resizeBuffer()
     // if it's not the first time we're allocating a texture
     // (ie, it's a resize) delete the previous texture
     if ( !init ) glDeleteTextures( 1, &texid );
-        glGenTextures(1, &texid);
+    glGenTextures(1, &texid);
     
     glBindTexture(GL_TEXTURE_2D, texid);
     
