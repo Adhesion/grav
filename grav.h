@@ -46,6 +46,7 @@ private:
     void mapRTP();
     
     static void* threadTest( void* args );
+    bool isThreadRunning();
 
     wxCmdLineParser parser;
     
@@ -58,6 +59,7 @@ private:
     gravManager* grav;
     
     bool usingThreads;
+    bool threadRunning;
     thread* VPMthread;
 
     int windowWidth, windowHeight;

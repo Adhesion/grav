@@ -81,6 +81,7 @@ bool gravApp::OnInit()
     if ( usingThreads )
     {
         grav->setThreads( usingThreads );
+        threadRunning = true;
         VPMthread = thread_start( threadTest, this );
     }
 
@@ -94,6 +95,8 @@ int gravApp::OnExit()
 {
     // TODO: deconstructors, etc
     GLUtil::getInstance()->cleanupGL();
+    threadRunning = false;
+    thread_join( VPMthread );
     return 0;
 }
 
@@ -196,12 +199,21 @@ void gravApp::mapRTP()
 
 void* gravApp::threadTest( void* args )
 {
-    printf( "gravApp::starting thread...\n" );
+    printf( "gravApp::starting network/decoding thread...\n" );
     gravApp* g = (gravApp*)args;
-    while ( true )
+    // wait a bit before starting this thread, since doing it too early might
+    // affect the WX tree before it's fully initialized somehow, rarely
+    // resulting in broken text or a crash
+    usleep( 100000 );
+    while ( g->isThreadRunning() )
     {
         usleep( 30000 );
         g->iterate();
     }
     return 0;
+}
+
+bool gravApp::isThreadRunning()
+{
+    return threadRunning;
 }
