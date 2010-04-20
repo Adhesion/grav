@@ -87,6 +87,7 @@ void RectangleBase::setDefaults()
     nameStart = -1; nameEnd = -1;
     name = "";
     altName = "";
+    siteID = "";
     myGroup = NULL;
     twidth = 0; theight = 0;
     effectVal = 0.0f;

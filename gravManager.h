@@ -108,6 +108,9 @@ public:
     void addNewSource( VideoSource* s );
     void deleteSource( std::vector<VideoSource*>::iterator si );
     
+    void deleteGroup( Group* g );
+    void removeFromLists( RectangleBase* obj );
+
     /*
      * This would be done in the constructor, but it has to be done after
      * the GL context is set up (and in the WX case, the constructor for this

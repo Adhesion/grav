@@ -26,7 +26,6 @@ Group::Group( float _x, float _y ) :
 Group::~Group()
 {
     removeAll();
-    printf( "group destructor\n" );
 }
 
 void Group::draw()

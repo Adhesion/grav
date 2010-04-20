@@ -754,29 +754,32 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
     VideoSource* s = (*si);
     
     lockSources();
+    
+    removeFromLists( temp );
 
-    // remove it from the tree
-    tree->removeObject( temp );
-    
     sources->erase( si );
-    
-    // remove it from drawnobjects, if it is being drawn
-    std::vector<RectangleBase*>::iterator i = drawnObjects->begin();
-    while ( (*i) != temp ) i++;
-    
-    // TODO: confirm this (checking whether it actually is in drawnobjects
-    //                      or not)
-    if ( i != drawnObjects->end() )
-        drawnObjects->erase( i );
-    
-    if ( temp->isSelected() )
+
+    if ( temp->isGrouped() )
     {
-        std::vector<RectangleBase*>::iterator j =
-            selectedObjects->begin();
-        while ( (*j) != temp ) j++;
-        selectedObjects->erase( j );
+        Group* g = temp->getGroup();
+        // delete the group the object was in if this is the last object in it
+        // and it's an automatically mad siteID group
+        // TODO probably have a better metric for determing auto-siteID groups
+        if ( g->getSiteID().compare( "" ) != 0 && g->numObjects() == 1 )
+        {
+            // note this duplicates the deleteGroup function since that does
+            // mutex locking itself, and we already did that here
+            removeFromLists( (RectangleBase*)g );
+
+            // remove the group from the list of siteIDgroups
+            std::map<std::string,Group*>::iterator gi =
+                    siteIDGroups->find( g->getSiteID() );
+            siteIDGroups->erase( gi );
+
+            delete g;
+        }
     }
-    
+
     // we need to do videosource's delete somewhere else, since this function
     // might be on a second thread, which would crash since the videosource
     // delete needs to do a GL call to delete its texture and GL calls can only
@@ -784,6 +787,39 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
     sourcesToDelete->push_back( s );
 
     unlockSources();
+}
+
+void gravManager::deleteGroup( Group* g )
+{
+    lockSources();
+
+    removeFromLists( g );
+    delete g;
+
+    unlockSources();
+}
+
+void gravManager::removeFromLists( RectangleBase* obj )
+{
+    // remove it from the tree
+    tree->removeObject( obj );
+
+    // remove it from drawnobjects, if it is being drawn
+    std::vector<RectangleBase*>::iterator i = drawnObjects->begin();
+    while ( (*i) != obj ) i++;
+
+    // TODO: confirm this (checking whether it actually is in drawnobjects
+    //                      or not)
+    if ( i != drawnObjects->end() )
+        drawnObjects->erase( i );
+
+    if ( obj->isSelected() )
+    {
+        std::vector<RectangleBase*>::iterator j =
+            selectedObjects->begin();
+        while ( (*j) != obj ) j++;
+        selectedObjects->erase( j );
+    }
 }
 
 void gravManager::setBorderTex( std::string border )
