@@ -106,6 +106,8 @@ public:
     void setGroup( Group* g );
     Group* getGroup();
     
+    RGBAColor getColor();
+
     /*
      * Return whether or not the current name can be said to be 'final'.
      * For video sources, this is the SDES_NAME as opposed to SDES_CNAME, and

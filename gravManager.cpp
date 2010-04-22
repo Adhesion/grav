@@ -64,6 +64,8 @@ gravManager::~gravManager()
     delete selectedObjects;
     delete siteIDGroups;
 
+    delete layouts;
+
     delete sourcesToDelete;
 
     mutex_free( sourceMutex );
@@ -177,13 +179,27 @@ void gravManager::draw()
         sourcesToDelete->clear();
     }
 
-    // draw line to geographical position
+    // draw line to geographical position, selected ones on top (and bigger)
     for ( si = drawnObjects->begin(); si != drawnObjects->end(); si++ )
     {
+        RGBAColor col = (*si)->getColor();
+        glColor4f( col.R, col.G, col.B, col.A );
+        if ( !(*si)->isGrouped() && !(*si)->isSelected() )
+        {
+            //drawCurvedEarthLine( (*si)->getLat(), (*si)->getLon(),
+            //                    (*si)->getX(), (*si)->getY(), (*si)->getZ() );
+            drawEarthPoint( (*si)->getLat(), (*si)->getLon(), 3.0f );
+        }
+    }
+    for ( si = selectedObjects->begin(); si != selectedObjects->end(); si++ )
+    {
+        RGBAColor col = (*si)->getColor();
+        glColor4f( col.R, col.G, col.B, col.A );
         if ( !(*si)->isGrouped() )
         {
-            drawCurvedEarthLine( (*si)->getLat(), (*si)->getLon(),
-                                (*si)->getX(), (*si)->getY(), (*si)->getZ() );
+            //drawCurvedEarthLine( (*si)->getLat(), (*si)->getLon(),
+            //                    (*si)->getX(), (*si)->getY(), (*si)->getZ() );
+            drawEarthPoint( (*si)->getLat(), (*si)->getLon(), 6.0f );
         }
     }
     
@@ -285,6 +301,8 @@ void gravManager::draw()
     
     if ( !input->isLeftButtonHeld() && holdCounter > 0 )
         holdCounter-=2;
+    else
+        incrementHoldCounter();
     drawCounter++;
 }
 
@@ -458,7 +476,6 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     float distanceScale = fabs(zdist/maxzdist);
     int i = 0;
     
-    glColor3f( 0.0f, 1.0f, 0.0f );
     glLineWidth( 2.0f );
     glBegin( GL_LINE_STRIP );
     glVertex3f( sx, sy, sz );
@@ -645,6 +662,17 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     //glVertex3f( earthx, earthy, earthz );
     glEnd();
     */
+}
+
+void gravManager::drawEarthPoint( float lat, float lon, float size )
+{
+    float sx, sy, sz;
+    earth->convertLatLong( lat, lon, sx, sy, sz );
+
+    glPointSize( size );
+    glBegin( GL_POINTS );
+    glVertex3f( sx, sy, sz );
+    glEnd();
 }
 
 void gravManager::setBoxSelectDrawing( bool draw )

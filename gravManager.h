@@ -65,6 +65,7 @@ public:
     
     void drawCurvedEarthLine( float lat, float lon, 
                               float destx, float desty, float destz );
+    void drawEarthPoint( float lat, float lon, float size );
                                     
     void setBoxSelectDrawing( bool draw );
     int getWindowWidth(); int getWindowHeight();

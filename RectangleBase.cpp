@@ -314,6 +314,11 @@ Group* RectangleBase::getGroup()
     return myGroup;
 }
 
+RGBAColor RectangleBase::getColor()
+{
+    return borderColor;
+}
+
 bool RectangleBase::usingFinalName()
 {
     return finalName;

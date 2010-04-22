@@ -495,7 +495,6 @@ void InputHandler::mouseLeftHeldMove( int x, int y )
         grav->setBoxSelectDrawing( true );
     }
     
-    grav->incrementHoldCounter();
     dragPrevX = mouseX;
     dragPrevY = mouseY;
 }
