@@ -114,6 +114,8 @@ VideoListener::vpmsession_source_app(VPMSession &session,
     
     if ( appS.compare( "site" ) == 0 && grav->usingSiteIDGroups() )
     {
+        grav->lockSources();
+
         // vic sends 4 nulls at the end of the rtcp_app string for some
         // reason, so chop those off
         dataS = std::string( dataS, 0, 32 );
@@ -123,12 +125,20 @@ VideoListener::vpmsession_source_app(VPMSession &session,
         // before we get any sources added, resulting in a crash when we try
         // and dereference the sources pointer - so skip this if we don't have
         // any sources yet
-        if ( grav->getSources()->size() == 0 ) return;
+        if ( grav->getSources()->size() == 0 )
+        {
+            grav->unlockSources();
+            return;
+        }
         
         while ( (*i)->getssrc() != ssrc )
         {
             i++;
-            if ( i == grav->getSources()->end() ) return;
+            if ( i == grav->getSources()->end() )
+            {
+                grav->unlockSources();
+                return;
+            }
         }
         
         if ( !(*i)->isGrouped() )
@@ -150,8 +160,8 @@ VideoListener::vpmsession_source_app(VPMSession &session,
             grav->getTree()->addObject( (*i) );
             
             grav->getTree()->updateObjectName( g );
-            
-            grav->retileVideos();
         }
+
+        grav->unlockSources();
     }
 }

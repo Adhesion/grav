@@ -863,14 +863,15 @@ Group* gravManager::createSiteIDGroup( std::string data )
     g->setSiteID( data );
     g->setTexture( borderTex, borderWidth, borderHeight );
     
-    lockSources();
+    // something that calls this function should mutex around it itself
+    //lockSources();
 
     drawnObjects->push_back( g );
     siteIDGroups->insert( std::pair<std::string,Group*>(data, g) );
     
     tree->addObject( g );
     
-    unlockSources();
+    //unlockSources();
 
     return g;
 }
