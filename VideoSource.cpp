@@ -10,13 +10,14 @@
 
 VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
                             VPMVideoBufferSink* vs, float _x, float _y ) :
-    session( _session ), ssrc( _ssrc ), videoSink( vs ), RectangleBase(_x,_y)
+    RectangleBase( _x, _y ), session( _session ), ssrc( _ssrc ), videoSink( vs )
 {
     vwidth = videoSink->getImageWidth();
     vheight = videoSink->getImageHeight();
     aspect = (float)vwidth / (float)vheight;
     tex_width = 0; tex_height = 0;
     texid = 0;
+    enableRendering = true;
 }
 
 VideoSource::~VideoSource()
@@ -64,99 +65,120 @@ void VideoSource::draw()
     //else
     t = (float)vheight/(float)tex_height;
     
-    if ( GLUtil::getInstance()->haveShaders() )
-    {
-        glUseProgram( GLUtil::getInstance()->getYUV420Program() );
-        glUniform1f( GLUtil::getInstance()->getYUV420xOffsetID(), s );
-        glUniform1f( GLUtil::getInstance()->getYUV420yOffsetID(), t );
-    }
-    
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texid);
-
-    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-    glPixelStorei( GL_UNPACK_ROW_LENGTH, vwidth );
-    
-    if ( videoSink->getImageFormat() == VIDEO_FORMAT_RGB24 )
-    {
-        glTexSubImage2D( GL_TEXTURE_2D,
-    	      0,
-    	      0,
-    	      0,
-    	      vwidth,
-    	      vheight,
-    	      GL_RGB,
-    	      GL_UNSIGNED_BYTE,
-    	      videoSink->getImageData() );
-    }
-    
-    // if we're doing yuv420, do the texture mapping for all 3 channels so the
-    // shader can properly work its magic
-    else if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
-    {
-        glTexSubImage2D( GL_TEXTURE_2D,
-              0,
-              0,
-              0,
-              vwidth,
-              vheight,
-              GL_LUMINANCE,
-              GL_UNSIGNED_BYTE,
-              videoSink->getImageData() );
-        
-        // now map the U & V to the bottom chunk of the image
-        // each is 1/4 of the size of the Y (half width, half height)
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, vwidth/2);
-        
-        glTexSubImage2D( GL_TEXTURE_2D,
-              0,
-              0,
-              vheight,
-              vwidth/2,
-              vheight/2,
-              GL_LUMINANCE,
-              GL_UNSIGNED_BYTE,
-              (GLubyte*)videoSink->getImageData() + (vwidth*vheight) );
-              
-        glTexSubImage2D( GL_TEXTURE_2D,
-              0,
-              vwidth/2,
-              vheight,
-              vwidth/2,
-              vheight/2,
-              GL_LUMINANCE,
-              GL_UNSIGNED_BYTE,
-              (GLubyte*)videoSink->getImageData() + 5*(vwidth*vheight)/4 );
-    }
-    
     // X & Y distances from center to edge
     float Xdist = aspect*scaleX/2;
     float Ydist = scaleY/2;
 
-    glBegin(GL_QUADS);
-    glColor3f( 1.0f, 1.0f, 1.0f );
-    
-    // size of the video in world space will be equivalent to getWidth x
-    // getHeight, which is the same as (aspect*scaleX) x scaleY
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(-Xdist, -Ydist, 0.0);
-    
-    glTexCoord2f(0.0, t);
-    glVertex3f(-Xdist, Ydist, 0.0);
+    // only do this texture stuff if rendering is enabled
+    if ( enableRendering )
+    {
+        if ( GLUtil::getInstance()->haveShaders() )
+        {
+            glUseProgram( GLUtil::getInstance()->getYUV420Program() );
+            glUniform1f( GLUtil::getInstance()->getYUV420xOffsetID(), s );
+            glUniform1f( GLUtil::getInstance()->getYUV420yOffsetID(), t );
+        }
 
-    glTexCoord2f(s, t);
-    glVertex3f(Xdist, Ydist, 0.0);
+        glEnable( GL_TEXTURE_2D );
+        glBindTexture( GL_TEXTURE_2D, texid );
+    
+        glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+        glPixelStorei( GL_UNPACK_ROW_LENGTH, vwidth );
+        
+        if ( videoSink->getImageFormat() == VIDEO_FORMAT_RGB24 )
+        {
+            glTexSubImage2D( GL_TEXTURE_2D,
+                  0,
+                  0,
+                  0,
+                  vwidth,
+                  vheight,
+                  GL_RGB,
+                  GL_UNSIGNED_BYTE,
+                  videoSink->getImageData() );
+        }
+        
+        // if we're doing yuv420, do the texture mapping for all 3 channels so
+        // the shader can properly work its magic
+        else if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
+        {
+            glTexSubImage2D( GL_TEXTURE_2D,
+                  0,
+                  0,
+                  0,
+                  vwidth,
+                  vheight,
+                  GL_LUMINANCE,
+                  GL_UNSIGNED_BYTE,
+                  videoSink->getImageData() );
 
-    glTexCoord2f(s, 0.0);
-    glVertex3f(Xdist, -Ydist, 0.0);
+            // now map the U & V to the bottom chunk of the image
+            // each is 1/4 of the size of the Y (half width, half height)
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, vwidth/2);
 
-    glEnd();
-    
-    glDisable(GL_TEXTURE_2D);
-    
-    if ( GLUtil::getInstance()->haveShaders() )
-        glUseProgram( 0 );
-    
+            glTexSubImage2D( GL_TEXTURE_2D,
+                  0,
+                  0,
+                  vheight,
+                  vwidth/2,
+                  vheight/2,
+                  GL_LUMINANCE,
+                  GL_UNSIGNED_BYTE,
+                  (GLubyte*)videoSink->getImageData() + (vwidth*vheight) );
+
+            glTexSubImage2D( GL_TEXTURE_2D,
+                  0,
+                  vwidth/2,
+                  vheight,
+                  vwidth/2,
+                  vheight/2,
+                  GL_LUMINANCE,
+                  GL_UNSIGNED_BYTE,
+                  (GLubyte*)videoSink->getImageData() + 5*(vwidth*vheight)/4 );
+        }
+
+        glBegin( GL_QUADS );
+        glColor3f( 1.0f, 1.0f, 1.0f );
+
+        // draw the actual quad that has the texture on it
+        // size of the video in world space will be equivalent to getWidth x
+        // getHeight, which is the same as (aspect*scaleX) x scaleY
+        glTexCoord2f( 0.0, 0.0 );
+        glVertex3f( -Xdist, -Ydist, 0.0 );
+
+        glTexCoord2f( 0.0, t );
+        glVertex3f( -Xdist, Ydist, 0.0 );
+
+        glTexCoord2f( s, t );
+        glVertex3f( Xdist, Ydist, 0.0 );
+
+        glTexCoord2f( s, 0.0 );
+        glVertex3f( Xdist, -Ydist, 0.0 );
+
+        glEnd();
+
+        glDisable(GL_TEXTURE_2D);
+
+        if ( GLUtil::getInstance()->haveShaders() )
+            glUseProgram( 0 );
+    }
+    // basic X for signifying that rendering is disabled
+    else
+    {
+        glBegin( GL_LINES );
+        glLineWidth( 3.0f );
+
+        glColor3f( 1.0f, 0.0f, 0.15f );
+
+        glVertex3f( -Xdist, -Ydist, 0.0f );
+        glVertex3f( Xdist, Ydist, 0.0f );
+
+        glVertex3f( -Xdist, Ydist, 0.0f );
+        glVertex3f( Xdist, -Ydist, 0.0f );
+
+        glEnd();
+    }
+
     if ( vwidth == 0 || vheight == 0 )
     {
         glPushMatrix();
@@ -323,6 +345,16 @@ void VideoSource::setWidth( float w )
 void VideoSource::setHeight( float h )
 {
     setScale( destScaleX * (h/destScaleY), h );
+}
+
+void VideoSource::setRendering( bool r )
+{
+    enableRendering = r;
+}
+
+bool VideoSource::getRendering()
+{
+    return enableRendering;
 }
 
 uint32_t VideoSource::getssrc()

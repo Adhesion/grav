@@ -54,19 +54,39 @@ public:
     float getDestWidth(); float getDestHeight();
     void setWidth( float w ); void setHeight( float h );
 
+    // set/get enable/disable for rendering
+    void setRendering( bool r );
+    bool getRendering();
+
 private:
-    VPMSession* session; // reference to the session that this video comes from
-    uint32_t ssrc; // synchronization source, from rtp
-    VPMVideoBufferSink* videoSink; // the source of the video data
-    unsigned int vwidth, vheight; // original dimensions of the video
-    float aspect; // aspect ratio of the video
+    // reference to the session that this video comes from - needed for grabbing
+    // metadata from RTCP/SDES
+    VPMSession* session;
+
+    // synchronization source, from rtp
+    uint32_t ssrc;
+
+    // the source of the video data
+    VPMVideoBufferSink* videoSink;
+
+    // original dimensions of the video
+    unsigned int vwidth, vheight;
+
+    // aspect ratio of the video
+    float aspect;
+
+    // remake the buffer when the video gets resized
+    void resizeBuffer();
     
-    void resizeBuffer(); // remake the buffer when the video gets resized
+    // dimensions rounded up to power of 2
+    unsigned int tex_width, tex_height;
     
-    unsigned int tex_width, tex_height; // dimensions rounded up to power of 2
-    GLuint texid; // GL texture identifier
+    // GL texture identifier
+    GLuint texid;
     bool init;
     
+    bool enableRendering;
+
 };
 
 #endif /* VIDEOSOURCE_H_ */

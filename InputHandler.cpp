@@ -245,6 +245,19 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
             grav->setSiteIDGrouping( true );
         break;
 
+    case 'X':
+        for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
+                        i++ )
+        {
+            RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
+            VideoSource* tempVS = dynamic_cast<VideoSource*>( temp );
+            if ( tempVS != NULL )
+            {
+                tempVS->setRendering( !tempVS->getRendering() );
+            }
+        }
+        break;
+
     case 'W':
         grav->setCamZ(grav->getCamZ()-1);
         break;
