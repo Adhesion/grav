@@ -16,6 +16,7 @@
 #include "GLUtil.h"
 #include "RectangleBase.h"
 #include "Group.h"
+#include "Runway.h"
 #include "Earth.h"
 #include "PNGLoader.h"
 #include "InputHandler.h"
@@ -47,10 +48,15 @@ gravManager::gravManager()
     videoSession_listener = new VideoListener( this );
     audioSession_listener = new AudioManager();
     videoInitialized = false; audioInitialized = false;
-    
+
     layouts = new LayoutManager();
     screenRect.setName( "screen rectangle" );
     screenRect.setAnimation( false );
+
+    runway = new Runway( -10.0f, 0.0f );
+    runway->setScale( 2.0f, 10.0f );
+    drawnObjects->push_back( runway );
+    printf( "\n\n\t drawnobjects now %i\n\n", drawnObjects->size() );
 
     usingThreads = false;
 
@@ -65,6 +71,8 @@ gravManager::~gravManager()
     delete siteIDGroups;
 
     delete layouts;
+
+    delete runway;
 
     delete sourcesToDelete;
 
@@ -172,7 +180,7 @@ void gravManager::draw()
     // delete sources that need to be deleted - see deleteSource for the reason
     if ( sourcesToDelete->size() > 0 )
     {
-        for ( int i = 0; i < sourcesToDelete->size(); i++ )
+        for ( unsigned int i = 0; i < sourcesToDelete->size(); i++ )
         {
             delete (*sourcesToDelete)[0];
         }
@@ -234,7 +242,7 @@ void gravManager::draw()
                 if ( (*si)->getSiteID().compare("") != 0 )
                 {
                     float level;
-                    level = audioSession_listener->getLevel( 
+                    level = audioSession_listener->getLevel(
                                     (*si)->getSiteID() );
                     // -2.0f is our default value for not finding the level
                     if ( level > -1.999f )
@@ -761,15 +769,16 @@ std::map<std::string,Group*>* gravManager::getSiteIDGroups()
 void gravManager::addNewSource( VideoSource* s )
 {
     if ( s == NULL ) return;
-    
+
     s->setTexture( borderTex, borderWidth, borderHeight );
 
     lockSources();
 
     sources->push_back( s );
     drawnObjects->push_back( s );
+    runway->add( s );
     s->updateName();
-    
+
     if ( tree != NULL )
         tree->addObject( (RectangleBase*)s );
 
@@ -787,6 +796,7 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
 
     sources->erase( si );
 
+    // TODO need case for runway grouping
     if ( temp->isGrouped() )
     {
         Group* g = temp->getGroup();
@@ -867,7 +877,8 @@ Group* gravManager::createSiteIDGroup( std::string data )
     //lockSources();
 
     drawnObjects->push_back( g );
-    siteIDGroups->insert( std::pair<std::string,Group*>(data, g) );
+    siteIDGroups->insert( std::pair<std::string,Group*>( data, g ) );
+    runway->add( g );
     
     tree->addObject( g );
     

@@ -3,9 +3,11 @@
 
 /*
  * @file Group.h
+ *
  * Represents a group of objects. The objects contained can be videos or other
  * groups (anything that is a RectangleBase). Objects in the group will be
  * drawn and moved together.
+ *
  * @author Andrew Ford
  */
 
@@ -21,7 +23,7 @@ public:
     Group( float _x, float _y );
     ~Group();
     
-    void draw();
+    virtual void draw();
     
     void add( RectangleBase* object );
     void remove( RectangleBase* object, bool move = true );
@@ -35,16 +37,16 @@ public:
     
     void changeLock();
     
-    void rearrange();
+    virtual void rearrange();
     
-    bool updateName();
+    virtual bool updateName();
     
     void move( float _x, float _y );
     void setPos( float _x, float _y );
     void setScale( float xs, float ys );
     void setScale( float xs, float ys, bool resizeMembers );
     
-private:
+protected:
     std::vector<RectangleBase*> objects;
     float buffer;
     bool locked;

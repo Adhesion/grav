@@ -89,6 +89,7 @@ public:
     std::string getSiteID();
     
     bool isSelected();
+    bool isSelectable();
     void setSelect( bool select );
     void setEffectVal( float f );
     void setAnimation( bool anim );
@@ -162,6 +163,7 @@ protected:
                          // pixels
     
     bool selected;
+    bool selectable;
     bool grouped;
     Group* myGroup;
     

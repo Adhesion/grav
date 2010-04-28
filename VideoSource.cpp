@@ -18,6 +18,7 @@ VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
     tex_width = 0; tex_height = 0;
     texid = 0;
     enableRendering = true;
+    aspect = 1.33f;
 }
 
 VideoSource::~VideoSource()
@@ -32,6 +33,9 @@ VideoSource::~VideoSource()
 
 void VideoSource::draw()
 {
+    //printf( "VideoSource::drawing %s at %f,%f, size %f,%f\n", getName().c_str(),
+    //        x, y, getWidth(), getHeight() );
+
     //animateValues();
     // to draw the border/text/common stuff
     RectangleBase::draw();
@@ -81,7 +85,7 @@ void VideoSource::draw()
 
         glEnable( GL_TEXTURE_2D );
         glBindTexture( GL_TEXTURE_2D, texid );
-    
+
         glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
         glPixelStorei( GL_UNPACK_ROW_LENGTH, vwidth );
         
@@ -339,6 +343,9 @@ float VideoSource::getDestHeight()
 
 void VideoSource::setWidth( float w )
 {
+    printf( "VideoSource::setting scale to %f,%f\n", w/aspect,
+            destScaleY * (w/(destScaleX*aspect)) );
+    printf( "aspect is %f\n", aspect );
     setScale( w/aspect, destScaleY * (w/(destScaleX*aspect)) );
 }
 

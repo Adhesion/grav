@@ -26,6 +26,7 @@ class Earth;
 class InputHandler;
 class TreeControl;
 class LayoutManager;
+class Runway;
 
 class gravManager
 {
@@ -159,6 +160,8 @@ private:
     
     LayoutManager* layouts;
     
+    Runway* runway;
+
     VPMSessionFactory *sf;
     
     VPMSession *videoSession;

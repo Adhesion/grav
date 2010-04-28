@@ -13,6 +13,7 @@ CPP_SRCS += \
 ../LayoutManager.cpp \
 ../PNGLoader.cpp \
 ../RectangleBase.cpp \
+../Runway.cpp \
 ../TreeControl.cpp \
 ../TreeNode.cpp \
 ../VideoListener.cpp \
@@ -30,6 +31,7 @@ OBJS += \
 ./LayoutManager.o \
 ./PNGLoader.o \
 ./RectangleBase.o \
+./Runway.o \
 ./TreeControl.o \
 ./TreeNode.o \
 ./VideoListener.o \
@@ -47,6 +49,7 @@ CPP_DEPS += \
 ./LayoutManager.d \
 ./PNGLoader.d \
 ./RectangleBase.d \
+./Runway.d \
 ./TreeControl.d \
 ./TreeNode.d \
 ./VideoListener.d \

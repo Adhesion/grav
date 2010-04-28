@@ -76,6 +76,7 @@ void RectangleBase::setDefaults()
     destX = x; destY = y;
     destScaleX = scaleX; destScaleY = scaleY;
     selected = false;
+    selectable = true;
     
     destBColor.R = 1.0f; destBColor.G = 1.0f;
     destBColor.B = 1.0f; destBColor.A = 0.7f;
@@ -265,6 +266,11 @@ bool RectangleBase::isSelected()
     return selected;
 }
 
+bool RectangleBase::isSelectable()
+{
+    return selectable;
+}
+
 void RectangleBase::setSelect( bool select )
 {
     selected = select;
@@ -360,7 +366,6 @@ bool RectangleBase::intersect( RectangleBase* other )
 void RectangleBase::draw()
 {
     animateValues();
-    // note that the position should be set before calling this
     
     // set up our position
     glPushMatrix();

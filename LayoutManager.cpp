@@ -295,8 +295,8 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
     }
     else
     {
-        span = (boundR-boundL)/numX;
-        stride = boundU-boundD / numY;
+        span = (boundR-boundL) / numX;
+        stride = (boundU-boundD) / numY;
         
         edgeU = boundU - 0.2f - (stride / 2);
         edgeD = boundD + 0.2f + (stride / 2);

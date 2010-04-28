@@ -541,8 +541,8 @@ bool InputHandler::selectVideos()
             //lastBoxed = false;
         }
         
-        bool intersect = (*si)->intersect( selectL, selectR,
-                                        selectU, selectD );
+        bool intersect = (*si)->intersect( selectL, selectR, selectU, selectD )
+                            && (*si)->isSelectable();
         
         // for click-and-drag movement
         clickedInside = intersect && !leftButtonHeld;
