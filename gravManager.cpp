@@ -327,34 +327,17 @@ void gravManager::ungroupAll()
     lockSources();
 
     printf( "deleting %i groups\n", siteIDGroups->size() );
-    std::vector<RectangleBase*>::iterator it;
-    for ( it = drawnObjects->begin(); it != drawnObjects->end(); )
+    std::map<std::string,Group*>::iterator it;
+    for ( it = siteIDGroups->begin(); it != siteIDGroups->end(); it++ )
     {
-        Group* g = dynamic_cast<Group*>((*it));
+        Group* g = (*it).second;
         if ( g != NULL )
         {
             g->removeAll();
-            it = drawnObjects->erase(it);
-            
-            // if the group we're removing is currently selected, remove it
-            // from the list of selected objects too
-            if ( g->isSelected() )
-            {
-                std::vector<RectangleBase*>::iterator j =
-                    selectedObjects->begin();
-                while ( (*j) != g ) j++;
-                selectedObjects->erase( j );
-            }
-            
-            tree->removeObject( g );
+            removeFromLists( g );
             delete g;
             
             printf( "single group deleted\n" );
-        }
-        else
-        {
-            printf( "not a group, skipping\n" );
-            it++;
         }
     }
     siteIDGroups->clear();
@@ -776,7 +759,7 @@ void gravManager::addNewSource( VideoSource* s )
 
     sources->push_back( s );
     drawnObjects->push_back( s );
-    runway->add( s );
+    //runway->add( s );
     s->updateName();
 
     if ( tree != NULL )
@@ -878,7 +861,7 @@ Group* gravManager::createSiteIDGroup( std::string data )
 
     drawnObjects->push_back( g );
     siteIDGroups->insert( std::pair<std::string,Group*>( data, g ) );
-    runway->add( g );
+    //runway->add( g );
     
     tree->addObject( g );
     
