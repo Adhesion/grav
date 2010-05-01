@@ -60,6 +60,8 @@ gravManager::gravManager()
     usingThreads = false;
     useRunway = true;
 
+    sourceCount = 0;
+
     sourceMutex = mutex_create();
 }
 
@@ -771,12 +773,14 @@ void gravManager::addNewSource( VideoSource* s )
     drawnObjects->push_back( s );
     s->updateName();
 
+    sourceCount++;
+
     if ( tree != NULL )
         tree->addObject( (RectangleBase*)s );
 
-    if ( useRunway )
+    if ( useRunway && sourceCount < 10 )
         runway->add( s );
-    else
+    else if ( !useRunway )
         retileVideos();
 
     unlockSources();

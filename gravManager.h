@@ -204,6 +204,8 @@ private:
 
     bool useRunway;
 
+    int sourceCount;
+
 };
 
 #endif /*GRAVMANAGER_H_*/
