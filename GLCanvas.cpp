@@ -34,7 +34,8 @@ void GLCanvas::draw( wxPaintEvent& evt )
     SetCurrent( *glContext );
     wxPaintDC( this );
     
-    grav->draw();
+    if ( grav != NULL )
+        grav->draw();
     //testDraw();
     
     SwapBuffers();
@@ -93,7 +94,7 @@ void GLCanvas::testKey( wxKeyEvent& evt )
 }
 
 void GLCanvas::GLreshape( int w, int h )
-{    
+{
     glViewport(0, 0, w, h);
   
     if (w > h)

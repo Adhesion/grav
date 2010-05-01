@@ -142,6 +142,9 @@ public:
 
     void setThreads( bool threads );
 
+    bool usingRunway();
+    void setRunwayUsage( bool run );
+
 private:
     
     std::vector<VideoSource*>* sources;
@@ -198,6 +201,8 @@ private:
     
     bool usingThreads;
     mutex* sourceMutex;
+
+    bool useRunway;
 
 };
 

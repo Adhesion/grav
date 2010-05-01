@@ -137,6 +137,8 @@ bool gravApp::handleArgs()
     
     usingThreads = parser.Found( _("threads") );
 
+    grav->setRunwayUsage( !parser.Found( _("automatic") ) );
+
     return true;
 }
 

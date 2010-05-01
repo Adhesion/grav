@@ -74,6 +74,9 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     { wxCMD_LINE_SWITCH, _("t"), _("threads"), _("enables threading separation"
             " of graphics and network/decoding") },
 
+    { wxCMD_LINE_SWITCH, _("am"), _("automatic"), _("automatically tiles"
+            " objects when added - if not, uses runway") },
+
     { wxCMD_LINE_OPTION, _("a"), _("audio"), _("RTP audio session address"),
         wxCMD_LINE_VAL_STRING },
     

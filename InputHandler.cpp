@@ -236,6 +236,8 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         break;
 
     case 'G':
+        // temporarily disabled since it causes weirdness with runway
+        /*
         if ( grav->usingSiteIDGroups() )
         {
             grav->setSiteIDGrouping( false );
@@ -243,6 +245,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         }
         else
             grav->setSiteIDGrouping( true );
+            */
         break;
 
     case 'X':
@@ -311,9 +314,9 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         grav->clearSelected();
         break;
 
-    // space
+    // space, disabled temporarily
     case WXK_SPACE:
-        grav->addTestObject();
+        // grav->addTestObject();
         break;
     }
 }

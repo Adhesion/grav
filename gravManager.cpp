@@ -56,9 +56,9 @@ gravManager::gravManager()
     runway = new Runway( -10.0f, 0.0f );
     runway->setScale( 2.0f, 10.0f );
     drawnObjects->push_back( runway );
-    printf( "\n\n\t drawnobjects now %i\n\n", drawnObjects->size() );
 
     usingThreads = false;
+    useRunway = true;
 
     sourceMutex = mutex_create();
 }
@@ -351,7 +351,8 @@ void gravManager::retileVideos()
     std::vector<RectangleBase*> objects;
     for ( unsigned int i = 0; i < drawnObjects->size(); i++ )
     {
-        if ( !(*drawnObjects)[i]->isGrouped() )
+        if ( !(*drawnObjects)[i]->isGrouped() &&
+                (*drawnObjects)[i]->isSelectable() )
         {
             objects.push_back( (*drawnObjects)[i] );
         }
@@ -404,7 +405,8 @@ void gravManager::perimeterAllVideos()
     std::vector<RectangleBase*> objectList;
     for ( unsigned int i = 0; i < drawnObjects->size(); i++ )
     {
-        if ( !(*drawnObjects)[i]->isGrouped() )
+        if ( !(*drawnObjects)[i]->isGrouped() &&
+                        (*drawnObjects)[i]->isSelectable() )
         {
             objectList.push_back( (*drawnObjects)[i] );
         }
@@ -425,6 +427,7 @@ void gravManager::addTestObject()
     RectangleBase* obj = new RectangleBase( 0.0f, 0.0f );
     drawnObjects->push_back( obj );
     obj->setName( "TEST" );
+    runway->add( obj );
 }
 
 void gravManager::moveToTop( RectangleBase* object )
@@ -697,6 +700,13 @@ void gravManager::setWindowSize( int w, int h )
     
     screenRect.setPos( (screenL+screenR)/2.0f, (screenU+screenD)/2.0f);
     screenRect.setScale( screenR-screenL, screenU-screenD );
+
+    // resize the runway to go on the left side
+    // TODO: make this work for horizontal, vertical, let user change it
+    runway->setScale( fabs( screenR - screenL ) * 0.07f,
+                      fabs( screenU - screenD ) * 0.93f, true );
+    runway->setPos( screenL + (fabs( screenU - screenD ) * 0.035f) +
+                  runway->getDestWidth() / 2.0f, ( screenU + screenD ) / 2.0f );
 }
 
 bool gravManager::usingSiteIDGroups()
@@ -759,11 +769,15 @@ void gravManager::addNewSource( VideoSource* s )
 
     sources->push_back( s );
     drawnObjects->push_back( s );
-    //runway->add( s );
     s->updateName();
 
     if ( tree != NULL )
         tree->addObject( (RectangleBase*)s );
+
+    if ( useRunway )
+        runway->add( s );
+    else
+        retileVideos();
 
     unlockSources();
 }
@@ -798,6 +812,15 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
             siteIDGroups->erase( gi );
 
             delete g;
+        }
+        // if not a siteID group then remove the object from it. this should
+        // work for runways, but should be more generic, ie for groups of
+        // groups? maybe in removefromlists, but careful not to degroup object
+        // before it hits that siteID check above or siteIDgroups will have
+        // invalid references
+        else
+        {
+            g->remove( (*si) );
         }
     }
 
@@ -851,20 +874,27 @@ void gravManager::setBorderTex( std::string border )
 
 Group* gravManager::createSiteIDGroup( std::string data )
 {
+    printf( "creating siteIDGroup\n" );
+
     Group* g = new Group( 0.0f, 0.0f );
     g->setName( data );
     g->setSiteID( data );
     g->setTexture( borderTex, borderWidth, borderHeight );
-    
+
     // something that calls this function should mutex around it itself
     //lockSources();
 
     drawnObjects->push_back( g );
     siteIDGroups->insert( std::pair<std::string,Group*>( data, g ) );
-    //runway->add( g );
-    
-    tree->addObject( g );
-    
+
+    if ( tree != NULL )
+        tree->addObject( g );
+
+    if ( useRunway )
+        runway->add( g );
+    else
+        retileVideos();
+
     //unlockSources();
 
     return g;
@@ -940,4 +970,28 @@ void gravManager::unlockSources()
 void gravManager::setThreads( bool threads )
 {
     usingThreads = threads;
+}
+
+bool gravManager::usingRunway()
+{
+    return useRunway;
+}
+
+void gravManager::setRunwayUsage( bool run )
+{
+    useRunway = run;
+
+    std::vector<RectangleBase*>::iterator it = drawnObjects->begin();
+    while ( (*it) != runway && it != drawnObjects->end() ) it++;
+    bool found = ( it != drawnObjects->end() );
+
+    // make sure it's drawn if enabled, not drawn if not
+    if ( useRunway && !found )
+    {
+        drawnObjects->push_back( runway );
+    }
+    else if ( !useRunway && found )
+    {
+        drawnObjects->erase( it );
+    }
 }

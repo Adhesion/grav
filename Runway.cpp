@@ -14,10 +14,16 @@ Runway::Runway( float _x, float _y ) :
     selectable = false;
     orientation = 1;
     setName( "Runway" );
+    intersectCounter = 0;
 }
 
 void Runway::draw()
 {
+    if ( intersectCounter == 0 && objects.size() > 0 )
+        checkMemberIntersect();
+
+    intersectCounter = ( intersectCounter + 1 ) % 10;
+
     animateValues();
 
     // note this must set up the position itself, since it doesn't call the
@@ -92,4 +98,32 @@ bool Runway::updateName()
     // so it doesn't need to be updated in that fashion
     // (return false since it doesn't change)
     return false;
+}
+
+void Runway::checkMemberIntersect()
+{
+    bool removed = false;
+    unsigned int num = objects.size();
+
+    for ( unsigned int i = 0; i < num; )
+    {
+        RectangleBase* obj = objects[i];
+        float ox = obj->getDestX();
+        float oy = obj->getDestY();
+
+        if ( ox > getRBound() || ox < getLBound() ||
+                oy > getUBound() || oy < getDBound() )
+        {
+            remove( obj, false );
+            removed = true;
+            num--;
+        }
+        else
+        {
+            i++;
+        }
+    }
+
+    if ( removed )
+        rearrange();
 }

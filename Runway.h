@@ -25,9 +25,16 @@ public:
 
     bool updateName();
 
+    // check the positions of all members and remove ones that are not inside
+    // the runway bounds
+    void checkMemberIntersect();
+
 private:
     // 0 means horizontal, 1 means vertical
     int orientation;
+
+    // only check member object intersect every few frames
+    int intersectCounter;
 
 };
 
