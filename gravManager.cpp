@@ -778,7 +778,7 @@ void gravManager::addNewSource( VideoSource* s )
     if ( tree != NULL )
         tree->addObject( (RectangleBase*)s );
 
-    if ( useRunway && sourceCount < 10 )
+    if ( useRunway && sourceCount > 9 )
         runway->add( s );
     else if ( !useRunway )
         retileVideos();
