@@ -894,10 +894,10 @@ Group* gravManager::createSiteIDGroup( std::string data )
     if ( tree != NULL )
         tree->addObject( g );
 
-    if ( useRunway )
+    /*if ( useRunway )
         runway->add( g );
     else
-        retileVideos();
+        retileVideos();*/
 
     //unlockSources();
 

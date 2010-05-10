@@ -77,6 +77,8 @@ void RectangleBase::setDefaults()
     destScaleX = scaleX; destScaleY = scaleY;
     selected = false;
     selectable = true;
+    showLockStatus = false;
+    locked = false;
     
     destBColor.R = 1.0f; destBColor.G = 1.0f;
     destBColor.B = 1.0f; destBColor.A = 0.7f;
@@ -325,6 +327,16 @@ RGBAColor RectangleBase::getColor()
     return borderColor;
 }
 
+bool RectangleBase::isLocked()
+{
+    return locked;
+}
+
+void RectangleBase::changeLock()
+{
+    locked = !locked;
+}
+
 bool RectangleBase::usingFinalName()
 {
     return finalName;
@@ -469,6 +481,10 @@ void RectangleBase::draw()
     if ( font )
     {
         std::string renderedName = getSubName();
+
+        if ( showLockStatus && !locked )
+            renderedName += " (unlocked)";
+
         const char* nc = renderedName.c_str();
         font->Render(nc);
     }

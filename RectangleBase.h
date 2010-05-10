@@ -110,6 +110,13 @@ public:
     RGBAColor getColor();
 
     /*
+     * For now locking only has meaning for groups, but is needed in the generic
+     * drawing code.
+     */
+    bool isLocked();
+    void changeLock();
+
+    /*
      * Return whether or not the current name can be said to be 'final'.
      * For video sources, this is the SDES_NAME as opposed to SDES_CNAME, and
      * for groups it signifies whether or not it has figured out a common
@@ -137,15 +144,19 @@ public:
     virtual void draw();
     
 protected:
-    float x,y,z; // position in world space (center of the object)
-    float destX, destY; // x/y destinations for movement/animation
+    // position in world space (center of the object)
+    float x,y,z;
+    // x/y destinations for movement/animation
+    float destX, destY;
     float angle;
     float scaleX, scaleY;
     float destScaleX, destScaleY;
     
-    float effectVal; // value for the amplitude of the audio connection
+    // value for the amplitude of the audio connection
+    float effectVal;
     
-    float lat, lon; // for global positioning
+    // for global positioning
+    float lat, lon;
     
     RGBAColor borderColor;
     RGBAColor destBColor;
@@ -154,18 +165,22 @@ protected:
     std::string name;
     std::string altName;
     std::string siteID;
-    int nameStart, nameEnd; // substring of the name to render
+    // substring of the name to render
+    int nameStart, nameEnd;
     bool finalName;
     
     FTFont* font;
     GLuint borderTex;
-    int twidth, theight; // width/height of our border/background texture in
-                         // pixels
+    // width/height of our border/background texture in
+    // pixels
+    int twidth, theight;
     
     bool selected;
     bool selectable;
     bool grouped;
     Group* myGroup;
+    bool locked;
+    bool showLockStatus;
     
     bool animated;
     void animateValues();

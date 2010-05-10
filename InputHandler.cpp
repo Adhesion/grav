@@ -236,8 +236,6 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         break;
 
     case 'G':
-        // temporarily disabled since it causes weirdness with runway
-        /*
         if ( grav->usingSiteIDGroups() )
         {
             grav->setSiteIDGrouping( false );
@@ -245,7 +243,6 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         }
         else
             grav->setSiteIDGrouping( true );
-            */
         break;
 
     case 'X':

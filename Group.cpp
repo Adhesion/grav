@@ -19,6 +19,7 @@ Group::Group( float _x, float _y ) :
     name = std::string( "Group" );
     
     locked = true;
+    showLockStatus = true;
     
     buffer = 1.0f;
 }
@@ -92,31 +93,6 @@ int Group::numObjects()
 bool Group::isGroup()
 {
     return true;
-}
-
-bool Group::isLocked()
-{
-    return locked;
-}
-
-void Group::changeLock()
-{
-    locked = !locked;
-    
-    // append string to name if we're unlocking, remove string if locking
-    std::string unlockString = " (unlocked)";
-    if ( locked )
-    {
-        size_t found = name.find( unlockString );
-        if ( found != std::string::npos )
-        {
-            name.erase( found, unlockString.length() );
-        }
-    }
-    else
-    {
-        name += unlockString;
-    }
 }
 
 void Group::rearrange()

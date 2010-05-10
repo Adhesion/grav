@@ -33,9 +33,6 @@ public:
     int numObjects();
     
     bool isGroup();
-    bool isLocked();
-    
-    void changeLock();
     
     virtual void rearrange();
     
@@ -49,7 +46,6 @@ public:
 protected:
     std::vector<RectangleBase*> objects;
     float buffer;
-    bool locked;
     LayoutManager layouts;
     
 };
