@@ -62,6 +62,8 @@ private:
     bool threadRunning;
     thread* VPMthread;
 
+    bool disableShaders;
+
     int windowWidth, windowHeight;
     
 };
@@ -76,6 +78,9 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 
     { wxCMD_LINE_SWITCH, _("am"), _("automatic"), _("automatically tiles"
             " objects when added - if not, uses runway") },
+
+    { wxCMD_LINE_SWITCH, _("ds"), _("disable-shaders"), _("disable GLSL shader-"
+            "based colorspace conversion if it would be available") },
 
     { wxCMD_LINE_OPTION, _("a"), _("audio"), _("RTP audio session address"),
         wxCMD_LINE_VAL_STRING },

@@ -76,7 +76,7 @@ void VideoSource::draw()
     // only do this texture stuff if rendering is enabled
     if ( enableRendering )
     {
-        if ( GLUtil::getInstance()->haveShaders() )
+        if ( GLUtil::getInstance()->useShaders() )
         {
             glUseProgram( GLUtil::getInstance()->getYUV420Program() );
             glUniform1f( GLUtil::getInstance()->getYUV420xOffsetID(), s );
@@ -163,7 +163,7 @@ void VideoSource::draw()
 
         glDisable(GL_TEXTURE_2D);
 
-        if ( GLUtil::getInstance()->haveShaders() )
+        if ( GLUtil::getInstance()->useShaders() )
             glUseProgram( 0 );
     }
     // basic X for signifying that rendering is disabled

@@ -51,6 +51,9 @@ bool gravApp::OnInit()
                             windowHeight );
     tree = new TreeControl( treeFrame );
     
+    // since that bool is used in init, set it before init
+    GLUtil::getInstance()->setShaderDisable( disableShaders );
+
     // initialize GL stuff (+ shaders) needs to be done AFTER attriblist is
     // used in making the canvas
     GLUtil::getInstance()->initGL();
@@ -136,6 +139,8 @@ bool gravApp::handleArgs()
     }
     
     usingThreads = parser.Found( _("threads") );
+
+    disableShaders = parser.Found( _("disable-shaders") );
 
     grav->setRunwayUsage( !parser.Found( _("automatic") ) );
 

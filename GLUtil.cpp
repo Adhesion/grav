@@ -32,7 +32,7 @@ bool GLUtil::initGL()
     const char* glVer = (const char*)glGetString( GL_VERSION );
     int glMajorVer, glMinorVer;
     sscanf( glVer, "%d.%d", &glMajorVer, &glMinorVer );
-    if ( glMajorVer >= 2 )
+    if ( glMajorVer >= 2 && !disableShaders )
     {
         YUV420Program = GLUtil::loadShaders( "GLSL/YUV420toRGB24" );
         YUV420xOffsetID = glGetUniformLocation( YUV420Program, "xOffset" );
@@ -240,13 +240,20 @@ FTFont* GLUtil::getMainFont()
     return mainFont;
 }
 
-bool GLUtil::haveShaders()
+bool GLUtil::useShaders()
 {
     return shaders;
 }
 
+void GLUtil::setShaderDisable( bool ds )
+{
+    disableShaders = ds;
+}
+
 GLUtil::GLUtil()
 {
+    disableShaders = false;
+
     frag420 =
     "uniform sampler2D texture;\n"
     "\n"

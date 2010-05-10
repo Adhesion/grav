@@ -79,8 +79,10 @@ public:
     /*
      * Returns whether shaders are available to use or not.
      */
-    bool haveShaders();
+    bool useShaders();
     
+    void setShaderDisable( bool ds );
+
 protected:
     GLUtil();
     ~GLUtil();
@@ -97,6 +99,7 @@ private:
     const GLchar* vert420;
     
     bool shaders;
+    bool disableShaders;
     
     GLuint YUV420Program;
     GLuint YUV420xOffsetID;
