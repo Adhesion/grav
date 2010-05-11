@@ -106,6 +106,18 @@ void VideoSource::draw()
         // the shader can properly work its magic
         else if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
         {
+            // experimental single-push method
+            /*glTexSubImage2D( GL_TEXTURE_2D,
+                             0,
+                             0,
+                             0,
+                             vwidth,
+                             3*vheight/2,
+                             GL_LUMINANCE,
+                             GL_UNSIGNED_BYTE,
+                             videoSink->getImageData() );*/
+
+            // 3 pushes separate
             glTexSubImage2D( GL_TEXTURE_2D,
                   0,
                   0,

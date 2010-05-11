@@ -184,7 +184,7 @@ void gravManager::draw()
     {
         for ( unsigned int i = 0; i < sourcesToDelete->size(); i++ )
         {
-            delete (*sourcesToDelete)[0];
+            delete (*sourcesToDelete)[i];
         }
         sourcesToDelete->clear();
     }
