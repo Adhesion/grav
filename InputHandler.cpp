@@ -176,7 +176,8 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         for ( unsigned int i = 0; i < grav->getDrawnObjects()->size(); i++ )
         {
             RectangleBase* temp = (*(grav->getDrawnObjects()))[i];
-            printf( "%s\n", temp->getName().c_str() );
+            printf( "%s (%fx%f)\n", temp->getName().c_str(),
+                    temp->getDestWidth(), temp->getDestHeight() );
         }
         break;
 

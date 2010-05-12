@@ -330,6 +330,7 @@ bool VideoSource::updateName()
         lon = strtod( lonS.c_str(), NULL );
     }
     
+    updateTextBounds();
     return nameChanged;
 }
 

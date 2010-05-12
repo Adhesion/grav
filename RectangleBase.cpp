@@ -144,6 +144,27 @@ float RectangleBase::getDBound()
     return destY - (getDestHeight()/2.0f);
 }
 
+float RectangleBase::getBorderSize()
+{
+    return getWidth() * 0.04;
+}
+
+float RectangleBase::getDestBorderSize()
+{
+    return getDestWidth() * 0.04;
+}
+
+float RectangleBase::getTextHeight()
+{
+    return ( textBounds.Upper().Yf() - textBounds.Lower().Yf() )
+            * getTextScale();
+}
+
+float RectangleBase::getTextScale()
+{
+    return scaleX * 0.0009;
+}
+
 void RectangleBase::move( float _x, float _y )
 {
     destX = _x;
@@ -233,6 +254,7 @@ float RectangleBase::getLon()
 void RectangleBase::setName( std::string s )
 {
     name = s;
+    updateTextBounds();
 }
 
 void RectangleBase::setSiteID( std::string sid )
@@ -347,10 +369,16 @@ bool RectangleBase::updateName()
     return false;
 }
 
+void RectangleBase::updateTextBounds()
+{
+    if ( font ) textBounds = font->BBox( getSubName().c_str() );
+}
+
 void RectangleBase::setSubstring( int start, int end )
 {
     nameStart = start;
     nameEnd = end;
+    updateTextBounds();
 }
 
 bool RectangleBase::intersect( float L, float R, float U, float D )
@@ -382,8 +410,8 @@ void RectangleBase::draw()
     // set up our position
     glPushMatrix();
 
-    glRotatef(angle, 0.0, 1.0, 0.0);
-    glTranslatef(x,y,z);
+    glRotatef( angle, 0.0, 1.0, 0.0 );
+    glTranslatef( x, y, z );
     
     // draw the border first
     glEnable( GL_BLEND );
@@ -419,8 +447,8 @@ void RectangleBase::draw()
     glScalef( 1.0f+effectVal, 1.0f+effectVal, 0.0f );
     
     // X & Y distances from center to edge
-    float Xdist = getWidth()/2.0f + 0.3f;
-    float Ydist = getHeight()/2.0f + 0.3f;
+    float Xdist = getWidth()/2.0f + getBorderSize();
+    float Ydist = getHeight()/2.0f + getBorderSize();
     
     glBegin( GL_QUADS );
     // set the border color
@@ -456,28 +484,29 @@ void RectangleBase::draw()
     for (; (gl_error); gl_error = glGetError()) {
         fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
     }*/
-    
+
     glPushMatrix();
 
-    float yOffset = 0.4f;
-    float scaleFactor = 0.006f * scaleX / 10.0f * 1.5f;
-    if ( isGroup() ) 
+    float yOffset = getBorderSize() * 1.25f;
+    float scaleFactor = getTextScale();
+
+    if ( isGroup() )
     {
-        yOffset = 0.9f;
-        scaleFactor = 0.006f * scaleX / 10.0f;
+        yOffset += getTextHeight();
+        scaleFactor *= 0.75f;
     }
-    
+
     glTranslatef( -getWidth()/2.0f, getHeight()/2.0f+yOffset, 0.0f );
     glRasterPos2f( -getWidth()/2.0f, getHeight()/2.0f+yOffset );
     glScalef( scaleFactor, scaleFactor, scaleFactor );
-    
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_LINE_SMOOTH);
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    
+
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glEnable( GL_LINE_SMOOTH );
+
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
     if ( font )
     {
         std::string renderedName = getSubName();
@@ -489,8 +518,8 @@ void RectangleBase::draw()
         font->Render(nc);
     }
     
-    glDisable(GL_BLEND);
-    glDisable(GL_LINE_SMOOTH);
+    glDisable( GL_BLEND );
+    glDisable( GL_LINE_SMOOTH );
     
     glPopMatrix();
     

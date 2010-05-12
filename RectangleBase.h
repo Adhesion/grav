@@ -45,6 +45,9 @@ public:
      */
     virtual float getWidth(); virtual float getHeight();
     virtual float getDestWidth(); virtual float getDestHeight();
+    float getBorderSize(); float getDestBorderSize();
+    float getTextHeight();
+    float getTextScale();
     float getLBound(); float getRBound(); float getUBound(); float getDBound();
     
     /*
@@ -125,6 +128,7 @@ public:
     bool usingFinalName();
     
     virtual bool updateName();
+    void updateTextBounds();
     void setSubstring( int start, int end );
     
     /*
@@ -170,6 +174,7 @@ protected:
     bool finalName;
     
     FTFont* font;
+    FTBBox textBounds;
     GLuint borderTex;
     // width/height of our border/background texture in
     // pixels

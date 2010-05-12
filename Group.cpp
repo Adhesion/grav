@@ -280,6 +280,7 @@ bool Group::updateName()
                             objects[k]->getSubName().c_str() );
     }
     
+    updateTextBounds();
     finalName = true;
     return true;
 }
