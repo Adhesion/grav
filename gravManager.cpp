@@ -430,6 +430,7 @@ void gravManager::addTestObject()
     drawnObjects->push_back( obj );
     obj->setName( "TEST" );
     runway->add( obj );
+    obj->setTexture( borderTex, borderWidth, borderHeight );
 }
 
 void gravManager::moveToTop( RectangleBase* object )

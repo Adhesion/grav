@@ -314,7 +314,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
 
     // space, disabled temporarily
     case WXK_SPACE:
-        // grav->addTestObject();
+        grav->addTestObject();
         break;
     }
 }

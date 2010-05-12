@@ -497,7 +497,7 @@ void RectangleBase::draw()
     }
 
     glTranslatef( -getWidth()/2.0f, getHeight()/2.0f+yOffset, 0.0f );
-    glRasterPos2f( -getWidth()/2.0f, getHeight()/2.0f+yOffset );
+    //glRasterPos2f( -getWidth()/2.0f, getHeight()/2.0f+yOffset );
     glScalef( scaleFactor, scaleFactor, scaleFactor );
 
     glEnable( GL_BLEND );

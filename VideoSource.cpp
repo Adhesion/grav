@@ -198,8 +198,8 @@ void VideoSource::draw()
     if ( vwidth == 0 || vheight == 0 )
     {
         glPushMatrix();
-        glTranslatef( -2.0f, 1.5f, 0.0f );
-        float scaleFactor = 0.001f * scaleX;
+        glTranslatef( -(getWidth()*0.275f), getHeight()*0.3f, 0.0f );
+        float scaleFactor = getTextScale();
         glScalef( scaleFactor, scaleFactor, scaleFactor );
         std::string waitingMessage( "Waiting for video..." );
         font->Render( waitingMessage.c_str() );
