@@ -52,8 +52,6 @@ public:
 
     void clearSelected();
     void ungroupAll();
-    void retileVideos();
-    void perimeterAllVideos();
     
     void addTestObject();
     
@@ -98,6 +96,12 @@ public:
     std::vector<RectangleBase*>* getSelectedObjects();
     std::map<std::string,Group*>* getSiteIDGroups();
     
+    /*
+     * "Movable" being defined as selectable non-groups, ie, things that will
+     * be moved by the user-initiated arrangements.
+     */
+    std::vector<RectangleBase*> getMovableObjects();
+
     /* 
      * Manage sources in the main list of sources as well as in the lists of
      * drawn & selected objects.
@@ -130,6 +134,7 @@ public:
     void setCamX( float x ); void setCamY( float y ); void setCamZ( float z );
     
     RectangleBase getScreenRect();
+    RectangleBase getEarthRect();
     
     void setEarth( Earth* e );
     void setInput( InputHandler* i );
@@ -185,6 +190,8 @@ private:
     // rectangle that represents the boundaries of the drawing area in world
     // space
     RectangleBase screenRect;
+    // rectangle that roughly defines where the earth is relative to the camera
+    RectangleBase earthRect;
     
     // background texture for groups & video objects
     GLuint borderTex;

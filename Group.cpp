@@ -114,7 +114,7 @@ void Group::rearrange()
     int numRow = objects.size() / numCol + ( objects.size() % numCol > 0 );
     printf( "Group:: group %s (%fx%f, %f,%f) rearranging\n", name.c_str(),
                 getWidth(), getHeight(), destX, destY );
-    
+
     // resize the group based on the aspect ratios of the current member(s)
     if ( objects.size() == 1 )
     {
@@ -136,43 +136,7 @@ void Group::rearrange()
     }
     
     layouts.gridArrange( getLBound(), getRBound(), getUBound(), getDBound(),
-                            numCol, numRow, true, false, true, objects );
-    // old version for without layout manager
-    /*float bufferSpaceX = (numCol-1) * buffer;
-    float bufferSpaceY = (numRow-1) * buffer;
-    printf( "rearranging %s...\n", name.c_str() );
-    printf( "grid is %i x %i\n", numCol, numRow );
-    printf( "largest object is %fx%f\n", largestWidth, largestHeight );
-    
-    float xOffset = ((numCol-1.0f) / 2.0f * largestWidth)
-                    + (bufferSpaceX/2.0f);
-    float yOffset = ((numRow-1.0f) / 2.0f * largestHeight)
-                    + (bufferSpaceY/2.0f);
-    
-    float nextX = destX - xOffset;
-    float nextY = destY + yOffset;
-    
-    printf( "group pos is %f,%f\n", x, y );
-    printf( "starting video pos is %f,%f\n", nextX, nextY );
-    printf( "offsets are %f,%f\n", xOffset, yOffset );
-    printf( "offsets in relative units: %f,%f\n", (numCol-1.0f) / 2.0f,
-                (numRow-1.0f) / 2.0f );
-    
-    for ( unsigned int i = 0; i < objects.size(); i++ )
-    {
-        printf( "moving object %i to %f,%f\n", i, nextX, nextY );
-        objects[i]->move( nextX, nextY );
-        nextX += largestWidth + bufferSpaceX;
-        if ( (signed int)i%numCol == numCol-1 )
-        {
-            printf( "on %ith video, going to next row\n", i );
-            nextX = destX - xOffset;
-            nextY -= (largestHeight + bufferSpaceY);
-        }
-    }
-    
-    setScale(largestWidth * numCol + bufferSpaceX + 0.3f,
-            largestHeight * numRow + bufferSpaceY + 0.3f);*/
+                            true, false, true, objects, numCol, numRow );
 }
 
 bool Group::updateName()

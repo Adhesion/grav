@@ -25,12 +25,16 @@ public:
                             float screenD, float boundL, float boundR,
                             float boundU, float boundD,
                             std::vector<RectangleBase*> objects );
-    bool gridArrange( RectangleBase boundRect, int numX, int numY, bool horiz,
-                        bool edge, bool resize,
-                        std::vector<RectangleBase*> objects );
+
+    bool gridArrange( RectangleBase boundRect,
+                        bool horiz, bool edge, bool resize,
+                        std::vector<RectangleBase*> objects,
+                        int numX = 0, int numY = 0 );
     bool gridArrange( float boundL, float boundR, float boundU, float boundD,
-                        int numX, int numY, bool horiz, bool edge, bool resize,
-                        std::vector<RectangleBase*> objects );
+                        bool horiz, bool edge, bool resize,
+                        std::vector<RectangleBase*> objects,
+                        int numX = 0, int numY = 0 );
+
     bool fullscreen( RectangleBase boundRect, RectangleBase* object );
     bool fullscreen( float boundL, float boundR, float boundU, float boundD,
                         RectangleBase* object );

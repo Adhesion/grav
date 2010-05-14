@@ -14,11 +14,14 @@
 
 #include <wx/wx.h>
 
+#include "LayoutManager.h"
+
 class VideoSource;
 class RectangleBase;
 class Earth;
 class Group;
 class gravManager;
+class LayoutManager;
 
 typedef double GLdouble;
 
@@ -60,6 +63,8 @@ private:
     // parent class
     gravManager* grav;
     
+    LayoutManager layouts;
+
     // special input modifiers like CTRL
     int special;
     

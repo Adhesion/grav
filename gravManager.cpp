@@ -53,6 +53,10 @@ gravManager::gravManager()
     screenRect.setName( "screen rectangle" );
     screenRect.setAnimation( false );
 
+    earthRect.setAnimation( false );
+    earthRect.setPos( 0.0f, 0.0f );
+    earthRect.setScale( 10.0f, 10.0f );
+
     runway = new Runway( -10.0f, 0.0f );
     runway->setScale( 2.0f, 10.0f );
     drawnObjects->push_back( runway );
@@ -346,82 +350,6 @@ void gravManager::ungroupAll()
     printf( "siteIDgroups cleared\n" );
 
     unlockSources();
-}
-
-void gravManager::retileVideos()
-{
-    std::vector<RectangleBase*> objects;
-    for ( unsigned int i = 0; i < drawnObjects->size(); i++ )
-    {
-        if ( !(*drawnObjects)[i]->isGrouped() &&
-                (*drawnObjects)[i]->isSelectable() )
-        {
-            objects.push_back( (*drawnObjects)[i] );
-        }
-    }
-    if ( objects.size() == 0 ) return;
-    
-    int numCol = ceil( sqrt( objects.size() ) );
-    int numRow = objects.size() / numCol + ( objects.size() % numCol > 0 );
-    printf( "gravManager: doing grid arrangement with %i objects (%ix%i)\n",
-                objects.size(), numCol, numRow );
-    bool res = layouts->gridArrange( screenRect, numCol, numRow, true, false,
-                                        true, objects );
-    if ( !res ) printf( "gravManager: grid arrangement failed\n" );
-    // old method:
-    /*
-    float x = -7.0f;
-    float y = 5.5f;
-    float buffer = 1.0f; // space between videos
-    
-    std::vector<RectangleBase*>::iterator si;
-    for ( si = drawnObjects->begin(); si != drawnObjects->end(); si++ )
-    {
-        if ( !(*si)->isGrouped() )
-        {
-            (*si)->move(x,y);
-            
-            std::vector<RectangleBase*>::iterator next = si + 1;
-            if ( next == drawnObjects->end() ) next = drawnObjects->begin();
-            
-            x += (*si)->getWidth()/2 + buffer +
-                    (*next)->getWidth()/2;
-            if ( x > 8.0f )
-            {
-                x = -7.0f;
-                y -= (*si)->getHeight()/2 + buffer +
-                        (*next)->getHeight()/2;
-            }
-        }
-        Group* g = dynamic_cast<Group*>(*si);
-        if ( g != NULL )
-            g->rearrange();
-    }
-    */
-}
-
-void gravManager::perimeterAllVideos()
-{
-    // setup list of objects to arrange - ignore grouped ones since groups will
-    // move their own members
-    std::vector<RectangleBase*> objectList;
-    for ( unsigned int i = 0; i < drawnObjects->size(); i++ )
-    {
-        if ( !(*drawnObjects)[i]->isGrouped() &&
-                        (*drawnObjects)[i]->isSelectable() )
-        {
-            objectList.push_back( (*drawnObjects)[i] );
-        }
-    }
-    RectangleBase boundRect;
-    boundRect.setAnimation( false );
-    boundRect.setPos( 0.0f, 0.0f );
-    boundRect.setScale( 10.0f, 10.0f );
-    printf( "starting to perimeter: bounds of %f,%f %f,%f\n", boundRect.getLBound(),
-                 boundRect.getRBound(),  boundRect.getUBound(),  boundRect.getDBound() );
-    printf( "width, scale: %f,%f %f,%f\n", boundRect.getWidth(), boundRect.getHeight(),
-                                boundRect.getScaleX(), boundRect.getScaleY() );
-    layouts->perimeterArrange( screenRect, boundRect, objectList );
 }
 
 void gravManager::addTestObject()
@@ -762,6 +690,20 @@ std::map<std::string,Group*>* gravManager::getSiteIDGroups()
     return siteIDGroups;
 }
 
+std::vector<RectangleBase*> gravManager::getMovableObjects()
+{
+    std::vector<RectangleBase*> objects;
+    for ( unsigned int i = 0; i < drawnObjects->size(); i++ )
+    {
+        if ( !(*drawnObjects)[i]->isGrouped() &&
+                (*drawnObjects)[i]->isSelectable() )
+        {
+            objects.push_back( (*drawnObjects)[i] );
+        }
+    }
+    return objects;
+}
+
 void gravManager::addNewSource( VideoSource* s )
 {
     if ( s == NULL ) return;
@@ -782,7 +724,8 @@ void gravManager::addNewSource( VideoSource* s )
     if ( useRunway && sourceCount > 9 )
         runway->add( s );
     else if ( !useRunway )
-        retileVideos();
+        layouts->gridArrange( screenRect, true, false, true,
+                                getMovableObjects() );
 
     unlockSources();
 }
@@ -804,7 +747,7 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
         Group* g = temp->getGroup();
         // delete the group the object was in if this is the last object in it
         // and it's an automatically mad siteID group
-        // TODO probably have a better metric for determing auto-siteID groups
+        // TODO probably have a better metric for determining auto-siteID groups
         if ( g->getSiteID().compare( "" ) != 0 && g->numObjects() == 1 )
         {
             // note this duplicates the deleteGroup function since that does
@@ -938,6 +881,11 @@ void gravManager::setCamZ( float z )
 RectangleBase gravManager::getScreenRect()
 {
     return screenRect;
+}
+
+RectangleBase gravManager::getEarthRect()
+{
+    return earthRect;
 }
 
 void gravManager::setEarth( Earth* e )

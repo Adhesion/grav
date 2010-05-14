@@ -12,7 +12,6 @@
 #include "Group.h"
 #include "gravManager.h"
 #include "Earth.h"
-#include "LayoutManager.h"
 
 #include <VPMedia/random_helper.h>
 
@@ -95,6 +94,8 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     // how much to scale when doing -/+: flipped in the former case
     float scaleAmt = 0.25f;
     
+    std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
+
     // TODO reorder this to make some sort of sense
     switch( key ) {
     
@@ -133,11 +134,13 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         break;
 
     case 'P':
-        grav->perimeterAllVideos();
+        layouts.perimeterArrange( grav->getScreenRect(), grav->getEarthRect(),
+                                    movableObjects );
         break;
 
     case 'R':
-        grav->retileVideos();
+        layouts.gridArrange( grav->getScreenRect(), true, false, true,
+                                movableObjects );
         break;
 
     case 'I':
@@ -228,8 +231,6 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         {
             if ( shiftHeld )
             {
-                // TODO: change this, it sucks
-                LayoutManager layouts;
                 layouts.fullscreen( grav->getScreenRect(),
                                      (*grav->getSelectedObjects())[0] );
             }

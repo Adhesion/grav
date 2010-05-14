@@ -69,8 +69,8 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
         for ( int i = 0; i < end; i++ )
             topObjs.push_back( objects[i] );
         // constant on top is for space for text
-        gridArrange( boundL, boundR, screenU-0.8f, boundU, topNum, 1, true,
-                     false, true, topObjs );
+        gridArrange( boundL, boundR, screenU-0.8f, boundU, true, false, true,
+                     topObjs, topNum, 1 );
     }
 
     end = topNum + sideNum;
@@ -80,8 +80,8 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
         printf( "arranging objects %d to %d to right\n", topNum, end-1 );
         for ( int i = topNum; i < end; i++ )
             rightObjs.push_back( objects[i] );
-        gridArrange( boundR, screenR, screenU, screenD, 1, sideNum, false, true,
-                        true, rightObjs );
+        gridArrange( boundR, screenR, screenU, screenD, false, true, true,
+                     rightObjs, 1, sideNum );
     }
 
     end = topNum + sideNum + bottomNum;
@@ -92,8 +92,8 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
                 end-1 );
         for ( int i = end-1; i >= topNum + sideNum; i-- )
             bottomObjs.push_back( objects[i] );
-        gridArrange( boundL, boundR, boundD, screenD, bottomNum, 1, true,
-                        false, true, bottomObjs );
+        gridArrange( boundL, boundR, boundD, screenD, true, false, true,
+                     bottomObjs, bottomNum, 1 );
     }
 
     if ( sideNum > 0 )
@@ -102,33 +102,48 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
                 topNum + sideNum + bottomNum, objects.size()-1 );
         for ( int i = objects.size()-1; i >= topNum + sideNum + bottomNum; i-- )
             leftObjs.push_back( objects[i] );
-        gridArrange( screenL, boundL, screenU, screenD, 1, sideNum, false, true,
-                        true, leftObjs );
+        gridArrange( screenL, boundL, screenU, screenD, false, true, true,
+                     leftObjs, 1, sideNum );
     }
 }
 
-bool LayoutManager::gridArrange( RectangleBase boundRect, int numX, int numY,
+bool LayoutManager::gridArrange( RectangleBase boundRect,
                                     bool horiz, bool edge, bool resize,
-                                    std::vector<RectangleBase*> objects )
+                                    std::vector<RectangleBase*> objects,
+                                    int numX, int numY )
 {
     float boundL = boundRect.getLBound();
     float boundR = boundRect.getRBound();
     float boundU = boundRect.getUBound();
     float boundD = boundRect.getDBound();
     
-    return gridArrange( boundL, boundR, boundU, boundD, numX, numY, horiz, edge,
-                            resize, objects );
+    return gridArrange( boundL, boundR, boundU, boundD, horiz, edge,
+                            resize, objects, numX, numY );
 }
 
 bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
-                                    float boundD, int numX, int numY,
+                                    float boundD,
                                     bool horiz, bool edge, bool resize,
-                                    std::vector<RectangleBase*> objects )
+                                    std::vector<RectangleBase*> objects,
+                                    int numX, int numY )
 {
+    if ( objects.size() == 0 )
+        return false;
+
+    // both of these being 0 (also the default vals) means we should figure out
+    // the proper numbers here
+    if ( numX == 0 && numY == 0 )
+    {
+        numX = ceil( sqrt( objects.size() ) );
+        numY = objects.size() / numX + ( objects.size() % numX > 0 );
+        printf( "layout: doing grid arrangement with %i objects (%ix%i)\n",
+                    objects.size(), numX, numY );
+    }
+
     // if there's too many objects, fail
     if (  objects.size() > (unsigned int)(numX * numY) )
         return false;
-    
+
     // if we only have one object, just fullscreen it to the area
     if ( objects.size() == 1 )
     {

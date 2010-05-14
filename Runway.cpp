@@ -82,13 +82,15 @@ void Runway::rearrange()
     if ( orientation == 0 )
     {
         layouts.gridArrange( getLBound(), getRBound(), getUBound(), getDBound(),
-                               objects.size(), 1, true, false, true, objects );
+                                true, false, true, objects,
+                                objects.size(), 1 );
     }
     // vertical
     else if ( orientation == 1 )
     {
         layouts.gridArrange( getLBound(), getRBound(), getUBound(), getDBound(),
-                               1, objects.size(), false, false, true, objects );
+                                false, false, true, objects,
+                                1, objects.size() );
     }
 }
 
