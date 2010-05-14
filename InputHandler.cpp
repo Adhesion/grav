@@ -222,18 +222,26 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         for ( si = grav->getSources()->begin();
                 si != grav->getSources()->end(); si++ )
         {
-            (*si)->move(0.0f,0.0f);
+            (*si)->move( 0.0f, 0.0f );
         }
         break;
-    
+
     case 'F':
-        if ( grav->getSelectedObjects()->size() == 1 )
+        if ( !shiftHeld && grav->getSelectedObjects()->size() > 0 )
         {
-            if ( shiftHeld )
-            {
-                layouts.fullscreen( grav->getScreenRect(),
-                                     (*grav->getSelectedObjects())[0] );
-            }
+            RectangleBase innerArea = grav->getScreenRect();
+            innerArea.setScale( innerArea.getScaleX()*0.65f,
+                                innerArea.getScaleY()*0.6f );
+
+            layouts.gridArrange( innerArea, true, false, true,
+                                    *(grav->getSelectedObjects()) );
+            layouts.perimeterArrange( grav->getScreenRect(), innerArea,
+                                        grav->getUnselectedObjects() );
+        }
+        else if ( shiftHeld && grav->getSelectedObjects()->size() == 1 )
+        {
+            layouts.fullscreen( grav->getScreenRect(),
+                                 (*grav->getSelectedObjects())[0] );
         }
         break;
 

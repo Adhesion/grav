@@ -704,6 +704,21 @@ std::vector<RectangleBase*> gravManager::getMovableObjects()
     return objects;
 }
 
+std::vector<RectangleBase*> gravManager::getUnselectedObjects()
+{
+    std::vector<RectangleBase*> unselectedObjects;
+    std::vector<RectangleBase*> movableObjs = getMovableObjects();
+    for ( unsigned int i = 0; i < movableObjs.size(); i++ )
+    {
+        if ( !movableObjs[i]->isSelected() )
+        {
+            unselectedObjects.push_back( movableObjs[i] );
+        }
+    }
+
+    return unselectedObjects;
+}
+
 void gravManager::addNewSource( VideoSource* s )
 {
     if ( s == NULL ) return;

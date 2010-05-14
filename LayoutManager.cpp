@@ -41,7 +41,8 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
     printf( "LayoutManager::perimeter: screen bounds: %f,%f %f,%f\n",
             screenL, screenR, screenU, screenD );
 
-    float spaceAspect = (boundR-boundL) / (screenU-screenD);
+    float topRatio = (boundR-boundL) / ((screenU-screenD)+(boundR-boundL));
+    float sideRatio = (screenU-screenD) / ((screenU-screenD)+(boundR-boundL));
     int topNum, sideNum, bottomNum;
 
     if ( objects.size() == 1 )
@@ -50,13 +51,13 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
     }
     else
     {
-        topNum = floor( spaceAspect * (float)objects.size() / 2.0f );
-        sideNum = ceil( (1.0f - spaceAspect) * (float)objects.size() / 2.0f );
+        topNum = floor( topRatio * (float)objects.size() / 2.0f );
+        sideNum = ceil( sideRatio * (float)objects.size() / 2.0f );
         bottomNum = std::max( (int)objects.size() - topNum - (sideNum*2), 0 );
     }
 
-    printf( "LayoutManager::perimeter: aspect of area: %f, %i %i\n",
-            spaceAspect, topNum, sideNum );
+    printf( "LayoutManager::perimeter: ratios of area: %f %f, %i %i\n",
+            topRatio, sideRatio, topNum, sideNum );
 
     // create lists of objects on top,right,down,left areas and send them
     // to be arranged

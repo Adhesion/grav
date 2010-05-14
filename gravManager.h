@@ -89,7 +89,9 @@ public:
     void scaleSelectedObjects( float scaleAmt );
 
     /*
-     * Getters for accessing sources/objects.
+     * Getters for accessing sources/objects. (Note these are actual lifetime,
+     * non-ephemeral lists, ie this class will keep these around and modify
+     * them)
      */
     std::vector<VideoSource*>* getSources();
     std::vector<RectangleBase*>* getDrawnObjects();
@@ -101,6 +103,11 @@ public:
      * be moved by the user-initiated arrangements.
      */
     std::vector<RectangleBase*> getMovableObjects();
+    /*
+     * Note that this is actually a subset of the movable objects, meaning it's
+     * not EVERY unselected object, just ones that should be moved.
+     */
+    std::vector<RectangleBase*> getUnselectedObjects();
 
     /* 
      * Manage sources in the main list of sources as well as in the lists of
