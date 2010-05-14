@@ -38,197 +38,72 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
                                         float boundU, float boundD,
                                         std::vector<RectangleBase*> objects )
 {
-    printf( "gravManager::perimeter: screen bounds: %f,%f %f,%f\n",
+    printf( "LayoutManager::perimeter: screen bounds: %f,%f %f,%f\n",
             screenL, screenR, screenU, screenD );
-    
-    float midLeft = screenL + ( fabs( boundL - screenL ) / 2.0f );
-    float midUp = screenU - ( fabs( screenU - boundU ) / 2.0f );
-    float midRight = screenR - ( fabs( screenR - boundR ) / 2.0f );
-    float midDown = screenD + ( fabs( boundD - screenD ) / 2.0f );
-    float startX = midLeft;
-    float startY = midUp;
-    float maxX = std::min( fabs( screenR - boundR ), fabs( boundL - screenL ) );
-    float maxY = std::min( fabs( screenU - boundU ), fabs( boundD - screenD ) )
-                    - 0.8f; // extra constant is for text
-    
-    printf( "gravManager::perimeter: start point: %f,%f\n", startX, startY );
-    printf( "gravManager::perimeter: maximums: %f,%f\n", maxX, maxY );
-    
-    unsigned int numObjects = objects.size();
-    float buffer = 1.0f;
-    float Xdir = 1.0f; float Ydir = 1.0f;
-    float curX = startX; float curY = startY;
-    int turnCount = 0;
-    int numU = 0; int numR = 0; int numD = 0; int numL = 0;
-    int* Xvals = new int[numObjects];
-    int* Yvals = new int[numObjects];
-    unsigned int turnPoint = 0;
-    
-    // do a dry run and find how the objects can fit into the space
-    for ( unsigned int i = 0; i < numObjects; i++ )
+
+    float spaceAspect = (boundR-boundL) / (screenU-screenD);
+    int topNum, sideNum, bottomNum;
+
+    if ( objects.size() == 1 )
     {
-        RectangleBase* obj = objects[i];
-        RectangleBase* nextObj;
-        if ( i == numObjects-1 )
-            nextObj = obj;
-        else
-            nextObj = objects[i+1];
-        printf( "gravManager::perimeter: analyzing at %f,%f\n", curX, curY );
-        Xvals[i] = curX; Yvals[i] = curY;
-        
-        // scale it down if it's bigger than the maximum X or Y sizes
-        if ( obj->getWidth() > maxX )
-            obj->setWidth( maxX );
-        if ( obj->getHeight() > maxY )
-            obj->setHeight( maxY );
-        
-        if ( turnCount % 2 == 0 )
-        {         
-            // if we've gone over the side, change directions
-            //if ( ( curX > (screenR-(nextObj->getWidth()/2.0f)) && Xdir == 1.0f ) ||
-            //     ( curX < (screenL+(nextObj->getWidth()/2.0f)) && Xdir == -1.0f ) )
-            if ( ( curX+obj->getWidth() > screenR && Xdir == 1.0f ) ||
-                 ( curX-obj->getWidth() < screenL && Xdir == -1.0f ) )
-            {
-                // we're turning, so place the current object on the next area
-                // and set the next object to go past that
-                turnCount++;
-                turnPoint = i;
-                printf( "gravManager::perimeter: TURN X to Y\n" );
-                Ydir *= -1.0f;
-                if ( turnCount == 1 )
-                {
-                    curX = midRight;
-                    curY = boundU - (buffer*2.0f) - nextObj->getHeight()/2.0f
-                            - obj->getHeight();
-                    numR++;
-                }
-                else if ( turnCount == 3 )
-                {
-                    curX = midLeft;
-                    curY = boundD + (buffer*2.0f) + nextObj->getHeight()/2.0f
-                            + obj->getHeight();
-                    numL++;
-                }
-            }
-            else
-            {
-                // otherwise this spot is valid, so increment the X direction
-                curX += (nextObj->getWidth()/2.0f + obj->getWidth()/2.0f
-                            + buffer) * Xdir;
-                
-                if ( turnCount == 0 )
-                    numU++;
-                else if ( turnCount == 2 )
-                    numD++;
-            }
-        }
-        else if ( turnCount % 2 == 1 )
-        {
-            // if we've gone over the side, change directions
-            //if ( ( curY > (boundU-(nextObj->getHeight()/2.0f)) && Ydir == 1.0f ) ||
-            //     ( curY < (boundD+(nextObj->getHeight()/2.0f)) && Ydir == -1.0f ) )
-            if ( ( curY+obj->getHeight() > boundU && Ydir == 1.0f ) ||
-                 ( curY-obj->getHeight() < boundD && Ydir == -1.0f ) )
-            {
-                turnCount++;
-                turnPoint = i;
-                printf( "gravManager::perimeter: TURN\n" );
-                Xdir *= -1.0f;
-                if ( turnCount == 2 )
-                {
-                    curX = midRight - (buffer*2.0f) - obj->getWidth();
-                    curY = midDown;
-                    numD++;
-                }
-                else if ( turnCount == 4 ) // meaning we've gone over?
-                {
-                    curX = midLeft + (buffer*2.0f) + obj->getWidth();
-                    curY = midUp;
-                    numU++;
-                }
-            }
-            else
-            {
-                printf( "valid y preincrement is %f,%f\n", curX, curY );
-                // this pos is valid so increment Y
-                curY += (obj->getHeight()/2.0f + nextObj->getHeight()/2.0f + buffer)
-                            * Ydir;
-                printf( "on y, valid, incremented, at %f,%f\n", curX, curY );
-                
-                if ( turnCount == 1 )
-                    numR++;
-                else if ( turnCount == 3 )
-                    numL++;
-            }
-        }
+        topNum = 1; sideNum = 0; bottomNum = 0;
     }
-    
-    printf( "gravManager::perimeter: analysis done, counts URDL: %d,%d,%d,%d\n",
-            numU, numR, numD, numL );
-    
-    // if we made more than 3 turns then there are overlapping videos so
-    // make them all a bit smaller
-    if ( turnCount > 3 && turnPoint != numObjects-1 ) 
-                        // AND, there was at least one more video to analyze
-    {
-        float sizeAvg = 0.0f;
-        float scaleAmt = -0.05f * (turnCount-2.0f);
-        for ( unsigned int i = 0; i < numObjects; i++ )
-        {
-            sizeAvg += (objects[i]->getWidth()*objects[i]->getHeight());
-        }
-        sizeAvg /= numObjects;
-        for ( unsigned int i = 0; i < numObjects; i++ )
-        {
-            RectangleBase* obj = objects[i];
-            if ( obj->getWidth()*obj->getHeight() > sizeAvg )
-                obj->setScale( obj->getScaleX()+obj->getScaleX()*scaleAmt,
-                           obj->getScaleY()+obj->getScaleY()*scaleAmt );
-        }
-    }
-    // otherwise we can move the videos to their positions
     else
-    {     
-        // create lists of objects on top,right,down,left areas and send them
-        // to be arranged
-        std::vector<RectangleBase*> topObjs, rightObjs, bottomObjs, leftObjs;
-        
-        if ( numU > 0 )
-        {
-            printf( "arranging objects %d to %d to top\n", 0, numU-1 );
-            for ( int i = 0; i < numU; i++ )
-                topObjs.push_back( objects[i] );
-            // constant on top is for space for text
-            gridArrange( screenL, screenR, screenU-0.8f, boundU, numU, 1, true,
-                         false, false, topObjs );
-        }
-        
-        if ( numR > 0 )
-        {
-            printf( "arranging objects %d to %d to right\n", numU, numU+numR-1 );
-            for ( int i = numU; i < numU+numR; i++ )
-                rightObjs.push_back( objects[i] );
-            gridArrange( boundR, screenR, boundU, boundD, 1, numR, false, true,
-                            false, rightObjs );
-        }
-        
-        if ( numD > 0 )
-        {
-            printf( "arranging objects %d to %d to bottom\n", numU+numR, numU+numR+numD-1 );
-            for ( int i = numU+numR+numD-1; i >= numU+numR; i-- )
-                bottomObjs.push_back( objects[i] );
-            gridArrange( screenL, screenR, boundD, screenD, numD, 1, true,
-                            false, false, bottomObjs );
-        }
-        
-        if ( numL > 0 )
-        {
-            for ( int i = numObjects-1; i >= numU+numR+numD; i-- )
-                leftObjs.push_back( objects[i] );
-            gridArrange( screenL, boundL, boundU, boundD, 1, numL, false, true,
-                            false, leftObjs );
-        }
+    {
+        topNum = floor( spaceAspect * (float)objects.size() / 2.0f );
+        sideNum = ceil( (1.0f - spaceAspect) * (float)objects.size() / 2.0f );
+        bottomNum = std::max( (int)objects.size() - topNum - (sideNum*2), 0 );
+    }
+
+    printf( "LayoutManager::perimeter: aspect of area: %f, %i %i\n",
+            spaceAspect, topNum, sideNum );
+
+    // create lists of objects on top,right,down,left areas and send them
+    // to be arranged
+    std::vector<RectangleBase*> topObjs, rightObjs, bottomObjs, leftObjs;
+    int end = topNum;
+
+    if ( topNum > 0 )
+    {
+        printf( "arranging objects %d to %d to top\n", 0, end-1 );
+        for ( int i = 0; i < end; i++ )
+            topObjs.push_back( objects[i] );
+        // constant on top is for space for text
+        gridArrange( boundL, boundR, screenU-0.8f, boundU, topNum, 1, true,
+                     false, true, topObjs );
+    }
+
+    end = topNum + sideNum;
+
+    if ( sideNum > 0 )
+    {
+        printf( "arranging objects %d to %d to right\n", topNum, end-1 );
+        for ( int i = topNum; i < end; i++ )
+            rightObjs.push_back( objects[i] );
+        gridArrange( boundR, screenR, screenU, screenD, 1, sideNum, false, true,
+                        true, rightObjs );
+    }
+
+    end = topNum + sideNum + bottomNum;
+
+    if ( bottomNum > 0 )
+    {
+        printf( "arranging objects %d to %d to bottom\n", topNum + sideNum,
+                end-1 );
+        for ( int i = end-1; i >= topNum + sideNum; i-- )
+            bottomObjs.push_back( objects[i] );
+        gridArrange( boundL, boundR, boundD, screenD, bottomNum, 1, true,
+                        false, true, bottomObjs );
+    }
+
+    if ( sideNum > 0 )
+    {
+        printf( "arranging objects %d to %d to left\n",
+                topNum + sideNum + bottomNum, objects.size()-1 );
+        for ( int i = objects.size()-1; i >= topNum + sideNum + bottomNum; i-- )
+            leftObjs.push_back( objects[i] );
+        gridArrange( screenL, boundL, screenU, screenD, 1, sideNum, false, true,
+                        true, leftObjs );
     }
 }
 

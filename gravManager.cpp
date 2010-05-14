@@ -429,7 +429,7 @@ void gravManager::addTestObject()
     RectangleBase* obj = new RectangleBase( 0.0f, 0.0f );
     drawnObjects->push_back( obj );
     obj->setName( "TEST" );
-    runway->add( obj );
+    //runway->add( obj );
     obj->setTexture( borderTex, borderWidth, borderHeight );
 }
 
