@@ -32,7 +32,7 @@ gravManager::gravManager()
 {
     windowWidth = 0; windowHeight = 0; // this should be set immediately
                                            // after init
-    holdCounter = 0; drawCounter = 0;
+    holdCounter = 0; drawCounter = 0; autoCounter = 0;
     camX = 0.0f;
     camY = 0.0f;
     camZ = 9.0f;
@@ -183,6 +183,20 @@ void gravManager::draw()
     
     lockSources();
 
+    // periodically automatically rearrange if on automatic - take last object
+    // and put it in center
+    if ( autoCounter == 0 && getMovableObjects().size() > 0 && !useRunway )
+    {
+        std::vector<RectangleBase*> outerObjs = getMovableObjects();
+        std::vector<RectangleBase*> innerObj( outerObjs.begin(),
+                                                outerObjs.begin()+1 );
+        outerObjs.erase( outerObjs.begin() );
+
+        layouts->focus( getScreenRect(), outerObjs, innerObj );
+
+        moveToTop( innerObj[0] );
+    }
+
     // delete sources that need to be deleted - see deleteSource for the reason
     if ( sourcesToDelete->size() > 0 )
     {
@@ -318,6 +332,7 @@ void gravManager::draw()
     else
         incrementHoldCounter();
     drawCounter++;
+    autoCounter = (autoCounter+1)%900;
 }
 
 void gravManager::clearSelected()
@@ -950,7 +965,7 @@ void gravManager::setRunwayUsage( bool run )
     useRunway = run;
 
     std::vector<RectangleBase*>::iterator it = drawnObjects->begin();
-    while ( (*it) != runway && it != drawnObjects->end() ) it++;
+    while ( (*it) != runway && it != drawnObjects->end() ) ++it;
     bool found = ( it != drawnObjects->end() );
 
     // make sure it's drawn if enabled, not drawn if not

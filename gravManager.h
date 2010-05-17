@@ -207,6 +207,7 @@ private:
     
     int holdCounter;
     int drawCounter;
+    int autoCounter;
     bool enableSiteIDGroups;
     
     float camX;

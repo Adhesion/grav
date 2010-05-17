@@ -39,6 +39,14 @@ public:
     bool fullscreen( float boundL, float boundR, float boundU, float boundD,
                         RectangleBase* object );
     
+    bool focus( RectangleBase boundRect, std::vector<RectangleBase*> outers,
+                    std::vector<RectangleBase*> inners,
+                    float scaleX = 0.65f, float scaleY = 0.6f );
+    bool focus( float boundL, float boundR, float boundU, float boundD,
+                    std::vector<RectangleBase*> outers,
+                    std::vector<RectangleBase*> inners,
+                    float scaleX = 0.65f, float scaleY = 0.6f );
+
 };
 
 #endif /*LAYOUTMANAGER_H_*/

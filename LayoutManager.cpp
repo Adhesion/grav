@@ -323,3 +323,46 @@ bool LayoutManager::fullscreen( float boundL, float boundR, float boundU,
     
     return true;
 }
+
+bool LayoutManager::focus( RectangleBase boundRect,
+                std::vector<RectangleBase*> outers,
+                std::vector<RectangleBase*> inners,
+                float scaleX, float scaleY )
+{
+    float boundL = boundRect.getLBound();
+    float boundR = boundRect.getRBound();
+    float boundU = boundRect.getUBound();
+    float boundD = boundRect.getDBound();
+
+    printf( "LayoutManager::focusing, outer rect %f %f %f %f\n", boundL, boundR,
+            boundU, boundD );
+
+    return focus( boundL, boundR, boundU, boundD, outers, inners,
+                        scaleX, scaleY );
+}
+
+bool LayoutManager::focus( float boundL, float boundR, float boundU,
+                float boundD, std::vector<RectangleBase*> outers,
+                std::vector<RectangleBase*> inners,
+                float scaleX, float scaleY )
+{
+    float centerX = ( boundL + boundR ) / 2.0f;
+    float centerY = ( boundD + boundU ) / 2.0f;
+    float Xdist = ( boundR - boundL ) * scaleX / 2.0f;
+    float Ydist = ( boundU - boundD ) * scaleY / 2.0f;
+    float innerL = centerX - Xdist;
+    float innerR = centerX + Xdist;
+    float innerU = centerY + Ydist;
+    float innerD = centerY - Ydist;
+
+    printf( "LayoutManager::focusing, inner rect %f %f %f %f\n", innerL, innerR,
+            innerU, innerD );
+
+    bool grid = gridArrange( innerL, innerR, innerU, innerD, true, false, true,
+                            inners );
+    perimeterArrange( boundL, boundR, boundU, boundD,
+                                innerL, innerR, innerU, innerD,
+                                outers );
+
+    return grid;
+}
