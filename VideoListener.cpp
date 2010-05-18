@@ -16,7 +16,7 @@
 VideoListener::VideoListener( gravManager* g ) :
     grav( g )
 {
-    x = -7.0f;
+    x = -7.5f;
     y = 5.5f;
 }
 
@@ -27,48 +27,46 @@ VideoListener::vpmsession_source_created(VPMSession &session,
                     VPMPayload type,
                     VPMPayloadDecoder *decoder)
 {
-  VPMVideoDecoder *d = dynamic_cast<VPMVideoDecoder*>(decoder);
+    VPMVideoDecoder *d = dynamic_cast<VPMVideoDecoder*>(decoder);
 
-  if (d) {
-    VPMVideoFormat format = d->getOutputFormat();
-    VPMVideoBufferSink *sink;
-    printf( "VideoListener::vpmsession_source_created: "
-            "creating source, have shaders? %i format? %i (yuv420p: %i)\n",
-            GLUtil::getInstance()->useShaders(), format, VIDEO_FORMAT_YUV420 );
-    if ( GLUtil::getInstance()->useShaders() && format == VIDEO_FORMAT_YUV420 )
-        sink = new VPMVideoBufferSink( format );
-    else
-        sink = new VPMVideoBufferSink( VIDEO_FORMAT_RGB24 );
-        
-    // note that the buffer sink will be deleted when the decoder for the source
-    // is (inside VPMedia), so that's why it isn't deleted here or in
-    // videosource
-        
-    if (!sink->initialise()) {
-      fprintf(stderr, "Failed to initialise video sink\n");
-      return;
-    }
-
-    d->connectVideoProcessor(sink);
-
-    printf( "creating new source at %f,%f\n", x, y );
-
-    VideoSource* source = new VideoSource( &session, ssrc, sink, x, y );
-    grav->addNewSource( source );
-    
-    // do some basic grid positions
-    x += 6.0f;
-    if ( x > 9.0f )
+    if ( d )
     {
-        x = -7.5f;
-        y -= 6.0f;
-    }
-    
-    //printf( "size of sources is %i\n", sources->size() );
+        VPMVideoFormat format = d->getOutputFormat();
+        VPMVideoBufferSink *sink;
+        printf( "VideoListener::vpmsession_source_created: "
+                "creating source, have shaders? %i format? %i (yuv420p: %i)\n",
+                GLUtil::getInstance()->useShaders(), format, VIDEO_FORMAT_YUV420 );
+        if ( GLUtil::getInstance()->useShaders() && format == VIDEO_FORMAT_YUV420 )
+            sink = new VPMVideoBufferSink( format );
+        else
+            sink = new VPMVideoBufferSink( VIDEO_FORMAT_RGB24 );
 
-    //session_sinks.push_back(sink);
-    //session_sink_current = session_sinks.begin();
-  }
+        // note that the buffer sink will be deleted when the decoder for the
+        // source is (inside VPMedia), so that's why it isn't deleted here or in
+        // videosource
+
+        if ( !sink->initialise() )
+        {
+            fprintf(stderr, "Failed to initialise video sink\n");
+            return;
+        }
+
+        d->connectVideoProcessor(sink);
+
+        printf( "creating new source at %f,%f\n", x, y );
+        
+        VideoSource* source = new VideoSource( &session, ssrc, sink, x, y );
+        grav->addNewSource( source );
+        
+        // do some basic grid positions
+        // TODO make this better, use layoutmanager somehow?
+        x += 8.8f;
+        if ( x > 15.0f )
+        {
+            x = -7.5f;
+            y -= 6.0f;
+        }
+    }
 }
 
 void 
@@ -79,7 +77,7 @@ VideoListener::vpmsession_source_deleted(VPMSession &session,
     std::vector<VideoSource*>::iterator si;
     printf( "grav: deleting ssrc 0x%08x\n", ssrc );
     for ( si = grav->getSources()->begin();
-            si != grav->getSources()->end(); si++ )
+            si != grav->getSources()->end(); ++si )
     {
         if ( (*si)->getssrc() == ssrc )
         {
@@ -133,7 +131,7 @@ VideoListener::vpmsession_source_app(VPMSession &session,
         
         while ( (*i)->getssrc() != ssrc )
         {
-            i++;
+            ++i;
             if ( i == grav->getSources()->end() )
             {
                 grav->unlockSources();

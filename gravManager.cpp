@@ -754,8 +754,14 @@ void gravManager::addNewSource( VideoSource* s )
     if ( useRunway && sourceCount > 9 )
         runway->add( s );
     else if ( !useRunway )
-        layouts->gridArrange( screenRect, true, false, true,
-                                getMovableObjects() );
+    {
+        std::vector<RectangleBase*> outerObjs = getMovableObjects();
+        std::vector<RectangleBase*> innerObj( outerObjs.end()-1,
+                                                outerObjs.end() );
+        outerObjs.erase( outerObjs.end()-1 );
+
+        layouts->focus( getScreenRect(), outerObjs, innerObj );
+    }
 
     unlockSources();
 }
