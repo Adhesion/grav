@@ -36,6 +36,8 @@ private:
     float xRot, yRot, zRot;
     float testLat;
     
+    float moveAmt;
+
     // keep track of the transformation matrix to use with lat/long conversion
     GLdouble* matrix;
     

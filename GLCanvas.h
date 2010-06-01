@@ -11,6 +11,8 @@
 #include <wx/glcanvas.h>
 #include <wx/timer.h>
 
+#include <sys/time.h>
+
 class gravManager;
 
 class GLCanvas : public wxGLCanvas
@@ -19,7 +21,8 @@ class GLCanvas : public wxGLCanvas
 public:
     GLCanvas( wxWindow* parent, gravManager* g, int* attributes, int width,
                 int height );
-    void draw( wxPaintEvent& evt );
+    void handlePaintEvent( wxPaintEvent& evt );
+    void draw();
     void resize( wxSizeEvent& evt );
     void GLreshape( int w, int h );
     
@@ -33,6 +36,9 @@ private:
     
     // tracks the aspect ratio of the screen for reshaping
     float screen_width, screen_height;
+
+    struct timeval time;
+    time_t lastTimeMS;
 
 };
 

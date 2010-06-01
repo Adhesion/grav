@@ -19,6 +19,7 @@ Earth::Earth()
     x = 0.0f; y = 0.0f, z = -25.0f;
     radius = 15.0f;
     xRot = 0.0f; yRot = 0.0f; zRot = 0.0f;
+    moveAmt = 0.03f;
     earthTex = PNGLoader::loadPNG( "earth.png", texWidth, texHeight );
 
     sphereQuad = gluNewQuadric();
@@ -105,6 +106,9 @@ void Earth::draw()
     glPopMatrix();
     
     testLat++;
+    /*x += moveAmt;
+    if ( x > 25.0f || x < -25.0f )
+        moveAmt *= -1.0f;*/
 }
 
 void Earth::convertLatLong( float lat, float lon, float &ex, float &ey,

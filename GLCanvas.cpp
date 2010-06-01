@@ -12,7 +12,7 @@
 #include <GL/glut.h>
 
 BEGIN_EVENT_TABLE(GLCanvas, wxGLCanvas)
-EVT_PAINT(GLCanvas::draw)
+EVT_PAINT(GLCanvas::handlePaintEvent)
 EVT_SIZE(GLCanvas::resize)
 END_EVENT_TABLE()
 
@@ -24,10 +24,24 @@ GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
     SetSize( wxSize( width, height ) );
     glContext = new wxGLContext( this );
     SetCurrent( *glContext );
+    gettimeofday( &time, NULL );
+    lastTimeMS = time.tv_usec;
 }
 
-void GLCanvas::draw( wxPaintEvent& evt )
+void GLCanvas::handlePaintEvent( wxPaintEvent& evt )
 {
+    draw();
+}
+
+void GLCanvas::draw()
+{
+    gettimeofday( &time, NULL );
+    time_t diff = time.tv_usec - lastTimeMS;
+    lastTimeMS = time.tv_usec;
+
+    //if ( diff > 30000 )
+    //    printf( "GLCanvas::draw: diff is %d\n", diff );
+
     if( !IsShown() ) return;
     
     //printf( "drawing\n" );
@@ -134,10 +148,10 @@ Timer::Timer( GLCanvas* c ) :
 
 void Timer::Notify()
 {
-    canvas->Refresh( false );
+    canvas->draw();
 }
 
 void Timer::Start()
 {
-    wxTimer::Start( 30 );
+    //wxTimer::Start( 16 );
 }

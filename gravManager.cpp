@@ -338,7 +338,7 @@ void gravManager::draw()
 void gravManager::clearSelected()
 {
     for ( std::vector<RectangleBase*>::iterator sli = selectedObjects->begin();
-            sli != selectedObjects->end(); sli++ )
+            sli != selectedObjects->end(); ++sli )
         (*sli)->setSelect(false);
     selectedObjects->clear();
 }
@@ -349,7 +349,7 @@ void gravManager::ungroupAll()
 
     printf( "deleting %i groups\n", siteIDGroups->size() );
     std::map<std::string,Group*>::iterator it;
-    for ( it = siteIDGroups->begin(); it != siteIDGroups->end(); it++ )
+    for ( it = siteIDGroups->begin(); it != siteIDGroups->end(); ++it )
     {
         Group* g = (*it).second;
         if ( g != NULL )

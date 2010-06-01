@@ -33,6 +33,10 @@ VideoSource::~VideoSource()
 
 void VideoSource::draw()
 {
+    /*if ( !videoSink->haveNewFrameAvailable() )
+        printf( "VideoSource::no new frame available\n" );
+    else
+        printf( "VideoSource::new frame available!!!\n" );*/
     //printf( "VideoSource::drawing %s at %f,%f, size %f,%f\n", getName().c_str(),
     //        x, y, getWidth(), getHeight() );
 
@@ -89,68 +93,72 @@ void VideoSource::draw()
         glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
         glPixelStorei( GL_UNPACK_ROW_LENGTH, vwidth );
         
-        if ( videoSink->getImageFormat() == VIDEO_FORMAT_RGB24 )
+        // only bother doing a texture push if there's a new frame
+        if ( videoSink->haveNewFrameAvailable() )
         {
-            glTexSubImage2D( GL_TEXTURE_2D,
-                  0,
-                  0,
-                  0,
-                  vwidth,
-                  vheight,
-                  GL_RGB,
-                  GL_UNSIGNED_BYTE,
-                  videoSink->getImageData() );
-        }
-        
-        // if we're doing yuv420, do the texture mapping for all 3 channels so
-        // the shader can properly work its magic
-        else if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
-        {
-            // experimental single-push method
-            /*glTexSubImage2D( GL_TEXTURE_2D,
-                             0,
-                             0,
-                             0,
-                             vwidth,
-                             3*vheight/2,
-                             GL_LUMINANCE,
-                             GL_UNSIGNED_BYTE,
-                             videoSink->getImageData() );*/
+            if ( videoSink->getImageFormat() == VIDEO_FORMAT_RGB24 )
+            {
+                glTexSubImage2D( GL_TEXTURE_2D,
+                      0,
+                      0,
+                      0,
+                      vwidth,
+                      vheight,
+                      GL_RGB,
+                      GL_UNSIGNED_BYTE,
+                      videoSink->getImageData() );
+            }
 
-            // 3 pushes separate
-            glTexSubImage2D( GL_TEXTURE_2D,
-                  0,
-                  0,
-                  0,
-                  vwidth,
-                  vheight,
-                  GL_LUMINANCE,
-                  GL_UNSIGNED_BYTE,
-                  videoSink->getImageData() );
+            // if we're doing yuv420, do the texture mapping for all 3 channels
+            // so the shader can properly work its magic
+            else if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
+            {
+                // experimental single-push method
+                /*glTexSubImage2D( GL_TEXTURE_2D,
+                                 0,
+                                 0,
+                                 0,
+                                 vwidth,
+                                 3*vheight/2,
+                                 GL_LUMINANCE,
+                                 GL_UNSIGNED_BYTE,
+                                 videoSink->getImageData() );*/
 
-            // now map the U & V to the bottom chunk of the image
-            // each is 1/4 of the size of the Y (half width, half height)
-            glPixelStorei(GL_UNPACK_ROW_LENGTH, vwidth/2);
+                // 3 pushes separate
+                glTexSubImage2D( GL_TEXTURE_2D,
+                      0,
+                      0,
+                      0,
+                      vwidth,
+                      vheight,
+                      GL_LUMINANCE,
+                      GL_UNSIGNED_BYTE,
+                      videoSink->getImageData() );
 
-            glTexSubImage2D( GL_TEXTURE_2D,
-                  0,
-                  0,
-                  vheight,
-                  vwidth/2,
-                  vheight/2,
-                  GL_LUMINANCE,
-                  GL_UNSIGNED_BYTE,
-                  (GLubyte*)videoSink->getImageData() + (vwidth*vheight) );
+                // now map the U & V to the bottom chunk of the image
+                // each is 1/4 of the size of the Y (half width, half height)
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, vwidth/2);
 
-            glTexSubImage2D( GL_TEXTURE_2D,
-                  0,
-                  vwidth/2,
-                  vheight,
-                  vwidth/2,
-                  vheight/2,
-                  GL_LUMINANCE,
-                  GL_UNSIGNED_BYTE,
-                  (GLubyte*)videoSink->getImageData() + 5*(vwidth*vheight)/4 );
+                glTexSubImage2D( GL_TEXTURE_2D,
+                      0,
+                      0,
+                      vheight,
+                      vwidth/2,
+                      vheight/2,
+                      GL_LUMINANCE,
+                      GL_UNSIGNED_BYTE,
+                      (GLubyte*)videoSink->getImageData() + (vwidth*vheight) );
+
+                glTexSubImage2D( GL_TEXTURE_2D,
+                      0,
+                      vwidth/2,
+                      vheight,
+                      vwidth/2,
+                      vheight/2,
+                      GL_LUMINANCE,
+                      GL_UNSIGNED_BYTE,
+                      (GLubyte*)videoSink->getImageData() + 5*(vwidth*vheight)/4 );
+            }
         }
 
         glBegin( GL_QUADS );

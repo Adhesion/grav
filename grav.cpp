@@ -107,6 +107,10 @@ void gravApp::idleHandler( wxIdleEvent& evt )
 {
     if ( !usingThreads )
         iterate();
+
+    canvas->draw();
+
+    evt.RequestMore();
 }
 
 void gravApp::iterate()

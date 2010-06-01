@@ -51,6 +51,13 @@ bool GLUtil::initGL()
     mainFont = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
     mainFont->FaceSize(100);
 
+    /*if ( glxewIsSupported( "GLX_SGI_SWAP_CONTROL" ) )
+    {
+        printf( "GLUtil::have glx sgi swap control\n" );
+    }
+    else
+        printf( "GLUtil::no swap control\n" );*/
+
     glEnable( GL_DEPTH_TEST );
     
     return true;
