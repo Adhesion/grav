@@ -7,7 +7,6 @@
 #include "GLUtil.h"
 #include "VideoSource.h"
 #include <string>
-#include <GL/glut.h>
 
 GLUtil* GLUtil::instance = NULL;
 
@@ -22,12 +21,8 @@ GLUtil* GLUtil::getInstance()
 
 bool GLUtil::initGL()
 {
-    char* argv[1] = { "GLUT" };
-    int argc = 1;
-    glutInit( &argc, argv );
-    
     glewInit();
-    
+
     // check GL version and use shaders if 2.0 or higher
     const char* glVer = (const char*)glGetString( GL_VERSION );
     int glMajorVer, glMinorVer;
@@ -45,21 +40,22 @@ bool GLUtil::initGL()
         shaders = false;
         printf( "GLUtil::initGL(): shaders NOT available (GL v%s)\n", glVer );
     }
-    
+
     // TODO: check whether we can redistribute a font instead of looking in
     //       a system spot, which would have to be different per-platform
     mainFont = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
     mainFont->FaceSize(100);
 
-    /*if ( glxewIsSupported( "GLX_SGI_SWAP_CONTROL" ) )
+    // TODO this is platform-specific, see the glxew include in glutil.h
+    if ( glxewIsSupported( "GLX_SGI_SWAP_CONTROL" ) )
     {
         printf( "GLUtil::have glx sgi swap control\n" );
     }
     else
-        printf( "GLUtil::no swap control\n" );*/
+        printf( "GLUtil::no swap control\n" );
 
     glEnable( GL_DEPTH_TEST );
-    
+
     return true;
 }
 

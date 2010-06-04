@@ -9,10 +9,6 @@
  * @author Andrew Ford
  */
 
-#include <GL/glew.h>
-
-#include <GL/glut.h>
-
 #include "RectangleBase.h"
 
 #include <VPMedia/video/VPMVideoBufferSink.h>

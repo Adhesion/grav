@@ -39,9 +39,6 @@ public:
     void wxMouseLUp( wxMouseEvent& evt );
     
     void processKeyboard( int keyCode, int x, int y );
-    void processSpecialKey( int key, int x, int y );
-    void processMouse( int button, int state, int x, int y );
-    void processActiveMotion( int x, int y );
     
     void leftClick( int x, int y );
     void leftRelease( int x, int y );

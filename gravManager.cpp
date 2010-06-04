@@ -21,8 +21,6 @@
 #include "TreeControl.h"
 #include "LayoutManager.h"
 
-#include <GL/glut.h>
-
 #include "gravManager.h"
 
 gravManager::gravManager()

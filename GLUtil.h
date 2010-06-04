@@ -9,7 +9,11 @@
  */
 
 #include <GL/glew.h>
-//#include <GL/glxew.h>
+
+// TODO glxew is platform specific, add some #defs to only include it on
+// supported platforms (just linux?)
+#include <GL/glxew.h>
+
 #include <FTGL/ftgl.h>
 
 #include <iostream>
@@ -21,8 +25,7 @@ public:
     static GLUtil* getInstance();
 
     /*
-     * Call glut and glew init functions, check for shaders, and load them if
-     * we can.
+     * Call glew init function, check for shaders, and load them if we can.
      */
     bool initGL();
     void cleanupGL();

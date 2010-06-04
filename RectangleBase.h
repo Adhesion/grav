@@ -11,9 +11,7 @@
 
 #include <string>
 
-#include <GL/glew.h>
-
-#include <FTGL/ftgl.h>
+#include "GLUtil.h"
 
 typedef struct {
     float R;

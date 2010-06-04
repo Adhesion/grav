@@ -8,7 +8,7 @@
  * @author Andrew Ford
  */
 
-#include <GL/glew.h>
+#include "GLUtil.h"
 
 class Earth
 {

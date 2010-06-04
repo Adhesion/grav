@@ -322,48 +322,6 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     }
 }
 
-void InputHandler::processSpecialKey( int key, int x, int y )
-{
-    switch( key )
-    {
-        case GLUT_KEY_LEFT:
-        case ':':
-            earth->rotate( 0.0f, 0.0f, -2.0f );
-            break;
-        case GLUT_KEY_RIGHT:
-        case '<':
-            earth->rotate( 0.0f, 0.0f, 2.0f );
-            break;
-        case GLUT_KEY_UP:
-        case ';':
-            earth->rotate( -2.0f, 0.0f, 0.0f );
-            break;
-        case GLUT_KEY_DOWN:
-        case '=':
-            earth->rotate( 2.0f, 0.0f, 0.0f );
-            break;
-    }
-}
-
-void InputHandler::processMouse( int button, int state, int x, int y )
-{
-    special = glutGetModifiers();
-    
-    if ( state == GLUT_DOWN && button == GLUT_LEFT_BUTTON )
-    {
-        leftClick( x, y );
-    }
-    else if ( state == GLUT_UP )
-    {
-        leftRelease( x, y );
-    }
-}
-
-void InputHandler::processActiveMotion( int x, int y )
-{
-    mouseLeftHeldMove( x, y );
-}
-
 void InputHandler::leftClick( int x, int y )
 {
     // glut screen coords are y-flipped relative to GL screen coords

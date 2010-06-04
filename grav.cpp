@@ -21,8 +21,6 @@
 #include <VPMedia/VPMSessionFactory.h>
 #include <VPMedia/random_helper.h>
 
-#include <GL/glut.h>
-
 IMPLEMENT_APP( gravApp )
 
 BEGIN_EVENT_TABLE(gravApp, wxApp)
