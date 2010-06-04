@@ -47,7 +47,10 @@ void VideoSource::draw()
     // set up our position
     glPushMatrix();
 
-    glRotatef(angle, 0.0, 1.0, 0.0);
+    glRotatef( xAngle, 1.0, 0.0, 0.0 );
+    glRotatef( yAngle, 0.0, 1.0, 0.0 );
+    glRotatef( zAngle, 0.0, 0.0, 1.0 );
+
     glTranslatef(x,y,z);
     
     //glDepthMask( GL_FALSE );

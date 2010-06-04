@@ -10,7 +10,16 @@
 
 #include <VPMedia/VPMSession.h>
 
+#include <sys/time.h>
+
 class gravManager;
+class VPMVideoSink;
+class GLCanvas;
+
+static struct timeval timeVS;
+static time_t lastTimeVS;
+static void newFrameCallbackTest( VPMVideoSink* sink, int buffer_idx,
+                                void* user_data );
  
 class VideoListener : public VPMSessionListener
 {

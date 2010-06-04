@@ -152,7 +152,7 @@ protected:
     float x,y,z;
     // x/y destinations for movement/animation
     float destX, destY;
-    float angle;
+    float xAngle, yAngle, zAngle;
     float scaleX, scaleY;
     float destScaleX, destScaleY;
     

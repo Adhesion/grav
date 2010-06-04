@@ -1,9 +1,6 @@
-#include <VPMedia/VPMSession.h>
-#include <VPMedia/VPMSessionFactory.h>
 #include <VPMedia/video/VPMVideoDecoder.h>
 #include <VPMedia/video/VPMVideoBufferSink.h>
 #include <VPMedia/video/format.h>
-#include <VPMedia/random_helper.h>
 #include <VPMedia/VPMLog.h>
 
 #include <cstdlib>
@@ -31,23 +28,18 @@
 gravManager::gravManager()
 {
     windowWidth = 0; windowHeight = 0; // this should be set immediately
-                                           // after init
+                                       // after init
     holdCounter = 0; drawCounter = 0; autoCounter = 0;
     camX = 0.0f;
     camY = 0.0f;
     camZ = 9.0f;
-    
+
     sources = new std::vector<VideoSource*>();
     drawnObjects = new std::vector<RectangleBase*>();
     selectedObjects = new std::vector<RectangleBase*>();
     siteIDGroups = new std::map<std::string,Group*>();
-    
-    sourcesToDelete = new std::vector<VideoSource*>();
 
-    sf = VPMSessionFactory::getInstance();
-    videoSession_listener = new VideoListener( this );
-    audioSession_listener = new AudioManager();
-    videoInitialized = false; audioInitialized = false;
+    sourcesToDelete = new std::vector<VideoSource*>();
 
     layouts = new LayoutManager();
     screenRect.setName( "screen rectangle" );
@@ -63,6 +55,8 @@ gravManager::gravManager()
 
     usingThreads = false;
     useRunway = true;
+
+    audioEnabled = false;
 
     sourceCount = 0;
 
@@ -83,55 +77,6 @@ gravManager::~gravManager()
     delete sourcesToDelete;
 
     mutex_free( sourceMutex );
-}
-
-bool gravManager::initSession( std::string address, bool audio )
-{
-    if ( !audio )
-    {
-        videoSession = sf->createSession( address.c_str(),
-                                        *videoSession_listener );
-      
-        videoSession->enableVideo(true);
-        videoSession->enableAudio(false);
-        videoSession->enableOther(false);
-      
-        if ( !videoSession->initialise() ) {
-            fprintf( stderr, "error: failed to initialise session\n" );
-            return false;
-        }
-        
-        videoSession_ts = random32();
-        videoInitialized = true;
-    }
-  
-    else
-    {
-        audioSession = sf->createSession( address.c_str(),
-                                        *audioSession_listener);
-
-        audioSession->enableVideo(false);
-        audioSession->enableAudio(true);
-        audioSession->enableOther(false);
-
-        if (!audioSession->initialise()) {
-            fprintf(stderr, "error: failed to initialise audioSession\n");
-            return false;
-        }
-
-        audioSession_ts = random32();
-        audioInitialized = true;
-    }
-    
-    return true;
-}
-
-void gravManager::iterateSessions()
-{
-    if ( videoSession && videoInitialized )
-        videoSession->iterate( videoSession_ts++ );
-    if ( audioEnabled && audioSession && audioInitialized )
-        audioSession->iterate( audioSession_ts++ );
 }
 
 void gravManager::draw()
@@ -262,8 +207,7 @@ void gravManager::draw()
                 if ( (*si)->getSiteID().compare("") != 0 )
                 {
                     float level;
-                    level = audioSession_listener->getLevel(
-                                    (*si)->getSiteID() );
+                    level = audio->getLevel( (*si)->getSiteID() );
                     // -2.0f is our default value for not finding the level
                     if ( level > -1.999f )
                         (*si)->setEffectVal( (level*2.0f) );
@@ -937,6 +881,16 @@ void gravManager::setInput( InputHandler* i )
 void gravManager::setTree( TreeControl* t )
 {
     tree = t;
+}
+
+void gravManager::setAudio( AudioManager* a )
+{
+    if ( a != NULL )
+        audioEnabled = true;
+    else
+        audioEnabled = false;
+
+    audio = a;
 }
 
 TreeControl* gravManager::getTree()

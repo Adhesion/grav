@@ -29,7 +29,7 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     destX = other.destX; destY = other.destY;
     scaleX = other.scaleX; scaleY = other.scaleY;
     destScaleX = other.destScaleX; destScaleY = other.destScaleY;
-    angle = other.angle;
+    xAngle = other.xAngle; yAngle = other.yAngle; zAngle = other.zAngle;
     
     effectVal = other.effectVal;
     
@@ -71,7 +71,7 @@ RectangleBase::~RectangleBase()
 void RectangleBase::setDefaults()
 {
     scaleX = 5.0f; scaleY = 5.0f;
-    angle = 0.0f;
+    xAngle = 0.0f; yAngle = 0.0f; zAngle = 0.0f;
     x = 0.0f; y = 0.0f; z = 0.0f;
     destX = x; destY = y;
     destScaleX = scaleX; destScaleY = scaleY;
@@ -410,8 +410,11 @@ void RectangleBase::draw()
     // set up our position
     glPushMatrix();
 
-    glRotatef( angle, 0.0, 1.0, 0.0 );
     glTranslatef( x, y, z );
+
+    glRotatef( xAngle, 1.0, 0.0, 0.0 );
+    glRotatef( yAngle, 0.0, 1.0, 0.0 );
+    glRotatef( zAngle, 0.0, 0.0, 1.0 );
     
     // draw the border first
     glEnable( GL_BLEND );
@@ -535,6 +538,9 @@ void RectangleBase::draw()
         i++;
     }
     //glutStrokeString(GLUT_STROKE_MONO_ROMAN, uc);*/
+    /*zAngle += 0.5f;
+    yAngle += 0.1f;
+    xAngle += 0.01f;*/
 }
 
 void RectangleBase::animateValues()

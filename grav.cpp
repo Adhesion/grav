@@ -13,9 +13,13 @@
 #include "TreeControl.h"
 #include "GLUtil.h"
 #include "VideoSource.h"
+#include "VideoListener.h"
+#include "AudioManager.h"
 
 #include <VPMedia/VPMLog.h>
 #include <VPMedia/VPMPayloadDecoderFactory.h>
+#include <VPMedia/VPMSessionFactory.h>
+#include <VPMedia/random_helper.h>
 
 #include <GL/glut.h>
 
@@ -32,6 +36,12 @@ bool gravApp::OnInit()
     // grav's windowwidth/height will be set by the glcanvas's resize callback
     
     parser.SetCmdLine( argc, argv );
+
+    sf = VPMSessionFactory::getInstance();
+    videoSession_listener = new VideoListener( grav );
+    audioSession_listener = new AudioManager();
+    videoInitialized = false; audioInitialized = false;
+
     handleArgs();
     
     mainFrame = new wxFrame( (wxFrame*)NULL, -1, _("grav"),
@@ -106,16 +116,60 @@ int gravApp::OnExit()
 void gravApp::idleHandler( wxIdleEvent& evt )
 {
     if ( !usingThreads )
-        iterate();
+        iterateSessions();
 
     canvas->draw();
 
     evt.RequestMore();
 }
 
-void gravApp::iterate()
+bool gravApp::initSession( std::string address, bool audio )
 {
-    grav->iterateSessions();
+    if ( !audio )
+    {
+        videoSession = sf->createSession( address.c_str(),
+                                        *videoSession_listener );
+
+        videoSession->enableVideo(true);
+        videoSession->enableAudio(false);
+        videoSession->enableOther(false);
+
+        if ( !videoSession->initialise() ) {
+            fprintf( stderr, "error: failed to initialise session\n" );
+            return false;
+        }
+
+        videoSession_ts = random32();
+        videoInitialized = true;
+    }
+
+    else
+    {
+        audioSession = sf->createSession( address.c_str(),
+                                        *audioSession_listener);
+
+        audioSession->enableVideo(false);
+        audioSession->enableAudio(true);
+        audioSession->enableOther(false);
+
+        if (!audioSession->initialise()) {
+            fprintf(stderr, "error: failed to initialise audioSession\n");
+            return false;
+        }
+
+        audioSession_ts = random32();
+        audioInitialized = true;
+    }
+
+    return true;
+}
+
+void gravApp::iterateSessions()
+{
+    if ( videoSession && videoInitialized )
+        videoSession->iterate( videoSession_ts++ );
+    if ( audioEnabled && audioSession && audioInitialized )
+        audioSession->iterate( audioSession_ts++ );
 }
 
 bool gravApp::handleArgs()
@@ -130,18 +184,22 @@ bool gravApp::handleArgs()
     }
     
     wxString videoAddress = parser.GetParam( 0 );
-    bool res = grav->initSession( std::string((char*)videoAddress.char_str()),
+    bool res = initSession( std::string((char*)videoAddress.char_str()),
                                     false );
     if ( res ) printf( "grav::video session initialized\n" );
     
     wxString audioAddress;
     if ( parser.Found( _("audio"), &audioAddress ) )
     {
-        bool aRes = grav->initSession(
+        bool aRes = initSession(
                             std::string((char*)audioAddress.char_str()), true );
-        if ( aRes ) printf( "grav::audio session initialized\n" );
+        if ( aRes )
+        {
+            printf( "grav::audio session initialized\n" );
+            grav->setAudio( audioSession_listener );
+        }
     }
-    
+
     usingThreads = parser.Found( _("threads") );
 
     disableShaders = parser.Found( _("disable-shaders") );
@@ -169,43 +227,6 @@ void gravApp::mapRTP()
     decoderFactory->mapPayloadType( 115, "L16_32k_stereo" );
     decoderFactory->mapPayloadType( 116, "L16_48k_mono" );
     decoderFactory->mapPayloadType( 117, "L16_48k_stereo" );
-    
-    // TODO: change these to mapPayloadType and add all PCM formats that rat
-    // supports
-    /*MAPSTATIC( RTP_PAYLOAD_MPEG4,
-        VPM_PAYLOAD_VIDEO,
-        "MPEG4",
-        "video/mpeg4",
-        "MPEG4",
-        VPMMPEG4Decoder );
-
-    MAPSTATIC( RTP_PAYLOAD_L16_48K_MONO,
-        VPM_PAYLOAD_AUDIO,
-        "L16_48k_mono",
-        "audio/l16_48k_mono",
-        "Linear16 48kHz Mono",
-        VPMLinear16Decoder_48k_mono );
-        
-    MAPSTATIC( RTP_PAYLOAD_L16_48K_STEREO,
-        VPM_PAYLOAD_AUDIO,
-        "L16_48k_stereo",
-        "audio/l16_48k_stereo",
-        "Linear16 48kHz STEREO",
-        VPMLinear16Decoder_48k_stereo );
-        
-    MAPSTATIC( RTP_PAYLOAD_L16_16K_MONO,
-        VPM_PAYLOAD_AUDIO,
-        "L16_16k_mono",
-        "audio/l16_16k_mono",
-        "Linear16 16kHz Mono",
-        VPMLinear16Decoder_16k_mono );
-        
-    MAPSTATIC( RTP_PAYLOAD_L16_16K_STEREO,
-        VPM_PAYLOAD_AUDIO,
-        "L16_16k_stereo",
-        "audio/l16_16k_stereo",
-        "Linear16 16kHz STEREO",
-        VPMLinear16Decoder_16k_stereo );*/
 }
 
 void* gravApp::threadTest( void* args )
@@ -218,8 +239,8 @@ void* gravApp::threadTest( void* args )
     usleep( 100000 );
     while ( g->isThreadRunning() )
     {
-        usleep( 30000 );
-        g->iterate();
+        //usleep( 16000 );
+        g->iterateSessions();
     }
     return 0;
 }

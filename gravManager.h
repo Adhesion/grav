@@ -34,15 +34,6 @@ class gravManager
 public:
     gravManager();
     ~gravManager();
-    
-    /*
-     * Create a new RTP session and attach it to the proper listener. If
-     * audio is true it's an audio session; video if false.
-     * Returns false if session creation fails, true otherwise.
-     */
-    bool initSession( std::string address, bool audio );
-    
-    void iterateSessions();
 
     /*
      * The main draw function: draws all objects in drawnObjects, as well as
@@ -146,6 +137,7 @@ public:
     void setEarth( Earth* e );
     void setInput( InputHandler* i );
     void setTree( TreeControl* t );
+    void setAudio( AudioManager* a );
     
     TreeControl* getTree();
 
@@ -177,18 +169,8 @@ private:
     
     Runway* runway;
 
-    VPMSessionFactory *sf;
-    
-    VPMSession *videoSession;
-    uint32_t videoSession_ts;
-    VideoListener* videoSession_listener;
-    bool videoInitialized;
-    
     bool audioEnabled;
-    VPMSession *audioSession;
-    uint32_t audioSession_ts;
-    AudioManager* audioSession_listener;
-    bool audioInitialized;
+    AudioManager* audio;
 
     bool drawSelectionBox;
     

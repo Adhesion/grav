@@ -16,10 +16,14 @@
 class GLCanvas;
 class gravManager;
 class TreeControl;
+class VideoListener;
+class AudioManager;
+class VPMSessionFactory;
+class VPMSession;
 
 class gravApp : public wxApp
 {
-    
+
 private:
 
     /**
@@ -31,7 +35,15 @@ private:
     DECLARE_EVENT_TABLE()
     
     void idleHandler( wxIdleEvent& evt );
-    void iterate();
+
+    /*
+     * Create a new RTP session and attach it to the proper listener. If
+     * audio is true it's an audio session; video if false.
+     * Returns false if session creation fails, true otherwise.
+     */
+    bool initSession( std::string address, bool audio );
+
+    void iterateSessions();
 
     /**
      * Parse the command line arguments and set options accordingly.
@@ -61,6 +73,19 @@ private:
     bool usingThreads;
     bool threadRunning;
     thread* VPMthread;
+
+    VPMSessionFactory *sf;
+
+    VPMSession* videoSession;
+    uint32_t videoSession_ts;
+    VideoListener* videoSession_listener;
+    bool videoInitialized;
+
+    bool audioEnabled;
+    VPMSession* audioSession;
+    uint32_t audioSession_ts;
+    AudioManager* audioSession_listener;
+    bool audioInitialized;
 
     bool disableShaders;
 

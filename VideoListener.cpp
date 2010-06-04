@@ -6,6 +6,7 @@
 #include "VideoListener.h"
 #include "VideoSource.h"
 #include "gravManager.h"
+#include "GLCanvas.h"
 #include "Group.h"
 #include "TreeControl.h"
 #include "GLUtil.h"
@@ -58,6 +59,8 @@ VideoListener::vpmsession_source_created(VPMSession &session,
         VideoSource* source = new VideoSource( &session, ssrc, sink, x, y );
         grav->addNewSource( source );
         
+        sink->addNewFrameCallback( &newFrameCallbackTest, NULL );
+
         // do some basic grid positions
         // TODO make this better, use layoutmanager somehow?
         x += 8.8f;
@@ -162,4 +165,16 @@ VideoListener::vpmsession_source_app(VPMSession &session,
 
         grav->unlockSources();
     }
+}
+
+static void newFrameCallbackTest( VPMVideoSink* sink, int buffer_idx,
+                                void* user_data )
+{
+    //printf( "new frame callback\n" );
+
+    gettimeofday( &timeVS, NULL );
+    time_t diff = timeVS.tv_usec - lastTimeVS;
+    lastTimeVS = timeVS.tv_usec;
+
+    //printf( "VS::newframe: diff is %d\n", diff );
 }
