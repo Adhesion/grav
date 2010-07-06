@@ -22,7 +22,7 @@ AudioManager::~AudioManager()
     
 }
 
-float AudioManager::getLevel( std::string name )
+float AudioManager::getLevel( std::string name, bool avg )
 {
     // Since there might be multiple sources with the same label (ie, one
     // site sending multiple audio streams) we'll average the values of the
@@ -32,16 +32,25 @@ float AudioManager::getLevel( std::string name )
     //printf( "AudioManager::getLevel: getting level for %s\n", name.c_str() );
     for ( unsigned int i = 0; i < sources.size(); i++ )
     {
-        if ( sources[i]->siteID.compare( name ) == 0 )
+        if ( sources[i]->siteID.compare( name ) == 0 ||
+                name.compare( "" ) == 0 )
         {
             //printf( "AudioManager::getLevel: found %s\n", name.c_str() );
-            temp += sources[i]->meter->level();
+            if ( avg )
+            {
+                temp += sources[i]->meter->levelAverage();
+                sources[i]->meter->resetAverage();
+            }
+            else
+                temp += sources[i]->meter->level();
             count++;
         }
         //else
             //printf( "AudioManager::getLevel: DID NOT find %s\n", name.c_str() );
     }
-    if ( count > 0 )
+    if ( count == 1 )
+        return temp;
+    else if ( count > 1 )
         return temp/(float)count;
     // default case
     return -2.0f;
@@ -52,23 +61,13 @@ void AudioManager::printLevels()
     for ( unsigned int i = 0; i < sources.size(); i++ )
     {
         printf( "source: 0x%08x/%s: %f\n", sources[i]->ssrc,
-        sources[i]->siteID.c_str(), sources[i]->meter->level() );
+                    sources[i]->siteID.c_str(), sources[i]->meter->level() );
     }
 }
 
-float AudioManager::getLevelAvg()
+float AudioManager::getLevelAvg(std::string name )
 {
-    float temp = 0.0f;
-    int count = 0;
-    for ( unsigned int i = 0; i < sources.size(); i++ )
-    {
-        temp += sources[i]->meter->levelAverage();
-        sources[i]->meter->resetAverage();
-        count++;
-    }
-    if ( count > 0 )
-        return temp/(float)count;
-    return -2.0f;
+    return getLevel( name, true );
 }
 
 void AudioManager::vpmsession_source_created( VPMSession &session,

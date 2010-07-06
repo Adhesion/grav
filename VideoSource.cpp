@@ -8,6 +8,8 @@
 #include "GLUtil.h"
 #include <cmath>
 
+#include <VPMedia/video/VPMVideoDecoder.h>
+
 VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
                             VPMVideoBufferSink* vs, float _x, float _y ) :
     RectangleBase( _x, _y ), session( _session ), ssrc( _ssrc ), videoSink( vs )
@@ -80,22 +82,14 @@ void VideoSource::draw()
     float Xdist = aspect*scaleX/2;
     float Ydist = scaleY/2;
 
+    glBindTexture( GL_TEXTURE_2D, texid );
+
+    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+    glPixelStorei( GL_UNPACK_ROW_LENGTH, vwidth );
+
     // only do this texture stuff if rendering is enabled
     if ( enableRendering )
     {
-        if ( GLUtil::getInstance()->useShaders() )
-        {
-            glUseProgram( GLUtil::getInstance()->getYUV420Program() );
-            glUniform1f( GLUtil::getInstance()->getYUV420xOffsetID(), s );
-            glUniform1f( GLUtil::getInstance()->getYUV420yOffsetID(), t );
-        }
-
-        glEnable( GL_TEXTURE_2D );
-        glBindTexture( GL_TEXTURE_2D, texid );
-
-        glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-        glPixelStorei( GL_UNPACK_ROW_LENGTH, vwidth );
-        
         // only bother doing a texture push if there's a new frame
         if ( videoSink->haveNewFrameAvailable() )
         {
@@ -163,48 +157,42 @@ void VideoSource::draw()
                       (GLubyte*)videoSink->getImageData() + 5*(vwidth*vheight)/4 );
             }
         }
-
-        glBegin( GL_QUADS );
-        glColor3f( 1.0f, 1.0f, 1.0f );
-
-        // draw the actual quad that has the texture on it
-        // size of the video in world space will be equivalent to getWidth x
-        // getHeight, which is the same as (aspect*scaleX) x scaleY
-        glTexCoord2f( 0.0, 0.0 );
-        glVertex3f( -Xdist, -Ydist, 0.0 );
-
-        glTexCoord2f( 0.0, t );
-        glVertex3f( -Xdist, Ydist, 0.0 );
-
-        glTexCoord2f( s, t );
-        glVertex3f( Xdist, Ydist, 0.0 );
-
-        glTexCoord2f( s, 0.0 );
-        glVertex3f( Xdist, -Ydist, 0.0 );
-
-        glEnd();
-
-        glDisable(GL_TEXTURE_2D);
-
-        if ( GLUtil::getInstance()->useShaders() )
-            glUseProgram( 0 );
     }
-    // basic X for signifying that rendering is disabled
-    else
+
+    // draw video texture, regardless of whether we just pushed something
+    // new or not
+    if ( GLUtil::getInstance()->useShaders() )
     {
-        glBegin( GL_LINES );
-        glLineWidth( 3.0f );
-
-        glColor3f( 1.0f, 0.0f, 0.15f );
-
-        glVertex3f( -Xdist, -Ydist, 0.0f );
-        glVertex3f( Xdist, Ydist, 0.0f );
-
-        glVertex3f( -Xdist, Ydist, 0.0f );
-        glVertex3f( Xdist, -Ydist, 0.0f );
-
-        glEnd();
+        glUseProgram( GLUtil::getInstance()->getYUV420Program() );
+        glUniform1f( GLUtil::getInstance()->getYUV420xOffsetID(), s );
+        glUniform1f( GLUtil::getInstance()->getYUV420yOffsetID(), t );
     }
+
+    glEnable( GL_TEXTURE_2D );
+    glBegin( GL_QUADS );
+    glColor3f( 1.0f, 1.0f, 1.0f );
+
+    // now draw the actual quad that has the texture on it
+    // size of the video in world space will be equivalent to getWidth x
+    // getHeight, which is the same as (aspect*scaleX) x scaleY
+    glTexCoord2f( 0.0, 0.0 );
+    glVertex3f( -Xdist, -Ydist, 0.0 );
+
+    glTexCoord2f( 0.0, t );
+    glVertex3f( -Xdist, Ydist, 0.0 );
+
+    glTexCoord2f( s, t );
+    glVertex3f( Xdist, Ydist, 0.0 );
+
+    glTexCoord2f( s, 0.0 );
+    glVertex3f( Xdist, -Ydist, 0.0 );
+
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
+
+    if ( GLUtil::getInstance()->useShaders() )
+        glUseProgram( 0 );
 
     if ( vwidth == 0 || vheight == 0 )
     {
@@ -215,6 +203,30 @@ void VideoSource::draw()
         std::string waitingMessage( "Waiting for video..." );
         font->Render( waitingMessage.c_str() );
         glPopMatrix();
+    }
+
+    // draw a basic X in the top-left corner for signifying that rendering is
+    // disabled, differentiating between muting and just having the texture
+    // push disabled via the color
+    if ( !enableRendering )
+    {
+        float dist = getWidth() * 0.1f;
+
+        glBegin( GL_LINES );
+        glLineWidth( 3.0f );
+
+        if ( isMuted() )
+            glColor3f( 1.0f, 0.0f, 0.15f );
+        else
+            glColor3f( 0.5f, 0.5f, 0.9f );
+
+        glVertex3f( -Xdist, Ydist - dist, 0.0f );
+        glVertex3f( -Xdist + dist, Ydist, 0.0f );
+
+        glVertex3f( -Xdist, Ydist, 0.0f );
+        glVertex3f( -Xdist + dist, Ydist - dist, 0.0f );
+
+        glEnd();
     }
     
     glPopMatrix();
@@ -345,6 +357,21 @@ bool VideoSource::updateName()
     return nameChanged;
 }
 
+uint32_t VideoSource::getssrc()
+{
+    return ssrc;
+}
+
+std::string VideoSource::getName()
+{
+    return name;
+}
+
+const char* VideoSource::getPayloadDesc()
+{
+    return videoSink->getVideoDecoder()->getDesc();
+}
+
 float VideoSource::getWidth()
 {
     return aspect * scaleX;
@@ -380,7 +407,10 @@ void VideoSource::setHeight( float h )
 
 void VideoSource::setRendering( bool r )
 {
-    enableRendering = r;
+    // muting is related to rendering - enablerendering shouldn't be true when
+    // it's muted, so stop it from changing when it is muted
+    if ( !isMuted() )
+        enableRendering = r;
 }
 
 bool VideoSource::getRendering()
@@ -388,12 +418,14 @@ bool VideoSource::getRendering()
     return enableRendering;
 }
 
-uint32_t VideoSource::getssrc()
+void VideoSource::toggleMute()
 {
-    return ssrc;
+    session->enableSource( ssrc, isMuted() );
+    enableRendering = !isMuted();
+    printf( "mute toggled, state now %i/%i\n", enableRendering, isMuted() );
 }
 
-std::string VideoSource::getName()
+bool VideoSource::isMuted()
 {
-	return name;
+    return !session->isSourceEnabled( ssrc );
 }

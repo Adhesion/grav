@@ -68,8 +68,8 @@ bool gravApp::OnInit()
     
     //printf( "hide root? %i\n", tree->HasFlag( wxTR_HIDE_ROOT ) );
     
-    Timer* t = new Timer( canvas );
-    t->Start();
+    timer = new Timer( canvas );
+    timer->Start();
     
     Earth* earth = new Earth();
     InputHandler* input = new InputHandler( earth, grav );
@@ -104,6 +104,7 @@ bool gravApp::OnInit()
 
 int gravApp::OnExit()
 {
+    printf( "grav::Exiting...\n" );
     // TODO: deconstructors, etc
     GLUtil::getInstance()->cleanupGL();
     threadRunning = false;
@@ -119,6 +120,7 @@ void gravApp::idleHandler( wxIdleEvent& evt )
     canvas->draw();
 
     evt.RequestMore();
+    //timer->printTiming();
 }
 
 bool gravApp::initSession( std::string address, bool audio )
@@ -195,6 +197,7 @@ bool gravApp::handleArgs()
         {
             printf( "grav::audio session initialized\n" );
             grav->setAudio( audioSession_listener );
+            audioEnabled = true;
         }
     }
 
@@ -237,7 +240,6 @@ void* gravApp::threadTest( void* args )
     usleep( 100000 );
     while ( g->isThreadRunning() )
     {
-        //usleep( 16000 );
         g->iterateSessions();
     }
     return 0;

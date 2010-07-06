@@ -45,6 +45,8 @@ public:
     uint32_t getssrc();
     std::string getName();
     
+    const char* getPayloadDesc();
+
     // overrides the functions from RectangleBase to account for aspect ratio
     float getWidth(); float getHeight();
     float getDestWidth(); float getDestHeight();
@@ -53,6 +55,10 @@ public:
     // set/get enable/disable for rendering
     void setRendering( bool r );
     bool getRendering();
+
+    // set/get for mute (controls state of decoder)
+    void toggleMute();
+    bool isMuted();
 
 private:
     // reference to the session that this video comes from - needed for grabbing

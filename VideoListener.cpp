@@ -28,7 +28,7 @@ VideoListener::vpmsession_source_created(VPMSession &session,
                     VPMPayload type,
                     VPMPayloadDecoder *decoder)
 {
-    VPMVideoDecoder *d = dynamic_cast<VPMVideoDecoder*>(decoder);
+    VPMVideoDecoder *d = dynamic_cast<VPMVideoDecoder*>( decoder );
 
     if ( d )
     {

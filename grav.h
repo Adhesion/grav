@@ -14,6 +14,7 @@
 #include <VPMedia/thread_helper.h>
 
 class GLCanvas;
+class Timer;
 class gravManager;
 class TreeControl;
 class VideoListener;
@@ -66,6 +67,7 @@ private:
     wxFrame* treeFrame;
     
     GLCanvas* canvas;
+    Timer* timer;
     TreeControl* tree;
     
     gravManager* grav;

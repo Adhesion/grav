@@ -33,22 +33,13 @@ void GLCanvas::handlePaintEvent( wxPaintEvent& evt )
 
 void GLCanvas::draw()
 {
-    gettimeofday( &time, NULL );
-    time_t diff = time.tv_usec - lastTimeMS;
-    lastTimeMS = time.tv_usec;
-
-    //if ( diff > 30000 )
-        //printf( "GLCanvas::draw: diff is %d\n", diff );
-
     if( !IsShown() ) return;
     
-    //printf( "drawing\n" );
     SetCurrent( *glContext );
     wxPaintDC( this );
     
     if ( grav != NULL )
         grav->draw();
-    //testDraw();
     
     SwapBuffers();
 }
@@ -98,15 +89,29 @@ void GLCanvas::GLreshape( int w, int h )
 Timer::Timer( GLCanvas* c ) :
     canvas( c )
 {
-    
+    gettimeofday( &time, NULL );
+    lastTimeMS = time.tv_usec;
 }
 
 void Timer::Notify()
 {
-    canvas->draw();
+    //canvas->draw();
+    //printTiming();
 }
 
 void Timer::Start()
 {
-    //wxTimer::Start( 16 );
+    wxTimer::Start( 1000 );
+}
+
+void Timer::printTiming()
+{
+    gettimeofday( &time, NULL );
+    time_t diff;
+    if ( lastTimeMS > time.tv_usec )
+        diff = (time.tv_usec+1000000) - lastTimeMS;
+    else
+        diff = time.tv_usec - lastTimeMS;
+    printf( "%lu\n", (unsigned long)diff );
+    lastTimeMS = time.tv_usec;
 }

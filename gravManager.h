@@ -158,6 +158,10 @@ private:
     
     std::vector<VideoSource*>* sourcesToDelete;
 
+    // temp lists for doing auto/audio focus
+    std::vector<RectangleBase*> outerObjs;
+    std::vector<RectangleBase*> innerObjs;
+
     Earth* earth;
 
     InputHandler* input;
@@ -171,6 +175,7 @@ private:
 
     bool audioEnabled;
     AudioManager* audio;
+    bool audioFocusTrigger;
 
     bool drawSelectionBox;
     

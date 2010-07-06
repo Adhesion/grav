@@ -31,8 +31,8 @@ class AudioManager : public VPMSessionListener
 public:
     AudioManager();
     ~AudioManager();
-    float getLevel( std::string name );
-    float getLevelAvg();
+    float getLevel( std::string name = "", bool avg = false );
+    float getLevelAvg( std::string name = "" );
     void printLevels();
     virtual void vpmsession_source_created( VPMSession &session,
                                           uint32_t ssrc,

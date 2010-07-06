@@ -50,8 +50,13 @@ public:
     void Notify();
     void Start();
     
+    // print number of microseconds since last call
+    void printTiming();
+
 private:
     GLCanvas* canvas;
+    struct timeval time;
+    time_t lastTimeMS;
     
 };
 

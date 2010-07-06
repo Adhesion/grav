@@ -55,6 +55,7 @@ gravManager::gravManager()
     useRunway = true;
 
     audioEnabled = false;
+    audioFocusTrigger = false;
 
     sourceCount = 0;
 
@@ -80,6 +81,7 @@ gravManager::~gravManager()
 void gravManager::draw()
 {   
     //audioSession_listener.printLevels();
+    audioFocusTrigger = false;
     
     // don't draw if either of these objects haven't been initialized yet
     if ( !earth || !input ) return;
@@ -130,14 +132,17 @@ void gravManager::draw()
     // and put it in center
     if ( autoCounter == 0 && getMovableObjects().size() > 0 && !useRunway )
     {
-        std::vector<RectangleBase*> outerObjs = getMovableObjects();
-        std::vector<RectangleBase*> innerObj( outerObjs.begin(),
-                                                outerObjs.begin()+1 );
+        outerObjs = getMovableObjects();
+        innerObjs = std::vector<RectangleBase*>( outerObjs.begin(),
+                                                    outerObjs.begin()+1 );
         outerObjs.erase( outerObjs.begin() );
 
-        layouts->focus( getScreenRect(), outerObjs, innerObj );
+        layouts->focus( getScreenRect(), outerObjs, innerObjs );
 
-        moveToTop( innerObj[0] );
+        moveToTop( innerObjs[0] );
+
+        outerObjs.clear();
+        innerObjs.clear();
     }
 
     // delete sources that need to be deleted - see deleteSource for the reason
@@ -199,16 +204,29 @@ void gravManager::draw()
         if ( !(*si)->isGrouped() )
         {
             // set the audio effect level
-            if ( audioEnabled )
+            if ( audioEnabled && drawCounter == 0 )
             {
                 // TODO: do a lookup with CNAME if siteIDs aren't enabled
                 if ( (*si)->getSiteID().compare("") != 0 )
                 {
                     float level;
-                    level = audio->getLevel( (*si)->getSiteID() );
+                    level = audio->getLevelAvg( (*si)->getSiteID() );
+                    //printf( "siteID %s level: %f\n", (*si)->getSiteID().c_str(),
+                    //        level );
                     // -2.0f is our default value for not finding the level
-                    if ( level > -1.999f )
-                        (*si)->setEffectVal( (level*2.0f) );
+                    if ( level > 0.01f )
+                    {
+                        innerObjs.push_back( (*si) );
+                        audioFocusTrigger = true;
+                    }
+                    else
+                    {
+                        outerObjs.push_back( (*si) );
+                    }
+                }
+                else
+                {
+                    outerObjs.push_back( (*si) );
                 }
             }
             //printf( "glutDisplay::drawing object %s\n", (*si)->getName().c_str());
@@ -227,6 +245,16 @@ void gravManager::draw()
     glDepthMask( GL_TRUE );
     //printf( "glutDisplay::done drawing objects\n" );
     
+    // do the audio focus if it triggered
+    if ( audioEnabled && audioFocusTrigger )
+    {
+        layouts->focus( getScreenRect(), outerObjs, innerObjs );
+
+        outerObjs.clear();
+        innerObjs.clear();
+    }
+    audioFocusTrigger = false;
+
     unlockSources();
 
     // draw the click-and-drag selection box

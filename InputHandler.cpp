@@ -174,6 +174,9 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
                             &scrX, &scrY, &scrZ);
             printf( "\tpos (screen): %f,%f,%f\n", scrX, scrY, scrZ );
             printf( "\tis grouped? %i\n", (*si)->isGrouped() );
+
+            printf( "\tDescription of codec: %s\n", (*si)->getPayloadDesc() );
+            printf( "\tis muted? %i\n", (*si)->isMuted() );
         }
         printf( "DrawnObjects:\n" );
         for ( unsigned int i = 0; i < grav->getDrawnObjects()->size(); i++ )
@@ -200,6 +203,15 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         }
         break;
 
+    case 'M':
+        for ( si = grav->getSources()->begin();
+                        si != grav->getSources()->end(); ++si )
+        {
+            if ( (*si)->isSelected() )
+                (*si)->toggleMute();
+        }
+        break;
+
     case 'O':
         printf( "random32: %i\n", random32() );
         printf( "random32max: %i\n", random32_max() );
@@ -207,7 +219,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
 
     case 'N':
         for ( si = grav->getSources()->begin();
-                si != grav->getSources()->end(); si++ )
+                si != grav->getSources()->end(); ++si )
         {
             if ( shiftHeld || (*si)->isSelected() )
             {
