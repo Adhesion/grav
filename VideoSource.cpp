@@ -394,9 +394,6 @@ float VideoSource::getDestHeight()
 
 void VideoSource::setWidth( float w )
 {
-    printf( "VideoSource::setting scale to %f,%f\n", w/aspect,
-            destScaleY * (w/(destScaleX*aspect)) );
-    printf( "aspect is %f\n", aspect );
     setScale( w/aspect, destScaleY * (w/(destScaleX*aspect)) );
 }
 

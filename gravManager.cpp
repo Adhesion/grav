@@ -738,11 +738,11 @@ void gravManager::addNewSource( VideoSource* s )
 
 void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
 {
-    RectangleBase* temp = (RectangleBase*)(*si);
-    VideoSource* s = (*si);
-    
     lockSources();
-    
+
+    RectangleBase* temp = (RectangleBase*)(*si);
+    VideoSource* s = *si;
+
     removeFromLists( temp );
 
     sources->erase( si );
@@ -751,10 +751,19 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
     if ( temp->isGrouped() )
     {
         Group* g = temp->getGroup();
+
+        // remove object from the group, regardless of whether it's a siteID
+        // group or not.
+        // this should work for runways, but should be more generic, ie for
+        // groups of groups? maybe in removefromlists, but careful not to
+        // degroup object before it hits that siteID check above or siteIDgroups
+        // will have invalid references
+        g->remove( temp );
+
         // delete the group the object was in if this is the last object in it
-        // and it's an automatically mad siteID group
+        // and it's an automatically made siteID group
         // TODO probably have a better metric for determining auto-siteID groups
-        if ( g->getSiteID().compare( "" ) != 0 && g->numObjects() == 1 )
+        if ( g->getSiteID().compare( "" ) != 0 && g->numObjects() == 0 )
         {
             // note this duplicates the deleteGroup function since that does
             // mutex locking itself, and we already did that here
@@ -766,15 +775,6 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
             siteIDGroups->erase( gi );
 
             delete g;
-        }
-        // if not a siteID group then remove the object from it. this should
-        // work for runways, but should be more generic, ie for groups of
-        // groups? maybe in removefromlists, but careful not to degroup object
-        // before it hits that siteID check above or siteIDgroups will have
-        // invalid references
-        else
-        {
-            g->remove( (*si) );
         }
     }
 

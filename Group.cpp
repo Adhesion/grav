@@ -61,10 +61,11 @@ void Group::add( RectangleBase* object )
 
 void Group::remove( RectangleBase* object, bool move )
 {
-    printf( "removing %s from group %s\n", object->getName().c_str(),
-                                        getName().c_str() );
+    //printf( "removing %s from group %s\n", object->getName().c_str(),
+    //                                    getName().c_str() );
     object->setGroup( NULL );
     object->setSubstring( -1, -1 );
+
     std::vector<RectangleBase*>::iterator i = objects.begin();
     while ( *i != object ) i++;
     objects.erase( i );
@@ -103,7 +104,7 @@ void Group::rearrange()
     
     float largestWidth = 0.0f, largestHeight = 0.0f; // for finding the biggest
                                                      // object in the group
-                                                     
+
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
         largestWidth = std::max( largestWidth, objects[i]->getWidth() );
@@ -112,8 +113,8 @@ void Group::rearrange()
     
     int numCol = ceil( sqrt( objects.size() ) );
     int numRow = objects.size() / numCol + ( objects.size() % numCol > 0 );
-    printf( "Group:: group %s (%fx%f, %f,%f) rearranging\n", name.c_str(),
-                getWidth(), getHeight(), destX, destY );
+    //printf( "Group:: group %s (%fx%f, %f,%f) rearranging\n", name.c_str(),
+    //            getWidth(), getHeight(), destX, destY );
 
     // resize the group based on the aspect ratios of the current member(s)
     if ( objects.size() == 1 )
@@ -156,7 +157,7 @@ bool Group::updateName()
     // names (ie, NAME vs CNAME)
     if ( !membersFinalized ) return false;
     
-    printf( "group members names finalized, finding common string...\n" );
+    //printf( "group members names finalized, finding common string...\n" );
     
     int splitPos = 0;
     int startParen = -1;
@@ -182,7 +183,7 @@ bool Group::updateName()
         // left paren to the left of the difference position (if found)
         startParen = objects[0]->getName().rfind( '(', splitPos );
         endParen = objects[0]->getName().find( ')', splitPos );
-        printf( ">1 startParen: %i, endParen: %i\n", startParen, endParen );
+        //printf( ">1 startParen: %i, endParen: %i\n", startParen, endParen );
         if ( endParen != -1 && startParen != -1 )
             splitPos = startParen;
     }
@@ -191,8 +192,8 @@ bool Group::updateName()
         // if there's only one, just split based on the rightmost & outermost
         // matched parens
         unsigned int i = objects[0]->getName().length()-1;
-        printf( "name is %s, length is %i, i is %i\n", 
-                objects[0]->getName().c_str(), i+1, i );
+        //printf( "name is %s, length is %i, i is %i\n",
+        //        objects[0]->getName().c_str(), i+1, i );
         int balance = 0;
         while ( i >= 0 && (balance != 0 || endParen == -1) )
         {
@@ -211,7 +212,7 @@ bool Group::updateName()
             i--;
         }
 
-        printf( "=1 startParen: %i, endParen: %i\n", startParen, endParen );
+        //printf( "=1 startParen: %i, endParen: %i\n", startParen, endParen );
         if ( endParen != -1 && startParen != -1 )
             splitPos = startParen;
     }
@@ -220,7 +221,7 @@ bool Group::updateName()
     // to the remainder
     name = objects[0]->getName().substr(0, splitPos);
     
-    printf( "common substr is %s, up to pos %i\n", name.c_str(), splitPos );
+    //printf( "common substr is %s, up to pos %i\n", name.c_str(), splitPos );
     for ( unsigned int k = 0; k < objects.size(); k++ )
     {
         // if we have more than one object in the group, re-find the positions
@@ -240,8 +241,8 @@ bool Group::updateName()
             objects[k]->setSubstring( splitPos,
                                 objects[k]->getName().length() );
         }
-        printf( "object name (remainder) set to %s\n",
-                            objects[k]->getSubName().c_str() );
+        //printf( "object name (remainder) set to %s\n",
+        //                    objects[k]->getSubName().c_str() );
     }
     
     updateTextBounds();

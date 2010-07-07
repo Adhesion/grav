@@ -88,6 +88,7 @@ VideoListener::vpmsession_source_deleted(VPMSession &session,
             return;
         }
     }
+    printf( "VideoListener::source_deleted: ERROR: ssrc not found?\n" );
 }
 
 void 

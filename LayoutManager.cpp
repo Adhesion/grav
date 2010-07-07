@@ -38,8 +38,8 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
                                         float boundU, float boundD,
                                         std::vector<RectangleBase*> objects )
 {
-    printf( "LayoutManager::perimeter: screen bounds: %f,%f %f,%f\n",
-            screenL, screenR, screenU, screenD );
+    //printf( "LayoutManager::perimeter: screen bounds: %f,%f %f,%f\n",
+    //        screenL, screenR, screenU, screenD );
 
     float topRatio = (boundR-boundL) / ((screenU-screenD)+(boundR-boundL));
     float sideRatio = (screenU-screenD) / ((screenU-screenD)+(boundR-boundL));
@@ -56,8 +56,8 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
         bottomNum = std::max( (int)objects.size() - topNum - (sideNum*2), 0 );
     }
 
-    printf( "LayoutManager::perimeter: ratios of area: %f %f, %i %i\n",
-            topRatio, sideRatio, topNum, sideNum );
+    //printf( "LayoutManager::perimeter: ratios of area: %f %f, %i %i\n",
+    //        topRatio, sideRatio, topNum, sideNum );
 
     // create lists of objects on top,right,down,left areas and send them
     // to be arranged
@@ -66,7 +66,7 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
 
     if ( topNum > 0 )
     {
-        printf( "arranging objects %d to %d to top\n", 0, end-1 );
+        //printf( "arranging objects %d to %d to top\n", 0, end-1 );
         for ( int i = 0; i < end; i++ )
             topObjs.push_back( objects[i] );
         // constant on top is for space for text
@@ -78,7 +78,7 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
 
     if ( sideNum > 0 )
     {
-        printf( "arranging objects %d to %d to right\n", topNum, end-1 );
+        //printf( "arranging objects %d to %d to right\n", topNum, end-1 );
         for ( int i = topNum; i < end; i++ )
             rightObjs.push_back( objects[i] );
         gridArrange( boundR, screenR, screenU, screenD, false, true, true,
@@ -89,8 +89,8 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
 
     if ( bottomNum > 0 )
     {
-        printf( "arranging objects %d to %d to bottom\n", topNum + sideNum,
-                end-1 );
+        //printf( "arranging objects %d to %d to bottom\n", topNum + sideNum,
+        //        end-1 );
         for ( int i = end-1; i >= topNum + sideNum; i-- )
             bottomObjs.push_back( objects[i] );
         gridArrange( boundL, boundR, boundD, screenD, true, false, true,
@@ -99,8 +99,8 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
 
     if ( sideNum > 0 )
     {
-        printf( "arranging objects %d to %d to left\n",
-                topNum + sideNum + bottomNum, objects.size()-1 );
+        //printf( "arranging objects %d to %d to left\n",
+        //        topNum + sideNum + bottomNum, objects.size()-1 );
         for ( int i = objects.size()-1; i >= topNum + sideNum + bottomNum; i-- )
             leftObjs.push_back( objects[i] );
         gridArrange( screenL, boundL, screenU, screenD, false, true, true,
@@ -137,8 +137,8 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
     {
         numX = ceil( sqrt( objects.size() ) );
         numY = objects.size() / numX + ( objects.size() % numX > 0 );
-        printf( "layout: doing grid arrangement with %i objects (%ix%i)\n",
-                    objects.size(), numX, numY );
+        //printf( "layout: doing grid arrangement with %i objects (%ix%i)\n",
+        //            objects.size(), numX, numY );
     }
 
     // if there's too many objects, fail
@@ -152,7 +152,7 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
         return true;
     }
     
-    printf( "grid:bounds: %f,%f %f,%f\n", boundL, boundR, boundU, boundD );
+    //printf( "grid:bounds: %f,%f %f,%f\n", boundL, boundR, boundU, boundD );
     
     float span; // height of rows if going horizontally,
                 // width of columns if going vertically
@@ -169,7 +169,7 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
         
         edgeL = boundL + 0.2f + (stride / 2);
         edgeR = boundR - 0.2f - (stride / 2);
-        printf( "grid: edges are %f,%f\n", edgeL, edgeR );
+        //printf( "grid: edges are %f,%f\n", edgeL, edgeR );
         if ( edge ) stride = (edgeR-edgeL) / std::max(1, (numX-1));
         
         curY = boundU - (span/2.0f);
@@ -206,9 +206,9 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
         }
     }
     
-    printf( "grid: starting at %f,%f\n", curX, curY );
-    printf( "grid: stride is %f\n", stride );
-    printf( "grid: span is %f\n", span );
+    //printf( "grid: starting at %f,%f\n", curX, curY );
+    //printf( "grid: stride is %f\n", stride );
+    //printf( "grid: span is %f\n", span );
     
     // if we're resizing them, do it on a first pass so the calculations later
     // are correct
@@ -235,12 +235,12 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
             }
             if ( aspect > objectAspect )
             {
-                printf( "layout setting height to %f\n", newHeight );
+                //printf( "layout setting height to %f\n", newHeight );
                 objects[i]->setHeight( newHeight );
             }
             else
             {
-                printf( "layout setting width to %f\n", newWidth );
+                //printf( "layout setting width to %f\n", newWidth );
                 objects[i]->setWidth( newWidth );
             }
         }
@@ -248,7 +248,7 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
     
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
-        printf( "grid: moving object %i to %f,%f\n", i, curX, curY );
+        //printf( "grid: moving object %i to %f,%f\n", i, curX, curY );
         objects[i]->move( curX, curY );
         int objectsLeft = (int)objects.size() - i - 1;
         
@@ -257,7 +257,7 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
             curX += stride;
             if ( (i+1) % numX == 0 )
             {
-                printf( "grid: changing to new row\n" );
+                //printf( "grid: changing to new row\n" );
                 curY -= span;
                 // if the number of objects we have left is less than a full
                 // row/column, change stride such that it's evenly spaced
@@ -334,8 +334,8 @@ bool LayoutManager::focus( RectangleBase boundRect,
     float boundU = boundRect.getUBound();
     float boundD = boundRect.getDBound();
 
-    printf( "LayoutManager::focusing, outer rect %f %f %f %f\n", boundL, boundR,
-            boundU, boundD );
+    //printf( "LayoutManager::focusing, outer rect %f %f %f %f\n", boundL, boundR,
+    //        boundU, boundD );
 
     return focus( boundL, boundR, boundU, boundD, outers, inners,
                         scaleX, scaleY );
@@ -355,8 +355,8 @@ bool LayoutManager::focus( float boundL, float boundR, float boundU,
     float innerU = centerY + Ydist;
     float innerD = centerY - Ydist;
 
-    printf( "LayoutManager::focusing, inner rect %f %f %f %f\n", innerL, innerR,
-            innerU, innerD );
+    //printf( "LayoutManager::focusing, inner rect %f %f %f %f\n", innerL, innerR,
+    //        innerU, innerD );
 
     bool grid = gridArrange( innerL, innerR, innerU, innerD, true, false, true,
                             inners );
