@@ -44,9 +44,10 @@ public:
     virtual float getWidth(); virtual float getHeight();
     virtual float getDestWidth(); virtual float getDestHeight();
     float getBorderSize(); float getDestBorderSize();
-    float getTextHeight();
-    float getTextScale();
     float getLBound(); float getRBound(); float getUBound(); float getDBound();
+
+    float getTextHeight(); float getTextWidth();
+    float getTextScale();
     
     /*
      * Change the position of the object. Move may or may not have animation
@@ -173,6 +174,9 @@ protected:
     
     FTFont* font;
     FTBBox textBounds;
+    // amount to scale the text relative to the total size
+    float relativeTextScale;
+
     GLuint borderTex;
     // width/height of our border/background texture in
     // pixels

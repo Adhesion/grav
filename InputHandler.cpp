@@ -177,6 +177,10 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
 
             printf( "\tDescription of codec: %s\n", (*si)->getPayloadDesc() );
             printf( "\tis muted? %i\n", (*si)->isMuted() );
+
+            printf( "\tSize: %f x %f\n", (*si)->getWidth(), (*si)->getHeight() );
+            printf( "\tText size: %f x %f\n", (*si)->getTextWidth(),
+                        (*si)->getTextHeight() );
         }
         printf( "DrawnObjects:\n" );
         for ( unsigned int i = 0; i < grav->getDrawnObjects()->size(); i++ )

@@ -80,6 +80,8 @@ void RectangleBase::setDefaults()
     showLockStatus = false;
     locked = false;
     
+    relativeTextScale = 0.0009;
+
     destBColor.R = 1.0f; destBColor.G = 1.0f;
     destBColor.B = 1.0f; destBColor.A = 0.7f;
     borderColor = destBColor;
@@ -160,9 +162,15 @@ float RectangleBase::getTextHeight()
             * getTextScale();
 }
 
+float RectangleBase::getTextWidth()
+{
+    return ( textBounds.Upper().Xf() - textBounds.Lower().Xf() )
+            * getTextScale();
+}
+
 float RectangleBase::getTextScale()
 {
-    return scaleX * 0.0009;
+    return scaleX * relativeTextScale;
 }
 
 void RectangleBase::move( float _x, float _y )
@@ -371,7 +379,14 @@ bool RectangleBase::updateName()
 
 void RectangleBase::updateTextBounds()
 {
-    if ( font ) textBounds = font->BBox( getSubName().c_str() );
+    if ( font )
+    {
+        textBounds = font->BBox( getSubName().c_str() );
+        if ( getTextWidth() > getWidth() + 0.05f )
+        {
+            relativeTextScale = 0.0009 * ( getWidth() / getTextWidth() );
+        }
+    }
 }
 
 void RectangleBase::setSubstring( int start, int end )
