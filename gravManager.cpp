@@ -81,7 +81,6 @@ gravManager::~gravManager()
 void gravManager::draw()
 {   
     //audioSession_listener.printLevels();
-    audioFocusTrigger = false;
     
     // don't draw if either of these objects haven't been initialized yet
     if ( !earth || !input ) return;
@@ -203,8 +202,10 @@ void gravManager::draw()
         // drawing their members
         if ( !(*si)->isGrouped() )
         {
-            // set the audio effect level
-            if ( audioEnabled && drawCounter == 0 )
+            // set the audio effect level on the drawcounter, if audio is
+            // enabled, and if it's selectable (excludes runway)
+            // TODO maybe change this if meaning of selectable changes
+            if ( audioEnabled && drawCounter == 0 && (*si)->isSelectable() )
             {
                 // TODO: do a lookup with CNAME if siteIDs aren't enabled
                 if ( (*si)->getSiteID().compare("") != 0 )
@@ -246,14 +247,17 @@ void gravManager::draw()
     //printf( "glutDisplay::done drawing objects\n" );
     
     // do the audio focus if it triggered
-    if ( audioEnabled && audioFocusTrigger )
+    if ( audioEnabled )
     {
-        layouts->focus( getScreenRect(), outerObjs, innerObjs );
+        if ( audioFocusTrigger )
+        {
+            layouts->focus( getScreenRect(), outerObjs, innerObjs );
+            audioFocusTrigger = false;
+        }
 
         outerObjs.clear();
         innerObjs.clear();
     }
-    audioFocusTrigger = false;
 
     unlockSources();
 
