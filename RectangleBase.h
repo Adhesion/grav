@@ -44,11 +44,18 @@ public:
     virtual float getWidth(); virtual float getHeight();
     virtual float getDestWidth(); virtual float getDestHeight();
     float getBorderSize(); float getDestBorderSize();
+    float getBorderScale();
     float getLBound(); float getRBound(); float getUBound(); float getDBound();
 
     float getTextHeight(); float getTextWidth();
     float getTextScale();
-    
+
+    /*
+     * Offset of the center of just the video/inner rectangle content to the
+     * center of the whole, meaning the borders and text are included.
+     */
+    float getCenterOffsetX(); float getCenterOffsetY();
+
     /*
      * Change the position of the object. Move may or may not have animation
      * (based on the animation switch), set will never have animation.
@@ -73,6 +80,13 @@ public:
     virtual void setWidth( float w );
     virtual void setHeight( float h );
     
+    /*
+     * Change the total size, ie, including borders and text, while preserving
+     * aspect ratio.
+     */
+    void setTotalWidth( float w );
+    void setTotalHeight( float h );
+
     /*
      * Set the background texture for this object.
      */
@@ -177,6 +191,8 @@ protected:
     // amount to scale the text relative to the total size
     float relativeTextScale;
 
+    // size of the border relative to total size
+    float borderScale;
     GLuint borderTex;
     // width/height of our border/background texture in
     // pixels

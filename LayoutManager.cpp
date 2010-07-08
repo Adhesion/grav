@@ -236,12 +236,12 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
             if ( aspect > objectAspect )
             {
                 //printf( "layout setting height to %f\n", newHeight );
-                objects[i]->setHeight( newHeight );
+                objects[i]->setTotalHeight( newHeight );
             }
             else
             {
                 //printf( "layout setting width to %f\n", newWidth );
-                objects[i]->setWidth( newWidth );
+                objects[i]->setTotalWidth( newWidth );
             }
         }
     }
@@ -309,18 +309,20 @@ bool LayoutManager::fullscreen( float boundL, float boundR, float boundU,
 {
     float spaceAspect = fabs((boundR-boundL)/(boundU-boundD));
     float objectAspect = object->getWidth()/object->getHeight();
-    
+
     if ( spaceAspect > objectAspect )
     {
-        object->setHeight( boundU-boundD );
+        object->setTotalHeight( boundU-boundD );
     }
     else
     {
-        object->setWidth( boundR-boundL );
+        object->setTotalWidth( boundR-boundL );
     }
-    
-    object->move( (boundR+boundL)/2.0f, (boundU+boundD)/2.0f );
-    
+
+    // TODO need to change this if getCenterOffsetX() is ever meaningful
+    object->move( (boundR+boundL)/2.0f, ((boundU+boundD)/2.0f) -
+                    object->getCenterOffsetY() );
+
     return true;
 }
 

@@ -82,6 +82,8 @@ void RectangleBase::setDefaults()
     
     relativeTextScale = 0.0009;
 
+    borderScale = 0.04;
+
     destBColor.R = 1.0f; destBColor.G = 1.0f;
     destBColor.B = 1.0f; destBColor.A = 0.7f;
     borderColor = destBColor;
@@ -148,12 +150,17 @@ float RectangleBase::getDBound()
 
 float RectangleBase::getBorderSize()
 {
-    return getWidth() * 0.04;
+    return getWidth() * borderScale;
 }
 
 float RectangleBase::getDestBorderSize()
 {
-    return getDestWidth() * 0.04;
+    return getDestWidth() * borderScale;
+}
+
+float RectangleBase::getBorderScale()
+{
+    return borderScale;
 }
 
 float RectangleBase::getTextHeight()
@@ -171,6 +178,19 @@ float RectangleBase::getTextWidth()
 float RectangleBase::getTextScale()
 {
     return scaleX * relativeTextScale;
+}
+
+// TODO this is 0 since the text can only be at the top - maybe change this
+// later if text can be in multiple positions
+float RectangleBase::getCenterOffsetX()
+{
+    return 0.0f;
+}
+
+float RectangleBase::getCenterOffsetY()
+{
+    float textRatio = getTextHeight() / getHeight();
+    return textRatio * getDestHeight() / 2.0f;
 }
 
 void RectangleBase::move( float _x, float _y )
@@ -206,6 +226,19 @@ void RectangleBase::setWidth( float w )
 void RectangleBase::setHeight( float h )
 {
     setScale( destScaleX * h / destScaleY, h );
+}
+
+// TODO make these more generic, maybe if text can be in different places
+void RectangleBase::setTotalWidth( float w )
+{
+    setWidth( w * (1.0f - ( 2.0f * getBorderScale() ) ) );
+}
+
+void RectangleBase::setTotalHeight( float h )
+{
+    float textRatio = getTextHeight() / getHeight();
+    printf( "RectangleBase::setting total height: text ratio is %f\n", textRatio );
+    setHeight( h * (1.0f - textRatio - ( 2.0f * getBorderScale() ) ) );
 }
 
 void RectangleBase::setTexture( GLuint tex, int width, int height )
