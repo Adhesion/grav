@@ -30,10 +30,20 @@ bool GLUtil::initGL()
     if ( glMajorVer >= 2 && !disableShaders )
     {
         YUV420Program = GLUtil::loadShaders( "GLSL/YUV420toRGB24" );
-        YUV420xOffsetID = glGetUniformLocation( YUV420Program, "xOffset" );
-        YUV420yOffsetID = glGetUniformLocation( YUV420Program, "yOffset" );
-        shaders = true;
-        printf( "GLUtil::initGL(): shaders are available (GL v%s)\n", glVer );
+        if ( YUV420Program )
+        {
+            YUV420xOffsetID = glGetUniformLocation( YUV420Program, "xOffset" );
+            YUV420yOffsetID = glGetUniformLocation( YUV420Program, "yOffset" );
+            shaders = true;
+            printf( "GLUtil::initGL(): shaders are available (GL v%s)\n",
+                        glVer );
+        }
+        else
+        {
+            shaders = false;
+            printf( "GLUtil::initGL(): shaders NOT available (GL v%s)\n",
+                        glVer );
+        }
     }
     else
     {

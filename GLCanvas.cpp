@@ -95,23 +95,37 @@ Timer::Timer( GLCanvas* c ) :
 
 void Timer::Notify()
 {
-    //canvas->draw();
+    canvas->draw();
     //printTiming();
 }
 
 void Timer::Start()
 {
-    wxTimer::Start( 1000 );
+    wxTimer::Start( 16 );
 }
 
 void Timer::printTiming()
 {
+    time_t diff = getTiming();
+    printf( "%lu\n", (unsigned long)diff );
+
+    resetTiming();
+}
+
+time_t Timer::getTiming()
+{
     gettimeofday( &time, NULL );
     time_t diff;
+
     if ( lastTimeMS > time.tv_usec )
         diff = (time.tv_usec+1000000) - lastTimeMS;
     else
         diff = time.tv_usec - lastTimeMS;
-    printf( "%lu\n", (unsigned long)diff );
+
+    return diff;
+}
+
+void Timer::resetTiming()
+{
     lastTimeMS = time.tv_usec;
 }

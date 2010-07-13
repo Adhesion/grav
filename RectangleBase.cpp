@@ -237,7 +237,6 @@ void RectangleBase::setTotalWidth( float w )
 void RectangleBase::setTotalHeight( float h )
 {
     float textRatio = getTextHeight() / getHeight();
-    printf( "RectangleBase::setting total height: text ratio is %f\n", textRatio );
     setHeight( h * (1.0f - textRatio - ( 2.0f * getBorderScale() ) ) );
 }
 

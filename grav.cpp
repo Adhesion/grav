@@ -67,9 +67,9 @@ bool gravApp::OnInit()
     GLUtil::getInstance()->initGL();
     
     //printf( "hide root? %i\n", tree->HasFlag( wxTR_HIDE_ROOT ) );
-    
     timer = new Timer( canvas );
     timer->Start();
+    videoSession_listener->setTimer( timer );
     
     Earth* earth = new Earth();
     InputHandler* input = new InputHandler( earth, grav );
@@ -105,21 +105,55 @@ bool gravApp::OnInit()
 int gravApp::OnExit()
 {
     printf( "grav::Exiting...\n" );
-    // TODO: deconstructors, etc
+    // TODO: test this stuff more
+
     GLUtil::getInstance()->cleanupGL();
     threadRunning = false;
     thread_join( VPMthread );
+
+    delete canvas;
+    delete timer;
+    delete tree;
+
+    delete grav;
+
+    if ( videoSession && videoInitialized )
+    {
+        delete videoSession;
+        delete videoSession_listener;
+    }
+    if ( audioEnabled && audioSession && audioInitialized )
+    {
+        delete audioSession;
+        delete audioSession_listener;
+    }
+
     return 0;
 }
 
 void gravApp::idleHandler( wxIdleEvent& evt )
 {
     if ( !usingThreads )
+    {
         iterateSessions();
+        evt.RequestMore();
+    }
 
-    canvas->draw();
+    // note this is the method for rendering on idle, with a limiter to 16ms
+    // (60fps) - disabled for now since timer seems decent enough
+    /*unsigned long time = (unsigned long)timer->getTiming();
+    if ( time > 16000 )
+    {
+        printf( "%lu\n", time );
+        //canvas->draw();
+        timer->resetTiming();
+    }
+    else
+    {
+        usleep( 1000 );
+    }
 
-    evt.RequestMore();
+    evt.RequestMore();*/
     //timer->printTiming();
 }
 
@@ -241,6 +275,7 @@ void* gravApp::threadTest( void* args )
     while ( g->isThreadRunning() )
     {
         g->iterateSessions();
+        usleep( 1000 );
     }
     return 0;
 }

@@ -52,6 +52,8 @@ public:
     
     // print number of microseconds since last call
     void printTiming();
+    time_t getTiming();
+    void resetTiming();
 
 private:
     GLCanvas* canvas;

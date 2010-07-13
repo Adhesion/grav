@@ -15,9 +15,8 @@
 class gravManager;
 class VPMVideoSink;
 class GLCanvas;
+class Timer;
 
-static struct timeval timeVS;
-static time_t lastTimeVS;
 static void newFrameCallbackTest( VPMVideoSink* sink, int buffer_idx,
                                 void* user_data );
  
@@ -42,8 +41,11 @@ public:
                                      const char *data, 
                                      uint32_t data_len);
 
+    void setTimer( Timer* t );
+
 private:
     gravManager* grav;
+    Timer* timer;
     
     // initial starting points for videos
     float x;

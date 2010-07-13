@@ -54,12 +54,13 @@ VideoListener::vpmsession_source_created(VPMSession &session,
 
         d->connectVideoProcessor(sink);
 
-        printf( "creating new source at %f,%f\n", x, y );
+        //printf( "creating new source at %f,%f\n", x, y );
         
         VideoSource* source = new VideoSource( &session, ssrc, sink, x, y );
         grav->addNewSource( source );
         
-        sink->addNewFrameCallback( &newFrameCallbackTest, NULL );
+        // new frame callback mostly just used for testing
+        //sink->addNewFrameCallback( &newFrameCallbackTest, (void*)timer );
 
         // do some basic grid positions
         // TODO make this better, use layoutmanager somehow?
@@ -168,14 +169,18 @@ VideoListener::vpmsession_source_app(VPMSession &session,
     }
 }
 
+void VideoListener::setTimer( Timer* t )
+{
+    timer = t;
+}
+
 static void newFrameCallbackTest( VPMVideoSink* sink, int buffer_idx,
                                 void* user_data )
 {
     //printf( "new frame callback\n" );
 
-    gettimeofday( &timeVS, NULL );
-    time_t diff = timeVS.tv_usec - lastTimeVS;
-    lastTimeVS = timeVS.tv_usec;
+    //Timer* timer = (Timer*)user_data;
+    //if ( timer ) timer->printTiming();
 
     //printf( "VS::newframe: diff is %d\n", diff );
 }
