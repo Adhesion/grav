@@ -46,7 +46,7 @@ class Timer : public wxTimer
 {
     
 public:
-    Timer( GLCanvas* c );
+    Timer( GLCanvas* c, int i );
     void Notify();
     void Start();
     
@@ -57,6 +57,10 @@ public:
 
 private:
     GLCanvas* canvas;
+
+    // interval between timer firing, in milliseconds
+    int interval;
+
     struct timeval time;
     time_t lastTimeMS;
     

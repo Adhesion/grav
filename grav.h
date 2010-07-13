@@ -70,6 +70,8 @@ private:
     Timer* timer;
     TreeControl* tree;
     
+    int timerInterval;
+
     gravManager* grav;
     
     bool usingThreads;
@@ -99,7 +101,7 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 {
     { wxCMD_LINE_SWITCH, _("h"), _("help"), _("displays the help message"),
         wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
-    
+
     { wxCMD_LINE_SWITCH, _("t"), _("threads"), _("enables threading separation"
             " of graphics and network/decoding") },
 
@@ -111,9 +113,12 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 
     { wxCMD_LINE_OPTION, _("a"), _("audio"), _("RTP audio session address"),
         wxCMD_LINE_VAL_STRING },
-    
+
+    { wxCMD_LINE_OPTION, _("f"), _("fps"), _("framerate for rendering"),
+        wxCMD_LINE_VAL_NUMBER },
+
     { wxCMD_LINE_PARAM, NULL, NULL, _("video address"), wxCMD_LINE_VAL_STRING },
-    
+
     { wxCMD_LINE_NONE }
 };
 

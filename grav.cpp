@@ -67,7 +67,7 @@ bool gravApp::OnInit()
     GLUtil::getInstance()->initGL();
     
     //printf( "hide root? %i\n", tree->HasFlag( wxTR_HIDE_ROOT ) );
-    timer = new Timer( canvas );
+    timer = new Timer( canvas, timerInterval );
     timer->Start();
     videoSession_listener->setTimer( timer );
     
@@ -136,6 +136,7 @@ void gravApp::idleHandler( wxIdleEvent& evt )
     if ( !usingThreads )
     {
         iterateSessions();
+        usleep( 500 );
         evt.RequestMore();
     }
 
@@ -154,7 +155,6 @@ void gravApp::idleHandler( wxIdleEvent& evt )
     }
 
     evt.RequestMore();*/
-    //timer->printTiming();
 }
 
 bool gravApp::initSession( std::string address, bool audio )
@@ -240,6 +240,21 @@ bool gravApp::handleArgs()
     disableShaders = parser.Found( _("disable-shaders") );
 
     grav->setRunwayUsage( !parser.Found( _("automatic") ) );
+
+    long int fps;
+    if ( parser.Found( _("fps"), &fps ) )
+    {
+        timerInterval = floor( 1000.0f / (float)fps );
+        if ( timerInterval < 1 )
+        {
+            printf( "ERROR: invalid fps value, resetting to ~60\n" );
+            timerInterval = 16;
+        }
+    }
+    else
+    {
+        timerInterval = 16;
+    }
 
     return true;
 }

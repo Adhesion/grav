@@ -86,8 +86,8 @@ void GLCanvas::GLreshape( int w, int h )
     grav->setWindowSize( w, h );
 }
 
-Timer::Timer( GLCanvas* c ) :
-    canvas( c )
+Timer::Timer( GLCanvas* c, int i ) :
+    canvas( c ), interval( i )
 {
     gettimeofday( &time, NULL );
     lastTimeMS = time.tv_usec;
@@ -101,7 +101,8 @@ void Timer::Notify()
 
 void Timer::Start()
 {
-    wxTimer::Start( 16 );
+    printf( "Timer::starting at interval %i\n", interval);
+    wxTimer::Start( interval );
 }
 
 void Timer::printTiming()
