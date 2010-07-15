@@ -14,6 +14,7 @@
 #include <sys/time.h>
 
 class gravManager;
+class Timer;
 
 class GLCanvas : public wxGLCanvas
 {
@@ -21,11 +22,16 @@ class GLCanvas : public wxGLCanvas
 public:
     GLCanvas( wxWindow* parent, gravManager* g, int* attributes, int width,
                 int height );
+    ~GLCanvas();
+
     void handlePaintEvent( wxPaintEvent& evt );
     void draw();
     void resize( wxSizeEvent& evt );
     void GLreshape( int w, int h );
     
+    void stopTimer();
+    void setTimer( Timer* t );
+
 private:
     gravManager* grav;
     wxGLContext* glContext;
@@ -37,8 +43,9 @@ private:
     // tracks the aspect ratio of the screen for reshaping
     float screen_width, screen_height;
 
-    struct timeval time;
-    time_t lastTimeMS;
+    // if draw is being called by a timer, have a reference to it so we can stop
+    // it if need be
+    Timer* renderTimer;
 
 };
 

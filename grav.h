@@ -3,9 +3,11 @@
 
 /**
  * @file grav.h
+ *
  * Header file for main grav app - contains the definition for the main class,
  * which acts as the main WX app/controller and OnInit() which acts as the
  * main().
+ *
  * @author Andrew Ford
  */
 
@@ -15,6 +17,7 @@
 
 class GLCanvas;
 class Timer;
+class Frame;
 class gravManager;
 class TreeControl;
 class VideoListener;
@@ -63,8 +66,8 @@ private:
 
     wxCmdLineParser parser;
     
-    wxFrame* mainFrame;
-    wxFrame* treeFrame;
+    Frame* mainFrame;
+    Frame* treeFrame;
     
     GLCanvas* canvas;
     Timer* timer;

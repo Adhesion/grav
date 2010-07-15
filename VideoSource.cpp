@@ -419,7 +419,6 @@ void VideoSource::toggleMute()
 {
     session->enableSource( ssrc, isMuted() );
     enableRendering = !isMuted();
-    printf( "mute toggled, state now %i/%i\n", enableRendering, isMuted() );
 }
 
 bool VideoSource::isMuted()

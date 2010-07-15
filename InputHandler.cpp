@@ -12,6 +12,7 @@
 #include "Group.h"
 #include "gravManager.h"
 #include "Earth.h"
+#include "Frame.h"
 
 #include <VPMedia/random_helper.h>
 
@@ -23,8 +24,8 @@ EVT_LEFT_DOWN(InputHandler::wxMouseLDown)
 EVT_LEFT_UP(InputHandler::wxMouseLUp)
 END_EVENT_TABLE()
 
-InputHandler::InputHandler( Earth* e, gravManager* g )
-    : earth( e ), grav( g )
+InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
+    : earth( e ), grav( g ), mainFrame( f )
 {
     tempSelectedObjects = new std::vector<RectangleBase*>();
     dragging = false;
@@ -305,7 +306,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     case 'Q':
     case 'q':
     case 27:
-        exit(0);
+        mainFrame->Close();
         break;
     }
 

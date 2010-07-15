@@ -21,9 +21,14 @@ TreeControl::TreeControl() :
 TreeControl::TreeControl( wxFrame* parent ) :
     wxTreeCtrl( parent, wxID_ANY )
 {
-    rootID = AddRoot(_("Groups"), -1, -1, new wxTreeItemData() );
+    rootID = AddRoot( _("Groups"), -1, -1, new wxTreeItemData() );
     SetSize( parent->GetSize() );
     //SetWindowStyle( GetWindowStyle() | wxTR_HIDE_ROOT );
+}
+
+TreeControl::~TreeControl()
+{
+    sourceManager->setTree( NULL );
 }
 
 void TreeControl::addSession( std::string address )
@@ -155,4 +160,9 @@ int TreeControl::OnCompareItems( const wxTreeItemId& item1,
         return 1;
     else
         return obj1->getName().compare( obj2->getName() );
+}
+
+void TreeControl::setSourceManager( gravManager* g )
+{
+    sourceManager = g;
 }

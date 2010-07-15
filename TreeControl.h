@@ -21,7 +21,9 @@ class TreeControl : public wxTreeCtrl
 public:
     TreeControl();
     TreeControl( wxFrame* parent );
-    
+
+    ~TreeControl();
+
     /*
      * Adds a new entry to represent a video or audio session. Sessions will
      * always be direct children of the root node.
@@ -40,9 +42,12 @@ public:
      */
     int OnCompareItems( const wxTreeItemId& item1,
                             const wxTreeItemId& item2 );
+
+    void setSourceManager( gravManager* g );
     
 private:
     wxTreeItemId rootID;
+    gravManager* sourceManager;
     
 };
 

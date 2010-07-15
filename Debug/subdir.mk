@@ -6,6 +6,7 @@
 CPP_SRCS += \
 ../AudioManager.cpp \
 ../Earth.cpp \
+../Frame.cpp \
 ../GLCanvas.cpp \
 ../GLUtil.cpp \
 ../Group.cpp \
@@ -24,6 +25,7 @@ CPP_SRCS += \
 OBJS += \
 ./AudioManager.o \
 ./Earth.o \
+./Frame.o \
 ./GLCanvas.o \
 ./GLUtil.o \
 ./Group.o \
@@ -42,6 +44,7 @@ OBJS += \
 CPP_DEPS += \
 ./AudioManager.d \
 ./Earth.d \
+./Frame.d \
 ./GLCanvas.d \
 ./GLUtil.d \
 ./Group.d \

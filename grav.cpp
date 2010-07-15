@@ -15,6 +15,7 @@
 #include "VideoSource.h"
 #include "VideoListener.h"
 #include "AudioManager.h"
+#include "Frame.h"
 
 #include <VPMedia/VPMLog.h>
 #include <VPMedia/VPMPayloadDecoderFactory.h>
@@ -42,15 +43,18 @@ bool gravApp::OnInit()
 
     handleArgs();
     
-    mainFrame = new wxFrame( (wxFrame*)NULL, -1, _("grav"),
-                        wxPoint( 10, 50 ),
+    mainFrame = new Frame( (wxFrame*)NULL, -1, _("grav"), wxPoint( 10, 50 ),
                         wxSize( windowWidth, windowHeight ) );
     mainFrame->Show( true );
+    mainFrame->SetName( _("main grav frame") );
+    SetTopWindow( mainFrame );
+    mainFrame->SetFocus();
+    //mainFrame->ShowFullScreen( true );
     
-    treeFrame = new wxFrame( (wxFrame*)NULL, -1, _("grav menu"),
-                        wxPoint( 960, 50 ),
+    treeFrame = new Frame( mainFrame, -1, _("grav menu"), wxPoint( 960, 50 ),
                         wxSize( 300, 600 ) );
     treeFrame->Show( true );
+    treeFrame->SetName( _("tree frame") );
     
     int attribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24,
                             0 };
@@ -58,6 +62,7 @@ bool gravApp::OnInit()
     canvas = new GLCanvas( mainFrame, grav, attribList, windowWidth,
                             windowHeight );
     tree = new TreeControl( treeFrame );
+    tree->setSourceManager( grav );
     
     // since that bool is used in init, set it before init
     GLUtil::getInstance()->setShaderDisable( disableShaders );
@@ -72,13 +77,14 @@ bool gravApp::OnInit()
     videoSession_listener->setTimer( timer );
     
     Earth* earth = new Earth();
-    InputHandler* input = new InputHandler( earth, grav );
+    InputHandler* input = new InputHandler( earth, grav, mainFrame );
     
     // add the input handler to the chain of things that can handle
     // events & give the canvas focus so we don't have to click on it to
     // start sending key events
     canvas->PushEventHandler( input );
     canvas->SetFocus();
+    canvas->setTimer( timer );
     
     grav->setEarth( earth );
     grav->setInput( input );
@@ -105,17 +111,19 @@ bool gravApp::OnInit()
 int gravApp::OnExit()
 {
     printf( "grav::Exiting...\n" );
-    // TODO: test this stuff more
+    // TODO: test this stuff more, valgrind etc
 
-    GLUtil::getInstance()->cleanupGL();
-    threadRunning = false;
-    thread_join( VPMthread );
+    if ( usingThreads )
+    {
+        threadRunning = false;
+        thread_join( VPMthread );
+    }
 
-    delete canvas;
+    // note, tree and canvas get deleted automatically since they're children
+    // of frames and frames delete their children automatically
+    // and those set the grav manager's tree to null and stop the timer
+    // respectively
     delete timer;
-    delete tree;
-
-    delete grav;
 
     if ( videoSession && videoInitialized )
     {
@@ -127,6 +135,10 @@ int gravApp::OnExit()
         delete audioSession;
         delete audioSession_listener;
     }
+
+    delete grav;
+
+    GLUtil::getInstance()->cleanupGL();
 
     return 0;
 }
@@ -214,7 +226,7 @@ bool gravApp::handleArgs()
     // if parse returns -1 then it spit out the help message, so exit
     if ( result == -1 )
     {
-        exit(0);
+        Exit();
     }
     
     wxString videoAddress = parser.GetParam( 0 );
@@ -292,6 +304,7 @@ void* gravApp::threadTest( void* args )
         g->iterateSessions();
         usleep( 1000 );
     }
+    printf( "gravApp::thread ending...\n" );
     return 0;
 }
 

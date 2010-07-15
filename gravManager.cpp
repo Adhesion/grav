@@ -194,7 +194,7 @@ void gravManager::draw()
         {
             // only bother updating it on the tree if it actually
             // changes - to suppress "" from getting shown
-            if ( (*si)->updateName() )
+            if ( tree && (*si)->updateName() )
                 tree->updateObjectName( (*si) );
         }
         
@@ -804,7 +804,8 @@ void gravManager::deleteGroup( Group* g )
 void gravManager::removeFromLists( RectangleBase* obj )
 {
     // remove it from the tree
-    tree->removeObject( obj );
+    if ( tree )
+        tree->removeObject( obj );
 
     // remove it from drawnobjects, if it is being drawn
     std::vector<RectangleBase*>::iterator i = drawnObjects->begin();

@@ -22,6 +22,7 @@ class Earth;
 class Group;
 class gravManager;
 class LayoutManager;
+class Frame;
 
 typedef double GLdouble;
 
@@ -29,7 +30,7 @@ class InputHandler : public wxEvtHandler
 {
     
 public:
-    InputHandler( Earth* e, gravManager* g );
+    InputHandler( Earth* e, gravManager* g, Frame* f );
     ~InputHandler();
     
     void wxKeyDown( wxKeyEvent& evt );
@@ -60,6 +61,9 @@ private:
     // parent class
     gravManager* grav;
     
+    // main gui window so we can trigger the proper quit sequence
+    Frame* mainFrame;
+
     LayoutManager layouts;
 
     // special input modifiers like CTRL

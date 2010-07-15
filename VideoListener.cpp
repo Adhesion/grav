@@ -79,7 +79,7 @@ VideoListener::vpmsession_source_deleted(VPMSession &session,
                     const char *reason)
 {
     std::vector<VideoSource*>::iterator si;
-    printf( "grav: deleting ssrc 0x%08x\n", ssrc );
+    //printf( "grav: deleting ssrc 0x%08x\n", ssrc );
     for ( si = grav->getSources()->begin();
             si != grav->getSources()->end(); ++si )
     {
@@ -89,7 +89,10 @@ VideoListener::vpmsession_source_deleted(VPMSession &session,
             return;
         }
     }
-    printf( "VideoListener::source_deleted: ERROR: ssrc not found?\n" );
+    // seems to get a lot of "sources deleted but not in video sources list" on
+    // exit - may be that view-only clients are listed in the session. need to
+    // test more, but not that much of an issue
+    //printf( "VideoListener::source_deleted: ERROR: ssrc not found?\n" );
 }
 
 void 
@@ -159,10 +162,13 @@ VideoListener::vpmsession_source_app(VPMSession &session,
             g->add( *i );
             
             // adding & removing will replace the object under its group
-            grav->getTree()->removeObject( (*i) );
-            grav->getTree()->addObject( (*i) );
-            
-            grav->getTree()->updateObjectName( g );
+            if ( grav->getTree() )
+            {
+                grav->getTree()->removeObject( (*i) );
+                grav->getTree()->addObject( (*i) );
+
+                grav->getTree()->updateObjectName( g );
+            }
         }
 
         grav->unlockSources();

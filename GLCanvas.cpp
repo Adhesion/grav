@@ -22,8 +22,11 @@ GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
     SetSize( wxSize( width, height ) );
     glContext = new wxGLContext( this );
     SetCurrent( *glContext );
-    gettimeofday( &time, NULL );
-    lastTimeMS = time.tv_usec;
+}
+
+GLCanvas::~GLCanvas()
+{
+    stopTimer();
 }
 
 void GLCanvas::handlePaintEvent( wxPaintEvent& evt )
@@ -84,6 +87,16 @@ void GLCanvas::GLreshape( int w, int h )
     // (finding the world space bounds for the screen) depends on the matrices
     // above being accurate
     grav->setWindowSize( w, h );
+}
+
+void GLCanvas::stopTimer()
+{
+    renderTimer->Stop();
+}
+
+void GLCanvas::setTimer( Timer* t )
+{
+    renderTimer = t;
 }
 
 Timer::Timer( GLCanvas* c, int i ) :
