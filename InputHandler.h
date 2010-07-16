@@ -82,8 +82,12 @@ private:
     float dragPrevY;
     
     bool leftButtonHeld;
+
+    // note shiftheld and altheld are for when ONLY those are held down - maybe
+    // change this to be more consistent
     bool ctrlHeld;
     bool shiftHeld;
+    bool altHeld;
     bool clickedInside;
     bool dragging;
     

@@ -33,6 +33,7 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     leftButtonHeld = false;
     ctrlHeld = false;
     shiftHeld = false;
+    altHeld = false;
 }
 
 InputHandler::~InputHandler()
@@ -43,10 +44,8 @@ InputHandler::~InputHandler()
 
 void InputHandler::wxKeyDown( wxKeyEvent& evt )
 {
-    if ( evt.GetModifiers() == wxMOD_SHIFT )
-        shiftHeld = true;
-    else
-        shiftHeld = false;
+    shiftHeld = ( evt.GetModifiers() == wxMOD_SHIFT );
+    altHeld = ( evt.GetModifiers() == wxMOD_ALT );
     
     processKeyboard( evt.GetKeyCode(), 0, 0 );
 
@@ -86,11 +85,12 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     std::vector<VPMVideoBufferSink*>::iterator t;
     std::map<std::string,Group*>::iterator mapi;
     unsigned char key = (unsigned char)keyCode;
-    /*printf( "Char pressed is %c (%i)\n", key, key );
+    printf( "Char pressed is %c (%i)\n", key, key );
     printf( "keycode is %i\n", keyCode );
     printf( "x,y in processKeyboard is %i,%i\n", x, y );
     printf( "is shift held? %i\n", shiftHeld );
-    printf( "is ctrl held? %i\n", ctrlHeld );*/
+    printf( "is ctrl held? %i\n", ctrlHeld );
+    printf( "is alt held? %i\n", altHeld );
     std::vector<VideoSource*>::const_iterator si;
     // how much to scale when doing -/+: flipped in the former case
     float scaleAmt = 0.25f;
@@ -301,6 +301,14 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     case '=':
         if ( shiftHeld )
             grav->scaleSelectedObjects( scaleAmt );
+        break;
+
+    // enter - alt-enter for fullscreen
+    case 13:
+        if ( altHeld )
+        {
+            mainFrame->ShowFullScreen( !mainFrame->IsFullScreen() );
+        }
         break;
 
     case 'Q':
