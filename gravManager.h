@@ -148,6 +148,7 @@ public:
 
     bool usingRunway();
     void setRunwayUsage( bool run );
+    Runway* getRunway();
 
 private:
     

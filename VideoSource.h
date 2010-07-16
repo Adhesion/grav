@@ -52,13 +52,12 @@ public:
     float getDestWidth(); float getDestHeight();
     void setWidth( float w ); void setHeight( float h );
 
-    // set/get enable/disable for rendering
-    void setRendering( bool r );
-    bool getRendering();
-
     // set/get for mute (controls state of decoder)
     void toggleMute();
     bool isMuted();
+
+    // override the rendering set to account for muting
+    void setRendering( bool r );
 
 private:
     // reference to the session that this video comes from - needed for grabbing
@@ -86,9 +85,6 @@ private:
     // GL texture identifier
     GLuint texid;
     bool init;
-    
-    bool enableRendering;
-
 };
 
 #endif /* VIDEOSOURCE_H_ */

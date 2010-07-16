@@ -969,3 +969,8 @@ void gravManager::setRunwayUsage( bool run )
         drawnObjects->erase( it );
     }
 }
+
+Runway* gravManager::getRunway()
+{
+    return runway;
+}

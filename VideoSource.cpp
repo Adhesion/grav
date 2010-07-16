@@ -19,7 +19,6 @@ VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
     aspect = (float)vwidth / (float)vheight;
     tex_width = 0; tex_height = 0;
     texid = 0;
-    enableRendering = true;
     aspect = 1.33f;
 }
 
@@ -168,9 +167,22 @@ void VideoSource::draw()
         glUniform1f( GLUtil::getInstance()->getYUV420yOffsetID(), t );
     }
 
+    // this is kind of a hack - selectable and using the border color aren't
+    // really the same thing, but they go together when disabling the runway
+    // TODO make a separate variable?
+    if ( selectable )
+    {
+        glColor3f( 1.0f, 1.0f, 1.0f );
+    }
+    else
+    {
+        glColor4f( borderColor.R, borderColor.G, borderColor.B, borderColor.A );
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    }
+
     glEnable( GL_TEXTURE_2D );
     glBegin( GL_QUADS );
-    glColor3f( 1.0f, 1.0f, 1.0f );
 
     // now draw the actual quad that has the texture on it
     // size of the video in world space will be equivalent to getWidth x
@@ -216,9 +228,9 @@ void VideoSource::draw()
         glLineWidth( 3.0f );
 
         if ( isMuted() )
-            glColor3f( 1.0f, 0.0f, 0.15f );
+            glColor4f( 1.0f, 0.0f, 0.15f, borderColor.A );
         else
-            glColor3f( 0.5f, 0.5f, 0.9f );
+            glColor4f( 0.5f, 0.5f, 0.9f, borderColor.A );
 
         glVertex3f( -Xdist, Ydist - dist, 0.0f );
         glVertex3f( -Xdist + dist, Ydist, 0.0f );
@@ -229,6 +241,12 @@ void VideoSource::draw()
         glEnd();
     }
     
+    // see above
+    if ( !selectable )
+    {
+        glDisable( GL_BLEND );
+    }
+
     glPopMatrix();
 
 }
@@ -402,19 +420,6 @@ void VideoSource::setHeight( float h )
     setScale( destScaleX * (h/destScaleY), h );
 }
 
-void VideoSource::setRendering( bool r )
-{
-    // muting is related to rendering - enablerendering shouldn't be true when
-    // it's muted, so stop it from changing when it is muted
-    if ( !isMuted() )
-        enableRendering = r;
-}
-
-bool VideoSource::getRendering()
-{
-    return enableRendering;
-}
-
 void VideoSource::toggleMute()
 {
     session->enableSource( ssrc, isMuted() );
@@ -424,4 +429,12 @@ void VideoSource::toggleMute()
 bool VideoSource::isMuted()
 {
     return !session->isSourceEnabled( ssrc );
+}
+
+void VideoSource::setRendering( bool r )
+{
+    // muting is related to rendering - enablerendering shouldn't be true when
+    // it's muted, so stop it from changing when it is muted
+    if ( !isMuted() )
+        enableRendering = r;
 }

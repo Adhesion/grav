@@ -13,6 +13,7 @@
 #include "gravManager.h"
 #include "Earth.h"
 #include "Frame.h"
+#include "Runway.h"
 
 #include <VPMedia/random_helper.h>
 
@@ -140,7 +141,12 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         break;
 
     case 'R':
-        layouts.gridArrange( grav->getScreenRect(), true, false, true,
+        if ( altHeld )
+        {
+            grav->getRunway()->setRendering( !grav->getRunway()->getRendering() );
+        }
+        else
+            layouts.gridArrange( grav->getScreenRect(), true, false, true,
                                 movableObjects );
         break;
 
@@ -213,7 +219,17 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
                         si != grav->getSources()->end(); ++si )
         {
             if ( (*si)->isSelected() )
+            {
                 (*si)->toggleMute();
+                // add it to the runway if we're using it, it's visible, etc.
+                if ( !(*si)->isGrouped() && (*si)->isMuted() &&
+                        grav->usingRunway() &&
+                        grav->getRunway()->getRendering() )
+                {
+                    grav->getRunway()->add( (*si) );
+                    (*si)->setSelect( false );
+                }
+            }
         }
         break;
 

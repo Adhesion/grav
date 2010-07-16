@@ -80,6 +80,8 @@ void RectangleBase::setDefaults()
     showLockStatus = false;
     locked = false;
     
+    enableRendering = true;
+
     relativeTextScale = 0.0009;
 
     borderScale = 0.04;
@@ -340,16 +342,24 @@ void RectangleBase::setSelect( bool select )
     selected = select;
     if ( select )
     {
-        destBColor.R = 1.0f; destBColor.G = 1.0f;
-        destBColor.B = 0.0f, destBColor.A = 0.8f;
+        RGBAColor selectCol;
+        selectCol.R = 1.0f; selectCol.G = 1.0f;
+        selectCol.B = 0.0f, selectCol.A = 0.8f;
+
+        setColor( selectCol );
     }
     else
     {
-        destBColor = baseBColor;
+        setColor( baseBColor );
     }
     
-    if ( !animated )
-        borderColor = destBColor;
+    /*if ( !animated )
+        borderColor = destBColor;*/
+}
+
+void RectangleBase::setSelectable( bool s )
+{
+    selectable = s;
 }
 
 void RectangleBase::setEffectVal( float f )
@@ -387,6 +397,14 @@ Group* RectangleBase::getGroup()
 RGBAColor RectangleBase::getColor()
 {
     return borderColor;
+}
+
+void RectangleBase::setColor( RGBAColor c )
+{
+    destBColor = c;
+
+    if ( !animated )
+        borderColor = destBColor;
 }
 
 bool RectangleBase::isLocked()
@@ -448,6 +466,16 @@ bool RectangleBase::intersect( RectangleBase* other )
     float top = other->getY() + other->getHeight()/2;
     
     return intersect( left, right, top, bottom );
+}
+
+void RectangleBase::setRendering( bool r )
+{
+    enableRendering = r;
+}
+
+bool RectangleBase::getRendering()
+{
+    return enableRendering;
 }
 
 void RectangleBase::draw()
@@ -601,7 +629,7 @@ void RectangleBase::animateValues()
     borderColor.R += (destBColor.R-borderColor.R)/3.0f;
     borderColor.G += (destBColor.G-borderColor.G)/3.0f;
     borderColor.B += (destBColor.B-borderColor.B)/3.0f;
-    borderColor.A += (destBColor.A-borderColor.A)/3.0f;
+    borderColor.A += (destBColor.A-borderColor.A)/7.0f;
     
     // snap to the destination, since we'll never actually get there via
     // the above lines due to roundoff errors

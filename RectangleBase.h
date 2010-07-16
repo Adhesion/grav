@@ -91,7 +91,7 @@ public:
      * Set the background texture for this object.
      */
     void setTexture( GLuint tex, int width, int height );
-    
+
     float getX(); float getY(); float getZ();
     float getDestX(); float getDestY();
     float getScaleX(); float getScaleY();
@@ -107,6 +107,7 @@ public:
     bool isSelected();
     bool isSelectable();
     void setSelect( bool select );
+    void setSelectable( bool s );
     void setEffectVal( float f );
     void setAnimation( bool anim );
     
@@ -124,6 +125,7 @@ public:
     Group* getGroup();
     
     RGBAColor getColor();
+    void setColor( RGBAColor c );
 
     /*
      * For now locking only has meaning for groups, but is needed in the generic
@@ -155,6 +157,13 @@ public:
     bool intersect( float L, float R, float U, float D );
     bool intersect( RectangleBase* other );
     
+    // set/get enable/disable for rendering
+    // this means different things for different subclasses - in base it means
+    // nothing, videosource uses it to disable rendering, runway makes it
+    // invisible
+    virtual void setRendering( bool r );
+    bool getRendering();
+
     /*
      * GL draw function to render the object.
      */
@@ -204,6 +213,8 @@ protected:
     Group* myGroup;
     bool locked;
     bool showLockStatus;
+
+    bool enableRendering;
     
     bool animated;
     void animateValues();

@@ -15,16 +15,22 @@ Runway::Runway( float _x, float _y ) :
     orientation = 1;
     setName( "Runway" );
     intersectCounter = 0;
+    destBColor.R = 1.0f; destBColor.G = 1.0f;
+    destBColor.B = 1.0f; destBColor.A = 1.0f;
+    borderColor.A = 0.0f;
 }
 
 void Runway::draw()
 {
+    animateValues();
+
+    if ( borderColor.A < 0.01f )
+        return;
+
     if ( intersectCounter == 0 && objects.size() > 0 )
         checkMemberIntersect();
 
     intersectCounter = ( intersectCounter + 1 ) % 10;
-
-    animateValues();
 
     // note this must set up the position itself, since it doesn't call the
     // inherited draw method from RectangleBase
@@ -45,7 +51,8 @@ void Runway::draw()
     // the main box
     glBegin( GL_QUADS );
 
-    glColor4f( 0.2f, 0.2f, 0.25f, 0.25f );
+    glColor4f( borderColor.R * 0.2f, borderColor.G * 0.2f,
+                borderColor.B * 0.25f, borderColor.A * 0.25f );
 
     glVertex3f( -Xdist, -Ydist, 0.0 );
     glVertex3f( -Xdist, Ydist, 0.0 );
@@ -57,7 +64,8 @@ void Runway::draw()
     // the outline
     glBegin( GL_LINE_LOOP );
 
-    glColor4f( 0.4f, 0.4f, 0.45f, 0.35f );
+    glColor4f( borderColor.R * 0.4f, borderColor.G * 0.4f,
+                borderColor.B * 0.45f, borderColor.A * 0.35f );
 
     glVertex3f( -Xdist, -Ydist, 0.0 );
     glVertex3f( -Xdist, Ydist, 0.0 );
@@ -131,4 +139,21 @@ void Runway::checkMemberIntersect()
 
     if ( removed )
         rearrange();
+}
+
+void Runway::setRendering( bool r )
+{
+    printf( "Runway::setting rendering to %i\n", r );
+    enableRendering = r;
+
+    if ( !r )
+        destBColor.A = 0.0f;
+    else
+        destBColor.A = baseBColor.A;
+
+    for ( unsigned int i = 0; i < objects.size(); i++ )
+    {
+        objects[i]->setColor( destBColor );
+        objects[i]->setSelectable( r );
+    }
 }
