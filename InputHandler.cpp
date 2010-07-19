@@ -144,6 +144,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         if ( altHeld )
         {
             grav->getRunway()->setRendering( !grav->getRunway()->getRendering() );
+            grav->clearSelected();
         }
         else
             layouts.gridArrange( grav->getScreenRect(), true, false, true,
@@ -231,6 +232,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
                 }
             }
         }
+        grav->clearSelected();
         break;
 
     case 'O':
@@ -251,13 +253,13 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         }
         break;
 
-    case '0':
+    /*case '0':
         for ( si = grav->getSources()->begin();
                 si != grav->getSources()->end(); ++si )
         {
             (*si)->move( 0.0f, 0.0f );
         }
-        break;
+        break;*/
 
     case 'F':
         if ( !shiftHeld && grav->getSelectedObjects()->size() > 0 )

@@ -147,7 +147,15 @@ void Runway::setRendering( bool r )
     enableRendering = r;
 
     if ( !r )
+    {
         destBColor.A = 0.0f;
+        // set children to unselected just in case they're selected - user will
+        // probably end up moving them accidentally
+        for ( unsigned int i = 0; i < objects.size(); i++ )
+        {
+            objects[i]->setSelect( false );
+        }
+    }
     else
         destBColor.A = baseBColor.A;
 

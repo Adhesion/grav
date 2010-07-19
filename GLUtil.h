@@ -77,6 +77,7 @@ public:
     GLuint getYUV420Program();
     GLuint getYUV420xOffsetID();
     GLuint getYUV420yOffsetID();
+    GLuint getYUV420alphaID();
     
     FTFont* getMainFont();
 
@@ -108,6 +109,7 @@ private:
     GLuint YUV420Program;
     GLuint YUV420xOffsetID;
     GLuint YUV420yOffsetID;
+    GLuint YUV420alphaID;
 
     FTFont* mainFont;
 

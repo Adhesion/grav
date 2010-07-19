@@ -34,6 +34,7 @@ bool GLUtil::initGL()
         {
             YUV420xOffsetID = glGetUniformLocation( YUV420Program, "xOffset" );
             YUV420yOffsetID = glGetUniformLocation( YUV420Program, "yOffset" );
+            YUV420alphaID = glGetUniformLocation( YUV420Program, "alpha" );
             shaders = true;
             printf( "GLUtil::initGL(): shaders are available (GL v%s)\n",
                         glVer );
@@ -249,6 +250,11 @@ GLuint GLUtil::getYUV420yOffsetID()
     return YUV420yOffsetID;
 }
 
+GLuint GLUtil::getYUV420alphaID()
+{
+    return YUV420alphaID;
+}
+
 FTFont* GLUtil::getMainFont()
 {
     return mainFont;
@@ -270,6 +276,7 @@ GLUtil::GLUtil()
 
     frag420 =
     "uniform sampler2D texture;\n"
+    "uniform float alpha;\n"
     "\n"
     "varying vec2 yCoord;\n"
     "varying vec2 uCoord;\n"
@@ -284,11 +291,10 @@ GLUtil::GLUtil()
     "    float cb = u - 0.5;\n"
     "    float cr = v - 0.5;\n"
     "\n"
-    "    vec3 rgb = vec3( y + (cr*1.3874),\n"
-    "                     y - (cb*0.7109) - (cr*0.3438),\n"
-    "                     y + (cb*1.7734) );\n"
-    "\n"
-    "    gl_FragColor = vec4( rgb, 1.0 );\n"
+    "    gl_FragColor = vec4( y + (cr*1.3874),\n"
+    "                         y - (cb*0.7109) - (cr*0.3438),\n"
+    "                         y + (cb*1.7734),\n"
+    "                         alpha );\n"
     "}\n";
     
     vert420 =

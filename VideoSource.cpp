@@ -165,6 +165,11 @@ void VideoSource::draw()
         glUseProgram( GLUtil::getInstance()->getYUV420Program() );
         glUniform1f( GLUtil::getInstance()->getYUV420xOffsetID(), s );
         glUniform1f( GLUtil::getInstance()->getYUV420yOffsetID(), t );
+        if ( !selectable )
+        {
+            glUniform1f( GLUtil::getInstance()->getYUV420alphaID(),
+                            borderColor.A );
+        }
     }
 
     // this is kind of a hack - selectable and using the border color aren't
