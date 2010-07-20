@@ -20,6 +20,7 @@ VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
     tex_width = 0; tex_height = 0;
     texid = 0;
     aspect = 1.33f;
+    useAlpha = false;
 }
 
 VideoSource::~VideoSource()
@@ -172,18 +173,17 @@ void VideoSource::draw()
         }
     }
 
-    // this is kind of a hack - selectable and using the border color aren't
-    // really the same thing, but they go together when disabling the runway
-    // TODO make a separate variable?
-    if ( selectable )
+    // use alpha of border color for video if set
+    if ( useAlpha )
     {
-        glColor3f( 1.0f, 1.0f, 1.0f );
+        glColor4f( 1.0f, 1.0f, 1.0f, borderColor.A );
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
     }
     else
     {
-        glColor4f( borderColor.R, borderColor.G, borderColor.B, borderColor.A );
-        glEnable( GL_BLEND );
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glColor3f( 1.0f, 1.0f, 1.0f );
     }
 
     glEnable( GL_TEXTURE_2D );
@@ -232,10 +232,7 @@ void VideoSource::draw()
         glBegin( GL_LINES );
         glLineWidth( 3.0f );
 
-        if ( isMuted() )
-            glColor4f( 1.0f, 0.0f, 0.15f, borderColor.A );
-        else
-            glColor4f( 0.5f, 0.5f, 0.9f, borderColor.A );
+        glColor4f( borderColor.R, borderColor.G, borderColor.B, borderColor.A );
 
         glVertex3f( -Xdist, Ydist - dist, 0.0f );
         glVertex3f( -Xdist + dist, Ydist, 0.0f );
@@ -247,7 +244,7 @@ void VideoSource::draw()
     }
     
     // see above
-    if ( !selectable )
+    if ( !useAlpha )
     {
         glDisable( GL_BLEND );
     }
@@ -429,6 +426,14 @@ void VideoSource::toggleMute()
 {
     session->enableSource( ssrc, isMuted() );
     enableRendering = !isMuted();
+
+    if ( isMuted() )
+    {
+        baseBColor.R = 1.0f; baseBColor.G = 0.1f; baseBColor.B = 0.15f;
+        setColor( baseBColor );
+    }
+    else
+        resetColor();
 }
 
 bool VideoSource::isMuted()
@@ -441,5 +446,21 @@ void VideoSource::setRendering( bool r )
     // muting is related to rendering - enablerendering shouldn't be true when
     // it's muted, so stop it from changing when it is muted
     if ( !isMuted() )
+    {
         enableRendering = r;
+
+        if ( !enableRendering )
+        {
+            baseBColor.R = 0.05f; baseBColor.G = 0.1f; baseBColor.B = 1.0f;
+            setColor( baseBColor );
+        }
+        else
+            resetColor();
+    }
+}
+
+void VideoSource::setSelectable( bool s )
+{
+    RectangleBase::setSelectable( s );
+    useAlpha = !selectable;
 }

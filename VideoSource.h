@@ -56,8 +56,10 @@ public:
     void toggleMute();
     bool isMuted();
 
-    // override the rendering set to account for muting
+    // override RectangleBase::setRendering to account for muting
     void setRendering( bool r );
+    // override RectangleBase::setSelectable to affect alpha usage
+    void setSelectable( bool s );
 
 private:
     // reference to the session that this video comes from - needed for grabbing
@@ -78,13 +80,16 @@ private:
 
     // remake the buffer when the video gets resized
     void resizeBuffer();
-    
+
     // dimensions rounded up to power of 2
     unsigned int tex_width, tex_height;
-    
+
     // GL texture identifier
     GLuint texid;
     bool init;
+
+    // whether to apply color's alpha to video
+    bool useAlpha;
 };
 
 #endif /* VIDEOSOURCE_H_ */

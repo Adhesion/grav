@@ -161,7 +161,14 @@ void Runway::setRendering( bool r )
 
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
-        objects[i]->setColor( destBColor );
+        RGBAColor col = objects[i]->getBaseColor();
+        if ( !r )
+        {
+            col.A = 0.0f;
+            objects[i]->setColor( col );
+        }
+        else
+            objects[i]->setColor( col );
         objects[i]->setSelectable( r );
     }
 }

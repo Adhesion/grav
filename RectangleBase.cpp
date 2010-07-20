@@ -86,10 +86,7 @@ void RectangleBase::setDefaults()
 
     borderScale = 0.04;
 
-    destBColor.R = 1.0f; destBColor.G = 1.0f;
-    destBColor.B = 1.0f; destBColor.A = 0.7f;
-    borderColor = destBColor;
-    baseBColor = destBColor;
+    resetColor();
     
     animated = true;
     finalName = false;
@@ -352,9 +349,6 @@ void RectangleBase::setSelect( bool select )
     {
         setColor( baseBColor );
     }
-    
-    /*if ( !animated )
-        borderColor = destBColor;*/
 }
 
 void RectangleBase::setSelectable( bool s )
@@ -399,12 +393,27 @@ RGBAColor RectangleBase::getColor()
     return borderColor;
 }
 
+RGBAColor RectangleBase::getBaseColor()
+{
+    return baseBColor;
+}
+
 void RectangleBase::setColor( RGBAColor c )
 {
     destBColor = c;
 
     if ( !animated )
         borderColor = destBColor;
+}
+
+void RectangleBase::resetColor()
+{
+    printf( "RectangleBase::resetting color\n" );
+    RGBAColor original;
+    original.R = 1.0f; original.G = 1.0f;
+    original.B = 1.0f; original.A = 0.7f;
+    baseBColor = original;
+    setColor( original );
 }
 
 bool RectangleBase::isLocked()
@@ -504,14 +513,13 @@ void RectangleBase::draw()
     
     glEnable( GL_TEXTURE_2D );
     glBindTexture( GL_TEXTURE_2D, borderTex );
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 
-        twidth);
+    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+    glPixelStorei( GL_UNPACK_ROW_LENGTH, twidth );
     
     /*printf( "DRAWPOSTBIND\n" );
     gl_error = glGetError();

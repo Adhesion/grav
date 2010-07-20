@@ -41,7 +41,11 @@ bool gravApp::OnInit()
     audioSession_listener = new AudioManager();
     videoInitialized = false; audioInitialized = false;
 
-    handleArgs();
+    if ( !handleArgs() )
+    {
+        delete grav;
+        return false;
+    }
     
     mainFrame = new Frame( (wxFrame*)NULL, -1, _("grav"), wxPoint( 10, 50 ),
                         wxSize( windowWidth, windowHeight ) );
@@ -225,9 +229,7 @@ bool gravApp::handleArgs()
     
     // if parse returns -1 then it spit out the help message, so exit
     if ( result == -1 )
-    {
-        Exit();
-    }
+        return false;
     
     wxString videoAddress = parser.GetParam( 0 );
     bool res = initSession( std::string((char*)videoAddress.char_str()),

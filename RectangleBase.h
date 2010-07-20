@@ -107,7 +107,7 @@ public:
     bool isSelected();
     bool isSelectable();
     void setSelect( bool select );
-    void setSelectable( bool s );
+    virtual void setSelectable( bool s );
     void setEffectVal( float f );
     void setAnimation( bool anim );
     
@@ -120,12 +120,17 @@ public:
      * Is this object a group itself?
      */
     virtual bool isGroup();
-    
+
     void setGroup( Group* g );
     Group* getGroup();
-    
+
     RGBAColor getColor();
+    RGBAColor getBaseColor();
     void setColor( RGBAColor c );
+    /*
+     * Resets color back to regular gray color.
+     */
+    void resetColor();
 
     /*
      * For now locking only has meaning for groups, but is needed in the generic
