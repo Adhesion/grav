@@ -26,7 +26,8 @@ IMPLEMENT_APP( gravApp )
 
 BEGIN_EVENT_TABLE(gravApp, wxApp)
 EVT_IDLE(gravApp::idleHandler)
-END_EVENT_TABLE()
+END_EVENT_TABLE(); // this ; is not necessary, just makes eclipse's syntax
+                   // parser shut up
 
 bool gravApp::OnInit()
 {
@@ -52,22 +53,25 @@ bool gravApp::OnInit()
     mainFrame->Show( true );
     mainFrame->SetName( _("main grav frame") );
     SetTopWindow( mainFrame );
-    mainFrame->SetFocus();
-    //mainFrame->ShowFullScreen( true );
-    
+    if ( startFullscreen )
+        mainFrame->ShowFullScreen( true );
+
     treeFrame = new Frame( mainFrame, -1, _("grav menu"), wxPoint( 960, 50 ),
                         wxSize( 300, 600 ) );
     treeFrame->Show( true );
     treeFrame->SetName( _("tree frame") );
-    
+
     int attribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24,
                             0 };
-    
+
     canvas = new GLCanvas( mainFrame, grav, attribList, windowWidth,
                             windowHeight );
     tree = new TreeControl( treeFrame );
     tree->setSourceManager( grav );
-    
+
+    // put the main frame on top
+    mainFrame->Raise();
+
     // since that bool is used in init, set it before init
     GLUtil::getInstance()->setShaderDisable( disableShaders );
 
@@ -253,6 +257,8 @@ bool gravApp::handleArgs()
     usingThreads = parser.Found( _("threads") );
 
     disableShaders = parser.Found( _("disable-shaders") );
+
+    startFullscreen = parser.Found( _("fullscreen") );
 
     grav->setRunwayUsage( !parser.Found( _("automatic") ) );
 
