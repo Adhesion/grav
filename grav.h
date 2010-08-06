@@ -74,6 +74,7 @@ private:
     TreeControl* tree;
     
     int timerInterval;
+    int timerIntervalUS;
 
     gravManager* grav;
     

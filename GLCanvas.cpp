@@ -109,7 +109,7 @@ Timer::Timer( GLCanvas* c, int i ) :
 void Timer::Notify()
 {
     canvas->draw();
-    //printTiming();
+    printTiming();
 }
 
 void Timer::Start()

@@ -15,7 +15,7 @@
 class gravManager;
 class VPMVideoSink;
 class GLCanvas;
-class Timer;
+class wxStopWatch;
 
 static void newFrameCallbackTest( VPMVideoSink* sink, int buffer_idx,
                                 void* user_data );
@@ -41,11 +41,11 @@ public:
                                      const char *data, 
                                      uint32_t data_len);
 
-    void setTimer( Timer* t );
+    void setTimer( wxStopWatch* t );
 
 private:
     gravManager* grav;
-    Timer* timer;
+    wxStopWatch* timer;
     
     // initial starting points for videos
     float x;

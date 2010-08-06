@@ -77,8 +77,9 @@ bool gravApp::OnInit()
     
     //printf( "hide root? %i\n", tree->HasFlag( wxTR_HIDE_ROOT ) );
     timer = new Timer( canvas, timerInterval );
-    timer->Start();
-    videoSession_listener->setTimer( timer );
+    //timer->Start();
+    //wxStopWatch* t2 = new wxStopWatch();
+    //videoSession_listener->setTimer( t2 );
     
     Earth* earth = new Earth();
     InputHandler* input = new InputHandler( earth, grav, mainFrame );
@@ -157,20 +158,20 @@ void gravApp::idleHandler( wxIdleEvent& evt )
     }
 
     // note this is the method for rendering on idle, with a limiter to 16ms
-    // (60fps) - disabled for now since timer seems decent enough
-    /*unsigned long time = (unsigned long)timer->getTiming();
-    if ( time > 16000 )
+    // (60fps)
+    unsigned long time = (unsigned long)timer->getTiming();
+    if ( time > (unsigned long)timerIntervalUS )
     {
-        printf( "%lu\n", time );
-        //canvas->draw();
+        //printf( "%lu\n", time );
+        canvas->draw();
         timer->resetTiming();
     }
     else
     {
-        usleep( 1000 );
+        wxMilliSleep( 1 );
     }
 
-    evt.RequestMore();*/
+    evt.RequestMore();
 }
 
 bool gravApp::initSession( std::string address, bool audio )
@@ -259,16 +260,20 @@ bool gravApp::handleArgs()
     if ( parser.Found( _("fps"), &fps ) )
     {
         timerInterval = floor( 1000.0f / (float)fps );
+        timerIntervalUS = floor( 1000000.0f / (float)fps );
         if ( timerInterval < 1 )
         {
             printf( "ERROR: invalid fps value, resetting to ~60\n" );
             timerInterval = 16;
+            timerIntervalUS = 16667;
         }
     }
     else
     {
         timerInterval = 16;
+        timerIntervalUS = 16667;
     }
+    printf( "microsecond timer is %i\n", timerIntervalUS );
 
     return true;
 }
@@ -279,7 +284,7 @@ void gravApp::mapRTP()
                             VPMPayloadDecoderFactory::getInstance();
     decoderFactory->mapPayloadType( 45, "MPEG4" );
     decoderFactory->mapPayloadType( 96, "H264" );
-    
+
     decoderFactory->mapPayloadType( 77, "H261AS" );
 
     // map audio codecs
@@ -300,11 +305,11 @@ void* gravApp::threadTest( void* args )
     // wait a bit before starting this thread, since doing it too early might
     // affect the WX tree before it's fully initialized somehow, rarely
     // resulting in broken text or a crash
-    usleep( 100000 );
+    wxMilliSleep( 100 );
     while ( g->isThreadRunning() )
     {
         g->iterateSessions();
-        usleep( 1000 );
+        wxMicroSleep( 500 );
     }
     printf( "gravApp::thread ending...\n" );
     return 0;

@@ -14,6 +14,8 @@
 #include <VPMedia/video/VPMVideoDecoder.h>
 #include <VPMedia/video/VPMVideoBufferSink.h>
 
+#include <wx/wx.h>
+
 VideoListener::VideoListener( gravManager* g ) :
     grav( g )
 {
@@ -175,7 +177,7 @@ VideoListener::vpmsession_source_app(VPMSession &session,
     }
 }
 
-void VideoListener::setTimer( Timer* t )
+void VideoListener::setTimer( wxStopWatch* t )
 {
     timer = t;
 }
@@ -183,10 +185,11 @@ void VideoListener::setTimer( Timer* t )
 static void newFrameCallbackTest( VPMVideoSink* sink, int buffer_idx,
                                 void* user_data )
 {
-    //printf( "new frame callback\n" );
-
-    //Timer* timer = (Timer*)user_data;
-    //if ( timer ) timer->printTiming();
-
-    //printf( "VS::newframe: diff is %d\n", diff );
+    wxStopWatch* timer = (wxStopWatch*)user_data;
+    if ( timer )
+    {
+        long time = timer->Time();
+        if ( time > 38 || time < 28 ) printf( "VideoListener::WARNING: time > 38ms or < 28ms (%lu)\n", time );
+        timer->Start( 0 );
+    }
 }
