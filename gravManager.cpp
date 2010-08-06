@@ -649,6 +649,11 @@ int gravManager::getHoldCounter()
     return holdCounter;
 }
 
+void gravManager::resetAutoCounter()
+{
+    autoCounter = 0;
+}
+
 void gravManager::scaleSelectedObjects( float scaleAmt )
 {
     for ( unsigned int i = 0; i < selectedObjects->size(); i++ )
@@ -959,10 +964,13 @@ void gravManager::setRunwayUsage( bool run )
     while ( (*it) != runway && it != drawnObjects->end() ) ++it;
     bool found = ( it != drawnObjects->end() );
 
+    // TODO maybe change this to just disable its drawing like with alt-r,
+    // rather than remove it entirely, to be consistent/look nice
+
     // make sure it's drawn if enabled, not drawn if not
     if ( useRunway && !found )
     {
-        drawnObjects->push_back( runway );
+        drawnObjects->insert( drawnObjects->begin(), runway );
     }
     else if ( !useRunway && found )
     {

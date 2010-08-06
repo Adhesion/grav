@@ -74,6 +74,8 @@ public:
     void incrementHoldCounter();
     int getHoldCounter();
     
+    void resetAutoCounter();
+
     /*
      * Scale selected objects by a certian amount.
      */

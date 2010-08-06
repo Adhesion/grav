@@ -304,7 +304,13 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         grav->setCamZ(grav->getCamZ()+1);
         break;
     case 'A':
-        grav->setCamX(grav->getCamX()-1);
+        if ( altHeld )
+        {
+            grav->setRunwayUsage( !grav->usingRunway() );
+            grav->resetAutoCounter();
+        }
+        else
+            grav->setCamX(grav->getCamX()-1);
         break;
     case 'D':
         grav->setCamX(grav->getCamX()+1);
