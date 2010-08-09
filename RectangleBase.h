@@ -127,6 +127,7 @@ public:
     RGBAColor getColor();
     RGBAColor getBaseColor();
     void setColor( RGBAColor c );
+    void setSecondaryColor( RGBAColor c );
     /*
      * Resets color back to regular gray color.
      */
@@ -192,6 +193,8 @@ protected:
     RGBAColor borderColor;
     RGBAColor destBColor;
     RGBAColor baseBColor;
+    RGBAColor secondaryColor;
+    RGBAColor destSecondaryColor;
     
     std::string name;
     std::string altName;

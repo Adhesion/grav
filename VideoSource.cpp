@@ -232,7 +232,8 @@ void VideoSource::draw()
         glBegin( GL_LINES );
         glLineWidth( 3.0f );
 
-        glColor4f( borderColor.R, borderColor.G, borderColor.B, borderColor.A );
+        glColor4f( secondaryColor.R, secondaryColor.G, secondaryColor.B,
+                    secondaryColor.A );
 
         glVertex3f( -Xdist, Ydist - dist, 0.0f );
         glVertex3f( -Xdist + dist, Ydist, 0.0f );
@@ -430,10 +431,17 @@ void VideoSource::toggleMute()
     if ( isMuted() )
     {
         baseBColor.R = 1.0f; baseBColor.G = 0.1f; baseBColor.B = 0.15f;
-        setColor( baseBColor );
+        // see resetColor for why we check for selected here
+        if ( !selected )
+            setColor( baseBColor );
+        setSecondaryColor( baseBColor );
     }
     else
+    {
         resetColor();
+        destSecondaryColor.R = 0.0f; destSecondaryColor.G = 0.0f;
+        destSecondaryColor.B = 0.0f; destSecondaryColor.A = 0.0f;
+    }
 }
 
 bool VideoSource::isMuted()
@@ -452,10 +460,17 @@ void VideoSource::setRendering( bool r )
         if ( !enableRendering )
         {
             baseBColor.R = 0.05f; baseBColor.G = 0.1f; baseBColor.B = 1.0f;
-            setColor( baseBColor );
+            // see resetColor for why we check for selected here
+            if ( !selected )
+                setColor( baseBColor );
+            setSecondaryColor( baseBColor );
         }
         else
+        {
             resetColor();
+            destSecondaryColor.R = 0.0f; destSecondaryColor.G = 0.0f;
+            destSecondaryColor.B = 0.0f; destSecondaryColor.A = 0.0f;
+        }
     }
 }
 

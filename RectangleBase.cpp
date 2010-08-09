@@ -38,6 +38,8 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     borderColor = other.borderColor;
     destBColor = other.destBColor;
     baseBColor = other.baseBColor;
+    secondaryColor = other.secondaryColor;
+    destSecondaryColor = other.destSecondaryColor;
     
     name = other.name;
     siteID = other.siteID;
@@ -87,7 +89,11 @@ void RectangleBase::setDefaults()
     borderScale = 0.04;
 
     resetColor();
-    
+    borderColor = destBColor;
+    destSecondaryColor.R = 0.0f; destSecondaryColor.G = 0.0f;
+    destSecondaryColor.B = 0.0f; destSecondaryColor.A = 0.0f;
+    secondaryColor = destSecondaryColor;
+
     animated = true;
     finalName = false;
     nameStart = -1; nameEnd = -1;
@@ -406,6 +412,14 @@ void RectangleBase::setColor( RGBAColor c )
         borderColor = destBColor;
 }
 
+void RectangleBase::setSecondaryColor( RGBAColor c )
+{
+    destSecondaryColor = c;
+
+    if ( !animated )
+        secondaryColor = destSecondaryColor;
+}
+
 void RectangleBase::resetColor()
 {
     printf( "RectangleBase::resetting color\n" );
@@ -413,7 +427,12 @@ void RectangleBase::resetColor()
     original.R = 1.0f; original.G = 1.0f;
     original.B = 1.0f; original.A = 0.7f;
     baseBColor = original;
-    setColor( original );
+
+    // only change the actual visual color if not selected - otherwise would
+    // override and lose the visual indication of selectedness and confuse the
+    // user
+    if ( !selected )
+        setColor( original );
 }
 
 bool RectangleBase::isLocked()
@@ -633,24 +652,39 @@ void RectangleBase::animateValues()
     y += (destY-y)/7.5f;
     scaleX += (destScaleX-scaleX)/7.5f;
     scaleY += (destScaleY-scaleY)/7.5f;
-    
+
     borderColor.R += (destBColor.R-borderColor.R)/3.0f;
     borderColor.G += (destBColor.G-borderColor.G)/3.0f;
     borderColor.B += (destBColor.B-borderColor.B)/3.0f;
     borderColor.A += (destBColor.A-borderColor.A)/7.0f;
-    
+
+    secondaryColor.R += (destSecondaryColor.R-secondaryColor.R)/3.0f;
+    secondaryColor.G += (destSecondaryColor.G-secondaryColor.G)/3.0f;
+    secondaryColor.B += (destSecondaryColor.B-secondaryColor.B)/3.0f;
+    secondaryColor.A += (destSecondaryColor.A-secondaryColor.A)/7.0f;
+
     // snap to the destination, since we'll never actually get there via
     // the above lines due to roundoff errors
     if ( fabs(destX-x) < 0.01f ) x = destX;
     if ( fabs(destY-y) < 0.01f ) y = destY;
     if ( fabs(destScaleX-scaleX) < 0.01f ) scaleX = destScaleX;
     if ( fabs(destScaleY-scaleY) < 0.01f ) scaleY = destScaleY;
-    if ( fabs(destBColor.R-borderColor.R) < 0.01f ) 
+
+    if ( fabs( destBColor.R - borderColor.R ) < 0.01f )
         borderColor.R = destBColor.R;
-    if ( fabs(destBColor.G-borderColor.G) < 0.01f ) 
+    if ( fabs( destBColor.G - borderColor.G ) < 0.01f )
         borderColor.G = destBColor.G;
-    if ( fabs(destBColor.B-borderColor.B) < 0.01f ) 
+    if ( fabs( destBColor.B - borderColor.B ) < 0.01f )
         borderColor.B = destBColor.B;
-    if ( fabs(destBColor.A-borderColor.A) < 0.01f ) 
+    if ( fabs( destBColor.A - borderColor.A ) < 0.01f )
         borderColor.A = destBColor.A;
+
+    if ( fabs( destSecondaryColor.R - secondaryColor.R ) < 0.01f )
+        secondaryColor.R = destSecondaryColor.R;
+    if ( fabs( destSecondaryColor.G - secondaryColor.G ) < 0.01f )
+        secondaryColor.G = destSecondaryColor.G;
+    if ( fabs( destSecondaryColor.B - secondaryColor.B ) < 0.01f )
+        secondaryColor.B = destSecondaryColor.B;
+    if ( fabs( destSecondaryColor.A - secondaryColor.A ) < 0.01f )
+        secondaryColor.A = destSecondaryColor.A;
 }
