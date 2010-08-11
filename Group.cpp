@@ -145,6 +145,8 @@ bool Group::updateName()
     if ( objects.size() == 0 ) return false;
     
     bool membersFinalized = true;
+    bool nameChanged = false;
+    std::string oldName = name;
     int shortestLength = 256;
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
@@ -220,6 +222,7 @@ bool Group::updateName()
     // set the group's name to the common substring, and the members' names
     // to the remainder
     name = objects[0]->getName().substr(0, splitPos);
+    nameChanged = name.compare( oldName ) == 0;
     
     //printf( "common substr is %s, up to pos %i\n", name.c_str(), splitPos );
     for ( unsigned int k = 0; k < objects.size(); k++ )
@@ -245,9 +248,10 @@ bool Group::updateName()
         //                    objects[k]->getSubName().c_str() );
     }
     
-    updateTextBounds();
+    //cutoffPos = -1;
+    updateTextBounds( nameChanged );
     finalName = true;
-    return true;
+    return nameChanged;
 }
 
 void Group::move( float _x, float _y )

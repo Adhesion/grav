@@ -45,6 +45,7 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     siteID = other.siteID;
     nameStart = other.nameStart; nameEnd = other.nameEnd;
     finalName = other.finalName;
+    cutoffPos = other.cutoffPos;
     
     font = other.font;
     
@@ -96,6 +97,7 @@ void RectangleBase::setDefaults()
 
     animated = true;
     finalName = false;
+    cutoffPos = -1;
     nameStart = -1; nameEnd = -1;
     name = "";
     altName = "";
@@ -298,8 +300,9 @@ float RectangleBase::getLon()
 
 void RectangleBase::setName( std::string s )
 {
+    bool nameChanged = s.compare( name ) == 0;
     name = s;
-    updateTextBounds();
+    updateTextBounds( nameChanged );
 }
 
 void RectangleBase::setSiteID( std::string sid )
@@ -315,7 +318,12 @@ std::string RectangleBase::getName()
 std::string RectangleBase::getSubName()
 {
     if ( nameStart != -1 && nameEnd != -1 )
-        return name.substr( nameStart, nameEnd-nameStart );
+    {
+        if ( cutoffPos == -1 )
+            return name.substr( nameStart, nameEnd - nameStart );
+        else
+            return name.substr( nameStart, cutoffPos - nameStart );
+    }
     else
         return name;
 }
@@ -422,7 +430,6 @@ void RectangleBase::setSecondaryColor( RGBAColor c )
 
 void RectangleBase::resetColor()
 {
-    printf( "RectangleBase::resetting color\n" );
     RGBAColor original;
     original.R = 1.0f; original.G = 1.0f;
     original.B = 1.0f; original.A = 0.7f;
@@ -455,14 +462,33 @@ bool RectangleBase::updateName()
     return false;
 }
 
-void RectangleBase::updateTextBounds()
+void RectangleBase::updateTextBounds( bool reset )
 {
     if ( font )
     {
         textBounds = font->BBox( getSubName().c_str() );
-        if ( getTextWidth() > getWidth() + 0.05f )
+        if ( reset )
+            cutoffPos = -1;
+        if ( getTextWidth() > getWidth() )
         {
-            relativeTextScale = 0.0009 * ( getWidth() / getTextWidth() );
+            //relativeTextScale = 0.0009 * ( getWidth() / getTextWidth() );
+            if ( nameStart == -1 || nameEnd == -1 )
+            {
+                nameStart = 0;
+                nameEnd = getName().length();
+            }
+            int numChars;
+            if ( cutoffPos == -1 )
+                numChars = nameEnd - nameStart;
+            else
+                numChars = cutoffPos - nameStart;
+            //printf( "RectangleBase::updateTextBounds: numchars is %i\n", numChars );
+
+            cutoffPos = nameEnd - ceil( ( 1.0f -
+                  ( getWidth() / getTextWidth() ) ) * numChars ) - 1;
+            //printf( "RectangleBase::updateTextBounds: overratio: %f\n", ( 1.0f -
+            //      ( getWidth() / getTextWidth() ) ) );
+            //printf( "RectangleBase::updateTextBounds: cutoffpos is now %i\n", cutoffPos );
         }
     }
 }
@@ -471,7 +497,8 @@ void RectangleBase::setSubstring( int start, int end )
 {
     nameStart = start;
     nameEnd = end;
-    updateTextBounds();
+    // reset cutoff, since it'll confirm again when updatetext is called
+    updateTextBounds( true );
 }
 
 bool RectangleBase::intersect( float L, float R, float U, float D )
@@ -615,6 +642,11 @@ void RectangleBase::draw()
     if ( font )
     {
         std::string renderedName = getSubName();
+
+        if ( cutoffPos != -1 )
+        {
+            renderedName += "...";
+        }
 
         if ( showLockStatus && !locked )
             renderedName += " (unlocked)";

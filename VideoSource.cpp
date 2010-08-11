@@ -297,6 +297,10 @@ void VideoSource::resizeBuffer()
                   GL_UNSIGNED_BYTE,
                   buffer);
     delete [] buffer;
+
+    // reset cutoff so it gets fully recalculated
+    //cutoffPos = -1;
+    updateTextBounds( true );
 }
 
 void VideoSource::scaleNative()
@@ -374,7 +378,7 @@ bool VideoSource::updateName()
         lon = strtod( lonS.c_str(), NULL );
     }
     
-    updateTextBounds();
+    updateTextBounds( nameChanged );
     return nameChanged;
 }
 

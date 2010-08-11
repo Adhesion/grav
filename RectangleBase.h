@@ -149,7 +149,7 @@ public:
     bool usingFinalName();
     
     virtual bool updateName();
-    void updateTextBounds();
+    void updateTextBounds( bool reset = false );
     void setSubstring( int start, int end );
     
     /*
@@ -202,6 +202,8 @@ protected:
     // substring of the name to render
     int nameStart, nameEnd;
     bool finalName;
+    // if name ends up being wider than the object itself, cut off with ellipsis
+    int cutoffPos;
     
     FTFont* font;
     FTBBox textBounds;
