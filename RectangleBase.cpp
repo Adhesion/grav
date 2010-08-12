@@ -157,12 +157,12 @@ float RectangleBase::getDBound()
 
 float RectangleBase::getBorderSize()
 {
-    return getWidth() * borderScale;
+    return scaleY * borderScale;
 }
 
 float RectangleBase::getDestBorderSize()
 {
-    return getDestWidth() * borderScale;
+    return destScaleY * borderScale;
 }
 
 float RectangleBase::getBorderScale()
@@ -172,8 +172,9 @@ float RectangleBase::getBorderScale()
 
 float RectangleBase::getTextHeight()
 {
-    return ( textBounds.Upper().Yf() - textBounds.Lower().Yf() )
-            * getTextScale();
+    // this ignores the lower point, since 0.0 in its coordinate system is the
+    // baseline
+    return ( textBounds.Upper().Yf() * getTextScale() ) + getTextOffset();
 }
 
 float RectangleBase::getTextWidth()
@@ -185,6 +186,11 @@ float RectangleBase::getTextWidth()
 float RectangleBase::getTextScale()
 {
     return scaleX * relativeTextScale;
+}
+
+float RectangleBase::getTextOffset()
+{
+    return getBorderSize() * 0.4f;
 }
 
 // TODO this is 0 since the text can only be at the top - maybe change this
@@ -576,11 +582,11 @@ void RectangleBase::draw()
     float s = (float)twidth / (float)GLUtil::getInstance()->pow2( twidth );
     float t = (float)theight / (float)GLUtil::getInstance()->pow2( theight );
     
-    glScalef( 1.0f+effectVal, 1.0f+effectVal, 0.0f );
+    //glScalef( 1.0f+effectVal, 1.0f+effectVal, 0.0f );
     
     // X & Y distances from center to edge
-    float Xdist = getWidth()/2.0f + getBorderSize();
-    float Ydist = getHeight()/2.0f + getBorderSize();
+    float Xdist = (getWidth()/2.0f) + getBorderSize();
+    float Ydist = (getHeight()/2.0f) + getBorderSize();
     
     glBegin( GL_QUADS );
     // set the border color
@@ -619,14 +625,14 @@ void RectangleBase::draw()
 
     glPushMatrix();
 
-    float yOffset = getBorderSize() * 1.25f;
+    float yOffset = getBorderSize() + getTextOffset();
     float scaleFactor = getTextScale();
 
-    if ( isGroup() )
+    /*if ( isGroup() )
     {
         yOffset += getTextHeight();
         scaleFactor *= 0.75f;
-    }
+    }*/
 
     glTranslatef( -getWidth()/2.0f, getHeight()/2.0f+yOffset, 0.0f );
     //glRasterPos2f( -getWidth()/2.0f, getHeight()/2.0f+yOffset );

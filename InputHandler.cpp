@@ -156,6 +156,8 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
                  grav->getSources()->size() );
         printf( "We currently have %i objects in drawnObjects.\n",
                  grav->getDrawnObjects()->size() );
+        printf( "Screen size is %f x %f\n", grav->getScreenRect().getWidth(),
+                grav->getScreenRect().getHeight() );
 
         for ( si = grav->getSources()->begin();
                 si != grav->getSources()->end(); si++ )

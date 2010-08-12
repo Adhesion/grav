@@ -47,8 +47,14 @@ public:
     float getBorderScale();
     float getLBound(); float getRBound(); float getUBound(); float getDBound();
 
+    /*
+     * Note that total text height includes offset from border (getTextOffset())
+     * Parts of letters that fall under the line (y, g, j, etc) will go in that
+     * space.
+     */
     float getTextHeight(); float getTextWidth();
     float getTextScale();
+    float getTextOffset();
 
     /*
      * Offset of the center of just the video/inner rectangle content to the
