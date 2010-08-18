@@ -614,10 +614,10 @@ void gravManager::setWindowSize( int w, int h )
     GLdouble dummy; // for Z which we don't need
     // update the screen size (in world space) coordinates
     glUtil->screenToWorld( (GLdouble)windowWidth, (GLdouble)windowHeight,
-                          (GLdouble)0.990991f, &screenR, &screenU, &dummy );
+                          0.99087065, &screenR, &screenU, &dummy );
     glUtil->screenToWorld( (GLdouble)0.0f, (GLdouble)0.0f,
-                          (GLdouble)0.990991f, &screenL, &screenD, &dummy );
-    
+                          0.99087065, &screenL, &screenD, &dummy );
+
     screenRect.setPos( (screenL+screenR)/2.0f, (screenU+screenD)/2.0f);
     screenRect.setScale( screenR-screenL, screenU-screenD );
 

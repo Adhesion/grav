@@ -122,6 +122,7 @@ void Group::rearrange()
         float objAspect =
                 objects[0]->getDestWidth() / objects[0]->getDestHeight();
         float diff = objAspect / ( getDestWidth() / getDestHeight() );
+        //printf( "Group::rearrange: modifying aspect by %f\n", diff );
         RectangleBase::setScale( destScaleX * diff, destScaleY );
     }
     else

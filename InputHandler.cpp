@@ -86,12 +86,12 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     std::vector<VPMVideoBufferSink*>::iterator t;
     std::map<std::string,Group*>::iterator mapi;
     unsigned char key = (unsigned char)keyCode;
-    printf( "Char pressed is %c (%i)\n", key, key );
+    /*printf( "Char pressed is %c (%i)\n", key, key );
     printf( "keycode is %i\n", keyCode );
     printf( "x,y in processKeyboard is %i,%i\n", x, y );
     printf( "is shift held? %i\n", shiftHeld );
     printf( "is ctrl held? %i\n", ctrlHeld );
-    printf( "is alt held? %i\n", altHeld );
+    printf( "is alt held? %i\n", altHeld );*/
     std::vector<VideoSource*>::const_iterator si;
     // how much to scale when doing -/+: flipped in the former case
     float scaleAmt = 0.25f;
@@ -382,11 +382,8 @@ void InputHandler::leftClick( int x, int y )
     grav->setBoxSelectDrawing( false );
     
     // get world coords for current mouse pos
-    GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
-                            &mouseX, &mouseY, &mouseZ );
-    
-    //printf( "mouse clicked at world %f,%f; screen %i,%i\n",
-    //        mouseX, mouseY, x, y );
+    GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.99087065,
+                                &mouseX, &mouseY, &mouseZ );
     
     // on click, any potential dragging afterwards must start here
     dragStartX = mouseX;

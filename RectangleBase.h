@@ -42,6 +42,7 @@ public:
      * aspect ratio, these will most likely be equal to the scale factors.
      */
     virtual float getWidth(); virtual float getHeight();
+    float getTotalWidth(); float getTotalHeight();
     virtual float getDestWidth(); virtual float getDestHeight();
     float getBorderSize(); float getDestBorderSize();
     float getBorderScale();
@@ -231,6 +232,7 @@ protected:
     bool showLockStatus;
 
     bool enableRendering;
+    bool debugDraw;
     
     bool animated;
     void animateValues();

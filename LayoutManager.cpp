@@ -224,14 +224,16 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
             if ( horiz )
             {
                 aspect = stride / span;
-                newHeight = span * 0.85f;
-                newWidth = stride * 0.85f;
+                // the .95s are to push things away from the edges, which can
+                // cut close due to roundoff error etc.
+                newHeight = span * 0.95f;
+                newWidth = stride * 0.95f;
             }
             else
             {
                 aspect = span / stride;
-                newHeight = stride * 0.85f;
-                newWidth = span * 0.85f;
+                newHeight = stride * 0.95f;
+                newWidth = span * 0.95f;
             }
             if ( aspect > objectAspect )
             {
@@ -249,7 +251,7 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
         //printf( "grid: moving object %i to %f,%f\n", i, curX, curY );
-        objects[i]->move( curX, curY );
+        objects[i]->move( curX, curY - objects[i]->getCenterOffsetY() );
         int objectsLeft = (int)objects.size() - i - 1;
         
         if ( horiz )
@@ -309,13 +311,18 @@ bool LayoutManager::fullscreen( float boundL, float boundR, float boundU,
 {
     float spaceAspect = fabs((boundR-boundL)/(boundU-boundD));
     float objectAspect = object->getWidth()/object->getHeight();
+    //printf( "LayoutManager::fullscreen: aspects are %f in %f\n", objectAspect, spaceAspect );
 
-    if ( spaceAspect > objectAspect )
+    if ( ( spaceAspect - objectAspect ) > 0.05f )
     {
+        //printf( "LayoutManager::fullscreen: setting height to %f\n",
+        //        boundU-boundD );
         object->setTotalHeight( boundU-boundD );
     }
     else
     {
+        //printf( "LayoutManager::fullscreen: setting width to %f\n",
+        //        boundR-boundL );
         object->setTotalWidth( boundR-boundL );
     }
 

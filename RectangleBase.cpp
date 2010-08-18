@@ -41,6 +41,9 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     secondaryColor = other.secondaryColor;
     destSecondaryColor = other.destSecondaryColor;
     
+    enableRendering = other.enableRendering;
+    debugDraw = other.debugDraw;
+
     name = other.name;
     siteID = other.siteID;
     nameStart = other.nameStart; nameEnd = other.nameEnd;
@@ -84,6 +87,7 @@ void RectangleBase::setDefaults()
     locked = false;
     
     enableRendering = true;
+    debugDraw = false;
 
     relativeTextScale = 0.0009;
 
@@ -123,6 +127,17 @@ float RectangleBase::getWidth()
 float RectangleBase::getHeight()
 {
     return scaleY;
+}
+
+float RectangleBase::getTotalWidth()
+{
+    return getWidth() + ( 2.0f * getBorderSize() );
+}
+
+float RectangleBase::getTotalHeight()
+{
+    return getHeight() + ( 2.0f * getBorderSize() ) + getTextOffset() +
+            getTextHeight();
 }
 
 float RectangleBase::getDestWidth()
@@ -202,7 +217,7 @@ float RectangleBase::getCenterOffsetX()
 
 float RectangleBase::getCenterOffsetY()
 {
-    float textRatio = getTextHeight() / getHeight();
+    float textRatio = ( getTextHeight() + getTextOffset() ) / getHeight();
     return textRatio * getDestHeight() / 2.0f;
 }
 
@@ -244,13 +259,17 @@ void RectangleBase::setHeight( float h )
 // TODO make these more generic, maybe if text can be in different places
 void RectangleBase::setTotalWidth( float w )
 {
-    setWidth( w * (1.0f - ( 2.0f * getBorderScale() ) ) );
+    //float newWidth = w * (1.0f - ( 2.0f * getBorderScale() ) );
+    float newWidth = w * getWidth() / getTotalWidth();
+    setWidth( newWidth );
 }
 
 void RectangleBase::setTotalHeight( float h )
 {
-    float textRatio = getTextHeight() / getHeight();
-    setHeight( h * (1.0f - textRatio - ( 2.0f * getBorderScale() ) ) );
+    //float textRatio = getTextHeight() / getHeight();
+    //float newHeight = h * (1.0f - textRatio - ( 2.0f * getBorderScale() ) );
+    float newHeight = h * getHeight() / getTotalHeight();
+    setHeight( newHeight );
 }
 
 void RectangleBase::setTexture( GLuint tex, int width, int height )
@@ -553,6 +572,53 @@ void RectangleBase::draw()
     glRotatef( zAngle, 0.0, 0.0, 1.0 );
     
     // draw the border first
+    float s = (float)twidth / (float)GLUtil::getInstance()->pow2( twidth );
+    float t = (float)theight / (float)GLUtil::getInstance()->pow2( theight );
+
+    // X & Y distances from center to edge
+    float Xdist = (getWidth()/2.0f) + getBorderSize();
+    float Ydist = (getHeight()/2.0f) + getBorderSize();
+
+    // DEBUG DRAW
+    if ( debugDraw )
+    {
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+        glBegin( GL_QUADS );
+        // set the border color
+        glColor4f( borderColor.R/2.0f,
+                   borderColor.G/1.5f,
+                   borderColor.B/1.3f,
+                   borderColor.A/3.0f );
+
+        glVertex3f(-Xdist, -Ydist, 0.0);
+        glVertex3f(-Xdist, Ydist, 0.0);
+        glVertex3f(Xdist, Ydist, 0.0);
+        glVertex3f(Xdist, -Ydist, 0.0);
+
+        glEnd();
+
+        glBegin( GL_QUADS );
+        // set the border color
+        glColor4f( borderColor.R/1.0f,
+                   borderColor.G/3.5f,
+                   borderColor.B/2.3f,
+                   borderColor.A/3.0f );
+
+        float textLY = (getHeight()/2.0f) + getBorderSize() + getTextOffset();
+        float textUY = textLY + getTextHeight();
+
+        glVertex3f(-Xdist, textLY, 0.0);
+        glVertex3f(-Xdist, textUY, 0.0);
+        glVertex3f(Xdist, textUY, 0.0);
+        glVertex3f(Xdist, textLY, 0.0);
+
+        glEnd();
+
+        glDisable( GL_BLEND );
+    }
+
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     //glBlendFunc( GL_ONE, GL_ONE );
@@ -578,15 +644,6 @@ void RectangleBase::draw()
     for (; (gl_error); gl_error = glGetError()) {
         fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
     }*/
-    
-    float s = (float)twidth / (float)GLUtil::getInstance()->pow2( twidth );
-    float t = (float)theight / (float)GLUtil::getInstance()->pow2( theight );
-    
-    //glScalef( 1.0f+effectVal, 1.0f+effectVal, 0.0f );
-    
-    // X & Y distances from center to edge
-    float Xdist = (getWidth()/2.0f) + getBorderSize();
-    float Ydist = (getHeight()/2.0f) + getBorderSize();
     
     glBegin( GL_QUADS );
     // set the border color
@@ -616,7 +673,7 @@ void RectangleBase::draw()
     glEnd();
     glDisable( GL_BLEND );
     glDisable( GL_TEXTURE_2D );
-    
+
     /*printf( "DRAWPOSTPOST\n" );
     gl_error = glGetError();
     for (; (gl_error); gl_error = glGetError()) {
@@ -656,6 +713,13 @@ void RectangleBase::draw()
 
         if ( showLockStatus && !locked )
             renderedName += " (unlocked)";
+
+        if ( debugDraw )
+        {
+            char* posString = new char[ 50 ];
+            sprintf( posString, "(%f,%f)", x, y );
+            renderedName += posString;
+        }
 
         const char* nc = renderedName.c_str();
         font->Render(nc);
