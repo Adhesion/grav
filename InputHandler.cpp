@@ -381,16 +381,34 @@ void InputHandler::leftClick( int x, int y )
     
     grav->setBoxSelectDrawing( false );
     
-    // get world coords for current mouse pos
-    GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.99087065,
-                                &mouseX, &mouseY, &mouseZ );
-    
+    // old method for getting world coords for current mouse pos
+    //GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.99087065,
+    //                            &mouseX, &mouseY, &mouseZ );
+    //printf( "leftClick::old method got %f,%f,%f\n", mouseX, mouseY, mouseZ );
+
+    // ray intersect-based click method
+    Point nearScreen( x, y, 0.0f );
+    Point farScreen( x, y, 0.5f );
+    Point near, far;
+    GLUtil::getInstance()->screenToWorld( nearScreen, near );
+    GLUtil::getInstance()->screenToWorld( farScreen, far );
+
+    Ray r;
+    r.location = near;
+    r.direction = far - near;
+    Point intersect;
+    bool rayRetVal = grav->getScreenRect().findRayIntersect( r, intersect );
+    if ( !rayRetVal )
+        return;
+    mouseX = intersect.getX();
+    mouseY = intersect.getY();
+
     // on click, any potential dragging afterwards must start here
     dragStartX = mouseX;
     dragStartY = mouseY;
     dragPrevX = mouseX;
     dragPrevY = mouseY;
-    
+
     // if we didn't click on a video, and we're not holding down ctrl to
     // begin a multi selection, so move the selected video(s) to the
     // clicked position in empty space
@@ -472,13 +490,30 @@ void InputHandler::mouseLeftHeldMove( int x, int y )
     // glut screen coords are y-flipped relative to GL screen coords
     y = grav->getWindowHeight() - y;
     
-    // get world coords for current mouse pos
-    GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
-                            &mouseX, &mouseY, &mouseZ );
+    // old method for getting world coords for current mouse pos
+    //GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
+    //                        &mouseX, &mouseY, &mouseZ );
     
+    // ray intersect-based click method
+    Point nearScreen( x, y, 0.0f );
+    Point farScreen( x, y, 0.5f );
+    Point near, far;
+    GLUtil::getInstance()->screenToWorld( nearScreen, near );
+    GLUtil::getInstance()->screenToWorld( farScreen, far );
+
+    Ray r;
+    r.location = near;
+    r.direction = far - near;
+    Point intersect;
+    bool rayRetVal = grav->getScreenRect().findRayIntersect( r, intersect );
+    if ( !rayRetVal )
+        return;
+    mouseX = intersect.getX();
+    mouseY = intersect.getY();
+
     dragEndX = mouseX;
     dragEndY = mouseY;
-    
+
     // set new position, when doing click-and-drag movement
     if ( clickedInside )
     {

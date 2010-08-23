@@ -18,6 +18,8 @@
 
 #include <iostream>
 
+#include "Point.h"
+
 class GLUtil
 {
 
@@ -56,6 +58,7 @@ public:
      */
     void worldToScreen( GLdouble x, GLdouble y, GLdouble z,
                         GLdouble* scrX, GLdouble* scrY, GLdouble* scrZ );
+    void worldToScreen( Point worldPoint, Point& screenPoint );
     
     /**
      * Converts screen coordinates (ie, pixels) to world space
@@ -67,6 +70,7 @@ public:
      */
     void screenToWorld( GLdouble scrX, GLdouble scrY, GLdouble scrZ,
                         GLdouble* x, GLdouble* y, GLdouble* z );
+    void screenToWorld( Point screenPoint, Point& worldPoint );
     
     /**
      * Uses GLEW to load a shader (.vert and .frag) from files and returns a

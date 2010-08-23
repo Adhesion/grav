@@ -12,6 +12,8 @@
 #include <string>
 
 #include "GLUtil.h"
+#include "Vector.h"
+#include "Ray.h"
 
 typedef struct {
     float R;
@@ -23,6 +25,7 @@ typedef struct {
 // we need to do forward declaration since rectanglebase and group circularly
 // reference each other
 class Group;
+class Point;
 
 class RectangleBase
 {
@@ -47,6 +50,16 @@ public:
     float getBorderSize(); float getDestBorderSize();
     float getBorderScale();
     float getLBound(); float getRBound(); float getUBound(); float getDBound();
+
+    Vector getNormal();
+
+    /*
+     * F is a constant, the same for all points on the plane, used for ray
+     * intersection.
+     */
+    float calculateFVal();
+
+    bool findRayIntersect( Ray r, Point &intersect );
 
     /*
      * Note that total text height includes offset from border (getTextOffset())
@@ -190,6 +203,7 @@ protected:
     float xAngle, yAngle, zAngle;
     float scaleX, scaleY;
     float destScaleX, destScaleY;
+    Vector normal;
     
     // value for the amplitude of the audio connection
     float effectVal;

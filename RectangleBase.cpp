@@ -8,6 +8,7 @@
 #include "Group.h"
 #include "PNGLoader.h"
 #include "GLUtil.h"
+#include "Point.h"
 
 #include <cmath>
 
@@ -30,6 +31,7 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     scaleX = other.scaleX; scaleY = other.scaleY;
     destScaleX = other.destScaleX; destScaleY = other.destScaleY;
     xAngle = other.xAngle; yAngle = other.yAngle; zAngle = other.zAngle;
+    normal = other.normal;
     
     effectVal = other.effectVal;
     
@@ -81,6 +83,9 @@ void RectangleBase::setDefaults()
     x = 0.0f; y = 0.0f; z = 0.0f;
     destX = x; destY = y;
     destScaleX = scaleX; destScaleY = scaleY;
+    // TODO make this actually based on the rotation
+    normal = Vector( 0.0f, 0.0f, 1.0f );
+
     selected = false;
     selectable = true;
     showLockStatus = false;
@@ -168,6 +173,37 @@ float RectangleBase::getUBound()
 float RectangleBase::getDBound()
 {
     return destY - (getDestHeight()/2.0f);
+}
+
+Vector RectangleBase::getNormal()
+{
+    return normal;
+}
+
+float RectangleBase::calculateFVal()
+{
+    return -( normal.getX() * x + normal.getY() * y + normal.getZ() * z);
+}
+
+bool RectangleBase::findRayIntersect( Ray r, Point& intersect )
+{
+    float dot = r.direction.dotProduct( normal );
+
+    if ( dot >= 0 )
+    {
+        return false;
+    }
+
+    float w = -( normal.dotProduct( r.location.toVector() ) + calculateFVal() )
+                   / dot;
+
+    intersect.setX( r.location.getX() + ( r.direction.getX() * w ) );
+    intersect.setY( r.location.getY() + ( r.direction.getY() * w ) );
+    intersect.setZ( r.location.getZ() + ( r.direction.getZ() * w ) );
+    // TODO also need to check whether intersect is actually on the polygon
+    // right now, it just checks whether it's on the plane
+
+    return true;
 }
 
 float RectangleBase::getBorderSize()

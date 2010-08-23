@@ -149,6 +149,16 @@ void GLUtil::worldToScreen( GLdouble x, GLdouble y, GLdouble z,
         printf( "gluproject returned false\n" );
 }
 
+void GLUtil::worldToScreen( Point worldPoint, Point& screenPoint )
+{
+    GLdouble screenX, screenY, screenZ;
+    worldToScreen( (GLdouble)worldPoint.getX(), (GLdouble)worldPoint.getY(),
+            (GLdouble)worldPoint.getZ(), &screenX, &screenY, &screenZ );
+    screenPoint.setX( (float)screenX );
+    screenPoint.setY( (float)screenY );
+    screenPoint.setZ( (float)screenZ );
+}
+
 void GLUtil::screenToWorld( GLdouble scrX, GLdouble scrY, GLdouble scrZ,
                                 GLdouble* x, GLdouble* y, GLdouble* z )
 {
@@ -156,6 +166,16 @@ void GLUtil::screenToWorld( GLdouble scrX, GLdouble scrY, GLdouble scrZ,
     
     gluUnProject( scrX, scrY, scrZ, modelview, projection, viewport,
                     x, y, z );
+}
+
+void GLUtil::screenToWorld( Point screenPoint, Point& worldPoint )
+{
+    GLdouble worldX, worldY, worldZ;
+    screenToWorld( (GLdouble)screenPoint.getX(), (GLdouble)screenPoint.getY(),
+            (GLdouble)screenPoint.getZ(), &worldX, &worldY, &worldZ );
+    worldPoint.setX( (float)worldX );
+    worldPoint.setY( (float)worldY );
+    worldPoint.setZ( (float)worldZ );
 }
 
 GLuint GLUtil::loadShaders( const char* location )
