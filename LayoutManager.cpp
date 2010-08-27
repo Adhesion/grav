@@ -310,10 +310,10 @@ bool LayoutManager::fullscreen( float boundL, float boundR, float boundU,
                                     float boundD, RectangleBase* object )
 {
     float spaceAspect = fabs((boundR-boundL)/(boundU-boundD));
-    float objectAspect = object->getWidth()/object->getHeight();
+    float objectAspect = object->getTotalWidth()/object->getTotalHeight();
     //printf( "LayoutManager::fullscreen: aspects are %f in %f\n", objectAspect, spaceAspect );
 
-    if ( ( spaceAspect - objectAspect ) > 0.05f )
+    if ( ( spaceAspect - objectAspect ) > 0.01f )
     {
         //printf( "LayoutManager::fullscreen: setting height to %f\n",
         //        boundU-boundD );

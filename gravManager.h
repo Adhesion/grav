@@ -150,6 +150,7 @@ public:
 
     bool usingRunway();
     void setRunwayUsage( bool run );
+    void setGridAuto( bool g );
     Runway* getRunway();
 
 private:
@@ -208,6 +209,7 @@ private:
     mutex* sourceMutex;
 
     bool useRunway;
+    bool gridAuto;
 
     int sourceCount;
 

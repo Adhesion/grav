@@ -142,6 +142,11 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     },
 
     {
+        wxCMD_LINE_SWITCH, _("ga"), _("gridauto"),
+            _("rearrange objects in grid on source add/remove")
+    },
+
+    {
         wxCMD_LINE_PARAM, NULL, NULL, _("video address"),
             wxCMD_LINE_VAL_STRING
     },

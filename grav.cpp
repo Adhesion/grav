@@ -262,6 +262,8 @@ bool gravApp::handleArgs()
 
     grav->setRunwayUsage( !parser.Found( _("automatic") ) );
 
+    grav->setGridAuto( parser.Found( _("gridauto") ) );
+
     long int fps;
     if ( parser.Found( _("fps"), &fps ) )
     {

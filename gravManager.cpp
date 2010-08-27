@@ -53,6 +53,7 @@ gravManager::gravManager()
 
     usingThreads = false;
     useRunway = true;
+    gridAuto = false;
 
     audioEnabled = false;
     audioFocusTrigger = false;
@@ -742,6 +743,10 @@ void gravManager::addNewSource( VideoSource* s )
         layouts->focus( getScreenRect(), outerObjs, innerObj );
     }
 
+    if ( gridAuto )
+        layouts->gridArrange( getScreenRect(), true, false, true,
+                                getMovableObjects() );
+
     unlockSources();
 }
 
@@ -786,6 +791,10 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
             delete g;
         }
     }
+
+    if ( gridAuto )
+        layouts->gridArrange( getScreenRect(), true, false, true,
+                                getMovableObjects() );
 
     // we need to do videosource's delete somewhere else, since this function
     // might be on a second thread, which would crash since the videosource
@@ -976,6 +985,11 @@ void gravManager::setRunwayUsage( bool run )
     {
         drawnObjects->erase( it );
     }
+}
+
+void gravManager::setGridAuto( bool g )
+{
+    gridAuto = g;
 }
 
 Runway* gravManager::getRunway()
