@@ -363,7 +363,7 @@ void RectangleBase::setName( std::string s )
 {
     bool nameChanged = s.compare( name ) == 0;
     name = s;
-    updateTextBounds( nameChanged );
+    updateTextBounds();
 }
 
 void RectangleBase::setSiteID( std::string sid )
@@ -523,14 +523,13 @@ bool RectangleBase::updateName()
     return false;
 }
 
-void RectangleBase::updateTextBounds( bool reset )
+void RectangleBase::updateTextBounds()
 {
     if ( font )
     {
         textBounds = font->BBox( getSubName().c_str() );
-        if ( reset )
-            cutoffPos = -1;
-        if ( getTextWidth() > getWidth() )
+        cutoffPos = -1;
+        while ( getTextWidth() > getWidth() )
         {
             //relativeTextScale = 0.0009 * ( getWidth() / getTextWidth() );
             if ( nameStart == -1 || nameEnd == -1 )
@@ -538,18 +537,17 @@ void RectangleBase::updateTextBounds( bool reset )
                 nameStart = 0;
                 nameEnd = getName().length();
             }
-            int numChars;
-            if ( cutoffPos == -1 )
-                numChars = nameEnd - nameStart;
-            else
-                numChars = cutoffPos - nameStart;
-            //printf( "RectangleBase::updateTextBounds: numchars is %i\n", numChars );
 
-            cutoffPos = nameEnd - ceil( ( 1.0f -
+            int curEnd;
+            if ( cutoffPos == -1 )
+                curEnd = nameEnd;
+            else
+                curEnd = cutoffPos;
+            int numChars = curEnd - nameStart;
+
+            cutoffPos = curEnd - ceil( ( 1.0f -
                   ( getWidth() / getTextWidth() ) ) * numChars ) - 1;
-            //printf( "RectangleBase::updateTextBounds: overratio: %f\n", ( 1.0f -
-            //      ( getWidth() / getTextWidth() ) ) );
-            //printf( "RectangleBase::updateTextBounds: cutoffpos is now %i\n", cutoffPos );
+            textBounds = font->BBox( getSubName().c_str() );
         }
     }
 }
@@ -559,7 +557,7 @@ void RectangleBase::setSubstring( int start, int end )
     nameStart = start;
     nameEnd = end;
     // reset cutoff, since it'll confirm again when updatetext is called
-    updateTextBounds( true );
+    updateTextBounds();
 }
 
 bool RectangleBase::intersect( float L, float R, float U, float D )

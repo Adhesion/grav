@@ -169,7 +169,7 @@ public:
     bool usingFinalName();
     
     virtual bool updateName();
-    void updateTextBounds( bool reset = false );
+    void updateTextBounds();
     void setSubstring( int start, int end );
     
     /*

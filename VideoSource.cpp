@@ -298,9 +298,8 @@ void VideoSource::resizeBuffer()
                   buffer);
     delete [] buffer;
 
-    // reset cutoff so it gets fully recalculated
-    //cutoffPos = -1;
-    updateTextBounds( true );
+    // update text bounds since the width might be different
+    updateTextBounds();
 }
 
 void VideoSource::scaleNative()
@@ -378,7 +377,8 @@ bool VideoSource::updateName()
         lon = strtod( lonS.c_str(), NULL );
     }
     
-    updateTextBounds( nameChanged );
+    if ( nameChanged )
+        updateTextBounds();
     return nameChanged;
 }
 

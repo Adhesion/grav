@@ -249,8 +249,8 @@ bool Group::updateName()
         //                    objects[k]->getSubName().c_str() );
     }
     
-    //cutoffPos = -1;
-    updateTextBounds( nameChanged );
+    if ( nameChanged )
+        updateTextBounds();
     finalName = true;
     return nameChanged;
 }

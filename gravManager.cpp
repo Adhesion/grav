@@ -195,7 +195,7 @@ void gravManager::draw()
         {
             // only bother updating it on the tree if it actually
             // changes - to suppress "" from getting shown
-            if ( tree && (*si)->updateName() )
+            if ( (*si)->updateName() && tree )
                 tree->updateObjectName( (*si) );
         }
         
