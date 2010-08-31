@@ -22,6 +22,7 @@ EVT_KEY_DOWN(InputHandler::wxKeyDown)
 EVT_CHAR(InputHandler::wxCharEvt)
 EVT_MOTION(InputHandler::wxMouseMove)
 EVT_LEFT_DOWN(InputHandler::wxMouseLDown)
+EVT_LEFT_DCLICK(InputHandler::wxMouseLDown)
 EVT_LEFT_UP(InputHandler::wxMouseLUp)
 END_EVENT_TABLE()
 
