@@ -473,6 +473,11 @@ RGBAColor RectangleBase::getBaseColor()
     return baseBColor;
 }
 
+RGBAColor RectangleBase::getSecondaryColor()
+{
+    return secondaryColor;
+}
+
 void RectangleBase::setColor( RGBAColor c )
 {
     destBColor = c;

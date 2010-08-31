@@ -162,13 +162,18 @@ void Runway::setRendering( bool r )
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
         RGBAColor col = objects[i]->getBaseColor();
+        RGBAColor col2 = objects[i]->getSecondaryColor();
         if ( !r )
         {
             col.A = 0.0f;
-            objects[i]->setColor( col );
+            col2.A = 0.0f;
         }
+        // note secondary color is going to lose its previous alpha here,
+        // TODO fix this somehow? adding a base-secondary-color seems excessive
         else
-            objects[i]->setColor( col );
+            col2.A = 1.0f;
+        objects[i]->setColor( col );
+        objects[i]->setSecondaryColor( col2 );
         objects[i]->setSelectable( r );
     }
 }

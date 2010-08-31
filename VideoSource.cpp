@@ -245,7 +245,7 @@ void VideoSource::draw()
     }
     
     // see above
-    if ( !useAlpha )
+    if ( useAlpha )
     {
         glDisable( GL_BLEND );
     }

@@ -95,7 +95,7 @@ void Earth::draw()
     glVertex3f( 0, 0, 0+50.0f );
     glEnd();
     */
-    
+
     glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 
     // render the sphere using its display list

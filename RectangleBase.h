@@ -146,6 +146,7 @@ public:
 
     RGBAColor getColor();
     RGBAColor getBaseColor();
+    RGBAColor getSecondaryColor();
     void setColor( RGBAColor c );
     void setSecondaryColor( RGBAColor c );
     /*
