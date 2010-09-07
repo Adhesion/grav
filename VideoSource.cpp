@@ -59,8 +59,8 @@ void VideoSource::draw()
     //glDepthRange (0.0, 0.9);
     //glPolygonOffset( 0.2, 0.8 );
     
-    float s = 1.0;
-    float t = 1.0;
+    //float s = 1.0;
+    //float t = 1.0;
     // if the texture id hasn't been initialized yet, this must be the
     // first draw call
     init = (texid == 0);
@@ -72,11 +72,13 @@ void VideoSource::draw()
         resizeBuffer();
     }
     
-    s = (float)vwidth/(float)tex_width;
+    //s = (float)vwidth/(float)tex_width;
     //if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
     //    t = (float)(3*vheight/2)/(float)tex_height;
     //else
-    t = (float)vheight/(float)tex_height;
+    //t = (float)vheight/(float)tex_height;
+    int s = vwidth;
+    int t = vheight;
     
     // X & Y distances from center to edge
     float Xdist = aspect*scaleX/2;
@@ -95,6 +97,8 @@ void VideoSource::draw()
         {
             if ( videoSink->getImageFormat() == VIDEO_FORMAT_RGB24 )
             {
+                //printf( "0,0,0: %u, %u, %u\n", ((unsigned char*)(videoSink->getImageData()))[0], ((unsigned char*)(videoSink->getImageData()))[1], ((unsigned char*)(videoSink->getImageData()))[2] );
+                //printf( "top left?: %u, %u, %u\n", ((unsigned char*)(videoSink->getImageData()))[(vwidth*(vheight-1)*3)], ((unsigned char*)(videoSink->getImageData()))[(vwidth*(vheight-1)*3)+1], ((unsigned char*)(videoSink->getImageData()))[(vwidth*(vheight-1)*3)+2] );
                 glTexSubImage2D( GL_TEXTURE_2D,
                       0,
                       0,
@@ -111,7 +115,7 @@ void VideoSource::draw()
             else if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
             {
                 // experimental single-push method
-                /*glTexSubImage2D( GL_TEXTURE_2D,
+                glTexSubImage2D( GL_TEXTURE_2D,
                                  0,
                                  0,
                                  0,
@@ -119,10 +123,10 @@ void VideoSource::draw()
                                  3*vheight/2,
                                  GL_LUMINANCE,
                                  GL_UNSIGNED_BYTE,
-                                 videoSink->getImageData() );*/
+                                 videoSink->getImageData() );
 
                 // 3 pushes separate
-                glTexSubImage2D( GL_TEXTURE_2D,
+                /*glTexSubImage2D( GL_TEXTURE_2D,
                       0,
                       0,
                       0,
@@ -154,7 +158,7 @@ void VideoSource::draw()
                       vheight/2,
                       GL_LUMINANCE,
                       GL_UNSIGNED_BYTE,
-                      (GLubyte*)videoSink->getImageData() + 5*(vwidth*vheight)/4 );
+                      (GLubyte*)videoSink->getImageData() + 5*(vwidth*vheight)/4 );*/
             }
         }
     }
@@ -164,8 +168,8 @@ void VideoSource::draw()
     if ( GLUtil::getInstance()->useShaders() )
     {
         glUseProgram( GLUtil::getInstance()->getYUV420Program() );
-        glUniform1f( GLUtil::getInstance()->getYUV420xOffsetID(), s );
-        glUniform1f( GLUtil::getInstance()->getYUV420yOffsetID(), t );
+        glUniform1i( GLUtil::getInstance()->getYUV420xOffsetID(), s );
+        glUniform1i( GLUtil::getInstance()->getYUV420yOffsetID(), t );
         if ( !selectable )
         {
             glUniform1f( GLUtil::getInstance()->getYUV420alphaID(),
@@ -192,21 +196,21 @@ void VideoSource::draw()
     // now draw the actual quad that has the texture on it
     // size of the video in world space will be equivalent to getWidth x
     // getHeight, which is the same as (aspect*scaleX) x scaleY
-    glTexCoord2f( 0.0, 0.0 );
+    glTexCoord2i( 0, 0 );
     glVertex3f( -Xdist, -Ydist, 0.0 );
 
-    glTexCoord2f( 0.0, t );
+    glTexCoord2i( 0, t );
     glVertex3f( -Xdist, Ydist, 0.0 );
 
-    glTexCoord2f( s, t );
+    glTexCoord2i( s, t );
     glVertex3f( Xdist, Ydist, 0.0 );
 
-    glTexCoord2f( s, 0.0 );
+    glTexCoord2i( s, 0 );
     glVertex3f( Xdist, -Ydist, 0.0 );
 
     glEnd();
 
-    glDisable(GL_TEXTURE_2D);
+    glDisable( GL_TEXTURE_2D );
 
     if ( GLUtil::getInstance()->useShaders() )
         glUseProgram( 0 );
@@ -281,7 +285,7 @@ void VideoSource::resizeBuffer()
     glBindTexture(GL_TEXTURE_2D, texid);
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     

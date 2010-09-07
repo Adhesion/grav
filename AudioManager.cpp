@@ -14,7 +14,7 @@
 
 AudioManager::AudioManager()
 {
-    
+    sources = std::vector<AudioSource*>( 0 );
 }
 
 AudioManager::~AudioManager()
@@ -29,7 +29,8 @@ float AudioManager::getLevel( std::string name, bool avg )
     // meters that match the given name.
     float temp = 0.0f;
     int count = 0;
-    //printf( "AudioManager::getLevel: getting level for %s\n", name.c_str() );
+    printf( "AudioManager::getLevel: getting level for %s\n", name.c_str() );
+    printf( "there are %i audio sources\n", sources.size() );
     for ( unsigned int i = 0; i < sources.size(); i++ )
     {
         if ( sources[i]->siteID.compare( name ) == 0 ||

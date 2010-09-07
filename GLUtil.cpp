@@ -318,8 +318,8 @@ GLUtil::GLUtil()
     "}\n";
     
     vert420 =
-    "uniform float xOffset;\n"
-    "uniform float yOffset;\n"
+    "uniform int xOffset;\n"
+    "uniform int yOffset;\n"
     "\n"
     "varying vec2 yCoord;\n"
     "varying vec2 uCoord;\n"
@@ -330,11 +330,11 @@ GLUtil::GLUtil()
     "    yCoord.s = gl_MultiTexCoord0.s;\n"
     "    yCoord.t = yOffset - gl_MultiTexCoord0.t;\n"
     "\n"
-    "    uCoord.s = (gl_MultiTexCoord0.s/2.0);\n"
-    "    uCoord.t = (3.0*yOffset/2.0) - (gl_MultiTexCoord0.t/2.0);\n"
+    "    uCoord.s = gl_MultiTexCoord0.s;\n"
+    "    uCoord.t = (5*yOffset/4) - (gl_MultiTexCoord0.t/4.0);\n"
     "\n"
-    "    vCoord.s = uCoord.s + xOffset/2.0;\n"
-    "    vCoord.t = uCoord.t;\n"
+    "    vCoord.s = uCoord.s;\n"
+    "    vCoord.t = (3*yOffset/2) - (gl_MultiTexCoord0.t/4.0);\n"
     "\n"
     "    gl_Position = ftransform();\n"
     "}\n";
