@@ -95,7 +95,7 @@ private:
     AudioManager* audioSession_listener;
     bool audioInitialized;
 
-    bool disableShaders;
+    bool enableShaders;
 
     bool startFullscreen;
 
@@ -121,9 +121,10 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     },
 
     {
-        wxCMD_LINE_SWITCH, _("ds"), _("disable-shaders"),
-            _("disable GLSL shader-based colorspace conversion if it would be "
-                "available")
+        wxCMD_LINE_SWITCH, _("es"), _("enable-shaders"),
+            _("enable GLSL shader-based colorspace conversion if it would be "
+                "available (experimental, may not look as good, adds CPU usage "
+                "to rendering thread)")
     },
 
     {

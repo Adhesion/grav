@@ -36,10 +36,15 @@ VideoListener::vpmsession_source_created(VPMSession &session,
     {
         VPMVideoFormat format = d->getOutputFormat();
         VPMVideoBufferSink *sink;
+
+        // if we have shaders available, set the output format to YUV420P so
+        // the videosource class will apply the YUV420P -> RGB conversion shader
         printf( "VideoListener::vpmsession_source_created: "
                 "creating source, have shaders? %i format? %i (yuv420p: %i)\n",
-                GLUtil::getInstance()->useShaders(), format, VIDEO_FORMAT_YUV420 );
-        if ( GLUtil::getInstance()->useShaders() && format == VIDEO_FORMAT_YUV420 )
+                GLUtil::getInstance()->areShadersAvailable(), format,
+                VIDEO_FORMAT_YUV420 );
+        if ( GLUtil::getInstance()->areShadersAvailable() &&
+                format == VIDEO_FORMAT_YUV420 )
             sink = new VPMVideoBufferSink( format );
         else
             sink = new VPMVideoBufferSink( VIDEO_FORMAT_RGB24 );

@@ -27,7 +27,7 @@ bool GLUtil::initGL()
     const char* glVer = (const char*)glGetString( GL_VERSION );
     int glMajorVer, glMinorVer;
     sscanf( glVer, "%d.%d", &glMajorVer, &glMinorVer );
-    if ( glMajorVer >= 2 && !disableShaders )
+    if ( glMajorVer >= 2 && enableShaders )
     {
         YUV420Program = GLUtil::loadShaders( "GLSL/YUV420toRGB24" );
         if ( YUV420Program )
@@ -35,20 +35,20 @@ bool GLUtil::initGL()
             YUV420xOffsetID = glGetUniformLocation( YUV420Program, "xOffset" );
             YUV420yOffsetID = glGetUniformLocation( YUV420Program, "yOffset" );
             YUV420alphaID = glGetUniformLocation( YUV420Program, "alpha" );
-            shaders = true;
+            shadersAvailable = true;
             printf( "GLUtil::initGL(): shaders are available (GL v%s)\n",
                         glVer );
         }
         else
         {
-            shaders = false;
+            shadersAvailable = false;
             printf( "GLUtil::initGL(): shaders NOT available (GL v%s)\n",
                         glVer );
         }
     }
     else
     {
-        shaders = false;
+        shadersAvailable = false;
         printf( "GLUtil::initGL(): shaders NOT available (GL v%s)\n", glVer );
     }
 
@@ -280,19 +280,19 @@ FTFont* GLUtil::getMainFont()
     return mainFont;
 }
 
-bool GLUtil::useShaders()
+bool GLUtil::areShadersAvailable()
 {
-    return shaders;
+    return shadersAvailable;
 }
 
-void GLUtil::setShaderDisable( bool ds )
+void GLUtil::setShaderEnable( bool es )
 {
-    disableShaders = ds;
+    enableShaders = es;
 }
 
 GLUtil::GLUtil()
 {
-    disableShaders = false;
+    enableShaders = false;
 
     frag420 =
     "uniform sampler2D texture;\n"

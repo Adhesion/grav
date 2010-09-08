@@ -87,10 +87,12 @@ public:
 
     /*
      * Returns whether shaders are available to use or not.
+     * Note shader enable needs to be set before initGL is called for the
+     * shader check to occur.
      */
-    bool useShaders();
+    bool areShadersAvailable();
     
-    void setShaderDisable( bool ds );
+    void setShaderEnable( bool es );
 
 protected:
     GLUtil();
@@ -107,8 +109,8 @@ private:
     const GLchar* frag420;
     const GLchar* vert420;
     
-    bool shaders;
-    bool disableShaders;
+    bool shadersAvailable;
+    bool enableShaders;
     
     GLuint YUV420Program;
     GLuint YUV420xOffsetID;

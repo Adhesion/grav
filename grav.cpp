@@ -73,7 +73,7 @@ bool gravApp::OnInit()
     mainFrame->Raise();
 
     // since that bool is used in init, set it before init
-    GLUtil::getInstance()->setShaderDisable( disableShaders );
+    GLUtil::getInstance()->setShaderEnable( enableShaders );
 
     // initialize GL stuff (+ shaders) needs to be done AFTER attriblist is
     // used in making the canvas
@@ -256,7 +256,7 @@ bool gravApp::handleArgs()
 
     usingThreads = parser.Found( _("threads") );
 
-    disableShaders = parser.Found( _("disable-shaders") );
+    enableShaders = parser.Found( _("enable-shaders") );
 
     startFullscreen = parser.Found( _("fullscreen") );
 

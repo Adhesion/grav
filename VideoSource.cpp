@@ -161,12 +161,12 @@ void VideoSource::draw()
 
     // draw video texture, regardless of whether we just pushed something
     // new or not
-    if ( GLUtil::getInstance()->useShaders() )
+    if ( GLUtil::getInstance()->areShadersAvailable() )
     {
         glUseProgram( GLUtil::getInstance()->getYUV420Program() );
         glUniform1f( GLUtil::getInstance()->getYUV420xOffsetID(), s );
         glUniform1f( GLUtil::getInstance()->getYUV420yOffsetID(), t );
-        if ( !selectable )
+        if ( useAlpha )
         {
             glUniform1f( GLUtil::getInstance()->getYUV420alphaID(),
                             borderColor.A );
@@ -208,7 +208,7 @@ void VideoSource::draw()
 
     glDisable(GL_TEXTURE_2D);
 
-    if ( GLUtil::getInstance()->useShaders() )
+    if ( GLUtil::getInstance()->areShadersAvailable() )
         glUseProgram( 0 );
 
     if ( vwidth == 0 || vheight == 0 )
