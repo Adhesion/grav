@@ -57,6 +57,7 @@ gravManager::gravManager()
 
     audioEnabled = false;
     audioFocusTrigger = false;
+    audio = NULL;
 
     sourceCount = 0;
 
@@ -81,8 +82,6 @@ gravManager::~gravManager()
 
 void gravManager::draw()
 {   
-    //audioSession_listener.printLevels();
-    
     // don't draw if either of these objects haven't been initialized yet
     if ( !earth || !input ) return;
     
@@ -91,9 +90,14 @@ void gravManager::draw()
     glLoadIdentity();
     gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
     
-    //GLUquadric* sphereQuad = gluNewQuadric();
-    //gluSphere( sphereQuad, audioSession_listener->getLevelAvg()*50.0f,
-    //            200, 200 );
+    // audio test drawing
+    /*if ( audioEnabled )
+    {
+        GLUquadric* sphereQuad = gluNewQuadric();
+        float level = audio->getLevelAvg();
+        printf( "level: %f\n", level );
+        gluSphere( sphereQuad, level * 50.0f, 200, 200 );
+    }*/
     
     // test text drawing
     /*glPushMatrix();
