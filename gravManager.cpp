@@ -39,6 +39,7 @@ gravManager::gravManager()
 
     sourcesToDelete = new std::vector<VideoSource*>();
     objectsToAddToTree = new std::vector<RectangleBase*>();
+    objectsToRemoveFromTree = new std::vector<RectangleBase*>();
 
     layouts = new LayoutManager();
     screenRect.setName( "screen rectangle" );
@@ -79,6 +80,7 @@ gravManager::~gravManager()
 
     delete sourcesToDelete;
     delete objectsToAddToTree;
+    delete objectsToRemoveFromTree;
 
     mutex_free( sourceMutex );
 }
@@ -152,15 +154,6 @@ void gravManager::draw()
         innerObjs.clear();
     }
 
-    // delete sources that need to be deleted - see deleteSource for the reason
-    if ( sourcesToDelete->size() > 0 )
-    {
-        for ( unsigned int i = 0; i < sourcesToDelete->size(); i++ )
-        {
-            delete (*sourcesToDelete)[i];
-        }
-        sourcesToDelete->clear();
-    }
     // add objects to tree that need to be added - similar to delete, tree is
     // modified on the main thread (in other WX places) so
     if ( objectsToAddToTree->size() > 0 && tree != NULL )
@@ -171,8 +164,26 @@ void gravManager::draw()
         }
         objectsToAddToTree->clear();
     }
+    // same for remove
+    if ( objectsToRemoveFromTree->size() > 0 && tree != NULL )
+    {
+        for ( unsigned int i = 0; i < objectsToRemoveFromTree->size(); i++ )
+        {
+            tree->removeObject( (*objectsToRemoveFromTree)[i] );
+        }
+        objectsToRemoveFromTree->clear();
+    }
+    // delete sources that need to be deleted - see deleteSource for the reason
+    if ( sourcesToDelete->size() > 0 )
+    {
+        for ( unsigned int i = 0; i < sourcesToDelete->size(); i++ )
+        {
+            delete (*sourcesToDelete)[i];
+        }
+        sourcesToDelete->clear();
+    }
 
-    // draw line to geographical position, selected ones on top (and bigger)
+    // draw point on geographical position, selected ones on top (and bigger)
     for ( si = drawnObjects->begin(); si != drawnObjects->end(); si++ )
     {
         RGBAColor col = (*si)->getColor();
@@ -839,7 +850,9 @@ void gravManager::removeFromLists( RectangleBase* obj )
 {
     // remove it from the tree
     if ( tree )
-        tree->removeObject( obj );
+    {
+        objectsToRemoveFromTree->push_back( obj );
+    }
 
     // remove it from drawnobjects, if it is being drawn
     std::vector<RectangleBase*>::iterator i = drawnObjects->begin();

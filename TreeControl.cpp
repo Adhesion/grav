@@ -9,6 +9,7 @@
 #include "TreeControl.h"
 #include "gravManager.h"
 #include "TreeNode.h"
+#include "Runway.h"
 
 #include <wx/wx.h>
 
@@ -41,8 +42,9 @@ void TreeControl::addObject( RectangleBase* obj )
 {
     wxTreeItemId parentID;
     
-    // if it's not grouped we can add it to root
-    if ( !obj->isGrouped() )
+    // if it's not grouped, or it's in the runway, we can add it to root
+    if ( !obj->isGrouped() || ( obj->isGrouped() &&
+                            dynamic_cast<Runway*>( obj->getGroup() ) != NULL ) )
     {
         parentID = rootID;
     }
@@ -78,6 +80,12 @@ void TreeControl::addObject( RectangleBase* obj )
 void TreeControl::removeObject( RectangleBase* obj )
 {
     wxTreeItemId item = findObject( rootID, obj );
+    if ( !item.IsOk() )
+    {
+        printf( "TreeControl::removeObject: ERROR: item %s not found?\n",
+                    obj->getName().c_str() );
+        return;
+    }
     
     // if we're removing a group, take all of its children and add them to
     // root

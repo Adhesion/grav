@@ -162,6 +162,7 @@ private:
 
     std::vector<VideoSource*>* sourcesToDelete;
     std::vector<RectangleBase*>* objectsToAddToTree;
+    std::vector<RectangleBase*>* objectsToRemoveFromTree;
 
     // temp lists for doing auto/audio focus
     std::vector<RectangleBase*> outerObjs;
