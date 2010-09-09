@@ -159,8 +159,9 @@ private:
     std::vector<RectangleBase*>* drawnObjects;
     std::vector<RectangleBase*>* selectedObjects;
     std::map<std::string,Group*>* siteIDGroups;
-    
+
     std::vector<VideoSource*>* sourcesToDelete;
+    std::vector<RectangleBase*>* objectsToAddToTree;
 
     // temp lists for doing auto/audio focus
     std::vector<RectangleBase*> outerObjs;
@@ -207,6 +208,7 @@ private:
     
     bool usingThreads;
     mutex* sourceMutex;
+    int lockCount;
 
     bool useRunway;
     bool gridAuto;

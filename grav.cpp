@@ -103,17 +103,7 @@ bool gravApp::OnInit()
     vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
     
     mapRTP();
-    
-    if ( usingThreads )
-    {
-        grav->setThreads( usingThreads );
-        threadRunning = true;
-        VPMthread = thread_start( threadTest, this );
-    }
-
-    //
-    //tree->addSession( std::string( "224.2.224.225/20002" ) );
-    
+    printf( "grav:init function complete\n" );
     return true;
 }
 
@@ -154,6 +144,13 @@ int gravApp::OnExit()
 
 void gravApp::idleHandler( wxIdleEvent& evt )
 {
+    if ( usingThreads && !threadRunning )
+    {
+        grav->setThreads( usingThreads );
+        threadRunning = true;
+        VPMthread = thread_start( threadTest, this );
+    }
+
     if ( !usingThreads )
     {
         iterateSessions();
@@ -244,8 +241,8 @@ bool gravApp::handleArgs()
     wxString audioAddress;
     if ( parser.Found( _("audio"), &audioAddress ) )
     {
-        bool aRes = initSession(
-                            std::string((char*)audioAddress.char_str()), true );
+        bool aRes =
+               initSession( std::string((char*)audioAddress.char_str()), true );
         if ( aRes )
         {
             printf( "grav::audio session initialized\n" );

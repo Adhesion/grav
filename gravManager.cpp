@@ -38,6 +38,7 @@ gravManager::gravManager()
     siteIDGroups = new std::map<std::string,Group*>();
 
     sourcesToDelete = new std::vector<VideoSource*>();
+    objectsToAddToTree = new std::vector<RectangleBase*>();
 
     layouts = new LayoutManager();
     screenRect.setName( "screen rectangle" );
@@ -62,6 +63,7 @@ gravManager::gravManager()
     sourceCount = 0;
 
     sourceMutex = mutex_create();
+    lockCount = 0;
 }
 
 gravManager::~gravManager()
@@ -76,6 +78,7 @@ gravManager::~gravManager()
     delete runway;
 
     delete sourcesToDelete;
+    delete objectsToAddToTree;
 
     mutex_free( sourceMutex );
 }
@@ -157,6 +160,16 @@ void gravManager::draw()
             delete (*sourcesToDelete)[i];
         }
         sourcesToDelete->clear();
+    }
+    // add objects to tree that need to be added - similar to delete, tree is
+    // modified on the main thread (in other WX places) so
+    if ( objectsToAddToTree->size() > 0 && tree != NULL )
+    {
+        for ( unsigned int i = 0; i < objectsToAddToTree->size(); i++ )
+        {
+            tree->addObject( (*objectsToAddToTree)[i] );
+        }
+        objectsToAddToTree->clear();
     }
 
     // draw line to geographical position, selected ones on top (and bigger)
@@ -732,8 +745,11 @@ void gravManager::addNewSource( VideoSource* s )
 
     sourceCount++;
 
+    // tree add needs to be done on main thread since WX accesses the tree in
+    // other places (ie, not thread safe, and this could be on a separate
+    // thread)
     if ( tree != NULL )
-        tree->addObject( (RectangleBase*)s );
+        objectsToAddToTree->push_back( (RectangleBase*)s );
 
     if ( useRunway && sourceCount > 9 )
         runway->add( s );
@@ -950,13 +966,21 @@ TreeControl* gravManager::getTree()
 void gravManager::lockSources()
 {
     if ( usingThreads )
+    {
         mutex_lock( sourceMutex );
+        lockCount++;
+        //printf( "gravManager::lock: count now %i\n", lockCount );
+    }
 }
 
 void gravManager::unlockSources()
 {
     if ( usingThreads )
+    {
         mutex_unlock( sourceMutex );
+        lockCount--;
+        //printf( "gravManager::unlock: count now %i\n", lockCount );
+    }
 }
 
 void gravManager::setThreads( bool threads )
