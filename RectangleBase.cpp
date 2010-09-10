@@ -532,8 +532,8 @@ void RectangleBase::updateTextBounds()
 {
     if ( font )
     {
-        textBounds = font->BBox( getSubName().c_str() );
         cutoffPos = -1;
+        textBounds = font->BBox( getSubName().c_str() );
         while ( getTextWidth() > getWidth() )
         {
             //relativeTextScale = 0.0009 * ( getWidth() / getTextWidth() );

@@ -223,7 +223,7 @@ bool Group::updateName()
     // set the group's name to the common substring, and the members' names
     // to the remainder
     name = objects[0]->getName().substr(0, splitPos);
-    nameChanged = name.compare( oldName ) == 0;
+    nameChanged = name.compare( oldName ) != 0;
     
     //printf( "common substr is %s, up to pos %i\n", name.c_str(), splitPos );
     for ( unsigned int k = 0; k < objects.size(); k++ )

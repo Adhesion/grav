@@ -167,10 +167,8 @@ void gravManager::draw()
     // same for remove
     if ( objectsToRemoveFromTree->size() > 0 && tree != NULL )
     {
-        printf( "gravManager::removing %i objects from tree\n", objectsToRemoveFromTree->size() );
         for ( unsigned int i = 0; i < objectsToRemoveFromTree->size(); i++ )
         {
-            printf( "\tremoving %s (%p)\n", (*objectsToRemoveFromTree)[i]->getName().c_str(), (*objectsToRemoveFromTree)[i] );
             tree->removeObject( (*objectsToRemoveFromTree)[i] );
         }
         objectsToRemoveFromTree->clear();
@@ -812,7 +810,6 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
         // TODO probably have a better metric for determining auto-siteID groups
         if ( g->getSiteID().compare( "" ) != 0 && g->numObjects() == 0 )
         {
-            printf( "gravManager::deleteSource(): last object from siteID group removed, removing group %s (%p)\n", g->getName().c_str(), g );
             // note this duplicates the deleteGroup function since that does
             // mutex locking itself, and we already did that here
             removeFromLists( (RectangleBase*)g );
@@ -854,7 +851,6 @@ void gravManager::deleteGroup( Group* g )
 
 void gravManager::removeFromLists( RectangleBase* obj )
 {
-    printf( "gravManager::removeFromLists: called on %s (%p)", obj->getName().c_str(), obj );
     // remove it from the tree
     if ( tree )
     {
