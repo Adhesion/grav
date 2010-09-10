@@ -20,7 +20,7 @@ VideoListener::VideoListener( gravManager* g ) :
     grav( g )
 {
     x = -7.5f;
-    y = 5.5f;
+    y = 5.7f;
 }
 
 void
@@ -75,7 +75,7 @@ VideoListener::vpmsession_source_created(VPMSession &session,
         if ( x > 15.0f )
         {
             x = -7.5f;
-            y -= 6.0f;
+            y -= 5.9f;
         }
     }
 }
