@@ -37,7 +37,7 @@ gravManager::gravManager()
     selectedObjects = new std::vector<RectangleBase*>();
     siteIDGroups = new std::map<std::string,Group*>();
 
-    sourcesToDelete = new std::vector<VideoSource*>();
+    objectsToDelete = new std::vector<RectangleBase*>();
     objectsToAddToTree = new std::vector<RectangleBase*>();
     objectsToRemoveFromTree = new std::vector<RectangleBase*>();
 
@@ -78,7 +78,7 @@ gravManager::~gravManager()
 
     delete runway;
 
-    delete sourcesToDelete;
+    delete objectsToDelete;
     delete objectsToAddToTree;
     delete objectsToRemoveFromTree;
 
@@ -167,20 +167,22 @@ void gravManager::draw()
     // same for remove
     if ( objectsToRemoveFromTree->size() > 0 && tree != NULL )
     {
+        printf( "gravManager::removing %i objects from tree\n", objectsToRemoveFromTree->size() );
         for ( unsigned int i = 0; i < objectsToRemoveFromTree->size(); i++ )
         {
+            printf( "\tremoving %s (%p)\n", (*objectsToRemoveFromTree)[i]->getName().c_str(), (*objectsToRemoveFromTree)[i] );
             tree->removeObject( (*objectsToRemoveFromTree)[i] );
         }
         objectsToRemoveFromTree->clear();
     }
     // delete sources that need to be deleted - see deleteSource for the reason
-    if ( sourcesToDelete->size() > 0 )
+    if ( objectsToDelete->size() > 0 )
     {
-        for ( unsigned int i = 0; i < sourcesToDelete->size(); i++ )
+        for ( unsigned int i = 0; i < objectsToDelete->size(); i++ )
         {
-            delete (*sourcesToDelete)[i];
+            delete (*objectsToDelete)[i];
         }
-        sourcesToDelete->clear();
+        objectsToDelete->clear();
     }
 
     // draw point on geographical position, selected ones on top (and bigger)
@@ -810,6 +812,7 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
         // TODO probably have a better metric for determining auto-siteID groups
         if ( g->getSiteID().compare( "" ) != 0 && g->numObjects() == 0 )
         {
+            printf( "gravManager::deleteSource(): last object from siteID group removed, removing group %s (%p)\n", g->getName().c_str(), g );
             // note this duplicates the deleteGroup function since that does
             // mutex locking itself, and we already did that here
             removeFromLists( (RectangleBase*)g );
@@ -819,7 +822,10 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
                     siteIDGroups->find( g->getSiteID() );
             siteIDGroups->erase( gi );
 
-            delete g;
+            // put off the group delete, since removing it from the tree has to
+            // happen on the main thread, and can't delete it before we remove
+            // it from the tree
+            objectsToDelete->push_back( g );
         }
     }
 
@@ -831,7 +837,7 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
     // might be on a second thread, which would crash since the videosource
     // delete needs to do a GL call to delete its texture and GL calls can only
     // be on the main thread
-    sourcesToDelete->push_back( s );
+    objectsToDelete->push_back( s );
 
     unlockSources();
 }
@@ -848,6 +854,7 @@ void gravManager::deleteGroup( Group* g )
 
 void gravManager::removeFromLists( RectangleBase* obj )
 {
+    printf( "gravManager::removeFromLists: called on %s (%p)", obj->getName().c_str(), obj );
     // remove it from the tree
     if ( tree )
     {

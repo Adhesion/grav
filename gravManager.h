@@ -160,7 +160,7 @@ private:
     std::vector<RectangleBase*>* selectedObjects;
     std::map<std::string,Group*>* siteIDGroups;
 
-    std::vector<VideoSource*>* sourcesToDelete;
+    std::vector<RectangleBase*>* objectsToDelete;
     std::vector<RectangleBase*>* objectsToAddToTree;
     std::vector<RectangleBase*>* objectsToRemoveFromTree;
 
