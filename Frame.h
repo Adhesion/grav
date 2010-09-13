@@ -17,6 +17,7 @@ class Frame : public wxFrame
 {
 
 public:
+    Frame( wxWindow* parent, wxWindowID id, const wxString& title );
     Frame( wxWindow* parent, wxWindowID id, const wxString& title,
                     const wxPoint& pos, const wxSize& size );
 

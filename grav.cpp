@@ -56,18 +56,37 @@ bool gravApp::OnInit()
     if ( startFullscreen )
         mainFrame->ShowFullScreen( true );
 
-    treeFrame = new Frame( mainFrame, -1, _("grav menu"), wxPoint( 960, 50 ),
-                        wxSize( 300, 600 ) );
+    int treeX = 960; int treeY = 50;
+    int treeWidth = 300; int treeHeight = 600;
+    treeFrame = new Frame( mainFrame, -1, _("grav menu"),
+                            wxPoint( treeX, treeY ),
+                            wxSize( treeWidth, treeHeight ) );
     treeFrame->Show( true );
     treeFrame->SetName( _("tree frame") );
+
+    treePanel = new wxPanel( treeFrame, wxID_ANY, treeFrame->GetPosition(), treeFrame->GetSize() );
+    treeNotebook = new wxNotebook( treePanel, wxID_ANY,
+                               treePanel->GetPosition(), treePanel->GetSize() );
 
     int attribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24,
                             0 };
 
     canvas = new GLCanvas( mainFrame, grav, attribList, windowWidth,
                             windowHeight );
-    tree = new TreeControl( treeFrame );
-    tree->setSourceManager( grav );
+    sourceTree = new TreeControl( treeNotebook );
+    sourceTree->setSourceManager( grav );
+    sessionTree = new TreeControl( treeNotebook );
+    treeNotebook->AddPage( sourceTree, _("Videos"), true );
+    treeNotebook->AddPage( sessionTree, _("Sessions") );
+
+    // sizer for the notebook in general
+    wxBoxSizer* treeSizer = new wxBoxSizer( wxVERTICAL );
+    treePanel->SetSizer( treeSizer );
+    treeSizer->Fit( treeFrame );
+    treeSizer->SetSizeHints( treeFrame );
+    treeSizer->Add( treeNotebook, wxEXPAND );
+    treeSizer->Show( treeNotebook );
+    treeSizer->Layout();
 
     // put the main frame on top
     mainFrame->Raise();
@@ -97,7 +116,7 @@ bool gravApp::OnInit()
     
     grav->setEarth( earth );
     grav->setInput( input );
-    grav->setTree( tree );
+    grav->setTree( sourceTree );
     grav->setBorderTex( "border.png" );
     
     vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );

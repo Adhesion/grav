@@ -13,6 +13,7 @@
 
 #include <wx/wx.h>
 #include <wx/cmdline.h>
+#include <wx/notebook.h>
 #include <VPMedia/thread_helper.h>
 
 class GLCanvas;
@@ -68,10 +69,13 @@ private:
     
     Frame* mainFrame;
     Frame* treeFrame;
+    wxPanel* treePanel;
+    wxNotebook* treeNotebook;
     
     GLCanvas* canvas;
     Timer* timer;
-    TreeControl* tree;
+    TreeControl* sourceTree;
+    TreeControl* sessionTree;
     
     int timerInterval;
     int timerIntervalUS;

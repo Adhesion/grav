@@ -19,11 +19,10 @@ TreeControl::TreeControl() :
     wxTreeCtrl( NULL, wxID_ANY )
 { }
 
-TreeControl::TreeControl( wxFrame* parent ) :
-    wxTreeCtrl( parent, wxID_ANY )
+TreeControl::TreeControl( wxWindow* parent ) :
+    wxTreeCtrl( parent, wxID_ANY, parent->GetPosition(), parent->GetSize() )
 {
     rootID = AddRoot( _("Groups"), -1, -1, new wxTreeItemData() );
-    SetSize( parent->GetSize() );
     //SetWindowStyle( GetWindowStyle() | wxTR_HIDE_ROOT );
 }
 

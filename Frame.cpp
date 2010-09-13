@@ -15,6 +15,12 @@ BEGIN_EVENT_TABLE(Frame, wxFrame)
 EVT_CLOSE(Frame::OnCloseWindow)
 END_EVENT_TABLE()
 
+Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title ) :
+                wxFrame( parent, id, title, wxDefaultPosition, wxDefaultSize )
+{
+
+}
+
 Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title,
                 const wxPoint& pos, const wxSize& size ) :
                 wxFrame( parent, id, title, pos, size )

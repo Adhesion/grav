@@ -20,7 +20,7 @@ class TreeControl : public wxTreeCtrl
 
 public:
     TreeControl();
-    TreeControl( wxFrame* parent );
+    TreeControl( wxWindow* parent );
 
     ~TreeControl();
 
