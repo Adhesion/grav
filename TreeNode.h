@@ -14,15 +14,15 @@ class RectangleBase;
 
 class TreeNode : public wxTreeItemData
 {
-    
+
 public:
     TreeNode( RectangleBase* obj, bool session );
     RectangleBase* getObject();
-    
+
 private:
     bool isSession;
     RectangleBase* object;
-    
+
 };
 
 #endif /*TREENODE_H_*/

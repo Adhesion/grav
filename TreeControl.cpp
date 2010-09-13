@@ -155,7 +155,8 @@ int TreeControl::OnCompareItems( const wxTreeItemId& item1,
     
     RectangleBase* obj1 = node1->getObject();
     RectangleBase* obj2 = node2->getObject();
-    if ( obj1 == NULL || obj2 == NULL ) return 0;
+    if ( obj1 == NULL || obj2 == NULL )
+        return 0;
     bool group1 = obj1->isGroup();
     bool group2 = obj2->isGroup();
     

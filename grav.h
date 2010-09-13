@@ -21,6 +21,7 @@ class Timer;
 class Frame;
 class gravManager;
 class TreeControl;
+class SessionTreeControl;
 class VideoListener;
 class AudioManager;
 class VPMSessionFactory;
@@ -75,7 +76,7 @@ private:
     GLCanvas* canvas;
     Timer* timer;
     TreeControl* sourceTree;
-    TreeControl* sessionTree;
+    SessionTreeControl* sessionTree;
     
     int timerInterval;
     int timerIntervalUS;

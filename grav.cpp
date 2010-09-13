@@ -11,6 +11,7 @@
 #include "gravManager.h"
 #include "InputHandler.h"
 #include "TreeControl.h"
+#include "SessionTreeControl.h"
 #include "GLUtil.h"
 #include "VideoSource.h"
 #include "VideoListener.h"
@@ -42,12 +43,7 @@ bool gravApp::OnInit()
     audioSession_listener = new AudioManager();
     videoInitialized = false; audioInitialized = false;
 
-    if ( !handleArgs() )
-    {
-        delete grav;
-        return false;
-    }
-    
+    // GUI setup
     mainFrame = new Frame( (wxFrame*)NULL, -1, _("grav"), wxPoint( 10, 50 ),
                         wxSize( windowWidth, windowHeight ) );
     mainFrame->Show( true );
@@ -75,7 +71,7 @@ bool gravApp::OnInit()
                             windowHeight );
     sourceTree = new TreeControl( treeNotebook );
     sourceTree->setSourceManager( grav );
-    sessionTree = new TreeControl( treeNotebook );
+    sessionTree = new SessionTreeControl( treeNotebook );
     treeNotebook->AddPage( sourceTree, _("Videos"), true );
     treeNotebook->AddPage( sessionTree, _("Sessions") );
 
@@ -90,6 +86,12 @@ bool gravApp::OnInit()
 
     // put the main frame on top
     mainFrame->Raise();
+
+    if ( !handleArgs() )
+    {
+        delete grav;
+        return false;
+    }
 
     // since that bool is used in init, set it before init
     GLUtil::getInstance()->setShaderEnable( enableShaders );
@@ -213,7 +215,6 @@ bool gravApp::initSession( std::string address, bool audio )
         videoSession_ts = random32();
         videoInitialized = true;
     }
-
     else
     {
         audioSession = sf->createSession( address.c_str(),
@@ -232,6 +233,7 @@ bool gravApp::initSession( std::string address, bool audio )
         audioInitialized = true;
     }
 
+    sessionTree->addSession( address, audio );
     return true;
 }
 

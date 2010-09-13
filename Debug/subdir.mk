@@ -16,6 +16,7 @@ CPP_SRCS += \
 ../Point.cpp \
 ../RectangleBase.cpp \
 ../Runway.cpp \
+../SessionTreeControl.cpp \
 ../TreeControl.cpp \
 ../TreeNode.cpp \
 ../Vector.cpp \
@@ -37,6 +38,7 @@ OBJS += \
 ./Point.o \
 ./RectangleBase.o \
 ./Runway.o \
+./SessionTreeControl.o \
 ./TreeControl.o \
 ./TreeNode.o \
 ./Vector.o \
@@ -58,6 +60,7 @@ CPP_DEPS += \
 ./Point.d \
 ./RectangleBase.d \
 ./Runway.d \
+./SessionTreeControl.d \
 ./TreeControl.d \
 ./TreeNode.d \
 ./Vector.d \
