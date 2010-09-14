@@ -53,6 +53,8 @@ gravManager::gravManager()
     runway->setScale( 2.0f, 10.0f );
     drawnObjects->push_back( runway );
 
+    brandString = "RIT Global Collaboration Grid";
+
     usingThreads = false;
     useRunway = true;
     gridAuto = false;
@@ -103,18 +105,6 @@ void gravManager::draw()
         printf( "level: %f\n", level );
         gluSphere( sphereQuad, level * 50.0f, 200, 200 );
     }*/
-    
-    // test text drawing
-    /*glPushMatrix();
-    glColor4f( 1.0f, 1.0f, 1.0f, 0.5f );
-    glScalef( 0.05f, 0.05f, 0.05f );
-    glTranslatef( 0.0f, 0.0f, 0.0f );
-    glRasterPos2f( 0.0f, 0.0f );
-    const char* text = "TEST TEXT";
-    FTFont* font = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
-    font->FaceSize(100);
-    font->Render( text );
-    glPopMatrix();*/
     
     // set it to update names only every 30 frames
     bool updateNames = false;
@@ -323,6 +313,18 @@ void gravManager::draw()
         glDisable(GL_BLEND);
     }
     
+    // test text drawing
+    glPushMatrix();
+    glEnable( GL_BLEND );
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor4f( 0.953f, 0.431f, 0.129f, 0.5f );
+    glTranslatef( -14.5f, 8.0f, 0.0f );
+    glScalef( 0.01f, 0.01f, 0.01f );
+    const char* text = brandString.c_str();
+    GLUtil::getInstance()->getMainFont()->Render( text );
+    glDisable( GL_BLEND );
+    glPopMatrix();
+
     glFlush();
     
     //glDisable( GL_POLYGON_OFFSET_FILL );

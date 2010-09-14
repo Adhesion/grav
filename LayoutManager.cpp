@@ -359,19 +359,27 @@ bool LayoutManager::focus( float boundL, float boundR, float boundU,
     float centerY = ( boundD + boundU ) / 2.0f;
     float Xdist = ( boundR - boundL ) * scaleX / 2.0f;
     float Ydist = ( boundU - boundD ) * scaleY / 2.0f;
-    float innerL = centerX - Xdist;
-    float innerR = centerX + Xdist;
-    float innerU = centerY + Ydist;
-    float innerD = centerY - Ydist;
+    // .95f to give some extra room
+    // TODO make this an argument?
+    float gridInnerL = centerX - (Xdist*0.95f);
+    float gridInnerR = centerX + (Xdist*0.95f);
+    float gridInnerU = centerY + (Ydist*0.95f);
+    float gridInnerD = centerY - (Ydist*0.95f);
+    float perimeterInnerL = centerX - Xdist;
+    float perimeterInnerR = centerX + Xdist;
+    float perimeterInnerU = centerY + Ydist;
+    float perimeterInnerD = centerY - Ydist;
 
     //printf( "LayoutManager::focusing, inner rect %f %f %f %f\n", innerL, innerR,
     //        innerU, innerD );
 
-    bool grid = gridArrange( innerL, innerR, innerU, innerD, true, false, true,
-                            inners );
+    bool grid = gridArrange( gridInnerL, gridInnerR, gridInnerU, gridInnerD,
+                                 true, false, true,
+                                 inners );
     perimeterArrange( boundL, boundR, boundU, boundD,
-                                innerL, innerR, innerU, innerD,
-                                outers );
+                        perimeterInnerL, perimeterInnerR,
+                        perimeterInnerU, perimeterInnerD,
+                          outers );
 
     return grid;
 }

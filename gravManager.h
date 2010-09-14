@@ -179,6 +179,8 @@ private:
     
     Runway* runway;
 
+    std::string brandString;
+
     bool audioEnabled;
     AudioManager* audio;
     bool audioFocusTrigger;
