@@ -204,6 +204,7 @@ private:
     RectangleBase screenRectSub;
     // rectangle that roughly defines where the earth is relative to the camera
     RectangleBase earthRect;
+    void recalculateRectSizes();
     
     // background texture for groups & video objects
     GLuint borderTex;

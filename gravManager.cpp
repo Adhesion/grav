@@ -666,6 +666,15 @@ void gravManager::setWindowSize( int w, int h )
     screenRectFull.setPos( (screenL+screenR)/2.0f, (screenU+screenD)/2.0f);
     screenRectFull.setScale( screenR-screenL, screenU-screenD );
 
+    recalculateRectSizes();
+}
+
+void gravManager::recalculateRectSizes()
+{
+    float screenU = screenRectFull.getUBound();
+    float screenD = screenRectFull.getDBound();
+    float screenL = screenRectFull.getLBound();
+    float screenR = screenRectFull.getRBound();
     // if we have header, make the sub rectangle smaller accordingly
     // same for moving runway down, and shifting sub to the right because of the
     // runway
@@ -1013,9 +1022,12 @@ void gravManager::setHeaderString( std::string h )
 {
     headerString = h;
     useHeader = headerString.compare( "" ) != 0;
+
     if ( GLUtil::getInstance()->getMainFont() )
         headerTextBox = GLUtil::getInstance()->getMainFont()->BBox(
                             headerString.c_str() );
+
+    recalculateRectSizes();
 }
 
 TreeControl* gravManager::getTree()
@@ -1073,6 +1085,8 @@ void gravManager::setRunwayUsage( bool run )
     {
         drawnObjects->erase( it );
     }
+
+    recalculateRectSizes();
 }
 
 void gravManager::setGridAuto( bool g )
