@@ -63,6 +63,7 @@ gravManager::gravManager()
     usingThreads = false;
     useRunway = true;
     gridAuto = false;
+    autoFocusRotate = false;
 
     audioEnabled = false;
     audioFocusTrigger = false;
@@ -134,7 +135,7 @@ void gravManager::draw()
 
     // periodically automatically rearrange if on automatic - take last object
     // and put it in center
-    if ( autoCounter == 0 && getMovableObjects().size() > 0 && !useRunway )
+    if ( autoCounter == 0 && getMovableObjects().size() > 0 && autoFocusRotate )
     {
         outerObjs = getMovableObjects();
         innerObjs = std::vector<RectangleBase*>( outerObjs.begin(),
@@ -1065,26 +1066,21 @@ bool gravManager::usingRunway()
     return useRunway;
 }
 
+bool gravManager::usingGridAuto()
+{
+    return gridAuto;
+}
+
+bool gravManager::usingAutoFocusRotate()
+{
+    return autoFocusRotate;
+}
+
 void gravManager::setRunwayUsage( bool run )
 {
     useRunway = run;
 
-    std::vector<RectangleBase*>::iterator it = drawnObjects->begin();
-    while ( (*it) != runway && it != drawnObjects->end() ) ++it;
-    bool found = ( it != drawnObjects->end() );
-
-    // TODO maybe change this to just disable its drawing like with alt-r,
-    // rather than remove it entirely, to be consistent/look nice
-
-    // make sure it's drawn if enabled, not drawn if not
-    if ( useRunway && !found )
-    {
-        drawnObjects->insert( drawnObjects->begin(), runway );
-    }
-    else if ( !useRunway && found )
-    {
-        drawnObjects->erase( it );
-    }
+    runway->setRendering( run );
 
     recalculateRectSizes();
 }
@@ -1092,6 +1088,13 @@ void gravManager::setRunwayUsage( bool run )
 void gravManager::setGridAuto( bool g )
 {
     gridAuto = g;
+}
+
+void gravManager::setAutoFocusRotate( bool a )
+{
+    autoFocusRotate = a;
+    if ( a && useRunway )
+        setRunwayUsage( false );
 }
 
 Runway* gravManager::getRunway()

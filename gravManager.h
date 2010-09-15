@@ -154,8 +154,11 @@ public:
     void setThreads( bool threads );
 
     bool usingRunway();
+    bool usingGridAuto();
+    bool usingAutoFocusRotate();
     void setRunwayUsage( bool run );
     void setGridAuto( bool g );
+    void setAutoFocusRotate( bool a );
     Runway* getRunway();
 
 private:
@@ -226,6 +229,7 @@ private:
 
     bool useRunway;
     bool gridAuto;
+    bool autoFocusRotate;
 
     int sourceCount;
 

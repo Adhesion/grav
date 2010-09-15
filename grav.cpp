@@ -280,7 +280,7 @@ bool gravApp::handleArgs()
 
     startFullscreen = parser.Found( _("fullscreen") );
 
-    grav->setRunwayUsage( !parser.Found( _("automatic") ) );
+    grav->setAutoFocusRotate( parser.Found( _("automatic") ) );
 
     grav->setGridAuto( parser.Found( _("gridauto") ) );
 

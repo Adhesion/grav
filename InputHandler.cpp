@@ -144,7 +144,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     case 'R':
         if ( altHeld )
         {
-            grav->getRunway()->setRendering( !grav->getRunway()->getRendering() );
+            grav->setRunwayUsage( !grav->usingRunway() );
             grav->clearSelected();
         }
         else
@@ -309,7 +309,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     case 'A':
         if ( altHeld )
         {
-            grav->setRunwayUsage( !grav->usingRunway() );
+            grav->setAutoFocusRotate( !grav->usingAutoFocusRotate() );
             grav->resetAutoCounter();
         }
         else

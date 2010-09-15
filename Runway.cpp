@@ -143,7 +143,7 @@ void Runway::checkMemberIntersect()
 
 void Runway::setRendering( bool r )
 {
-    printf( "Runway::setting rendering to %i\n", r );
+    //printf( "Runway::setting rendering to %i\n", r );
     enableRendering = r;
 
     if ( !r )
