@@ -133,13 +133,18 @@ public:
     float getCamX(); float getCamY(); float getCamZ();
     void setCamX( float x ); void setCamY( float y ); void setCamZ( float z );
     
-    RectangleBase getScreenRect();
+    RectangleBase getScreenRect( bool full = false );
     RectangleBase getEarthRect();
     
     void setEarth( Earth* e );
     void setInput( InputHandler* i );
     void setTree( TreeControl* t );
     void setAudio( AudioManager* a );
+    /*
+     * Note, this should be called after GL setup since it needs to calculate
+     * the text size, which depends on the font being set up.
+     */
+    void setHeaderString( std::string h );
     
     TreeControl* getTree();
 
@@ -179,7 +184,11 @@ private:
     
     Runway* runway;
 
-    std::string brandString;
+    std::string headerString;
+    bool useHeader;
+    FTBBox headerTextBox;
+    float textScale;
+    float textOffset;
 
     bool audioEnabled;
     AudioManager* audio;
@@ -190,8 +199,9 @@ private:
     // dimensions of the drawing window in pixels
     int windowWidth, windowHeight;
     // rectangle that represents the boundaries of the drawing area in world
-    // space
-    RectangleBase screenRect;
+    // space - full and one minus header & runway
+    RectangleBase screenRectFull;
+    RectangleBase screenRectSub;
     // rectangle that roughly defines where the earth is relative to the camera
     RectangleBase earthRect;
     

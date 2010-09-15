@@ -42,8 +42,10 @@ gravManager::gravManager()
     objectsToRemoveFromTree = new std::vector<RectangleBase*>();
 
     layouts = new LayoutManager();
-    screenRect.setName( "screen rectangle" );
-    screenRect.setAnimation( false );
+    screenRectFull.setName( "screen rectangle full" );
+    screenRectFull.setAnimation( false );
+    screenRectFull.setName( "screen rectangle sub" );
+    screenRectSub.setAnimation( false );
 
     earthRect.setAnimation( false );
     earthRect.setPos( 0.0f, 0.0f );
@@ -53,7 +55,10 @@ gravManager::gravManager()
     runway->setScale( 2.0f, 10.0f );
     drawnObjects->push_back( runway );
 
-    brandString = "RIT Global Collaboration Grid";
+    headerString = "";
+    useHeader = false;
+    textScale = 0.01;
+    textOffset = 0.25;
 
     usingThreads = false;
     useRunway = true;
@@ -314,16 +319,25 @@ void gravManager::draw()
     }
     
     // test text drawing
-    glPushMatrix();
-    glEnable( GL_BLEND );
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glColor4f( 0.953f, 0.431f, 0.129f, 0.5f );
-    glTranslatef( -14.5f, 8.0f, 0.0f );
-    glScalef( 0.01f, 0.01f, 0.01f );
-    const char* text = brandString.c_str();
-    GLUtil::getInstance()->getMainFont()->Render( text );
-    glDisable( GL_BLEND );
-    glPopMatrix();
+    if ( useHeader )
+    {
+        glPushMatrix();
+
+        glEnable( GL_BLEND );
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glColor4f( 0.953f, 0.431f, 0.129f, 0.5f );
+        float textXPos = screenRectFull.getLBound() + textOffset;
+        float textYPos = screenRectFull.getUBound() -
+                ( ( headerTextBox.Upper().Yf() - headerTextBox.Lower().Yf() )
+                        * textScale ) - textOffset;
+        glTranslatef( textXPos, textYPos, 0.0f );
+        glScalef( textScale, textScale, textScale );
+        const char* text = headerString.c_str();
+        GLUtil::getInstance()->getMainFont()->Render( text );
+        glDisable( GL_BLEND );
+
+        glPopMatrix();
+    }
 
     glFlush();
     
@@ -649,15 +663,31 @@ void gravManager::setWindowSize( int w, int h )
     glUtil->screenToWorld( (GLdouble)0.0f, (GLdouble)0.0f,
                           0.99087065, &screenL, &screenD, &dummy );
 
-    screenRect.setPos( (screenL+screenR)/2.0f, (screenU+screenD)/2.0f);
-    screenRect.setScale( screenR-screenL, screenU-screenD );
+    screenRectFull.setPos( (screenL+screenR)/2.0f, (screenU+screenD)/2.0f);
+    screenRectFull.setScale( screenR-screenL, screenU-screenD );
+
+    // if we have header, make the sub rectangle smaller accordingly
+    // same for moving runway down, and shifting sub to the right because of the
+    // runway
+    float top = screenU;
+    float left = screenL;
+    if ( useHeader )
+        top = screenU - ( 2.0f * textOffset ) -
+                ( ( headerTextBox.Upper().Yf() - headerTextBox.Lower().Yf() )
+                    * textScale );
 
     // resize the runway to go on the left side
     // TODO: make this work for horizontal, vertical, let user change it
     runway->setScale( fabs( screenR - screenL ) * 0.07f,
-                      fabs( screenU - screenD ) * 0.93f, true );
-    runway->setPos( screenL + (fabs( screenU - screenD ) * 0.035f) +
-                  runway->getDestWidth() / 2.0f, ( screenU + screenD ) / 2.0f );
+                      fabs( top - screenD ) * 0.93f, true );
+    runway->setPos( screenL + (fabs( top - screenD ) * 0.035f) +
+                  runway->getDestWidth() / 2.0f, ( top + screenD ) / 2.0f );
+
+    if ( useRunway )
+       left = screenL + (fabs( top - screenD ) * 0.035f * 2.0f) +
+               ( fabs( screenR - screenL ) * 0.07f );
+    screenRectSub.setPos( (left+screenR)/2.0f, (top+screenD)/2.0f);
+    screenRectSub.setScale( screenR-left, top-screenD );
 }
 
 bool gravManager::usingSiteIDGroups()
@@ -941,9 +971,12 @@ void gravManager::setCamZ( float z )
     camZ = z;
 }
 
-RectangleBase gravManager::getScreenRect()
+RectangleBase gravManager::getScreenRect( bool full )
 {
-    return screenRect;
+    if ( full )
+        return screenRectFull;
+    else
+        return screenRectSub;
 }
 
 RectangleBase gravManager::getEarthRect()
@@ -974,6 +1007,15 @@ void gravManager::setAudio( AudioManager* a )
         audioEnabled = false;
 
     audio = a;
+}
+
+void gravManager::setHeaderString( std::string h )
+{
+    headerString = h;
+    useHeader = headerString.compare( "" ) != 0;
+    if ( GLUtil::getInstance()->getMainFont() )
+        headerTextBox = GLUtil::getInstance()->getMainFont()->BBox(
+                            headerString.c_str() );
 }
 
 TreeControl* gravManager::getTree()

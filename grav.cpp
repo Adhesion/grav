@@ -99,6 +99,8 @@ bool gravApp::OnInit()
     // initialize GL stuff (+ shaders) needs to be done AFTER attriblist is
     // used in making the canvas
     GLUtil::getInstance()->initGL();
+
+    grav->setHeaderString( "RIT Global Collaboration Grid" );
     
     //printf( "hide root? %i\n", tree->HasFlag( wxTR_HIDE_ROOT ) );
     timer = new Timer( canvas, timerInterval );
