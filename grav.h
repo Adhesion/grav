@@ -16,6 +16,8 @@
 #include <wx/notebook.h>
 #include <VPMedia/thread_helper.h>
 
+#include <vector>
+
 class GLCanvas;
 class Timer;
 class Frame;
@@ -89,13 +91,15 @@ private:
 
     VPMSessionFactory *sf;
 
-    VPMSession* videoSession;
+    std::vector<std::string> initialVideoAddresses;
+    std::vector<VPMSession*> videoSessions;
     uint32_t videoSession_ts;
     VideoListener* videoSession_listener;
     bool videoInitialized;
 
+    std::vector<std::string> initialAudioAddresses;
     bool audioEnabled;
-    VPMSession* audioSession;
+    std::vector<VPMSession*> audioSessions;
     uint32_t audioSession_ts;
     AudioManager* audioSession_listener;
     bool audioInitialized;
@@ -105,7 +109,7 @@ private:
     bool startFullscreen;
 
     int windowWidth, windowHeight;
-    
+
 };
 
 static const wxCmdLineEntryDesc cmdLineDesc[] =
