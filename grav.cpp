@@ -101,8 +101,11 @@ bool gravApp::OnInit()
     // used in making the canvas
     GLUtil::getInstance()->initGL();
 
-    grav->setHeaderString( "RIT Global Collaboration Grid" );
-    
+    if ( headerSet )
+        grav->setHeaderString( header );
+    else
+        grav->setHeaderString( "RIT Global Collaboration Grid" );
+
     //printf( "hide root? %i\n", tree->HasFlag( wxTR_HIDE_ROOT ) );
     timer = new Timer( canvas, timerInterval );
     //timer->Start();
@@ -303,6 +306,13 @@ bool gravApp::handleArgs()
                                 std::string((char*)audioAddress.char_str()) );
     }
 
+    wxString headerWX;
+    headerSet = parser.Found( _("header"), &headerWX );
+    if ( headerSet )
+    {
+        header = std::string((char*)headerWX.char_str());
+    }
+
     usingThreads = parser.Found( _("threads") );
 
     enableShaders = parser.Found( _("enable-shaders") );
@@ -357,7 +367,7 @@ void gravApp::mapRTP()
 
 void* gravApp::threadTest( void* args )
 {
-    printf( "gravApp::starting network/decoding thread...\n" );
+    printf( "grav::starting network/decoding thread...\n" );
     gravApp* g = (gravApp*)args;
     // wait a bit before starting this thread, since doing it too early might
     // affect the WX tree before it's fully initialized somehow, rarely
@@ -367,7 +377,7 @@ void* gravApp::threadTest( void* args )
     {
         g->iterateSessions();
     }
-    printf( "gravApp::thread ending...\n" );
+    printf( "grav::thread ending...\n" );
     return 0;
 }
 

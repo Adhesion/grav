@@ -217,7 +217,7 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
         for ( unsigned int i = 0; i < objects.size(); i++ )
         {
             float objectAspect =
-                        objects[i]->getDestWidth()/objects[i]->getDestHeight();
+                       objects[i]->getTotalWidth()/objects[i]->getTotalHeight();
             float aspect = 1.0f;
             float newWidth = 1.0f;
             float newHeight = 1.0f;

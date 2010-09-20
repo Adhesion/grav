@@ -84,7 +84,7 @@ private:
     int timerIntervalUS;
 
     gravManager* grav;
-    
+
     bool usingThreads;
     bool threadRunning;
     thread* VPMthread;
@@ -103,6 +103,9 @@ private:
     uint32_t audioSession_ts;
     AudioManager* audioSession_listener;
     bool audioInitialized;
+
+    std::string header;
+    bool headerSet;
 
     bool enableShaders;
 
@@ -138,6 +141,11 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 
     {
         wxCMD_LINE_OPTION, _("a"), _("audio"), _("RTP audio session address"),
+            wxCMD_LINE_VAL_STRING
+    },
+
+    {
+        wxCMD_LINE_OPTION, _("ht"), _("header"), _("Header string"),
             wxCMD_LINE_VAL_STRING
     },
 

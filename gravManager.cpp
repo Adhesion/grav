@@ -44,7 +44,7 @@ gravManager::gravManager()
     layouts = new LayoutManager();
     screenRectFull.setName( "screen rectangle full" );
     screenRectFull.setAnimation( false );
-    screenRectFull.setName( "screen rectangle sub" );
+    screenRectSub.setName( "screen rectangle sub" );
     screenRectSub.setAnimation( false );
 
     earthRect.setAnimation( false );
