@@ -304,6 +304,10 @@ void VideoSource::resizeBuffer()
 
 void VideoSource::scaleNative()
 {
+    // no point in scaling to 0x0
+    if ( vwidth == 0 || vheight == 0 )
+        return;
+
     // get the top left point of the screen in world coords, since that's
     // what the screen coordinates are relative to
     GLdouble topLeftX; GLdouble topLeftY; GLdouble topLeftZ;
