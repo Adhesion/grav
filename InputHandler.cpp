@@ -48,7 +48,8 @@ void InputHandler::wxKeyDown( wxKeyEvent& evt )
 {
     shiftHeld = ( evt.GetModifiers() == wxMOD_SHIFT );
     altHeld = ( evt.GetModifiers() == wxMOD_ALT );
-    
+    ctrlHeld = ( evt.GetModifiers() == wxMOD_CMD );
+
     processKeyboard( evt.GetKeyCode(), 0, 0 );
 
     evt.Skip(); // so now the char event can grab this, if need be
@@ -153,52 +154,78 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         break;
 
     case 'I':
-        printf( "We currently have %i sources.\n",
-                 grav->getSources()->size() );
-        printf( "We currently have %i objects in drawnObjects.\n",
-                 grav->getDrawnObjects()->size() );
-        printf( "Screen size is %f x %f\n", grav->getScreenRect().getWidth(),
-                grav->getScreenRect().getHeight() );
-
-        for ( si = grav->getSources()->begin();
-                si != grav->getSources()->end(); si++ )
+        // ctrl-I -> invert selection
+        if ( ctrlHeld )
         {
-            printf( "name: %s\n",
-                (*si)->getMetadata(
-                    VPMSession::VPMSESSION_SDES_NAME).c_str() );
-            printf( "stored name: %s\n", (*si)->getName().c_str() );
-            printf( "cname: %s\n",
-                (*si)->getMetadata(
-                    VPMSession::VPMSESSION_SDES_CNAME).c_str() );
-            printf( "stored altname: %s\n", (*si)->getAltName().c_str() );
-            printf( "loc: %s\n",
-                (*si)->getMetadata(
-                    VPMSession::VPMSESSION_SDES_LOC).c_str() );
-            printf( "ssrc 0x%08x (%d)\n", (*si)->getssrc(),
-                        (*si)->getssrc() );
-            printf( "\tpos (world): %f,%f\n",
-                    (*si)->getX(), (*si)->getY() );
-            GLdouble scrX; GLdouble scrY; GLdouble scrZ;
-            GLUtil::getInstance()->worldToScreen( (GLdouble)(*si)->getX(),
-                            (GLdouble)(*si)->getY(),
-                            (GLdouble)(*si)->getZ(),
-                            &scrX, &scrY, &scrZ);
-            printf( "\tpos (screen): %f,%f,%f\n", scrX, scrY, scrZ );
-            printf( "\tis grouped? %i\n", (*si)->isGrouped() );
-
-            printf( "\tDescription of codec: %s\n", (*si)->getPayloadDesc() );
-            printf( "\tis muted? %i\n", (*si)->isMuted() );
-
-            printf( "\tSize: %f x %f\n", (*si)->getWidth(), (*si)->getHeight() );
-            printf( "\tText size: %f x %f\n", (*si)->getTextWidth(),
-                        (*si)->getTextHeight() );
+            for ( unsigned int i = 0; i < movableObjects.size(); i++ )
+            {
+                RectangleBase* obj = movableObjects[i];
+                obj->setSelect( !obj->isSelected() );
+                if ( obj->isSelected() )
+                {
+                    grav->getSelectedObjects()->push_back( obj );
+                }
+                else
+                {
+                    std::vector<RectangleBase*>::iterator it =
+                            grav->getSelectedObjects()->begin();
+                    while ( (*it) != obj ) it++;
+                    grav->getSelectedObjects()->erase( it );
+                }
+            }
         }
-        printf( "DrawnObjects:\n" );
-        for ( unsigned int i = 0; i < grav->getDrawnObjects()->size(); i++ )
+        else
         {
-            RectangleBase* temp = (*(grav->getDrawnObjects()))[i];
-            printf( "%s (%fx%f)\n", temp->getName().c_str(),
-                    temp->getDestWidth(), temp->getDestHeight() );
+            printf( "We currently have %i sources.\n",
+                     grav->getSources()->size() );
+            printf( "We currently have %i objects in drawnObjects.\n",
+                     grav->getDrawnObjects()->size() );
+            printf( "Screen size is %f x %f\n",
+                    grav->getScreenRect().getWidth(),
+                    grav->getScreenRect().getHeight() );
+
+            for ( si = grav->getSources()->begin();
+                    si != grav->getSources()->end(); si++ )
+            {
+                printf( "name: %s\n",
+                    (*si)->getMetadata(
+                        VPMSession::VPMSESSION_SDES_NAME).c_str() );
+                printf( "stored name: %s\n", (*si)->getName().c_str() );
+                printf( "cname: %s\n",
+                    (*si)->getMetadata(
+                        VPMSession::VPMSESSION_SDES_CNAME).c_str() );
+                printf( "stored altname: %s\n", (*si)->getAltName().c_str() );
+                printf( "loc: %s\n",
+                    (*si)->getMetadata(
+                        VPMSession::VPMSESSION_SDES_LOC).c_str() );
+                printf( "ssrc 0x%08x (%d)\n", (*si)->getssrc(),
+                            (*si)->getssrc() );
+                printf( "\tpos (world): %f,%f\n",
+                        (*si)->getX(), (*si)->getY() );
+                GLdouble scrX; GLdouble scrY; GLdouble scrZ;
+                GLUtil::getInstance()->worldToScreen( (GLdouble)(*si)->getX(),
+                                (GLdouble)(*si)->getY(),
+                                (GLdouble)(*si)->getZ(),
+                                &scrX, &scrY, &scrZ);
+                printf( "\tpos (screen): %f,%f,%f\n", scrX, scrY, scrZ );
+                printf( "\tis grouped? %i\n", (*si)->isGrouped() );
+
+                printf( "\tDescription of codec: %s\n",
+                            (*si)->getPayloadDesc() );
+                printf( "\tis muted? %i\n", (*si)->isMuted() );
+
+                printf( "\tSize: %f x %f\n", (*si)->getWidth(),
+                            (*si)->getHeight() );
+                printf( "\tText size: %f x %f\n", (*si)->getTextWidth(),
+                            (*si)->getTextHeight() );
+            }
+            printf( "DrawnObjects:\n" );
+            for ( unsigned int i = 0; i < grav->getDrawnObjects()->size(); i++ )
+            {
+                RectangleBase* temp = (*(grav->getDrawnObjects()))[i];
+                printf( "%s (%fx%f)\n", temp->getName().c_str(),
+                        temp->getDestWidth(), temp->getDestHeight() );
+            }
         }
         break;
 
@@ -311,6 +338,15 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         {
             grav->setAutoFocusRotate( !grav->usingAutoFocusRotate() );
             grav->resetAutoCounter();
+        }
+        else if ( ctrlHeld )
+        {
+            grav->clearSelected();
+            for ( unsigned int i = 0; i < movableObjects.size(); i++ )
+            {
+                movableObjects[i]->setSelect( true );
+                grav->getSelectedObjects()->push_back( movableObjects[i] );
+            }
         }
         else
             grav->setCamX(grav->getCamX()-1);
