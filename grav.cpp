@@ -54,6 +54,7 @@ bool gravApp::OnInit()
                         wxSize( windowWidth, windowHeight ) );
     mainFrame->Show( true );
     mainFrame->SetName( _("main grav frame") );
+    mainFrame->setSourceManager( grav );
     SetTopWindow( mainFrame );
     if ( startFullscreen )
         mainFrame->ShowFullScreen( true );

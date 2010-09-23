@@ -706,12 +706,6 @@ bool InputHandler::selectVideos()
     return videoSelected;
 }
 
-void InputHandler::spawnPropertyWindow( wxCommandEvent& evt )
-{
-    printf( "video property window spawning\n" );
-    // do some stuff
-}
-
 bool InputHandler::isLeftButtonHeld()
 {
     return leftButtonHeld;

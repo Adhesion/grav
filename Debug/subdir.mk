@@ -20,6 +20,7 @@ CPP_SRCS += \
 ../TreeControl.cpp \
 ../TreeNode.cpp \
 ../Vector.cpp \
+../VideoInfoDialog.cpp \
 ../VideoListener.cpp \
 ../VideoSource.cpp \
 ../grav.cpp \
@@ -42,6 +43,7 @@ OBJS += \
 ./TreeControl.o \
 ./TreeNode.o \
 ./Vector.o \
+./VideoInfoDialog.o \
 ./VideoListener.o \
 ./VideoSource.o \
 ./grav.o \
@@ -64,6 +66,7 @@ CPP_DEPS += \
 ./TreeControl.d \
 ./TreeNode.d \
 ./Vector.d \
+./VideoInfoDialog.d \
 ./VideoListener.d \
 ./VideoSource.d \
 ./grav.d \

@@ -47,7 +47,6 @@ public:
     void mouseLeftHeldMove( int x, int y );
     
     bool selectVideos();
-    void spawnPropertyWindow( wxCommandEvent& evt );
     static int propertyID;
 
     /*

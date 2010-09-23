@@ -8,13 +8,15 @@
  * @author Andrew Ford
  */
 
+#include "gravManager.h"
 #include "Frame.h"
 #include "GLCanvas.h"
 #include "InputHandler.h"
+#include "VideoInfoDialog.h"
 
 BEGIN_EVENT_TABLE(Frame, wxFrame)
 EVT_CLOSE(Frame::OnCloseWindow)
-EVT_MENU(InputHandler::propertyID, InputHandler::spawnPropertyWindow)
+EVT_MENU(InputHandler::propertyID, Frame::spawnPropertyWindow)
 END_EVENT_TABLE()
 
 Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title ) :
@@ -28,6 +30,21 @@ Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title,
                 wxFrame( parent, id, title, pos, size )
 {
 
+}
+
+void Frame::setSourceManager( gravManager* g )
+{
+    grav = g;
+}
+
+void Frame::spawnPropertyWindow( wxCommandEvent& evt )
+{
+    for ( unsigned int i = 0; i < grav->getSelectedObjects()->size(); i++ )
+    {
+        VideoInfoDialog* dialog = new VideoInfoDialog( this,
+                (*grav->getSelectedObjects())[i] );
+        dialog->Show();
+    }
 }
 
 void Frame::OnCloseWindow( wxCloseEvent& evt )
