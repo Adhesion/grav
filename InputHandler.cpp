@@ -24,7 +24,10 @@ EVT_MOTION(InputHandler::wxMouseMove)
 EVT_LEFT_DOWN(InputHandler::wxMouseLDown)
 EVT_LEFT_DCLICK(InputHandler::wxMouseLDown)
 EVT_LEFT_UP(InputHandler::wxMouseLUp)
+EVT_RIGHT_DOWN(InputHandler::wxMouseRDown)
 END_EVENT_TABLE()
+
+int InputHandler::propertyID = wxNewId();
 
 InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     : earth( e ), grav( g ), mainFrame( f )
@@ -81,6 +84,16 @@ void InputHandler::wxMouseLUp( wxMouseEvent& evt )
 {
     leftRelease( evt.GetPosition().x, evt.GetPosition().y );
     evt.Skip();
+}
+
+void InputHandler::wxMouseRDown( wxMouseEvent& evt )
+{
+    if ( grav->getSelectedObjects()->size() > 0 )
+    {
+        wxMenu rightClickMenu;
+        rightClickMenu.Append( propertyID, _("Properties") );
+        mainFrame->PopupMenu( &rightClickMenu, evt.GetPosition() );
+    }
 }
 
 void InputHandler::processKeyboard( int keyCode, int x, int y )
@@ -691,6 +704,12 @@ bool InputHandler::selectVideos()
     }
     
     return videoSelected;
+}
+
+void InputHandler::spawnPropertyWindow( wxCommandEvent& evt )
+{
+    printf( "video property window spawning\n" );
+    // do some stuff
 }
 
 bool InputHandler::isLeftButtonHeld()

@@ -10,9 +10,11 @@
 
 #include "Frame.h"
 #include "GLCanvas.h"
+#include "InputHandler.h"
 
 BEGIN_EVENT_TABLE(Frame, wxFrame)
 EVT_CLOSE(Frame::OnCloseWindow)
+EVT_MENU(InputHandler::propertyID, InputHandler::spawnPropertyWindow)
 END_EVENT_TABLE()
 
 Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title ) :

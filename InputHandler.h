@@ -38,6 +38,7 @@ public:
     void wxMouseMove( wxMouseEvent& evt );
     void wxMouseLDown( wxMouseEvent& evt );
     void wxMouseLUp( wxMouseEvent& evt );
+    void wxMouseRDown( wxMouseEvent& evt );
     
     void processKeyboard( int keyCode, int x, int y );
     
@@ -46,6 +47,8 @@ public:
     void mouseLeftHeldMove( int x, int y );
     
     bool selectVideos();
+    void spawnPropertyWindow( wxCommandEvent& evt );
+    static int propertyID;
 
     /*
      * Various accessors.
