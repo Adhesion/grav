@@ -23,10 +23,10 @@ VideoInfoDialog::VideoInfoDialog( wxWindow* parent, RectangleBase* o )
     VideoSource* video = dynamic_cast<VideoSource*>( obj );
     if ( video )
     {
-        text += "SDES name:\t" +
+        text += "RTP name:\t" +
               video->getMetadata( VPMSession::VPMSESSION_SDES_NAME ) +
               "\n";
-        text += "SDES cname:\t" +
+        text += "RTP cname:\t" +
               video->getMetadata( VPMSession::VPMSESSION_SDES_CNAME ) +
               "\n";
         text += "Location:\t" +
