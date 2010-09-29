@@ -57,6 +57,11 @@ private:
 
     static void* threadTest( void* args );
     bool isThreadRunning();
+    /**
+     * Calls iterate sessions on the session manager, but also sleeps if there
+     * was no iteration (to avoid CPU spin). Used when sessions are on separate
+     * thread.
+     */
     void iterateSessions();
 
     wxCmdLineParser parser;

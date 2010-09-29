@@ -136,10 +136,12 @@ bool gravApp::OnInit()
     for ( unsigned int i = 0; i < initialVideoAddresses.size(); i++ )
     {
         sessionManager->initSession( initialVideoAddresses[i], false );
+        sessionTree->addSession( initialVideoAddresses[i], false );
     }
     for ( unsigned int i = 0; i < initialAudioAddresses.size(); i++ )
     {
         sessionManager->initSession( initialAudioAddresses[i], true );
+        sessionTree->addSession( initialAudioAddresses[i], true );
     }
 
     printf( "grav:init function complete\n" );
@@ -218,30 +220,11 @@ void gravApp::idleHandler( wxIdleEvent& evt )
 void gravApp::iterateSessions()
 {
     bool haveSessions = sessionManager->iterateSessions();
-    /*if ( videoInitialized )
-    {
-        for ( unsigned int i = 0; i < videoSessions.size(); i++ )
-        {
-            videoSessions[i]->iterate( videoSession_ts++ );
-            haveSessions = haveSessions || true;
-        }
-    }
-    if ( audioEnabled && audioInitialized )
-    {
-        for ( unsigned int i = 0; i < audioSessions.size(); i++ )
-        {
-            audioSessions[i]->iterate( audioSession_ts++ );
-            haveSessions = haveSessions || true;
-        }
-    }*/
+
     // if there are no sessions, sleep so as not to spin and consume CPU
     // needlessly
     if ( !haveSessions )
         wxMicroSleep( 500 );
-    //if ( videoSession && videoInitialized )
-    //    videoSession->iterate( videoSession_ts++ );
-    //if ( audioEnabled && audioSession && audioInitialized )
-    //    audioSession->iterate( audioSession_ts++ );
 }
 
 bool gravApp::handleArgs()
