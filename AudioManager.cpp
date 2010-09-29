@@ -29,7 +29,9 @@ float AudioManager::getLevel( std::string name, bool avg )
     // meters that match the given name.
     float temp = 0.0f;
     int count = 0;
+
     //printf( "AudioManager::getLevel: getting level for %s\n", name.c_str() );
+
     for ( unsigned int i = 0; i < sources.size(); i++ )
     {
         if ( sources[i]->siteID.compare( name ) == 0 ||
@@ -48,12 +50,18 @@ float AudioManager::getLevel( std::string name, bool avg )
         //else
             //printf( "AudioManager::getLevel: DID NOT find %s\n", name.c_str() );
     }
+
     if ( count == 1 )
         return temp;
     else if ( count > 1 )
         return temp/(float)count;
     // default case
     return -2.0f;
+}
+
+float AudioManager::getLevelAvg( std::string name )
+{
+    return getLevel( name, true );
 }
 
 void AudioManager::printLevels()
@@ -65,9 +73,9 @@ void AudioManager::printLevels()
     }
 }
 
-float AudioManager::getLevelAvg(std::string name )
+unsigned int AudioManager::getSourceCount()
 {
-    return getLevel( name, true );
+    return sources.size();
 }
 
 void AudioManager::vpmsession_source_created( VPMSession &session,
@@ -100,7 +108,14 @@ void AudioManager::vpmsession_source_deleted( VPMSession &session,
                                           uint32_t ssrc,
                                           const char *reason )
 {
-    // TODO fix this...
+    std::vector<AudioSource*>::iterator it = sources.begin();
+    while ( (*it)->ssrc != ssrc ) it++;
+    if ( it == sources.end() )
+        printf( "AudioManager::delete::ERROR ssrc not found?\n" );
+
+    delete (*it)->meter;
+    delete (*it);
+    sources.erase( it );
 }
 
 void AudioManager::vpmsession_source_description( VPMSession &session,

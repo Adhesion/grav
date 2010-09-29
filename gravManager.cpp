@@ -230,7 +230,8 @@ void gravManager::draw()
             // set the audio effect level on the drawcounter, if audio is
             // enabled, and if it's selectable (excludes runway)
             // TODO maybe change this if meaning of selectable changes
-            if ( audioEnabled && drawCounter == 0 && (*si)->isSelectable() )
+            if ( audioEnabled && drawCounter == 0 && (*si)->isSelectable() &&
+                    audio->getSourceCount() > 0 )
             {
                 // TODO: do a lookup with CNAME if siteIDs aren't enabled
                 if ( (*si)->getSiteID().compare("") != 0 )
@@ -272,7 +273,7 @@ void gravManager::draw()
     //printf( "glutDisplay::done drawing objects\n" );
     
     // do the audio focus if it triggered
-    if ( audioEnabled )
+    if ( audioEnabled && audio->getSourceCount() > 0 )
     {
         if ( audioFocusTrigger )
         {
@@ -319,7 +320,7 @@ void gravManager::draw()
         glDisable(GL_BLEND);
     }
     
-    // test text drawing
+    // header text drawing
     if ( useHeader )
     {
         glPushMatrix();

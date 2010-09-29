@@ -26,8 +26,7 @@ class TreeControl;
 class SessionTreeControl;
 class VideoListener;
 class AudioManager;
-class VPMSessionFactory;
-class VPMSession;
+class SessionManager;
 
 class gravApp : public wxApp
 {
@@ -44,15 +43,6 @@ private:
     
     void idleHandler( wxIdleEvent& evt );
 
-    /*
-     * Create a new RTP session and attach it to the proper listener. If
-     * audio is true it's an audio session; video if false.
-     * Returns false if session creation fails, true otherwise.
-     */
-    bool initSession( std::string address, bool audio );
-
-    void iterateSessions();
-
     /**
      * Parse the command line arguments and set options accordingly.
      * Primarily for setting the video/audio/etc addresses.
@@ -64,9 +54,10 @@ private:
      * (those that are have already been mapped in VPMedia)
      */
     void mapRTP();
-    
+
     static void* threadTest( void* args );
     bool isThreadRunning();
+    void iterateSessions();
 
     wxCmdLineParser parser;
     
@@ -89,20 +80,20 @@ private:
     bool threadRunning;
     thread* VPMthread;
 
-    VPMSessionFactory *sf;
-
     std::vector<std::string> initialVideoAddresses;
-    std::vector<VPMSession*> videoSessions;
-    uint32_t videoSession_ts;
-    VideoListener* videoSession_listener;
-    bool videoInitialized;
+    //std::vector<VPMSession*> videoSessions;
+    //uint32_t videoSession_ts;
+    VideoListener* videoSessionListener;
+    //bool videoInitialized;
 
     std::vector<std::string> initialAudioAddresses;
-    bool audioEnabled;
-    std::vector<VPMSession*> audioSessions;
-    uint32_t audioSession_ts;
-    AudioManager* audioSession_listener;
-    bool audioInitialized;
+    //bool audioEnabled;
+    //std::vector<VPMSession*> audioSessions;
+    //uint32_t audioSession_ts;
+    AudioManager* audioSessionListener;
+    //bool audioInitialized;
+
+    SessionManager* sessionManager;
 
     std::string header;
     bool headerSet;

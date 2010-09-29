@@ -12,6 +12,7 @@
 #include "InputHandler.h"
 #include "TreeControl.h"
 #include "SessionTreeControl.h"
+#include "SessionManager.h"
 #include "GLUtil.h"
 #include "VideoSource.h"
 #include "VideoListener.h"
@@ -21,7 +22,6 @@
 #include <VPMedia/VPMLog.h>
 #include <VPMedia/VPMPayloadDecoderFactory.h>
 #include <VPMedia/VPMSessionFactory.h>
-#include <VPMedia/random_helper.h>
 
 IMPLEMENT_APP( gravApp )
 
@@ -38,10 +38,11 @@ bool gravApp::OnInit()
     
     parser.SetCmdLine( argc, argv );
 
-    sf = VPMSessionFactory::getInstance();
-    videoSession_listener = new VideoListener( grav );
-    audioSession_listener = new AudioManager();
-    videoInitialized = false; audioInitialized = false;
+    videoSessionListener = new VideoListener( grav );
+    audioSessionListener = new AudioManager();
+    sessionManager = new SessionManager( videoSessionListener,
+                                            audioSessionListener );
+    //videoInitialized = false; audioInitialized = false;
 
     if ( !handleArgs() )
     {
@@ -134,11 +135,11 @@ bool gravApp::OnInit()
 
     for ( unsigned int i = 0; i < initialVideoAddresses.size(); i++ )
     {
-        initSession( initialVideoAddresses[i], false );
+        sessionManager->initSession( initialVideoAddresses[i], false );
     }
     for ( unsigned int i = 0; i < initialAudioAddresses.size(); i++ )
     {
-        initSession( initialAudioAddresses[i], true );
+        sessionManager->initSession( initialAudioAddresses[i], true );
     }
 
     printf( "grav:init function complete\n" );
@@ -162,18 +163,21 @@ int gravApp::OnExit()
     // respectively
     delete timer;
 
-    if ( videoInitialized )
+    delete sessionManager;
+    delete videoSessionListener;
+    delete audioSessionListener;
+    /*if ( videoInitialized )
     {
         for ( unsigned int i = 0; i < videoSessions.size(); i++ )
             delete videoSessions[i];
-        delete videoSession_listener;
+
     }
     if ( audioEnabled && audioInitialized )
     {
         for ( unsigned int i = 0; i < audioSessions.size(); i++ )
             delete audioSessions[i];
-        delete audioSession_listener;
-    }
+
+    }*/
 
     delete grav;
 
@@ -192,7 +196,7 @@ void gravApp::idleHandler( wxIdleEvent& evt )
     }
 
     if ( !usingThreads )
-        iterateSessions();
+        sessionManager->iterateSessions();
 
     // note this is the method for rendering on idle, with a limiter to 16ms
     // (60fps)
@@ -211,57 +215,10 @@ void gravApp::idleHandler( wxIdleEvent& evt )
     evt.RequestMore();
 }
 
-bool gravApp::initSession( std::string address, bool audio )
-{
-    if ( !audio )
-    {
-        VPMSession* videoSession = sf->createSession( address.c_str(),
-                                        *videoSession_listener );
-
-        videoSession->enableVideo(true);
-        videoSession->enableAudio(false);
-        videoSession->enableOther(false);
-
-        if ( !videoSession->initialise() ) {
-            fprintf( stderr, "error: failed to initialise session\n" );
-            return false;
-        }
-
-        videoSession_ts = random32();
-        videoSessions.push_back( videoSession );
-        videoInitialized = true;
-        printf( "grav::initialized video session on %s\n", address.c_str() );
-    }
-    else
-    {
-        VPMSession* audioSession = sf->createSession( address.c_str(),
-                                        *audioSession_listener);
-
-        audioSession->enableVideo(false);
-        audioSession->enableAudio(true);
-        audioSession->enableOther(false);
-
-        if (!audioSession->initialise()) {
-            fprintf(stderr, "error: failed to initialise audioSession\n");
-            return false;
-        }
-
-        audioSession_ts = random32();
-        audioSessions.push_back( audioSession );
-        audioInitialized = true;
-        audioEnabled = true;
-        printf( "grav::initialized audio session on %s\n", address.c_str() );
-        grav->setAudio( audioSession_listener );
-    }
-
-    sessionTree->addSession( address, audio );
-    return true;
-}
-
 void gravApp::iterateSessions()
 {
-    bool haveSessions = false;
-    if ( videoInitialized )
+    bool haveSessions = sessionManager->iterateSessions();
+    /*if ( videoInitialized )
     {
         for ( unsigned int i = 0; i < videoSessions.size(); i++ )
         {
@@ -276,7 +233,7 @@ void gravApp::iterateSessions()
             audioSessions[i]->iterate( audioSession_ts++ );
             haveSessions = haveSessions || true;
         }
-    }
+    }*/
     // if there are no sessions, sleep so as not to spin and consume CPU
     // needlessly
     if ( !haveSessions )
@@ -291,20 +248,21 @@ bool gravApp::handleArgs()
 {
     parser.SetDesc( cmdLineDesc );
     int result = parser.Parse();
-    
+
     // if parse returns -1 then it spit out the help message, so exit
     if ( result == -1 )
         return false;
-    
+
     wxString videoAddress = parser.GetParam( 0 );
     initialVideoAddresses.push_back(
                                 std::string((char*)videoAddress.char_str()) );
-    
+
     wxString audioAddress;
     if ( parser.Found( _("audio"), &audioAddress ) )
     {
         initialAudioAddresses.push_back(
                                 std::string((char*)audioAddress.char_str()) );
+        grav->setAudio( audioSessionListener );
     }
 
     wxString headerWX;

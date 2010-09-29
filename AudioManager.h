@@ -34,6 +34,7 @@ public:
     float getLevel( std::string name = "", bool avg = false );
     float getLevelAvg( std::string name = "" );
     void printLevels();
+    unsigned int getSourceCount();
     virtual void vpmsession_source_created( VPMSession &session,
                                           uint32_t ssrc,
                                           uint32_t pt,
