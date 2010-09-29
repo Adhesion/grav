@@ -135,13 +135,17 @@ bool gravApp::OnInit()
 
     for ( unsigned int i = 0; i < initialVideoAddresses.size(); i++ )
     {
-        sessionManager->initSession( initialVideoAddresses[i], false );
-        sessionTree->addSession( initialVideoAddresses[i], false );
+        printf ( "grav::initializing video address %s\n",
+                    initialVideoAddresses[i].c_str() );
+        if ( sessionManager->initSession( initialVideoAddresses[i], false ) )
+            sessionTree->addSession( initialVideoAddresses[i], false );
     }
     for ( unsigned int i = 0; i < initialAudioAddresses.size(); i++ )
     {
-        sessionManager->initSession( initialAudioAddresses[i], true );
-        sessionTree->addSession( initialAudioAddresses[i], true );
+        printf ( "grav::initializing audio address %s\n",
+                    initialAudioAddresses[i].c_str() );
+        if ( sessionManager->initSession( initialAudioAddresses[i], true ) )
+            sessionTree->addSession( initialAudioAddresses[i], true );
     }
 
     printf( "grav:init function complete\n" );
@@ -236,9 +240,12 @@ bool gravApp::handleArgs()
     if ( result == -1 )
         return false;
 
-    wxString videoAddress = parser.GetParam( 0 );
-    initialVideoAddresses.push_back(
-                                std::string((char*)videoAddress.char_str()) );
+    for ( unsigned int i = 0; i < parser.GetParamCount(); i++ )
+    {
+        wxString videoAddress = parser.GetParam( i );
+        initialVideoAddresses.push_back(
+                                  std::string((char*)videoAddress.char_str()) );
+    }
 
     wxString audioAddress;
     if ( parser.Found( _("audio"), &audioAddress ) )

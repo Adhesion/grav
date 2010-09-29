@@ -162,7 +162,7 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 
     {
         wxCMD_LINE_PARAM, NULL, NULL, _("video address"),
-            wxCMD_LINE_VAL_STRING
+            wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE
     },
 
     {
