@@ -95,6 +95,8 @@ bool SessionManager::removeSession( std::string addr )
         return false;
     }
 
+    int* counter = (*it).audio ? &audioSessionCount : &videoSessionCount;
+    (*counter)--;
     delete (*it).session;
     sessions.erase( it );
     mutex_unlock( sessionMutex );
