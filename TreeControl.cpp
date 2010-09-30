@@ -31,12 +31,6 @@ TreeControl::~TreeControl()
     sourceManager->setTree( NULL );
 }
 
-void TreeControl::addSession( std::string address )
-{
-    AppendItem( rootID, wxString( address.c_str(), wxConvUTF8 ),
-                -1, -1, new TreeNode( NULL, true ) );
-}
-
 void TreeControl::addObject( RectangleBase* obj )
 {
     wxTreeItemId parentID;
@@ -123,7 +117,8 @@ wxTreeItemId TreeControl::findObject( wxTreeItemId root, RectangleBase* obj )
         if ( data != NULL )
         {
             RectangleBase* target = data->getObject();
-            if ( target == obj ) return current;
+            if ( target == obj )
+                return current;
         }
         if ( ItemHasChildren( current ) )
         {

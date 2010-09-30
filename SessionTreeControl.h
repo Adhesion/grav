@@ -20,6 +20,8 @@ public:
     SessionTreeControl();
     SessionTreeControl( wxWindow* parent );
     void addSession( std::string address, bool audio );
+    void removeSession( std::string address );
+    wxTreeItemId findSession( wxTreeItemId root, std::string address );
 
 private:
     wxTreeItemId rootID;

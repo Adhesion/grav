@@ -24,12 +24,6 @@ public:
 
     ~TreeControl();
 
-    /*
-     * Adds a new entry to represent a video or audio session. Sessions will
-     * always be direct children of the root node.
-     */
-    void addSession( std::string address );
-    
     void addObject( RectangleBase* obj );
     void removeObject( RectangleBase* obj );
     wxTreeItemId findObject( wxTreeItemId root, RectangleBase* obj );

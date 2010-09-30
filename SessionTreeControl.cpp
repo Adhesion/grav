@@ -35,3 +35,43 @@ void SessionTreeControl::addSession( std::string address, bool audio )
         Expand( audioNodeID );
     }
 }
+
+void SessionTreeControl::removeSession( std::string address )
+{
+    wxTreeItemId item = findSession( rootID, address );
+    if ( !item.IsOk() )
+    {
+        printf( "SessionTreeControl::removeObject: ERROR: item %s not found?\n",
+                    address.c_str() );
+        return;
+    }
+
+    Delete( item );
+}
+
+wxTreeItemId SessionTreeControl::findSession( wxTreeItemId root,
+                                                std::string address )
+{
+    wxTreeItemIdValue temp; // unused var, needed in getchild
+    wxTreeItemId targetItem;
+    wxTreeItemId current = GetFirstChild( root, temp );
+
+    while ( current.IsOk() )
+    {
+        wxString text = GetItemText( current );
+        std::string target = std::string( text.char_str() );
+        if ( target.compare( address ) == 0 )
+            return current;
+
+        if ( ItemHasChildren( current ) )
+        {
+            targetItem = findSession( current, address );
+            if ( targetItem.IsOk() )
+                return targetItem;
+        }
+        current = GetNextChild( root, temp );
+    }
+
+    wxTreeItemId none;
+    return none; // return default value if not found
+}
