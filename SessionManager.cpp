@@ -168,6 +168,14 @@ bool SessionManager::iterateSessions()
             sessions[i].session->iterate( sessions[i].sessionTS++ );
         haveSessions = haveSessions || sessions[i].enabled;
     }
+    if ( sessions.size() >= 1 )
+    {
+        if ( sessions[0].sessionTS % 1000 == 0 )
+        {
+            printf( "SessionManager::iterate: have %u sessions, TS=%u\n",
+                    sessions.size(), sessions[0].sessionTS );
+        }
+    }
 
     mutex_unlock( sessionMutex );
     lockCount--;

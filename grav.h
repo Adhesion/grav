@@ -31,6 +31,10 @@ class SessionManager;
 class gravApp : public wxApp
 {
 
+public:
+    static bool threadDebug;
+    static int threadCounter;
+
 private:
 
     /**

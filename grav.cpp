@@ -30,6 +30,9 @@ EVT_IDLE(gravApp::idleHandler)
 END_EVENT_TABLE(); // this ; is not necessary, just makes eclipse's syntax
                    // parser shut up
 
+bool gravApp::threadDebug = true;
+int gravApp::threadCounter = 0;
+
 bool gravApp::OnInit()
 {
     grav = new gravManager();
@@ -326,6 +329,12 @@ void* gravApp::threadTest( void* args )
     while ( g->isThreadRunning() )
     {
         g->iterateSessions();
+        if ( threadDebug )
+        {
+            if ( threadCounter == 0 )
+                printf( "grav::thread still running\n" );
+            threadCounter = (threadCounter+1)%1000;
+        }
     }
     printf( "grav::thread ending...\n" );
     return 0;
