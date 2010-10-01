@@ -147,6 +147,7 @@ bool gravApp::OnInit()
         if ( sessionManager->initSession( initialAudioAddresses[i], true ) )
             sessionTree->addSession( initialAudioAddresses[i], true );
     }
+    sessionTree->setSessionManager( sessionManager );
 
     printf( "grav:init function complete\n" );
     return true;

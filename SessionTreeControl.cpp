@@ -7,7 +7,17 @@
  * @author Andrew Ford
  */
 
+#include <wx/menu.h>
+
 #include "SessionTreeControl.h"
+#include "SessionManager.h"
+
+BEGIN_EVENT_TABLE(SessionTreeControl, wxTreeCtrl)
+EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY, SessionTreeControl::itemRightClick)
+END_EVENT_TABLE()
+
+int SessionTreeControl::disableID = wxNewId();
+int SessionTreeControl::removeID = wxNewId();
 
 SessionTreeControl::SessionTreeControl() :
     wxTreeCtrl( NULL, wxID_ANY )
@@ -20,6 +30,11 @@ SessionTreeControl::SessionTreeControl( wxWindow* parent ) :
     videoNodeID = AppendItem( rootID, _("Video") );
     audioNodeID = AppendItem( rootID, _("Audio") );
     Expand( rootID );
+}
+
+void SessionTreeControl::setSessionManager( SessionManager* s )
+{
+    sessionManager = s;
 }
 
 void SessionTreeControl::addSession( std::string address, bool audio )
@@ -74,4 +89,45 @@ wxTreeItemId SessionTreeControl::findSession( wxTreeItemId root,
 
     wxTreeItemId none;
     return none; // return default value if not found
+}
+
+void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
+{
+    std::string text = std::string( GetItemText( evt.GetItem() ).char_str() );
+    {
+        if ( text.compare( "Video" ) != 0 && text.compare( "Audio" ) != 0 &&
+                text.compare( "Sessions" ) != 0 )
+        {
+            printf( "SessionTreeControl::rightclick on %s\n", text.c_str() );
+            wxMenu rightClickMenu;
+            rightClickMenu.Append( disableID, _("Disable") );
+            rightClickMenu.Append( removeID, _("Remove") );
+            // TODO static evt_menu binding (at top) doesn't seem to work for
+            // these, so doing runtime connect
+            Connect( disableID, wxEVT_COMMAND_MENU_SELECTED,
+                      wxCommandEventHandler(SessionTreeControl::disableEvent) );
+            Connect( removeID, wxEVT_COMMAND_MENU_SELECTED,
+                      wxCommandEventHandler(SessionTreeControl::removeEvent) );
+
+            PopupMenu( &rightClickMenu, evt.GetPoint() );
+        }
+    }
+}
+
+void SessionTreeControl::disableEvent( wxCommandEvent& evt )
+{
+    printf( "disable clicked\n" );
+    std::string selectedAddress = std::string(
+                                     GetItemText( GetSelection() ).char_str() );
+    printf( "selected: %s\n", selectedAddress.c_str() );
+}
+
+void SessionTreeControl::removeEvent( wxCommandEvent& evt )
+{
+    printf( "remove clicked\n" );
+    std::string selectedAddress = std::string(
+                                     GetItemText( GetSelection() ).char_str() );
+    printf( "selected: %s\n", selectedAddress.c_str() );
+    sessionManager->removeSession( selectedAddress );
+    removeSession( selectedAddress );
 }

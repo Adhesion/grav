@@ -16,6 +16,10 @@ class VideoListener;
 class AudioManager;
 class mutex;
 
+#include <vector>
+
+#include <VPMedia/VPMTypes.h>
+
 typedef struct {
     std::string address;
     bool audio;

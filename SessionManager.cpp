@@ -85,15 +85,23 @@ bool SessionManager::initSession( std::string address, bool audio )
 
 bool SessionManager::removeSession( std::string addr )
 {
+    printf( "SessionManager::removing session %s\n", addr.c_str() );
+    printf( "SessionManager::we have %i sessions\n", sessions.size() );
     mutex_lock( sessionMutex );
-
+    printf( "sdfsdf\n" );
     std::vector<SessionEntry>::iterator it = sessions.begin();
-    while ( (*it).address.compare( addr ) != 0 ) it++;
+    while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
+    {
+        printf( "SessionManager:: %s does not match\n", (*it).address.c_str() );
+        it++;
+    }
     if ( it == sessions.end() )
     {
         mutex_unlock( sessionMutex );
+        printf( "SessionManager::ERROR session not found\n" );
         return false;
     }
+    printf( "SessionManager::found session, removing\n" );
 
     int* counter = (*it).audio ? &audioSessionCount : &videoSessionCount;
     (*counter)--;

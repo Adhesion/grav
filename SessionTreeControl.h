@@ -13,20 +13,35 @@
 
 #include <wx/treectrl.h>
 
+class SessionManager;
+
 class SessionTreeControl : public wxTreeCtrl
 {
 
 public:
     SessionTreeControl();
     SessionTreeControl( wxWindow* parent );
+    void setSessionManager( SessionManager* s );
+
     void addSession( std::string address, bool audio );
     void removeSession( std::string address );
     wxTreeItemId findSession( wxTreeItemId root, std::string address );
+
+    void itemRightClick( wxTreeEvent& evt );
+    void disableEvent( wxCommandEvent& evt );
+    void removeEvent( wxCommandEvent& evt );
+
+    static int disableID;
+    static int removeID;
 
 private:
     wxTreeItemId rootID;
     wxTreeItemId videoNodeID;
     wxTreeItemId audioNodeID;
+
+    SessionManager* sessionManager;
+
+    DECLARE_EVENT_TABLE()
 
 };
 
