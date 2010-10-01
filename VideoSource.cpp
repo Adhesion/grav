@@ -90,6 +90,7 @@ void VideoSource::draw()
     // only do this texture stuff if rendering is enabled
     if ( enableRendering )
     {
+        videoSink->lockImage();
         // only bother doing a texture push if there's a new frame
         if ( videoSink->haveNewFrameAvailable() )
         {
@@ -157,6 +158,7 @@ void VideoSource::draw()
                       (GLubyte*)videoSink->getImageData() + 5*(vwidth*vheight)/4 );
             }
         }
+        videoSink->unlockImage();
     }
 
     // draw video texture, regardless of whether we just pushed something
