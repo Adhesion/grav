@@ -28,10 +28,10 @@ public:
     wxTreeItemId findSession( wxTreeItemId root, std::string address );
 
     void itemRightClick( wxTreeEvent& evt );
-    void disableEvent( wxCommandEvent& evt );
+    void toggleEnableEvent( wxCommandEvent& evt );
     void removeEvent( wxCommandEvent& evt );
 
-    static int disableID;
+    static int toggleEnableID;
     static int removeID;
 
 private:

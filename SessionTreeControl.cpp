@@ -16,7 +16,7 @@ BEGIN_EVENT_TABLE(SessionTreeControl, wxTreeCtrl)
 EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY, SessionTreeControl::itemRightClick)
 END_EVENT_TABLE()
 
-int SessionTreeControl::disableID = wxNewId();
+int SessionTreeControl::toggleEnableID = wxNewId();
 int SessionTreeControl::removeID = wxNewId();
 
 SessionTreeControl::SessionTreeControl() :
@@ -99,30 +99,41 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
                 text.compare( "Sessions" ) != 0 )
         {
             wxMenu rightClickMenu;
-            rightClickMenu.Append( disableID, _("Disable") );
+            wxString toggleLabel = sessionManager->isSessionEnabled( text ) ?
+                    _("Disable") : _("Enable");
+            rightClickMenu.Append( toggleEnableID, toggleLabel );
             rightClickMenu.Append( removeID, _("Remove") );
             // TODO static evt_menu binding (at top) doesn't seem to work for
             // these, so doing runtime connect
-            Connect( disableID, wxEVT_COMMAND_MENU_SELECTED,
-                      wxCommandEventHandler(SessionTreeControl::disableEvent) );
+            Connect( toggleEnableID, wxEVT_COMMAND_MENU_SELECTED,
+               wxCommandEventHandler( SessionTreeControl::toggleEnableEvent) );
             Connect( removeID, wxEVT_COMMAND_MENU_SELECTED,
-                      wxCommandEventHandler(SessionTreeControl::removeEvent) );
+               wxCommandEventHandler( SessionTreeControl::removeEvent ) );
 
             PopupMenu( &rightClickMenu, evt.GetPoint() );
         }
     }
 }
 
-void SessionTreeControl::disableEvent( wxCommandEvent& evt )
+void SessionTreeControl::toggleEnableEvent( wxCommandEvent& evt )
 {
     std::string selectedAddress = std::string(
                                      GetItemText( GetSelection() ).char_str() );
+    if ( sessionManager->setSessionEnable( selectedAddress,
+            !sessionManager->isSessionEnabled( selectedAddress ) ) )
+    {
+        wxColour col = sessionManager->isSessionEnabled( selectedAddress ) ?
+                        *wxWHITE : *wxLIGHT_GREY;
+        SetItemBackgroundColour( GetSelection(), col );
+    }
 }
 
 void SessionTreeControl::removeEvent( wxCommandEvent& evt )
 {
     std::string selectedAddress = std::string(
                                      GetItemText( GetSelection() ).char_str() );
-    sessionManager->removeSession( selectedAddress );
-    removeSession( selectedAddress );
+    if ( sessionManager->removeSession( selectedAddress ) )
+    {
+        removeSession( selectedAddress );
+    }
 }

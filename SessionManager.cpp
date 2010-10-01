@@ -92,7 +92,6 @@ bool SessionManager::initSession( std::string address, bool audio )
 
 bool SessionManager::removeSession( std::string addr )
 {
-    pause = true;
     lockSessions();
 
     std::vector<SessionEntry>::iterator it = sessions.begin();
@@ -110,7 +109,6 @@ bool SessionManager::removeSession( std::string addr )
     (*counter)--;
     delete (*it).session;
     sessions.erase( it );
-    pause = false;
     unlockSessions();
     return true;
 }
@@ -159,7 +157,9 @@ bool SessionManager::iterateSessions()
         wxMicroSleep( 10 );
     }
 
-    lockSessions();
+    // note: iterate doesn't do lockSessions() since it shouldn't affect pause
+    mutex_lock( sessionMutex );
+    lockCount++;
 
     bool haveSessions = false;
     for ( unsigned int i = 0; i < sessions.size(); i++ )
@@ -169,7 +169,8 @@ bool SessionManager::iterateSessions()
         haveSessions = haveSessions || sessions[i].enabled;
     }
 
-    unlockSessions();
+    mutex_unlock( sessionMutex );
+    lockCount--;
     return haveSessions;
 }
 
@@ -186,6 +187,7 @@ int SessionManager::getAudioSessionCount()
 void SessionManager::lockSessions()
 {
     //printf( "SessionManager::lock::attempting to get lock...\n" );
+    pause = true;
     mutex_lock( sessionMutex );
     lockCount++;
     //printf( "SessionManager::lock::lock gained, count now %i\n", lockCount );
@@ -194,6 +196,7 @@ void SessionManager::lockSessions()
 void SessionManager::unlockSessions()
 {
     //printf( "SessionManager::lock::unlocking, count %i\n", lockCount );
+    pause = false;
     mutex_unlock( sessionMutex );
     lockCount--;
     //printf( "SessionManager::lock::lock released, count now %i\n", lockCount );
