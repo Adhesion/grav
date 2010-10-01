@@ -12,6 +12,8 @@
 #include <VPMedia/thread_helper.h>
 #include <VPMedia/random_helper.h>
 
+#include <wx/utils.h>
+
 #include <stdio.h>
 
 #include "SessionManager.h"
@@ -22,6 +24,11 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
     : videoSessionListener( vl ), audioSessionListener( al )
 {
     sessionMutex = mutex_create();
+
+    videoSessionCount = 0;
+    audioSessionCount = 0;
+    lockCount = 0;
+    pause = false;
 }
 
 SessionManager::~SessionManager()
@@ -35,7 +42,7 @@ SessionManager::~SessionManager()
 
 bool SessionManager::initSession( std::string address, bool audio )
 {
-    mutex_lock( sessionMutex );
+    lockSessions();
 
     SessionEntry entry;
     VPMSession* session;
@@ -65,7 +72,7 @@ bool SessionManager::initSession( std::string address, bool audio )
     if ( !session->initialise() )
     {
         fprintf(stderr, "error: failed to initialise session\n");
-        mutex_unlock( sessionMutex );
+        unlockSessions();
         return false;
     }
 
@@ -79,75 +86,80 @@ bool SessionManager::initSession( std::string address, bool audio )
     entry.session = session;
     sessions.push_back( entry );
 
-    mutex_unlock( sessionMutex );
+    unlockSessions();
     return true;
 }
 
 bool SessionManager::removeSession( std::string addr )
 {
-    printf( "SessionManager::removing session %s\n", addr.c_str() );
-    printf( "SessionManager::we have %i sessions\n", sessions.size() );
-    mutex_lock( sessionMutex );
-    printf( "sdfsdf\n" );
+    pause = true;
+    lockSessions();
+
     std::vector<SessionEntry>::iterator it = sessions.begin();
     while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
-    {
-        printf( "SessionManager:: %s does not match\n", (*it).address.c_str() );
         it++;
-    }
+
     if ( it == sessions.end() )
     {
-        mutex_unlock( sessionMutex );
-        printf( "SessionManager::ERROR session not found\n" );
+        unlockSessions();
+        printf( "SessionManager::ERROR: session %s not found\n", addr.c_str() );
         return false;
     }
-    printf( "SessionManager::found session, removing\n" );
 
     int* counter = (*it).audio ? &audioSessionCount : &videoSessionCount;
     (*counter)--;
     delete (*it).session;
     sessions.erase( it );
-    mutex_unlock( sessionMutex );
+    pause = false;
+    unlockSessions();
     return true;
 }
 
 bool SessionManager::setSessionEnable( std::string addr, bool set )
 {
-    mutex_lock( sessionMutex );
+    lockSessions();
 
     std::vector<SessionEntry>::iterator it = sessions.begin();
     while ( (*it).address.compare( addr ) != 0 ) it++;
     if ( it == sessions.end() )
     {
-        mutex_unlock( sessionMutex );
+        unlockSessions();
         return false;
     }
 
     (*it).enabled = set;
-    mutex_unlock( sessionMutex );
+    unlockSessions();
     return true;
 }
 
 bool SessionManager::isSessionEnabled( std::string addr )
 {
-    mutex_lock( sessionMutex );
+    lockSessions();
 
     std::vector<SessionEntry>::iterator it = sessions.begin();
     while ( (*it).address.compare( addr ) != 0 ) it++;
     if ( it == sessions.end() )
     {
-        mutex_unlock( sessionMutex );
+        unlockSessions();
         return false;
     }
 
     bool ret = (*it).enabled;
-    mutex_unlock( sessionMutex );
+    unlockSessions();
     return ret;
 }
 
 bool SessionManager::iterateSessions()
 {
-    mutex_lock( sessionMutex );
+    // kind of a hack to force this to wait, when removing etc.
+    // mutex should do this but this thread seems way too eager
+    if ( pause )
+    {
+        printf( "Sessions temporarily paused...\n" );
+        wxMicroSleep( 10 );
+    }
+
+    lockSessions();
 
     bool haveSessions = false;
     for ( unsigned int i = 0; i < sessions.size(); i++ )
@@ -157,7 +169,7 @@ bool SessionManager::iterateSessions()
         haveSessions = haveSessions || sessions[i].enabled;
     }
 
-    mutex_unlock( sessionMutex );
+    unlockSessions();
     return haveSessions;
 }
 
@@ -169,4 +181,20 @@ int SessionManager::getVideoSessionCount()
 int SessionManager::getAudioSessionCount()
 {
     return audioSessionCount;
+}
+
+void SessionManager::lockSessions()
+{
+    //printf( "SessionManager::lock::attempting to get lock...\n" );
+    mutex_lock( sessionMutex );
+    lockCount++;
+    //printf( "SessionManager::lock::lock gained, count now %i\n", lockCount );
+}
+
+void SessionManager::unlockSessions()
+{
+    //printf( "SessionManager::lock::unlocking, count %i\n", lockCount );
+    mutex_unlock( sessionMutex );
+    lockCount--;
+    //printf( "SessionManager::lock::lock released, count now %i\n", lockCount );
 }

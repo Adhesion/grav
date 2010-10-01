@@ -54,6 +54,9 @@ public:
     int getVideoSessionCount();
     int getAudioSessionCount();
 
+    void lockSessions();
+    void unlockSessions();
+
 private:
     std::vector<SessionEntry> sessions;
     VideoListener* videoSessionListener;
@@ -62,6 +65,8 @@ private:
     int audioSessionCount;
 
     mutex* sessionMutex;
+    int lockCount;
+    bool pause;
 
 };
 

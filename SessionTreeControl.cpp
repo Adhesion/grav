@@ -98,7 +98,6 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
         if ( text.compare( "Video" ) != 0 && text.compare( "Audio" ) != 0 &&
                 text.compare( "Sessions" ) != 0 )
         {
-            printf( "SessionTreeControl::rightclick on %s\n", text.c_str() );
             wxMenu rightClickMenu;
             rightClickMenu.Append( disableID, _("Disable") );
             rightClickMenu.Append( removeID, _("Remove") );
@@ -116,18 +115,14 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
 
 void SessionTreeControl::disableEvent( wxCommandEvent& evt )
 {
-    printf( "disable clicked\n" );
     std::string selectedAddress = std::string(
                                      GetItemText( GetSelection() ).char_str() );
-    printf( "selected: %s\n", selectedAddress.c_str() );
 }
 
 void SessionTreeControl::removeEvent( wxCommandEvent& evt )
 {
-    printf( "remove clicked\n" );
     std::string selectedAddress = std::string(
                                      GetItemText( GetSelection() ).char_str() );
-    printf( "selected: %s\n", selectedAddress.c_str() );
     sessionManager->removeSession( selectedAddress );
     removeSession( selectedAddress );
 }
