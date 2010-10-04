@@ -47,6 +47,9 @@ public:
     
     const char* getPayloadDesc();
 
+    unsigned int getVideoWidth();
+    unsigned int getVideoHeight();
+
     // overrides the functions from RectangleBase to account for aspect ratio
     float getWidth(); float getHeight();
     float getDestWidth(); float getDestHeight();

@@ -403,6 +403,16 @@ const char* VideoSource::getPayloadDesc()
     return videoSink->getVideoDecoder()->getDesc();
 }
 
+unsigned int VideoSource::getVideoWidth()
+{
+    return vwidth;
+}
+
+unsigned int VideoSource::getVideoHeight()
+{
+    return vheight;
+}
+
 float VideoSource::getWidth()
 {
     return aspect * scaleX;

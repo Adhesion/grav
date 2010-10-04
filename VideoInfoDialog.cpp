@@ -16,7 +16,7 @@
 VideoInfoDialog::VideoInfoDialog( wxWindow* parent, RectangleBase* o )
     : wxDialog( parent, wxID_ANY, _("Video Info") ), obj( o )
 {
-    SetSize( wxSize( 200, 200 ) );
+    SetSize( wxSize( 250, 150 ) );
     wxStaticText* wxText = new wxStaticText( this, wxID_ANY, _("") );
     std::string text;
     text += "Name:\t" + obj->getName() + "\n";
@@ -34,6 +34,13 @@ VideoInfoDialog::VideoInfoDialog( wxWindow* parent, RectangleBase* o )
               "\n";
         text += "Codec:\t" +
               std::string( video->getPayloadDesc() ) +
+              "\n";
+        char width[10];
+        char height[10];
+        sprintf( width, "%u", video->getVideoWidth() );
+        sprintf( height, "%u", video->getVideoHeight() );
+        text += "Resolution:\t" +
+              std::string( width ) + " x " + std::string( height ) +
               "\n";
     }
     text += "Grouped?\t" +
