@@ -28,9 +28,13 @@ public:
     wxTreeItemId findSession( wxTreeItemId root, std::string address );
 
     void itemRightClick( wxTreeEvent& evt );
-    void toggleEnableEvent( wxCommandEvent& evt );
-    void removeEvent( wxCommandEvent& evt );
+    void addVideoSessionEvent( wxCommandEvent& evt );
+    void addAudioSessionEvent( wxCommandEvent& evt );
+    void toggleEnableSessionEvent( wxCommandEvent& evt );
+    void removeSessionEvent( wxCommandEvent& evt );
 
+    static int addVideoID;
+    static int addAudioID;
     static int toggleEnableID;
     static int removeID;
 

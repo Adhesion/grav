@@ -8,6 +8,7 @@
  */
 
 #include <wx/menu.h>
+#include <wx/textdlg.h>
 
 #include "SessionTreeControl.h"
 #include "SessionManager.h"
@@ -16,6 +17,8 @@ BEGIN_EVENT_TABLE(SessionTreeControl, wxTreeCtrl)
 EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY, SessionTreeControl::itemRightClick)
 END_EVENT_TABLE()
 
+int SessionTreeControl::addVideoID = wxNewId();
+int SessionTreeControl::addAudioID = wxNewId();
 int SessionTreeControl::toggleEnableID = wxNewId();
 int SessionTreeControl::removeID = wxNewId();
 
@@ -93,29 +96,74 @@ wxTreeItemId SessionTreeControl::findSession( wxTreeItemId root,
 
 void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
 {
-    std::string text = std::string( GetItemText( evt.GetItem() ).char_str() );
-    {
-        if ( text.compare( "Video" ) != 0 && text.compare( "Audio" ) != 0 &&
-                text.compare( "Sessions" ) != 0 )
-        {
-            wxMenu rightClickMenu;
-            wxString toggleLabel = sessionManager->isSessionEnabled( text ) ?
-                    _("Disable") : _("Enable");
-            rightClickMenu.Append( toggleEnableID, toggleLabel );
-            rightClickMenu.Append( removeID, _("Remove") );
-            // TODO static evt_menu binding (at top) doesn't seem to work for
-            // these, so doing runtime connect
-            Connect( toggleEnableID, wxEVT_COMMAND_MENU_SELECTED,
-               wxCommandEventHandler( SessionTreeControl::toggleEnableEvent) );
-            Connect( removeID, wxEVT_COMMAND_MENU_SELECTED,
-               wxCommandEventHandler( SessionTreeControl::removeEvent ) );
+    wxMenu rightClickMenu;
 
-            PopupMenu( &rightClickMenu, evt.GetPoint() );
+    std::string text = std::string( GetItemText( evt.GetItem() ).char_str() );
+    if ( text.compare( "Video" ) != 0 && text.compare( "Audio" ) != 0 &&
+            text.compare( "Sessions" ) != 0 )
+    {
+        wxString toggleLabel = sessionManager->isSessionEnabled( text ) ?
+                _("Disable") : _("Enable");
+        rightClickMenu.Append( toggleEnableID, toggleLabel );
+        rightClickMenu.Append( removeID, _("Remove") );
+        // TODO static evt_menu binding (at top) doesn't seem to work for
+        // these, so doing runtime connect
+        Connect( toggleEnableID, wxEVT_COMMAND_MENU_SELECTED,
+                    wxCommandEventHandler(
+                            SessionTreeControl::toggleEnableSessionEvent) );
+        Connect( removeID, wxEVT_COMMAND_MENU_SELECTED,
+                    wxCommandEventHandler(
+                            SessionTreeControl::removeSessionEvent ) );
+    }
+    if ( text.compare( "Video" ) == 0 || text.compare( "Sessions" ) == 0 )
+    {
+        rightClickMenu.Append( addVideoID, _("Add video session") );
+        Connect( addVideoID, wxEVT_COMMAND_MENU_SELECTED,
+            wxCommandEventHandler( SessionTreeControl::addVideoSessionEvent ) );
+    }
+    if ( text.compare( "Audio" ) == 0 || text.compare( "Sessions" ) == 0 )
+    {
+        rightClickMenu.Append( addAudioID, _("Add audio session") );
+        Connect( addAudioID, wxEVT_COMMAND_MENU_SELECTED,
+            wxCommandEventHandler( SessionTreeControl::addAudioSessionEvent ) );
+    }
+
+    PopupMenu( &rightClickMenu, evt.GetPoint() );
+}
+
+// TODO make these use the same code and not be stupid - might necessitate
+// making a custom dialog class or secondary radio button dialog choice
+void SessionTreeControl::addVideoSessionEvent( wxCommandEvent& evt )
+{
+    wxTextEntryDialog dialog( this, _("Enter session in format address/port"),
+                                _("Add New Video Session") );
+
+    if ( dialog.ShowModal() == wxID_OK )
+    {
+        std::string address( dialog.GetValue().char_str() );
+        if ( sessionManager->initSession( address, false ) )
+        {
+            addSession( address, false );
         }
     }
 }
 
-void SessionTreeControl::toggleEnableEvent( wxCommandEvent& evt )
+void SessionTreeControl::addAudioSessionEvent( wxCommandEvent& evt )
+{
+    wxTextEntryDialog dialog( this, _("Enter session in format address/port"),
+                                _("Add New Audio Session") );
+
+    if ( dialog.ShowModal() == wxID_OK )
+    {
+        std::string address( dialog.GetValue().char_str() );
+        if ( sessionManager->initSession( address, true ) )
+        {
+            addSession( address, true );
+        }
+    }
+}
+
+void SessionTreeControl::toggleEnableSessionEvent( wxCommandEvent& evt )
 {
     std::string selectedAddress = std::string(
                                      GetItemText( GetSelection() ).char_str() );
@@ -128,7 +176,7 @@ void SessionTreeControl::toggleEnableEvent( wxCommandEvent& evt )
     }
 }
 
-void SessionTreeControl::removeEvent( wxCommandEvent& evt )
+void SessionTreeControl::removeSessionEvent( wxCommandEvent& evt )
 {
     std::string selectedAddress = std::string(
                                      GetItemText( GetSelection() ).char_str() );
