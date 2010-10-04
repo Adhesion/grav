@@ -108,14 +108,17 @@ void AudioManager::vpmsession_source_deleted( VPMSession &session,
                                           uint32_t ssrc,
                                           const char *reason )
 {
-    std::vector<AudioSource*>::iterator it = sources.begin();
-    while ( (*it)->ssrc != ssrc ) it++;
-    if ( it == sources.end() )
-        printf( "AudioManager::delete::ERROR ssrc not found?\n" );
-
-    delete (*it)->meter;
-    delete (*it);
-    sources.erase( it );
+    std::vector<AudioSource*>::iterator it;
+    for ( it = sources.begin(); it != sources.end(); ++it )
+    {
+        if ( (*it)->ssrc == ssrc )
+        {
+            delete (*it)->meter;
+            delete (*it);
+            sources.erase( it );
+            return;
+        }
+    }
 }
 
 void AudioManager::vpmsession_source_description( VPMSession &session,
