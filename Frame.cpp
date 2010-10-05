@@ -13,10 +13,15 @@
 #include "GLCanvas.h"
 #include "InputHandler.h"
 #include "VideoInfoDialog.h"
+#include "SessionTreeControl.h"
 
 BEGIN_EVENT_TABLE(Frame, wxFrame)
 EVT_CLOSE(Frame::OnCloseWindow)
+// for right click -> properties in main window
 EVT_MENU(InputHandler::propertyID, Frame::spawnPropertyWindow)
+// for menubar on side window
+EVT_MENU(SessionTreeControl::addVideoID, SessionTreeControl::addVideoSessionEvent)
+EVT_MENU(SessionTreeControl::addAudioID, SessionTreeControl::addAudioSessionEvent)
 END_EVENT_TABLE()
 
 Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title ) :

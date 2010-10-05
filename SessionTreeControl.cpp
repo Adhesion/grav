@@ -12,6 +12,7 @@
 
 #include "SessionTreeControl.h"
 #include "SessionManager.h"
+#include "Frame.h"
 
 BEGIN_EVENT_TABLE(SessionTreeControl, wxTreeCtrl)
 EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY, SessionTreeControl::itemRightClick)
@@ -33,6 +34,23 @@ SessionTreeControl::SessionTreeControl( wxWindow* parent ) :
     videoNodeID = AppendItem( rootID, _("Video") );
     audioNodeID = AppendItem( rootID, _("Audio") );
     Expand( rootID );
+
+    wxMenu* sessionMenu = new wxMenu();
+    sessionMenu->Append( addVideoID, _("Add video session") );
+    sessionMenu->Append( addAudioID, _("Add audio session") );
+
+    // add menubar to parent frame here - kind of clunky
+    wxMenuBar* menubar = new wxMenuBar;
+    menubar->Append( sessionMenu, _("Sessions") );
+    wxWindow* tempParent = this;
+    while ( tempParent && dynamic_cast<Frame*>( tempParent ) == NULL )
+        tempParent = tempParent->GetParent();
+    Frame* topFrame = dynamic_cast<Frame*>( tempParent );
+    if ( topFrame != NULL )
+    {
+        Frame* topFrame = dynamic_cast<Frame*>( tempParent );
+        topFrame->SetMenuBar( menubar );
+    }
 }
 
 void SessionTreeControl::setSessionManager( SessionManager* s )
