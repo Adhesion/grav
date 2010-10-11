@@ -26,12 +26,12 @@ public:
                   RectangleBase screenRect,
                   RectangleBase boundRect,
                   std::vector<RectangleBase*> objects,
-                  std::map<std::string, std::string> options);
+                 std::map<std::string, std::string> options=std::map<std::string, std::string>());
     void arrange( std::string method,
                   float screenL, float screenR, float screenU, float screenD,
                   float boundL, float boundR, float boundU, float boundD,
                   std::vector<RectangleBase*> objects,
-                  std::map<std::string, std::string> options);
+                 std::map<std::string, std::string> options=std::map<std::string, std::string>());
 
     void perimeterArrange( RectangleBase screenRect, RectangleBase boundRect,
                             std::vector<RectangleBase*> objects );

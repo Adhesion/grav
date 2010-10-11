@@ -20,7 +20,7 @@ void LayoutManager::arrange( std::string method,
                              RectangleBase screenRect,
                              RectangleBase boundRect,
                              std::vector<RectangleBase*> objects,
-                             std::map<std::string, std::string> options )
+                             std::map<std::string, std::string> options)
 {
     float screenL = screenRect.getLBound();
     float screenR = screenRect.getRBound();
@@ -44,7 +44,7 @@ void LayoutManager::arrange( std::string method,
                              float boundL, float boundR,
                              float boundU, float boundD,
                              std::vector<RectangleBase*> objects,
-                             std::map<std::string, std::string> options )
+                             std::map<std::string, std::string> options)
 {
     perimeterArrange(screenL, screenR, screenU, screenD,
                      boundL, boundR, boundU, boundD,
