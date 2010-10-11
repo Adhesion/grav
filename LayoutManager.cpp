@@ -46,9 +46,15 @@ void LayoutManager::arrange( std::string method,
                              std::vector<RectangleBase*> objects,
                              std::map<std::string, std::string> options)
 {
-    perimeterArrange(screenL, screenR, screenU, screenD,
-                     boundL, boundR, boundU, boundD,
-                     objects); // not passing options for now...
+    if ( method == "perimeter" ) {
+        perimeterArrange(screenL, screenR, screenU, screenD,
+                         boundL, boundR, boundU, boundD,
+                         objects);
+    } else if ( method == "grid" ) {
+        // unimplemented
+    } else {
+        // raise a huge error
+    }
 }
 
 
