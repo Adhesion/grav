@@ -17,38 +17,38 @@ LayoutManager::LayoutManager()
 
 
 bool LayoutManager::arrange( std::string method,
-                             RectangleBase screenRect,
-                             RectangleBase boundRect,
+                             RectangleBase outerRect,
+                             RectangleBase innerRect,
                              std::vector<RectangleBase*> objects,
                              std::map<std::string, std::string> options)
 {
-    float screenL = screenRect.getLBound();
-    float screenR = screenRect.getRBound();
-    float screenU = screenRect.getUBound();
-    float screenD = screenRect.getDBound();
+    float outerL = outerRect.getLBound();
+    float outerR = outerRect.getRBound();
+    float outerU = outerRect.getUBound();
+    float outerD = outerRect.getDBound();
 
-    float boundL = boundRect.getLBound();
-    float boundR = boundRect.getRBound();
-    float boundU = boundRect.getUBound();
-    float boundD = boundRect.getDBound();
+    float innerL = innerRect.getLBound();
+    float innerR = innerRect.getRBound();
+    float innerU = innerRect.getUBound();
+    float innerD = innerRect.getDBound();
 
     return arrange(method,
-            screenL, screenR, screenU, screenD,
-            boundL, boundR, boundU, boundD,
+            outerL, outerR, outerU, outerD,
+            innerL, innerR, innerU, innerD,
             objects, options);
 }
 
 bool LayoutManager::arrange( std::string method,
-                             float screenL, float screenR,
-                             float screenU, float screenD,
-                             float boundL, float boundR,
-                             float boundU, float boundD,
+                             float outerL, float outerR,
+                             float outerU, float outerD,
+                             float innerL, float innerR,
+                             float innerU, float innerD,
                              std::vector<RectangleBase*> objects,
                              std::map<std::string, std::string> options)
 {
     typedef bool (LayoutManager::*fn_ptr)(
-        float sL, float sR, float sU, float sD,
-        float bL, float bR, float bU, float bD,
+        float oL, float oR, float oU, float oD,
+        float iL, float iR, float iU, float iD,
         std::vector<RectangleBase*> objs,
         std::map<std::string, std::string> opts);
 
@@ -61,43 +61,43 @@ bool LayoutManager::arrange( std::string method,
         printf( "ZOMG:::: a huge error should be thrown here!!!\n" );
         return false; // double false !!!
     }
-    return (this->*lookup[method])( screenL, screenR, screenU, screenD,
-                                    boundL, boundR, boundU, boundD,
+    return (this->*lookup[method])( outerL, outerR, outerU, outerD,
+                                    innerL, innerR, innerU, innerD,
                                     objects, options );
 }
 
 
-bool LayoutManager::perimeterArrange( RectangleBase screenRect,
-                                        RectangleBase boundRect,
+bool LayoutManager::perimeterArrange( RectangleBase outerRect,
+                                        RectangleBase innerRect,
                                         std::vector<RectangleBase*> objects,
                                         std::map<std::string, std::string> opts)
 {
-    float screenL = screenRect.getLBound();
-    float screenR = screenRect.getRBound();
-    float screenU = screenRect.getUBound();
-    float screenD = screenRect.getDBound();
+    float outerL = outerRect.getLBound();
+    float outerR = outerRect.getRBound();
+    float outerU = outerRect.getUBound();
+    float outerD = outerRect.getDBound();
     
-    float boundL = boundRect.getLBound();
-    float boundR = boundRect.getRBound();
-    float boundU = boundRect.getUBound();
-    float boundD = boundRect.getDBound();
+    float innerL = innerRect.getLBound();
+    float innerR = innerRect.getRBound();
+    float innerU = innerRect.getUBound();
+    float innerD = innerRect.getDBound();
     
-    return perimeterArrange( screenL, screenR, screenU, screenD, boundL, boundR,
-                                boundU, boundD, objects );
+    return perimeterArrange( outerL, outerR, outerU, outerD, innerL, innerR,
+                                innerU, innerD, objects );
 }
 
-bool LayoutManager::perimeterArrange( float screenL, float screenR,
-                                        float screenU, float screenD,
-                                        float boundL, float boundR,
-                                        float boundU, float boundD,
+bool LayoutManager::perimeterArrange( float outerL, float outerR,
+                                        float outerU, float outerD,
+                                        float innerL, float innerR,
+                                        float innerU, float innerD,
                                         std::vector<RectangleBase*> objects,
                                         std::map<std::string, std::string> opts)
 {
-    //printf( "LayoutManager::perimeter: screen bounds: %f,%f %f,%f\n",
-    //        screenL, screenR, screenU, screenD );
+    //printf( "LayoutManager::perimeter: outer inners: %f,%f %f,%f\n",
+    //        outerL, outerR, outerU, outerD );
 
-    float topRatio = (boundR-boundL) / ((screenU-screenD)+(boundR-boundL));
-    float sideRatio = (screenU-screenD) / ((screenU-screenD)+(boundR-boundL));
+    float topRatio = (innerR-innerL) / ((outerU-outerD)+(innerR-innerL));
+    float sideRatio = (outerU-outerD) / ((outerU-outerD)+(innerR-innerL));
     int topNum, sideNum, bottomNum;
 
     if ( objects.size() == 1 )
@@ -125,7 +125,7 @@ bool LayoutManager::perimeterArrange( float screenL, float screenR,
         for ( int i = 0; i < end; i++ )
             topObjs.push_back( objects[i] );
         // constant on top is for space for text
-        gridArrange( boundL, boundR, screenU-0.8f, boundU, true, false, true,
+        gridArrange( innerL, innerR, outerU-0.8f, innerU, true, false, true,
                      topObjs, topNum, 1 );
     }
 
@@ -136,7 +136,7 @@ bool LayoutManager::perimeterArrange( float screenL, float screenR,
         //printf( "arranging objects %d to %d to right\n", topNum, end-1 );
         for ( int i = topNum; i < end; i++ )
             rightObjs.push_back( objects[i] );
-        gridArrange( boundR, screenR, screenU, screenD, false, true, true,
+        gridArrange( innerR, outerR, outerU, outerD, false, true, true,
                      rightObjs, 1, sideNum );
     }
 
@@ -148,7 +148,7 @@ bool LayoutManager::perimeterArrange( float screenL, float screenR,
         //        end-1 );
         for ( int i = end-1; i >= topNum + sideNum; i-- )
             bottomObjs.push_back( objects[i] );
-        gridArrange( boundL, boundR, boundD, screenD, true, false, true,
+        gridArrange( innerL, innerR, innerD, outerD, true, false, true,
                      bottomObjs, bottomNum, 1 );
     }
 
@@ -158,23 +158,23 @@ bool LayoutManager::perimeterArrange( float screenL, float screenR,
         //        topNum + sideNum + bottomNum, objects.size()-1 );
         for ( int i = objects.size()-1; i >= topNum + sideNum + bottomNum; i-- )
             leftObjs.push_back( objects[i] );
-        gridArrange( screenL, boundL, screenU, screenD, false, true, true,
+        gridArrange( outerL, innerL, outerU, outerD, false, true, true,
                      leftObjs, 1, sideNum );
     }
     return true;
 }
 
-bool LayoutManager::gridArrange( RectangleBase boundRect,
+bool LayoutManager::gridArrange( RectangleBase innerRect,
                                     bool horiz, bool edge, bool resize,
                                     std::vector<RectangleBase*> objects,
                                     int numX, int numY )
 {
-    float boundL = boundRect.getLBound();
-    float boundR = boundRect.getRBound();
-    float boundU = boundRect.getUBound();
-    float boundD = boundRect.getDBound();
+    float innerL = innerRect.getLBound();
+    float innerR = innerRect.getRBound();
+    float innerU = innerRect.getUBound();
+    float innerD = innerRect.getDBound();
     
-    return gridArrange( boundL, boundR, boundU, boundD, horiz, edge,
+    return gridArrange( innerL, innerR, innerU, innerD, horiz, edge,
                             resize, objects, numX, numY );
 }
 
@@ -182,10 +182,10 @@ bool LayoutManager::gridArrange( RectangleBase boundRect,
 bool str2bool(std::string str) { return str == "True" ? True : False; }
 int str2int(std::string str) { return atoi(str.c_str()); }
 
-bool LayoutManager::gridArrange(float screenL, float screenR,
-                                float screenU, float screenD,
-                                float boundL, float boundR,
-                                float boundU, float boundD,
+bool LayoutManager::gridArrange(float outerL, float outerR,
+                                float outerU, float outerD,
+                                float innerL, float innerR,
+                                float innerU, float innerD,
                                 std::vector<RectangleBase*> objects,
                                 std::map<std::string, std::string> opts )
 {
@@ -204,7 +204,7 @@ bool LayoutManager::gridArrange(float screenL, float screenR,
             opts[i->first] = i->second;
     }
 
-    return gridArrange(boundL, boundR, boundU, boundD,
+    return gridArrange(innerL, innerR, innerU, innerD,
                        str2bool(opts["horiz"]),
                        str2bool(opts["edge"]),
                        str2bool(opts["resize"]),
@@ -212,8 +212,8 @@ bool LayoutManager::gridArrange(float screenL, float screenR,
                        str2int(opts["numX"]),
                        str2int(opts["numY"]));
 }
-bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
-                                    float boundD,
+bool LayoutManager::gridArrange( float innerL, float innerR, float innerU,
+                                    float innerD,
                                     bool horiz, bool edge, bool resize,
                                     std::vector<RectangleBase*> objects,
                                     int numX, int numY )
@@ -238,61 +238,61 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
     // if we only have one object, just fullscreen it to the area
     if ( objects.size() == 1 )
     {
-        fullscreen( boundL, boundR, boundU, boundD, objects[0] );
+        fullscreen( innerL, innerR, innerU, innerD, objects[0] );
         return true;
     }
     
-    // printf( "grid:bounds: %f,%f %f,%f\n", boundL, boundR, boundU, boundD );
+    // printf( "grid:inners: %f,%f %f,%f\n", innerL, innerR, innerU, innerD );
     
     float span; // height of rows if going horizontally,
                 // width of columns if going vertically
     float stride; // distance to move each time
     float curX, curY;
-    float edgeL = boundL, edgeR = boundR, edgeU = boundU, edgeD = boundD;
+    float edgeL = innerL, edgeR = innerR, edgeU = innerU, edgeD = innerD;
     
     // set up span and stride, etc differently for horizontal vs vertical
     // arrangement
     if ( horiz )
     {
-        span = (boundU-boundD) / numY;
-        stride = (boundR-boundL) / numX;
+        span = (innerU-innerD) / numY;
+        stride = (innerR-innerL) / numX;
         
-        edgeL = boundL + 0.2f + (stride / 2);
-        edgeR = boundR - 0.2f - (stride / 2);
+        edgeL = innerL + 0.2f + (stride / 2);
+        edgeR = innerR - 0.2f - (stride / 2);
         //printf( "grid: edges are %f,%f\n", edgeL, edgeR );
         if ( edge ) stride = (edgeR-edgeL) / std::max(1, (numX-1));
         
-        curY = boundU - (span/2.0f);
+        curY = innerU - (span/2.0f);
         
         if ( numX == 1 )
-            curX = (boundR+boundL)/2.0f;
+            curX = (innerR+innerL)/2.0f;
         else
         {
             if ( edge )
                 curX = edgeL;
             else
-                curX = boundL + (stride/2.0f);
+                curX = innerL + (stride/2.0f);
         }
     }
     else
     {
-        span = (boundR-boundL) / numX;
-        stride = (boundU-boundD) / numY;
+        span = (innerR-innerL) / numX;
+        stride = (innerU-innerD) / numY;
         
-        edgeU = boundU - 0.2f - (stride / 2);
-        edgeD = boundD + 0.2f + (stride / 2);
+        edgeU = innerU - 0.2f - (stride / 2);
+        edgeD = innerD + 0.2f + (stride / 2);
         if ( edge ) stride = (edgeU-edgeD) / std::max(1, (numY-1));
 
-        curX = boundL + (span/2.0f);
+        curX = innerL + (span/2.0f);
         
         if ( numY == 1 )
-            curY = (boundU+boundD)/2.0f;
+            curY = (innerU+innerD)/2.0f;
         else
         {
             if ( edge )
                 curY = edgeU;
             else
-                curY = boundU - (stride/2.0f);
+                curY = innerU - (stride/2.0f);
         }
     }
     
@@ -358,9 +358,9 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
                     if ( edge )
                         stride = (edgeR-edgeL) / std::max(1, (objectsLeft-1));
                     else
-                        stride = (boundR-boundL) / (objectsLeft);
+                        stride = (innerR-innerL) / (objectsLeft);
                 }
-                curX = boundL + (stride/2.0f);
+                curX = innerL + (stride/2.0f);
             }
         }
         else
@@ -376,9 +376,9 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
                     if ( edge )
                         stride = (edgeU-edgeD) / std::max(1, (objectsLeft-1));
                     else
-                        stride = boundU-boundD / (objectsLeft+1);
+                        stride = innerU-innerD / (objectsLeft+1);
                 }
-                curY = boundU - (stride/2.0f);
+                curY = innerU - (stride/2.0f);
             }
         }
     }
@@ -386,69 +386,69 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
     return true;
 }
 
-bool LayoutManager::fullscreen( RectangleBase boundRect, RectangleBase* object )
+bool LayoutManager::fullscreen( RectangleBase innerRect, RectangleBase* object )
 {
-    float boundL = boundRect.getLBound();
-    float boundR = boundRect.getRBound();
-    float boundU = boundRect.getUBound();
-    float boundD = boundRect.getDBound();
+    float innerL = innerRect.getLBound();
+    float innerR = innerRect.getRBound();
+    float innerU = innerRect.getUBound();
+    float innerD = innerRect.getDBound();
     
-    return fullscreen( boundL, boundR, boundU, boundD, object );
+    return fullscreen( innerL, innerR, innerU, innerD, object );
 }
 
-bool LayoutManager::fullscreen( float boundL, float boundR, float boundU,
-                                    float boundD, RectangleBase* object )
+bool LayoutManager::fullscreen( float innerL, float innerR, float innerU,
+                                    float innerD, RectangleBase* object )
 {
-    float spaceAspect = fabs((boundR-boundL)/(boundU-boundD));
+    float spaceAspect = fabs((innerR-innerL)/(innerU-innerD));
     float objectAspect = object->getTotalWidth()/object->getTotalHeight();
     //printf( "LayoutManager::fullscreen: aspects are %f in %f\n", objectAspect, spaceAspect );
 
     if ( ( spaceAspect - objectAspect ) > 0.01f )
     {
         //printf( "LayoutManager::fullscreen: setting height to %f\n",
-        //        boundU-boundD );
-        object->setTotalHeight( boundU-boundD );
+        //        innerU-innerD );
+        object->setTotalHeight( innerU-innerD );
     }
     else
     {
         //printf( "LayoutManager::fullscreen: setting width to %f\n",
-        //        boundR-boundL );
-        object->setTotalWidth( boundR-boundL );
+        //        innerR-innerL );
+        object->setTotalWidth( innerR-innerL );
     }
 
     // TODO need to change this if getCenterOffsetX() is ever meaningful
-    object->move( (boundR+boundL)/2.0f, ((boundU+boundD)/2.0f) -
+    object->move( (innerR+innerL)/2.0f, ((innerU+innerD)/2.0f) -
                     object->getCenterOffsetY() );
 
     return true;
 }
 
-bool LayoutManager::focus( RectangleBase boundRect,
+bool LayoutManager::focus( RectangleBase innerRect,
                 std::vector<RectangleBase*> outers,
                 std::vector<RectangleBase*> inners,
                 float scaleX, float scaleY )
 {
-    float boundL = boundRect.getLBound();
-    float boundR = boundRect.getRBound();
-    float boundU = boundRect.getUBound();
-    float boundD = boundRect.getDBound();
+    float innerL = innerRect.getLBound();
+    float innerR = innerRect.getRBound();
+    float innerU = innerRect.getUBound();
+    float innerD = innerRect.getDBound();
 
-    //printf( "LayoutManager::focusing, outer rect %f %f %f %f\n", boundL, boundR,
-    //        boundU, boundD );
+    //printf( "LayoutManager::focusing, outer rect %f %f %f %f\n", innerL, innerR,
+    //        innerU, innerD );
 
-    return focus( boundL, boundR, boundU, boundD, outers, inners,
+    return focus( innerL, innerR, innerU, innerD, outers, inners,
                         scaleX, scaleY );
 }
 
-bool LayoutManager::focus( float boundL, float boundR, float boundU,
-                float boundD, std::vector<RectangleBase*> outers,
+bool LayoutManager::focus( float innerL, float innerR, float innerU,
+                float innerD, std::vector<RectangleBase*> outers,
                 std::vector<RectangleBase*> inners,
                 float scaleX, float scaleY )
 {
-    float centerX = ( boundL + boundR ) / 2.0f;
-    float centerY = ( boundD + boundU ) / 2.0f;
-    float Xdist = ( boundR - boundL ) * scaleX / 2.0f;
-    float Ydist = ( boundU - boundD ) * scaleY / 2.0f;
+    float centerX = ( innerL + innerR ) / 2.0f;
+    float centerY = ( innerD + innerU ) / 2.0f;
+    float Xdist = ( innerR - innerL ) * scaleX / 2.0f;
+    float Ydist = ( innerU - innerD ) * scaleY / 2.0f;
     // .95f to give some extra room
     // TODO make this an argument?
     float gridInnerL = centerX - (Xdist*0.95f);
@@ -466,7 +466,7 @@ bool LayoutManager::focus( float boundL, float boundR, float boundU,
     bool grid = gridArrange( gridInnerL, gridInnerR, gridInnerU, gridInnerD,
                                  true, false, true,
                                  inners );
-    perimeterArrange( boundL, boundR, boundU, boundD,
+    perimeterArrange( innerL, innerR, innerU, innerD,
                         perimeterInnerL, perimeterInnerR,
                         perimeterInnerU, perimeterInnerD,
                           outers );

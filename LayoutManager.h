@@ -23,45 +23,45 @@ public:
     LayoutManager();
 
     bool arrange( std::string method,
-                  RectangleBase screenRect,
-                  RectangleBase boundRect,
+                  RectangleBase outerRect,
+                  RectangleBase innerRect,
                   std::vector<RectangleBase*> objects,
                  std::map<std::string, std::string> options=std::map<std::string, std::string>());
     bool arrange( std::string method,
-                  float screenL, float screenR, float screenU, float screenD,
-                  float boundL, float boundR, float boundU, float boundD,
+                  float outerL, float outerR, float outerU, float outerD,
+                  float innerL, float innerR, float innerU, float innerD,
                   std::vector<RectangleBase*> objects,
                  std::map<std::string, std::string> options=std::map<std::string, std::string>());
 
-    bool fullscreen( RectangleBase boundRect, RectangleBase* object );
-    bool fullscreen( float boundL, float boundR, float boundU, float boundD,
+    bool fullscreen( RectangleBase innerRect, RectangleBase* object );
+    bool fullscreen( float innerL, float innerR, float innerU, float innerD,
                         RectangleBase* object );
     
-    bool focus( RectangleBase boundRect, std::vector<RectangleBase*> outers,
+    bool focus( RectangleBase innerRect, std::vector<RectangleBase*> outers,
                     std::vector<RectangleBase*> inners,
                     float scaleX = 0.65f, float scaleY = 0.6f );
-    bool focus( float boundL, float boundR, float boundU, float boundD,
+    bool focus( float innerL, float innerR, float innerU, float innerD,
                     std::vector<RectangleBase*> outers,
                     std::vector<RectangleBase*> inners,
                     float scaleX = 0.65f, float scaleY = 0.6f );
 private:
-    bool perimeterArrange( RectangleBase screenRect, RectangleBase boundRect,
+    bool perimeterArrange( RectangleBase outerRect, RectangleBase innerRect,
                             std::vector<RectangleBase*> objects,
                             std::map<std::string, std::string> options=std::map<std::string, std::string>());
-    bool perimeterArrange( float screenL, float screenR, float screenU,
-                            float screenD, float boundL, float boundR,
-                            float boundU, float boundD,
+    bool perimeterArrange( float outerL, float outerR, float outerU,
+                            float outerD, float innerL, float innerR,
+                            float innerU, float innerD,
                             std::vector<RectangleBase*> objects,
                             std::map<std::string, std::string> options=std::map<std::string, std::string>());
-    bool gridArrange( RectangleBase boundRect,
+    bool gridArrange( RectangleBase innerRect,
                         bool horiz, bool edge, bool resize,
                         std::vector<RectangleBase*> objects,
                         int numX = 0, int numY = 0 );
-    bool gridArrange(float screenL, float screenR, float screenU, float screenD,
-                     float boundL, float boundR, float boundU, float boundD,
+    bool gridArrange(float outerL, float outerR, float outerU, float outerD,
+                     float innerL, float innerR, float innerU, float innerD,
                      std::vector<RectangleBase*> objects,
                      std::map<std::string, std::string> options);
-    bool gridArrange( float boundL, float boundR, float boundU, float boundD,
+    bool gridArrange( float innerL, float innerR, float innerU, float innerD,
                         bool horiz, bool edge, bool resize,
                         std::vector<RectangleBase*> objects,
                         int numX = 0, int numY = 0 );
