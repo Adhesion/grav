@@ -7,6 +7,7 @@
 #include "Group.h"
 #include <VPMedia/random_helper.h>
 #include <cmath>
+#include <sstream>
 
 Group::Group( float _x, float _y ) :
     RectangleBase( _x, _y )
@@ -136,9 +137,20 @@ void Group::rearrange()
             RectangleBase::setScale( destScaleX,
                                         destScaleY * (aspect/newAspect) );
     }
+
+
+    // Setup options for the grid layout
+    std::map<std::string, std::string> opts = \
+        std::map<std::string, std::string>();
+    std::ostringstream ss;
+    ss << numCol;
+    opts["numX"] = ss.str();
+    ss << "\r" << numRow;
+    opts["numY"] = ss.str();
     
-    layouts.gridArrange( getLBound(), getRBound(), getUBound(), getDBound(),
-                            true, false, true, objects, numCol, numRow );
+    layouts.arrange("grid", 0, 0, 0, 0,
+                    getLBound(), getRBound(), getUBound(), getDBound(),
+                    objects, opts);
 }
 
 bool Group::updateName()
