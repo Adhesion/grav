@@ -33,6 +33,7 @@ public:
                   std::vector<RectangleBase*> objects,
                  std::map<std::string, std::string> options=std::map<std::string, std::string>());
 
+    // TBD -- consider using a vector<string, vector<Rectangle>> to bring this under the 'arrange' facade
     bool focus( RectangleBase innerRect, std::vector<RectangleBase*> outers,
                     std::vector<RectangleBase*> inners,
                     float scaleX = 0.65f, float scaleY = 0.6f );
