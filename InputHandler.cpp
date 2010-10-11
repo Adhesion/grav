@@ -164,14 +164,9 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         }
         else
         {
-            std::map<std::string, std::string> opts = \
-                    std::map<std::string, std::string>();
-            opts["horiz"] = "True";
-            opts["edge"] = "False";
-            opts["resize"] = "True";
             layouts.arrange("grid",
                             grav->getScreenRect(), grav->getEarthRect(),
-                            movableObjects, opts);
+                            movableObjects);
         }
         break;
 

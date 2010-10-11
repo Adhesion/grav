@@ -173,6 +173,7 @@ bool LayoutManager::gridArrange( RectangleBase boundRect,
 
 // Little utility... should be phased out with a better usage of std::map
 bool str2bool(std::string str) { return str == "True" ? True : False; }
+int str2int(std::string str) { return atoi(str.c_str()); }
 
 bool LayoutManager::gridArrange(float screenL, float screenR,
                                 float screenU, float screenD,
@@ -181,12 +182,28 @@ bool LayoutManager::gridArrange(float screenL, float screenR,
                                 std::vector<RectangleBase*> objects,
                                 std::map<std::string, std::string> opts )
 {
-    // TODO -- working here
+    // Setup opts defaults
+    std::map<std::string, std::string> dflt = \
+        std::map<std::string, std::string>();
+    dflt["horiz"] = "True"; dflt["edge"] = "False"; dflt["resize"] = "True";
+    dflt["numX"] = "0";     dflt["numY"] = "0";
+
+    // Apply the opts defaults to opts
+    for (std::map<std::string,std::string>::iterator i = dflt.begin();
+         i != dflt.end(); i++)
+    {
+        // If the value wasn't specified by our caller, then load the default
+        if ( opts.find(i->first) == opts.end() ) 
+            opts[i->first] = i->second;
+    }
+
     return gridArrange(boundL, boundR, boundU, boundD,
                        str2bool(opts["horiz"]),
                        str2bool(opts["edge"]),
                        str2bool(opts["resize"]),
-                       objects);
+                       objects,
+                       str2int(opts["numX"]),
+                       str2int(opts["numY"]));
 }
 bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
                                     float boundD,
