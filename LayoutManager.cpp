@@ -3,6 +3,7 @@
  * Definition of the LayoutManager, which takes objects and arranges them into
  * grid, perimeter, fullscreen, etc.
  * @author Andrew Ford
+ *         Ralph Bean
  */
 
 #include <cstdio>
@@ -14,9 +15,56 @@
 LayoutManager::LayoutManager()
 { }
 
+
+void LayoutManager::arrange( std::string method,
+                             RectangleBase screenRect,
+                             RectangleBase boundRect,
+                             std::vector<RectangleBase*> objects,
+                             std::map<std::string, std::string> options)
+{
+    float screenL = screenRect.getLBound();
+    float screenR = screenRect.getRBound();
+    float screenU = screenRect.getUBound();
+    float screenD = screenRect.getDBound();
+
+    float boundL = boundRect.getLBound();
+    float boundR = boundRect.getRBound();
+    float boundU = boundRect.getUBound();
+    float boundD = boundRect.getDBound();
+
+    arrange(method,
+            screenL, screenR, screenU, screenD,
+            boundL, boundR, boundU, boundD,
+            objects, options);
+}
+
+void LayoutManager::arrange( std::string method,
+                             float screenL, float screenR,
+                             float screenU, float screenD,
+                             float boundL, float boundR,
+                             float boundU, float boundD,
+                             std::vector<RectangleBase*> objects,
+                             std::map<std::string, std::string> options)
+{
+    // TODO -- do this with an std::map of function pointers
+    if ( method == "perimeter" ) {
+        perimeterArrange(screenL, screenR, screenU, screenD,
+                         boundL, boundR, boundU, boundD,
+                         objects, options);
+    } else if ( method == "grid" ) {
+        gridArrange(screenL, screenR, screenU, screenD,
+                    boundL, boundR, boundU, boundD,
+                    objects, options);
+    } else {
+        printf( "ZOMG:::: a huge error should be thrown here!!!\n" );
+    }
+}
+
+
 void LayoutManager::perimeterArrange( RectangleBase screenRect,
                                         RectangleBase boundRect,
-                                        std::vector<RectangleBase*> objects )
+                                        std::vector<RectangleBase*> objects,
+                                        std::map<std::string, std::string> opts)
 {
     float screenL = screenRect.getLBound();
     float screenR = screenRect.getRBound();
@@ -36,7 +84,8 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
                                         float screenU, float screenD,
                                         float boundL, float boundR,
                                         float boundU, float boundD,
-                                        std::vector<RectangleBase*> objects )
+                                        std::vector<RectangleBase*> objects,
+                                        std::map<std::string, std::string> opts)
 {
     //printf( "LayoutManager::perimeter: screen bounds: %f,%f %f,%f\n",
     //        screenL, screenR, screenU, screenD );
@@ -122,6 +171,40 @@ bool LayoutManager::gridArrange( RectangleBase boundRect,
                             resize, objects, numX, numY );
 }
 
+// Little utility... should be phased out with a better usage of std::map
+bool str2bool(std::string str) { return str == "True" ? True : False; }
+int str2int(std::string str) { return atoi(str.c_str()); }
+
+bool LayoutManager::gridArrange(float screenL, float screenR,
+                                float screenU, float screenD,
+                                float boundL, float boundR,
+                                float boundU, float boundD,
+                                std::vector<RectangleBase*> objects,
+                                std::map<std::string, std::string> opts )
+{
+    // Setup opts defaults
+    std::map<std::string, std::string> dflt = \
+        std::map<std::string, std::string>();
+    dflt["horiz"] = "True"; dflt["edge"] = "False"; dflt["resize"] = "True";
+    dflt["numX"] = "0";     dflt["numY"] = "0";
+
+    // Apply the opts defaults to opts
+    for (std::map<std::string,std::string>::iterator i = dflt.begin();
+         i != dflt.end(); i++)
+    {
+        // If the value wasn't specified by our caller, then load the default
+        if ( opts.find(i->first) == opts.end() ) 
+            opts[i->first] = i->second;
+    }
+
+    return gridArrange(boundL, boundR, boundU, boundD,
+                       str2bool(opts["horiz"]),
+                       str2bool(opts["edge"]),
+                       str2bool(opts["resize"]),
+                       objects,
+                       str2int(opts["numX"]),
+                       str2int(opts["numY"]));
+}
 bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
                                     float boundD,
                                     bool horiz, bool edge, bool resize,
@@ -152,7 +235,7 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
         return true;
     }
     
-    //printf( "grid:bounds: %f,%f %f,%f\n", boundL, boundR, boundU, boundD );
+    printf( "grid:bounds: %f,%f %f,%f\n", boundL, boundR, boundU, boundD );
     
     float span; // height of rows if going horizontally,
                 // width of columns if going vertically

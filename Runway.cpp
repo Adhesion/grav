@@ -6,6 +6,7 @@
  */
 
 #include "Runway.h"
+#include <sstream>
 
 Runway::Runway( float _x, float _y ) :
     Group( _x, _y )
@@ -89,19 +90,30 @@ void Runway::rearrange()
 {
     if ( objects.size() == 0 ) return;
 
+    std::map<std::string, std::string> opts = \
+        std::map<std::string, std::string>();
     // horizontal
     if ( orientation == 0 )
     {
-        layouts.gridArrange( getLBound(), getRBound(), getUBound(), getDBound(),
-                                true, false, true, objects,
-                                objects.size(), 1 );
+        std::ostringstream ss;
+        ss << objects.size();
+        opts["numX"] = ss.str();
+        opts["numY"] = "1";
+        layouts.arrange("grid", 0, 0, 0, 0,
+                        getLBound(), getRBound(), getUBound(), getDBound(),
+                        objects, opts);
     }
     // vertical
     else if ( orientation == 1 )
     {
-        layouts.gridArrange( getLBound(), getRBound(), getUBound(), getDBound(),
-                                false, false, true, objects,
-                                1, objects.size() );
+        std::ostringstream ss;
+        ss << objects.size();
+        opts["numX"] = "1";
+        opts["numY"] = ss.str();
+        opts["horiz"] = "False";
+        layouts.arrange("grid", 0, 0, 0, 0,
+                        getLBound(), getRBound(), getUBound(), getDBound(),
+                        objects, opts);
     }
 }
 

@@ -151,8 +151,9 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         break;
 
     case 'P':
-        layouts.perimeterArrange( grav->getScreenRect(), grav->getEarthRect(),
-                                    movableObjects );
+        layouts.arrange("perimeter",
+                        grav->getScreenRect(), grav->getEarthRect(),
+                        movableObjects);
         break;
 
     case 'R':
@@ -162,8 +163,11 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
             grav->clearSelected();
         }
         else
-            layouts.gridArrange( grav->getScreenRect(), true, false, true,
-                                movableObjects );
+        {
+            layouts.arrange("grid",
+                            grav->getScreenRect(), grav->getEarthRect(),
+                            movableObjects);
+        }
         break;
 
     case 'I':

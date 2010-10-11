@@ -1,0 +1,4 @@
+*.o
+*.d
+Debug/grav
+*.swp
