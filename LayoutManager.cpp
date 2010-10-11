@@ -238,7 +238,7 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
     // if we only have one object, just fullscreen it to the area
     if ( objects.size() == 1 )
     {
-        fullscreen( outerL, outerR, outerU, outerD, objects[0] );
+        objects[0]->fillToRect( outerL, outerR, outerU, outerD );
         return true;
     }
     
@@ -383,43 +383,6 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
         }
     }
     
-    return true;
-}
-
-bool LayoutManager::fullscreen( RectangleBase innerRect, RectangleBase* object )
-{
-    float innerL = innerRect.getLBound();
-    float innerR = innerRect.getRBound();
-    float innerU = innerRect.getUBound();
-    float innerD = innerRect.getDBound();
-    
-    return fullscreen( innerL, innerR, innerU, innerD, object );
-}
-
-bool LayoutManager::fullscreen( float innerL, float innerR, float innerU,
-                                    float innerD, RectangleBase* object )
-{
-    float spaceAspect = fabs((innerR-innerL)/(innerU-innerD));
-    float objectAspect = object->getTotalWidth()/object->getTotalHeight();
-    //printf( "LayoutManager::fullscreen: aspects are %f in %f\n", objectAspect, spaceAspect );
-
-    if ( ( spaceAspect - objectAspect ) > 0.01f )
-    {
-        //printf( "LayoutManager::fullscreen: setting height to %f\n",
-        //        innerU-innerD );
-        object->setTotalHeight( innerU-innerD );
-    }
-    else
-    {
-        //printf( "LayoutManager::fullscreen: setting width to %f\n",
-        //        innerR-innerL );
-        object->setTotalWidth( innerR-innerL );
-    }
-
-    // TODO need to change this if getCenterOffsetX() is ever meaningful
-    object->move( (innerR+innerL)/2.0f, ((innerU+innerD)/2.0f) -
-                    object->getCenterOffsetY() );
-
     return true;
 }
 

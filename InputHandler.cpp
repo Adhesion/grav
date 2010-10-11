@@ -316,8 +316,10 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         }
         else if ( shiftHeld && grav->getSelectedObjects()->size() == 1 )
         {
-            layouts.fullscreen( grav->getScreenRect(),
-                                 (*grav->getSelectedObjects())[0] );
+            (*grav->getSelectedObjects())[0]->fillToRect(grav->getScreenRect());
+            // TODO -- remove this
+            //layouts.fullscreen( grav->getScreenRect(),
+            //                     (*grav->getSelectedObjects())[0] );
         }
         break;
 

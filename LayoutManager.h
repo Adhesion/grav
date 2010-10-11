@@ -33,10 +33,6 @@ public:
                   std::vector<RectangleBase*> objects,
                  std::map<std::string, std::string> options=std::map<std::string, std::string>());
 
-    bool fullscreen( RectangleBase innerRect, RectangleBase* object );
-    bool fullscreen( float innerL, float innerR, float innerU, float innerD,
-                        RectangleBase* object );
-    
     bool focus( RectangleBase innerRect, std::vector<RectangleBase*> outers,
                     std::vector<RectangleBase*> inners,
                     float scaleX = 0.65f, float scaleY = 0.6f );
