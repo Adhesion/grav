@@ -164,17 +164,17 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
     return true;
 }
 
-bool LayoutManager::gridArrange( RectangleBase innerRect,
+bool LayoutManager::gridArrange( RectangleBase outerRect,
                                     bool horiz, bool edge, bool resize,
                                     std::vector<RectangleBase*> objects,
                                     int numX, int numY )
 {
-    float innerL = innerRect.getLBound();
-    float innerR = innerRect.getRBound();
-    float innerU = innerRect.getUBound();
-    float innerD = innerRect.getDBound();
+    float outerL = outerRect.getLBound();
+    float outerR = outerRect.getRBound();
+    float outerU = outerRect.getUBound();
+    float outerD = outerRect.getDBound();
     
-    return gridArrange( innerL, innerR, innerU, innerD, horiz, edge,
+    return gridArrange( outerL, outerR, outerU, outerD, horiz, edge,
                             resize, objects, numX, numY );
 }
 
@@ -204,7 +204,7 @@ bool LayoutManager::gridArrange(float outerL, float outerR,
             opts[i->first] = i->second;
     }
 
-    return gridArrange(innerL, innerR, innerU, innerD,
+    return gridArrange(outerL, outerR, outerU, outerD,
                        str2bool(opts["horiz"]),
                        str2bool(opts["edge"]),
                        str2bool(opts["resize"]),
@@ -212,8 +212,8 @@ bool LayoutManager::gridArrange(float outerL, float outerR,
                        str2int(opts["numX"]),
                        str2int(opts["numY"]));
 }
-bool LayoutManager::gridArrange( float innerL, float innerR, float innerU,
-                                    float innerD,
+bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
+                                    float outerD,
                                     bool horiz, bool edge, bool resize,
                                     std::vector<RectangleBase*> objects,
                                     int numX, int numY )
@@ -238,61 +238,61 @@ bool LayoutManager::gridArrange( float innerL, float innerR, float innerU,
     // if we only have one object, just fullscreen it to the area
     if ( objects.size() == 1 )
     {
-        fullscreen( innerL, innerR, innerU, innerD, objects[0] );
+        fullscreen( outerL, outerR, outerU, outerD, objects[0] );
         return true;
     }
     
-    // printf( "grid:inners: %f,%f %f,%f\n", innerL, innerR, innerU, innerD );
+    // printf( "grid:outers: %f,%f %f,%f\n", outerL, outerR, outerU, outerD );
     
     float span; // height of rows if going horizontally,
                 // width of columns if going vertically
     float stride; // distance to move each time
     float curX, curY;
-    float edgeL = innerL, edgeR = innerR, edgeU = innerU, edgeD = innerD;
+    float edgeL = outerL, edgeR = outerR, edgeU = outerU, edgeD = outerD;
     
     // set up span and stride, etc differently for horizontal vs vertical
     // arrangement
     if ( horiz )
     {
-        span = (innerU-innerD) / numY;
-        stride = (innerR-innerL) / numX;
+        span = (outerU-outerD) / numY;
+        stride = (outerR-outerL) / numX;
         
-        edgeL = innerL + 0.2f + (stride / 2);
-        edgeR = innerR - 0.2f - (stride / 2);
+        edgeL = outerL + 0.2f + (stride / 2);
+        edgeR = outerR - 0.2f - (stride / 2);
         //printf( "grid: edges are %f,%f\n", edgeL, edgeR );
         if ( edge ) stride = (edgeR-edgeL) / std::max(1, (numX-1));
         
-        curY = innerU - (span/2.0f);
+        curY = outerU - (span/2.0f);
         
         if ( numX == 1 )
-            curX = (innerR+innerL)/2.0f;
+            curX = (outerR+outerL)/2.0f;
         else
         {
             if ( edge )
                 curX = edgeL;
             else
-                curX = innerL + (stride/2.0f);
+                curX = outerL + (stride/2.0f);
         }
     }
     else
     {
-        span = (innerR-innerL) / numX;
-        stride = (innerU-innerD) / numY;
+        span = (outerR-outerL) / numX;
+        stride = (outerU-outerD) / numY;
         
-        edgeU = innerU - 0.2f - (stride / 2);
-        edgeD = innerD + 0.2f + (stride / 2);
+        edgeU = outerU - 0.2f - (stride / 2);
+        edgeD = outerD + 0.2f + (stride / 2);
         if ( edge ) stride = (edgeU-edgeD) / std::max(1, (numY-1));
 
-        curX = innerL + (span/2.0f);
+        curX = outerL + (span/2.0f);
         
         if ( numY == 1 )
-            curY = (innerU+innerD)/2.0f;
+            curY = (outerU+outerD)/2.0f;
         else
         {
             if ( edge )
                 curY = edgeU;
             else
-                curY = innerU - (stride/2.0f);
+                curY = outerU - (stride/2.0f);
         }
     }
     
@@ -358,9 +358,9 @@ bool LayoutManager::gridArrange( float innerL, float innerR, float innerU,
                     if ( edge )
                         stride = (edgeR-edgeL) / std::max(1, (objectsLeft-1));
                     else
-                        stride = (innerR-innerL) / (objectsLeft);
+                        stride = (outerR-outerL) / (objectsLeft);
                 }
-                curX = innerL + (stride/2.0f);
+                curX = outerL + (stride/2.0f);
             }
         }
         else
@@ -376,9 +376,9 @@ bool LayoutManager::gridArrange( float innerL, float innerR, float innerU,
                     if ( edge )
                         stride = (edgeU-edgeD) / std::max(1, (objectsLeft-1));
                     else
-                        stride = innerU-innerD / (objectsLeft+1);
+                        stride = outerU-outerD / (objectsLeft+1);
                 }
-                curY = innerU - (stride/2.0f);
+                curY = outerU - (stride/2.0f);
             }
         }
     }
