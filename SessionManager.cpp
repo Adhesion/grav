@@ -29,6 +29,8 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
     audioSessionCount = 0;
     lockCount = 0;
     pause = false;
+
+    rotatePos = -1;
 }
 
 SessionManager::~SessionManager()
@@ -111,6 +113,62 @@ bool SessionManager::removeSession( std::string addr )
     sessions.erase( it );
     unlockSessions();
     return true;
+}
+
+void SessionManager::addRotatedSession( std::string addr, bool audio )
+{
+    lockSessions();
+    videoRotateList.push_back( addr );
+    unlockSessions();
+}
+
+void SessionManager::removeRotatedSession( std::string addr, bool audio )
+{
+    lockSessions();
+    std::vector<std::string>::iterator vrlit = videoRotateList.begin();
+    while ( vrlit != videoRotateList.end() && (*vrlit).compare( addr ) != 0 )
+        vrlit++;
+    if ( vrlit == videoRotateList.end() )
+    {
+        // if addr not found, exit
+        unlockSessions();
+        return;
+    }
+    else
+    {
+        videoRotateList.erase( vrlit );
+        // find session & remove it from main list if it's active
+        std::vector<SessionEntry>::iterator it2 = sessions.begin();
+        while ( it2 != sessions.end() && (*it2).address.compare( addr ) != 0 )
+            it2++;
+        if ( it2 == sessions.end() )
+        {
+            unlockSessions();
+            return;
+        }
+        else
+        {
+            unlockSessions();
+            removeSession( (*it2).address );
+        }
+    }
+}
+
+void SessionManager::rotate( bool audio )
+{
+    lockSessions();
+
+    if ( rotatePos != -1 )
+        lastRotateSession = videoRotateList[ rotatePos ];
+    int numSessions = (int)videoRotateList.size();
+    if ( ++rotatePos >= numSessions )
+    {
+        rotatePos = 0;
+    }
+
+    unlockSessions();
+    removeSession( lastRotateSession );
+    initSession( videoRotateList[ rotatePos ], false );
 }
 
 bool SessionManager::setSessionEnable( std::string addr, bool set )

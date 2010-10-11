@@ -43,6 +43,14 @@ public:
     bool initSession( std::string addr, bool audio );
     bool removeSession( std::string addr );
 
+    /*
+     * Note audio is ignored for this for the time being - only rotating video
+     * sessions for now.
+     */
+    void addRotatedSession( std::string addr, bool audio );
+    void removeRotatedSession( std::string addr, bool audio );
+    void rotate( bool audio );
+
     bool setSessionEnable( std::string addr, bool set );
     bool isSessionEnabled( std::string addr );
 
@@ -63,6 +71,10 @@ private:
     AudioManager* audioSessionListener;
     int videoSessionCount;
     int audioSessionCount;
+
+    std::vector<std::string> videoRotateList;
+    int rotatePos;
+    std::string lastRotateSession;
 
     mutex* sessionMutex;
     int lockCount;
