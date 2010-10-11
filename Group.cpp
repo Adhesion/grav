@@ -148,8 +148,9 @@ void Group::rearrange()
     ss << "\r" << numRow;
     opts["numY"] = ss.str();
     
-    layouts.arrange("grid", 0, 0, 0, 0,
+    layouts.arrange("grid",
                     getLBound(), getRBound(), getUBound(), getDBound(),
+                    0, 0, 0, 0,
                     objects, opts);
 }
 

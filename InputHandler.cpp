@@ -165,7 +165,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         else
         {
             layouts.arrange("grid",
-                            grav->getScreenRect(), grav->getEarthRect(),
+                            grav->getEarthRect(), grav->getScreenRect(),
                             movableObjects);
         }
         break;
