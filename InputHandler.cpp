@@ -151,8 +151,11 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         break;
 
     case 'P':
-        layouts.perimeterArrange( grav->getScreenRect(), grav->getEarthRect(),
-                                    movableObjects );
+        //layouts.perimeterArrange( grav->getScreenRect(), grav->getEarthRect(),
+        //                            movableObjects );
+        opts = std::map<std::string, std::string>()
+        layouts.arrange("perimeter", grav->getScreenRect(), grav->getEarthRect(),
+                        movableObjects, opts);
         break;
 
     case 'R':

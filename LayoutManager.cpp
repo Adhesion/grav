@@ -3,6 +3,7 @@
  * Definition of the LayoutManager, which takes objects and arranges them into
  * grid, perimeter, fullscreen, etc.
  * @author Andrew Ford
+ *         Ralph Bean
  */
 
 #include <cstdio>
@@ -13,6 +14,43 @@
 
 LayoutManager::LayoutManager()
 { }
+
+
+void LayoutManager::arrange( std::string method,
+                             RectangleBase screenRect,
+                             RectangleBase boundRect,
+                             std::vector<RectangleBase*> objects,
+                             std::map<std::string, std::string> options )
+{
+    float screenL = screenRect.getLBound();
+    float screenR = screenRect.getRBound();
+    float screenU = screenRect.getUBound();
+    float screenD = screenRect.getDBound();
+
+    float boundL = boundRect.getLBound();
+    float boundR = boundRect.getRBound();
+    float boundU = boundRect.getUBound();
+    float boundD = boundRect.getDBound();
+
+    arrange(method,
+            screenL, screenR, screenU, screenD,
+            boundL, boundR, boundU, boundD,
+            objects, options);
+}
+
+void LayoutManager::arrange( std::string method,
+                             float screenL, float screenR,
+                             float screenU, float screenD,
+                             float boundL, float boundR,
+                             float boundU, float boundD,
+                             std::vector<RectangleBase*> objects,
+                             std::map<std::string, std::string> options )
+{
+    perimeterArrange(screenL, screenR, screenU, screenD,
+                     boundL, boundR, boundU, boundD,
+                     objects); // not passing options for now...
+}
+
 
 void LayoutManager::perimeterArrange( RectangleBase screenRect,
                                         RectangleBase boundRect,

@@ -7,8 +7,11 @@
  * arranging the objects in particular ways.
  * Future versions may read from Python scripts.
  * @author Andrew Ford
+ *         Ralph Bean
  */
 
+#include <string>
+#include <map>
 #include <vector>
 
 class RectangleBase;
@@ -18,7 +21,18 @@ class LayoutManager
     
 public:
     LayoutManager();
-    
+
+    void arrange( std::string method,
+                  RectangleBase screenRect,
+                  RectangleBase boundRect,
+                  std::vector<RectangleBase*> objects,
+                  std::map<std::string, std::string> options);
+    void arrange( std::string method,
+                  float screenL, float screenR, float screenU, float screenD,
+                  float boundL, float boundR, float boundU, float boundD,
+                  std::vector<RectangleBase*> objects,
+                  std::map<std::string, std::string> options);
+
     void perimeterArrange( RectangleBase screenRect, RectangleBase boundRect,
                             std::vector<RectangleBase*> objects );
     void perimeterArrange( float screenL, float screenR, float screenU,
