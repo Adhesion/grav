@@ -46,25 +46,24 @@ bool LayoutManager::arrange( std::string method,
                              std::vector<RectangleBase*> objects,
                              std::map<std::string, std::string> options)
 {
-    // TODO -- do this with an std::map of function pointers
     typedef bool (LayoutManager::*fn_ptr)(
         float sL, float sR, float sU, float sD,
         float bL, float bR, float bU, float bD,
         std::vector<RectangleBase*> objs,
         std::map<std::string, std::string> opts);
-    fn_ptr fn;
 
-    if ( method == "perimeter" ) {
-        fn = &LayoutManager::perimeterArrange;
-    } else if ( method == "grid" ) {
-        fn = &LayoutManager::gridArrange;
-    } else {
+    std::map<std::string, fn_ptr> lookup;
+    lookup["perimeter"] = &LayoutManager::perimeterArrange;
+    lookup["grid"]      = &LayoutManager::gridArrange;
+
+    if ( lookup.find(method) == lookup.end() )
+    {
         printf( "ZOMG:::: a huge error should be thrown here!!!\n" );
         return false; // double false !!!
     }
-    return (this->*fn)(screenL, screenR, screenU, screenD,
-                boundL, boundR, boundU, boundD,
-                objects, options);
+    return (this->*lookup[method])( screenL, screenR, screenU, screenD,
+                                    boundL, boundR, boundU, boundD,
+                                    objects, options );
 }
 
 
