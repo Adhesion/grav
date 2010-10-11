@@ -151,8 +151,6 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         break;
 
     case 'P':
-        //layouts.perimeterArrange( grav->getScreenRect(), grav->getEarthRect(),
-        //                            movableObjects );
         layouts.arrange("perimeter",
                         grav->getScreenRect(), grav->getEarthRect(),
                         movableObjects);
@@ -165,8 +163,16 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
             grav->clearSelected();
         }
         else
-            layouts.gridArrange( grav->getScreenRect(), true, false, true,
-                                movableObjects );
+        {
+            std::map<std::string, std::string> opts = \
+                    std::map<std::string, std::string>();
+            opts["horiz"] = "True";
+            opts["edge"] = "False";
+            opts["resize"] = "True";
+            layouts.arrange("grid",
+                            grav->getScreenRect(), grav->getEarthRect(),
+                            movableObjects, opts);
+        }
         break;
 
     case 'I':

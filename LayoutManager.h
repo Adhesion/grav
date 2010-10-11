@@ -33,21 +33,19 @@ public:
                   std::vector<RectangleBase*> objects,
                  std::map<std::string, std::string> options=std::map<std::string, std::string>());
 
-    void perimeterArrange( RectangleBase screenRect, RectangleBase boundRect,
-                            std::vector<RectangleBase*> objects );
-    void perimeterArrange( float screenL, float screenR, float screenU,
-                            float screenD, float boundL, float boundR,
-                            float boundU, float boundD,
-                            std::vector<RectangleBase*> objects );
-
     bool gridArrange( RectangleBase boundRect,
                         bool horiz, bool edge, bool resize,
                         std::vector<RectangleBase*> objects,
                         int numX = 0, int numY = 0 );
+    bool gridArrange(float screenL, float screenR, float screenU, float screenD,
+                     float boundL, float boundR, float boundU, float boundD,
+                     std::vector<RectangleBase*> objects,
+                     std::map<std::string, std::string> options);
     bool gridArrange( float boundL, float boundR, float boundU, float boundD,
                         bool horiz, bool edge, bool resize,
                         std::vector<RectangleBase*> objects,
                         int numX = 0, int numY = 0 );
+
 
     bool fullscreen( RectangleBase boundRect, RectangleBase* object );
     bool fullscreen( float boundL, float boundR, float boundU, float boundD,
@@ -60,7 +58,15 @@ public:
                     std::vector<RectangleBase*> outers,
                     std::vector<RectangleBase*> inners,
                     float scaleX = 0.65f, float scaleY = 0.6f );
-
+private:
+    void perimeterArrange( RectangleBase screenRect, RectangleBase boundRect,
+                            std::vector<RectangleBase*> objects,
+                            std::map<std::string, std::string> options=std::map<std::string, std::string>());
+    void perimeterArrange( float screenL, float screenR, float screenU,
+                            float screenD, float boundL, float boundR,
+                            float boundU, float boundD,
+                            std::vector<RectangleBase*> objects,
+                            std::map<std::string, std::string> options=std::map<std::string, std::string>());
 };
 
 #endif /*LAYOUTMANAGER_H_*/
