@@ -16,7 +16,7 @@ LayoutManager::LayoutManager()
 { }
 
 
-void LayoutManager::arrange( std::string method,
+bool LayoutManager::arrange( std::string method,
                              RectangleBase screenRect,
                              RectangleBase boundRect,
                              std::vector<RectangleBase*> objects,
@@ -32,13 +32,13 @@ void LayoutManager::arrange( std::string method,
     float boundU = boundRect.getUBound();
     float boundD = boundRect.getDBound();
 
-    arrange(method,
+    return arrange(method,
             screenL, screenR, screenU, screenD,
             boundL, boundR, boundU, boundD,
             objects, options);
 }
 
-void LayoutManager::arrange( std::string method,
+bool LayoutManager::arrange( std::string method,
                              float screenL, float screenR,
                              float screenU, float screenD,
                              float boundL, float boundR,
@@ -47,21 +47,28 @@ void LayoutManager::arrange( std::string method,
                              std::map<std::string, std::string> options)
 {
     // TODO -- do this with an std::map of function pointers
+    typedef bool (LayoutManager::*fn_ptr)(
+        float sL, float sR, float sU, float sD,
+        float bL, float bR, float bU, float bD,
+        std::vector<RectangleBase*> objs,
+        std::map<std::string, std::string> opts);
+    fn_ptr fn;
+
     if ( method == "perimeter" ) {
-        perimeterArrange(screenL, screenR, screenU, screenD,
-                         boundL, boundR, boundU, boundD,
-                         objects, options);
+        fn = &LayoutManager::perimeterArrange;
     } else if ( method == "grid" ) {
-        gridArrange(screenL, screenR, screenU, screenD,
-                    boundL, boundR, boundU, boundD,
-                    objects, options);
+        fn = &LayoutManager::gridArrange;
     } else {
         printf( "ZOMG:::: a huge error should be thrown here!!!\n" );
+        return false; // double false !!!
     }
+    return (this->*fn)(screenL, screenR, screenU, screenD,
+                boundL, boundR, boundU, boundD,
+                objects, options);
 }
 
 
-void LayoutManager::perimeterArrange( RectangleBase screenRect,
+bool LayoutManager::perimeterArrange( RectangleBase screenRect,
                                         RectangleBase boundRect,
                                         std::vector<RectangleBase*> objects,
                                         std::map<std::string, std::string> opts)
@@ -76,11 +83,11 @@ void LayoutManager::perimeterArrange( RectangleBase screenRect,
     float boundU = boundRect.getUBound();
     float boundD = boundRect.getDBound();
     
-    perimeterArrange( screenL, screenR, screenU, screenD, boundL, boundR,
-                        boundU, boundD, objects );
+    return perimeterArrange( screenL, screenR, screenU, screenD, boundL, boundR,
+                                boundU, boundD, objects );
 }
 
-void LayoutManager::perimeterArrange( float screenL, float screenR,
+bool LayoutManager::perimeterArrange( float screenL, float screenR,
                                         float screenU, float screenD,
                                         float boundL, float boundR,
                                         float boundU, float boundD,
@@ -155,6 +162,7 @@ void LayoutManager::perimeterArrange( float screenL, float screenR,
         gridArrange( screenL, boundL, screenU, screenD, false, true, true,
                      leftObjs, 1, sideNum );
     }
+    return true;
 }
 
 bool LayoutManager::gridArrange( RectangleBase boundRect,

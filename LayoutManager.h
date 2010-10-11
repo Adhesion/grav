@@ -22,12 +22,12 @@ class LayoutManager
 public:
     LayoutManager();
 
-    void arrange( std::string method,
+    bool arrange( std::string method,
                   RectangleBase screenRect,
                   RectangleBase boundRect,
                   std::vector<RectangleBase*> objects,
                  std::map<std::string, std::string> options=std::map<std::string, std::string>());
-    void arrange( std::string method,
+    bool arrange( std::string method,
                   float screenL, float screenR, float screenU, float screenD,
                   float boundL, float boundR, float boundU, float boundD,
                   std::vector<RectangleBase*> objects,
@@ -45,10 +45,10 @@ public:
                     std::vector<RectangleBase*> inners,
                     float scaleX = 0.65f, float scaleY = 0.6f );
 private:
-    void perimeterArrange( RectangleBase screenRect, RectangleBase boundRect,
+    bool perimeterArrange( RectangleBase screenRect, RectangleBase boundRect,
                             std::vector<RectangleBase*> objects,
                             std::map<std::string, std::string> options=std::map<std::string, std::string>());
-    void perimeterArrange( float screenL, float screenR, float screenU,
+    bool perimeterArrange( float screenL, float screenR, float screenU,
                             float screenD, float boundL, float boundR,
                             float boundU, float boundD,
                             std::vector<RectangleBase*> objects,
