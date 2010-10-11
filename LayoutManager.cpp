@@ -242,7 +242,7 @@ bool LayoutManager::gridArrange( float boundL, float boundR, float boundU,
         return true;
     }
     
-    printf( "grid:bounds: %f,%f %f,%f\n", boundL, boundR, boundU, boundD );
+    // printf( "grid:bounds: %f,%f %f,%f\n", boundL, boundR, boundU, boundD );
     
     float span; // height of rows if going horizontally,
                 // width of columns if going vertically
