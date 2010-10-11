@@ -33,20 +33,6 @@ public:
                   std::vector<RectangleBase*> objects,
                  std::map<std::string, std::string> options=std::map<std::string, std::string>());
 
-    bool gridArrange( RectangleBase boundRect,
-                        bool horiz, bool edge, bool resize,
-                        std::vector<RectangleBase*> objects,
-                        int numX = 0, int numY = 0 );
-    bool gridArrange(float screenL, float screenR, float screenU, float screenD,
-                     float boundL, float boundR, float boundU, float boundD,
-                     std::vector<RectangleBase*> objects,
-                     std::map<std::string, std::string> options);
-    bool gridArrange( float boundL, float boundR, float boundU, float boundD,
-                        bool horiz, bool edge, bool resize,
-                        std::vector<RectangleBase*> objects,
-                        int numX = 0, int numY = 0 );
-
-
     bool fullscreen( RectangleBase boundRect, RectangleBase* object );
     bool fullscreen( float boundL, float boundR, float boundU, float boundD,
                         RectangleBase* object );
@@ -67,6 +53,18 @@ private:
                             float boundU, float boundD,
                             std::vector<RectangleBase*> objects,
                             std::map<std::string, std::string> options=std::map<std::string, std::string>());
+    bool gridArrange( RectangleBase boundRect,
+                        bool horiz, bool edge, bool resize,
+                        std::vector<RectangleBase*> objects,
+                        int numX = 0, int numY = 0 );
+    bool gridArrange(float screenL, float screenR, float screenU, float screenD,
+                     float boundL, float boundR, float boundU, float boundD,
+                     std::vector<RectangleBase*> objects,
+                     std::map<std::string, std::string> options);
+    bool gridArrange( float boundL, float boundR, float boundU, float boundD,
+                        bool horiz, bool edge, bool resize,
+                        std::vector<RectangleBase*> objects,
+                        int numX = 0, int numY = 0 );
 };
 
 #endif /*LAYOUTMANAGER_H_*/
