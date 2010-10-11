@@ -46,14 +46,12 @@ void LayoutManager::arrange( std::string method,
                              std::vector<RectangleBase*> objects,
                              std::map<std::string, std::string> options)
 {
-    printf( "in layoutmanager::arrange redirector\n" );
     // TODO -- do this with an std::map of function pointers
     if ( method == "perimeter" ) {
         perimeterArrange(screenL, screenR, screenU, screenD,
                          boundL, boundR, boundU, boundD,
                          objects, options);
     } else if ( method == "grid" ) {
-        printf( "in layoutmanager::arrange redirector\n" );
         gridArrange(screenL, screenR, screenU, screenD,
                     boundL, boundR, boundU, boundD,
                     objects, options);
