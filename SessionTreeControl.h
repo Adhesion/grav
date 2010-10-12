@@ -29,6 +29,8 @@ public:
     void removeSession( std::string address );
     wxTreeItemId findSession( wxTreeItemId root, std::string address );
 
+    void rotateVideoSessions();
+
     void itemRightClick( wxTreeEvent& evt );
     void addVideoSessionEvent( wxCommandEvent& evt );
     void addAudioSessionEvent( wxCommandEvent& evt );
@@ -39,6 +41,7 @@ public:
     static int addAudioID;
     static int toggleEnableID;
     static int removeID;
+    static int rotateID;
 
 private:
     wxTreeItemId rootID;

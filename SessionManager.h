@@ -53,6 +53,9 @@ public:
     void removeRotatedSession( std::string addr, bool audio );
     void rotate( bool audio );
 
+    std::string getCurrentRotateSession();
+    std::string getLastRotateSession();
+
     bool setSessionEnable( std::string addr, bool set );
     bool isSessionEnabled( std::string addr );
 

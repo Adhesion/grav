@@ -22,6 +22,7 @@ int SessionTreeControl::addVideoID = wxNewId();
 int SessionTreeControl::addAudioID = wxNewId();
 int SessionTreeControl::toggleEnableID = wxNewId();
 int SessionTreeControl::removeID = wxNewId();
+int SessionTreeControl::rotateID = wxNewId();
 
 SessionTreeControl::SessionTreeControl() :
     wxTreeCtrl( NULL, wxID_ANY )
@@ -137,6 +138,21 @@ wxTreeItemId SessionTreeControl::findSession( wxTreeItemId root,
 
     wxTreeItemId none;
     return none; // return default value if not found
+}
+
+void SessionTreeControl::rotateVideoSessions()
+{
+    sessionManager->rotate( false );
+
+    wxTreeItemId current = findSession( videoNodeID,
+                               sessionManager->getCurrentRotateSession() );
+    wxTreeItemId last =    findSession( videoNodeID,
+                               sessionManager->getLastRotateSession() );
+
+    if ( current.IsOk() )
+        SetItemBackgroundColour( current, *wxRED );
+    if ( last.IsOk() )
+        SetItemBackgroundColour( last, *wxBLUE );
 }
 
 void SessionTreeControl::itemRightClick( wxTreeEvent& evt )

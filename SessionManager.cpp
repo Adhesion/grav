@@ -171,6 +171,16 @@ void SessionManager::rotate( bool audio )
     initSession( videoRotateList[ rotatePos ], false );
 }
 
+std::string SessionManager::getCurrentRotateSession()
+{
+    return videoRotateList[ rotatePos ];
+}
+
+std::string SessionManager::getLastRotateSession()
+{
+    return lastRotateSession;
+}
+
 bool SessionManager::setSessionEnable( std::string addr, bool set )
 {
     lockSessions();
