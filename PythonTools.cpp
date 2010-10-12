@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     }
     PyObject* tuple = PyTuple_New(1);
     PyTuple_SetItem(tuple, 0, list);
-    PyObject* pRes = ptools.call("grav/py_scripts/test.py",
+    PyObject* pRes = ptools.call("py/test.py",
                                  "test_function", tuple);
     res = ptools.ltov(pRes);
     for ( int i = 0; i < res.size(); i++ ) {
