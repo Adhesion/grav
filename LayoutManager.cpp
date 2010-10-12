@@ -55,6 +55,7 @@ bool LayoutManager::arrange( std::string method,
     std::map<std::string, fn_ptr> lookup;
     lookup["perimeter"] = &LayoutManager::perimeterArrange;
     lookup["grid"]      = &LayoutManager::gridArrange;
+    lookup["focus"]     = &LayoutManager::focus;
 
     if ( lookup.find(method) == lookup.end() )
     {
@@ -201,6 +202,7 @@ bool LayoutManager::gridArrange( RectangleBase outerRect,
 // Little utility... should be phased out with a better usage of std::map
 bool str2bool(std::string str) { return str == "True" ? True : False; }
 int str2int(std::string str) { return atoi(str.c_str()); }
+float str2fl(std::string str) { return atof(str.c_str()); }
 
 bool LayoutManager::gridArrange(float outerL, float outerR,
                                 float outerU, float outerD,
@@ -414,34 +416,70 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
     return true;
 }
 
-bool LayoutManager::focus( RectangleBase innerRect,
-                std::vector<RectangleBase*> outers,
-                std::vector<RectangleBase*> inners,
-                float scaleX, float scaleY )
+bool LayoutManager::focus( RectangleBase innerRect, RectangleBase outerRect,
+                          std::map<std::string, std::vector<RectangleBase*> > data,
+                          std::map<std::string, std::string> opts)
 {
     float innerL = innerRect.getLBound();
     float innerR = innerRect.getRBound();
     float innerU = innerRect.getUBound();
     float innerD = innerRect.getDBound();
 
-    //printf( "LayoutManager::focusing, outer rect %f %f %f %f\n", innerL, innerR,
-    //        innerU, innerD );
+    float outerL = outerRect.getLBound();
+    float outerR = outerRect.getRBound();
+    float outerU = outerRect.getUBound();
+    float outerD = outerRect.getDBound();
 
-    return focus( innerL, innerR, innerU, innerD, outers, inners,
-                        scaleX, scaleY );
+    return focus( innerL, innerR, innerU, innerD,
+                  outerL, outerR, outerU, outerD,
+                  data, opts );
 }
 
-bool LayoutManager::focus( float innerL, float innerR, float innerU,
-                float innerD, std::vector<RectangleBase*> outers,
-                std::vector<RectangleBase*> inners,
-                float scaleX, float scaleY )
+bool LayoutManager::focus( float innerL, float innerR,
+                           float innerU, float innerD, 
+                           float outerL, float outerR,
+                           float outerU, float outerD,
+                           std::map<std::string, std::vector<RectangleBase*> > data,
+                           std::map<std::string, std::string> opts)
 {
+    // Extract object data
+    if ( data.find("outers") == data.end() )
+    {
+        printf( "ZOMG:::: gridArrange was not passed an 'outers'\n" );
+        return false;
+    }
+    if ( data.find("inners") == data.end() )
+    {
+        printf( "ZOMG:::: gridArrange was not passed an 'inners'\n" );
+        return false;
+    }
+    std::vector<RectangleBase*> outers = data["outers"];
+    std::vector<RectangleBase*> inners = data["inners"];
+
+    // Setup opts defaults
+    std::map<std::string, std::string> dflt = \
+        std::map<std::string, std::string>();
+    dflt["scaleX"] = "0.65";   dflt["scaleY"] = "0.6";
+
+    // Apply the opts defaults to opts
+    for (std::map<std::string,std::string>::iterator i = dflt.begin();
+         i != dflt.end(); i++)
+    {
+        // If the value wasn't specified by our caller, then load the default
+        if ( opts.find(i->first) == opts.end() ) 
+            opts[i->first] = i->second;
+    }
+
+    float scaleX = str2fl(opts["scaleX"]);
+    float scaleY = str2fl(opts["scaleY"]);
+
     float centerX = ( innerL + innerR ) / 2.0f;
     float centerY = ( innerD + innerU ) / 2.0f;
     float Xdist = ( innerR - innerL ) * scaleX / 2.0f;
     float Ydist = ( innerU - innerD ) * scaleY / 2.0f;
     // .95f to give some extra room
     // TODO make this an argument?
+    // could be easier now with the opts map?
     float gridInnerL = centerX - (Xdist*0.95f);
     float gridInnerR = centerX + (Xdist*0.95f);
     float gridInnerU = centerY + (Ydist*0.95f);
@@ -450,9 +488,6 @@ bool LayoutManager::focus( float innerL, float innerR, float innerU,
     float perimeterInnerR = centerX + Xdist;
     float perimeterInnerU = centerY + Ydist;
     float perimeterInnerD = centerY - Ydist;
-
-    //printf( "LayoutManager::focusing, inner rect %f %f %f %f\n", innerL, innerR,
-    //        innerU, innerD );
 
     std::map<std::string, std::vector<RectangleBase*> > a_data =
         std::map<std::string, std::vector<RectangleBase*> >();

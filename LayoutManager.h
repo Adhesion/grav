@@ -33,16 +33,15 @@ public:
                   std::map<std::string, std::vector<RectangleBase*> > data,
                   std::map<std::string, std::string> options=std::map<std::string, std::string>());
 
-    // TBD -- consider using a vector<string, vector<Rectangle> > to bring
-    //          this under the 'arrange' facade
-    bool focus( RectangleBase innerRect, std::vector<RectangleBase*> outers,
-                    std::vector<RectangleBase*> inners,
-                    float scaleX = 0.65f, float scaleY = 0.6f );
-    bool focus( float innerL, float innerR, float innerU, float innerD,
-                    std::vector<RectangleBase*> outers,
-                    std::vector<RectangleBase*> inners,
-                    float scaleX = 0.65f, float scaleY = 0.6f );
 private:
+    // TODO -- Need another fake rect here
+    bool focus( RectangleBase innerRect, RectangleBase outerRect,
+                    std::map<std::string, std::vector<RectangleBase*> > data,
+                    std::map<std::string, std::string> options=std::map<std::string, std::string>());
+    bool focus( float innerL, float innerR, float innerU, float innerD,
+                float outerL, float outerR, float outerU, float outerD,
+                std::map<std::string, std::vector<RectangleBase*> > data,
+                std::map<std::string, std::string> options=std::map<std::string, std::string>());
     bool perimeterArrange( RectangleBase outerRect, RectangleBase innerRect,
                             std::map<std::string, std::vector<RectangleBase*> > data,
                             std::map<std::string, std::string> options=std::map<std::string, std::string>());

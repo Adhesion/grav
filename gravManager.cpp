@@ -142,7 +142,11 @@ void gravManager::draw()
                                                     outerObjs.begin()+1 );
         outerObjs.erase( outerObjs.begin() );
 
-        layouts->focus( getScreenRect(), outerObjs, innerObjs );
+        std::map<std::string, std::vector<RectangleBase*> > data = \
+            std::map<std::string, std::vector<RectangleBase*> >();
+        data["inners"] = innerObjs;
+        data["outers"] = outerObjs;
+        layouts->arrange( "focus", getScreenRect(), RectangleBase(), data );
 
         moveToTop( innerObjs[0] );
 
@@ -277,7 +281,11 @@ void gravManager::draw()
     {
         if ( audioFocusTrigger )
         {
-            layouts->focus( getScreenRect(), outerObjs, innerObjs );
+            std::map<std::string, std::vector<RectangleBase*> > data = \
+                std::map<std::string, std::vector<RectangleBase*> >();
+            data["inners"] = innerObjs;
+            data["outers"] = outerObjs;
+            layouts->arrange( "focus", getScreenRect(), RectangleBase(), data );
             audioFocusTrigger = false;
         }
 
@@ -814,7 +822,11 @@ void gravManager::addNewSource( VideoSource* s )
                                                 outerObjs.end() );
         outerObjs.erase( outerObjs.end()-1 );
 
-        layouts->focus( getScreenRect(), outerObjs, innerObj );
+        std::map<std::string, std::vector<RectangleBase*> > data = \
+            std::map<std::string, std::vector<RectangleBase*> >();
+        data["inners"] = innerObjs;
+        data["outers"] = outerObjs;
+        layouts->arrange( "focus", getScreenRect(), RectangleBase(), data );
     }
 
     if ( gridAuto ) {

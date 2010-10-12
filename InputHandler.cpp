@@ -315,15 +315,16 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     case 'F':
         if ( !shiftHeld && grav->getSelectedObjects()->size() > 0 )
         {
-            layouts.focus( grav->getScreenRect(), grav->getUnselectedObjects(),
-                            *(grav->getSelectedObjects()) );
+            std::map<std::string, std::vector<RectangleBase*> > data = \
+                std::map<std::string, std::vector<RectangleBase*> >();
+            data["outers"] = grav->getUnselectedObjects();
+            data["inners"] = *(grav->getSelectedObjects());
+            layouts.arrange( "focus", grav->getScreenRect(),
+                              RectangleBase(), data );
         }
         else if ( shiftHeld && grav->getSelectedObjects()->size() == 1 )
         {
             (*grav->getSelectedObjects())[0]->fillToRect(grav->getScreenRect());
-            // TODO -- remove this
-            //layouts.fullscreen( grav->getScreenRect(),
-            //                     (*grav->getSelectedObjects())[0] );
         }
         break;
 
