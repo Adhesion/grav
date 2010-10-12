@@ -2,3 +2,6 @@
 *.d
 Debug/grav
 *.swp
+a.out
+*.pyc
+*.pyo

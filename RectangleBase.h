@@ -108,6 +108,12 @@ public:
     void setTotalHeight( float h );
 
     /*
+     * Fill to another rectangle.
+     */
+    void fillToRect( RectangleBase rect );
+    void fillToRect( float left, float right, float up, float down );
+
+    /*
      * Set the background texture for this object.
      */
     void setTexture( GLuint tex, int width, int height );

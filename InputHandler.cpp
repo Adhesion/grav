@@ -112,6 +112,8 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     float scaleAmt = 0.25f;
     
     std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
+    std::map<std::string, std::vector<RectangleBase*> > data = \
+        std::map<std::string, std::vector<RectangleBase*> >();
 
     // TODO reorder this to make some sort of sense
     switch( key ) {
@@ -151,9 +153,10 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         break;
 
     case 'P':
+        data["objects"] = movableObjects;
         layouts.arrange("perimeter",
                         grav->getScreenRect(), grav->getEarthRect(),
-                        movableObjects);
+                        data);
         break;
 
     case 'R':
@@ -164,9 +167,10 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         }
         else
         {
+            data["objects"] = movableObjects;
             layouts.arrange("grid",
-                            grav->getScreenRect(), grav->getEarthRect(),
-                            movableObjects);
+                            grav->getScreenRect(), RectangleBase(),
+                            data);
         }
         break;
 
@@ -311,13 +315,16 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     case 'F':
         if ( !shiftHeld && grav->getSelectedObjects()->size() > 0 )
         {
-            layouts.focus( grav->getScreenRect(), grav->getUnselectedObjects(),
-                            *(grav->getSelectedObjects()) );
+            std::map<std::string, std::vector<RectangleBase*> > data = \
+                std::map<std::string, std::vector<RectangleBase*> >();
+            data["outers"] = grav->getUnselectedObjects();
+            data["inners"] = *(grav->getSelectedObjects());
+            layouts.arrange( "focus", grav->getScreenRect(),
+                              RectangleBase(), data );
         }
         else if ( shiftHeld && grav->getSelectedObjects()->size() == 1 )
         {
-            layouts.fullscreen( grav->getScreenRect(),
-                                 (*grav->getSelectedObjects())[0] );
+            (*grav->getSelectedObjects())[0]->fillToRect(grav->getScreenRect());
         }
         break;
 

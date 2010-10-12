@@ -147,10 +147,15 @@ void Group::rearrange()
     opts["numX"] = ss.str();
     ss << "\r" << numRow;
     opts["numY"] = ss.str();
-    
-    layouts.arrange("grid", 0, 0, 0, 0,
+
+    std::map<std::string, std::vector<RectangleBase*> > data = \
+        std::map<std::string, std::vector<RectangleBase*> >();
+    data["objects"] = objects;
+
+    layouts.arrange("grid",
                     getLBound(), getRBound(), getUBound(), getDBound(),
-                    objects, opts);
+                    0, 0, 0, 0,
+                    data, opts);
 }
 
 bool Group::updateName()

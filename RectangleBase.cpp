@@ -308,6 +308,27 @@ void RectangleBase::setTotalHeight( float h )
     setHeight( newHeight );
 }
 
+void RectangleBase::fillToRect( RectangleBase r )
+{
+    fillToRect(r.getLBound(), r.getRBound(), r.getUBound(), r.getDBound());
+}
+void RectangleBase::fillToRect( float innerL, float innerR,
+                                float innerU, float innerD )
+{
+    float spaceAspect = fabs( ( innerR - innerL ) / ( innerU - innerD ) );
+    float objectAspect = getTotalWidth() / getTotalHeight();
+
+    if ( ( spaceAspect - objectAspect ) > 0.01f )
+        setTotalHeight( innerU - innerD );
+    else
+        setTotalWidth( innerR - innerL );
+
+    // TODO need to change this if getCenterOffsetX() is ever meaningful
+    move( ( innerR + innerL ) / 2.0f,
+          ( ( innerU + innerD ) / 2.0f ) - getCenterOffsetY() );
+}
+
+
 void RectangleBase::setTexture( GLuint tex, int width, int height )
 {
     borderTex = tex;
