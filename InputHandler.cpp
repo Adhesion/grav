@@ -112,6 +112,8 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     float scaleAmt = 0.25f;
     
     std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
+    std::map<std::string, std::vector<RectangleBase*> > data = \
+        std::map<std::string, std::vector<RectangleBase*> >();
 
     // TODO reorder this to make some sort of sense
     switch( key ) {
@@ -151,9 +153,10 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         break;
 
     case 'P':
+        data["objects"] = movableObjects;
         layouts.arrange("perimeter",
                         grav->getScreenRect(), grav->getEarthRect(),
-                        movableObjects);
+                        data);
         break;
 
     case 'R':
@@ -164,9 +167,10 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         }
         else
         {
+            data["objects"] = movableObjects;
             layouts.arrange("grid",
                             grav->getScreenRect(), RectangleBase(),
-                            movableObjects);
+                            data);
         }
         break;
 

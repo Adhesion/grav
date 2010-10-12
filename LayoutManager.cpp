@@ -19,7 +19,7 @@ LayoutManager::LayoutManager()
 bool LayoutManager::arrange( std::string method,
                              RectangleBase outerRect,
                              RectangleBase innerRect,
-                             std::vector<RectangleBase*> objects,
+                             std::map<std::string, std::vector<RectangleBase*> > data,
                              std::map<std::string, std::string> options)
 {
     float outerL = outerRect.getLBound();
@@ -35,7 +35,7 @@ bool LayoutManager::arrange( std::string method,
     return arrange(method,
             outerL, outerR, outerU, outerD,
             innerL, innerR, innerU, innerD,
-            objects, options);
+            data, options);
 }
 
 bool LayoutManager::arrange( std::string method,
@@ -43,13 +43,13 @@ bool LayoutManager::arrange( std::string method,
                              float outerU, float outerD,
                              float innerL, float innerR,
                              float innerU, float innerD,
-                             std::vector<RectangleBase*> objects,
+                             std::map<std::string, std::vector<RectangleBase*> > data,
                              std::map<std::string, std::string> options)
 {
     typedef bool (LayoutManager::*fn_ptr)(
         float oL, float oR, float oU, float oD,
         float iL, float iR, float iU, float iD,
-        std::vector<RectangleBase*> objs,
+        std::map<std::string, std::vector<RectangleBase*> > dat,
         std::map<std::string, std::string> opts);
 
     std::map<std::string, fn_ptr> lookup;
@@ -63,13 +63,13 @@ bool LayoutManager::arrange( std::string method,
     }
     return (this->*lookup[method])( outerL, outerR, outerU, outerD,
                                     innerL, innerR, innerU, innerD,
-                                    objects, options );
+                                    data, options );
 }
 
 
 bool LayoutManager::perimeterArrange( RectangleBase outerRect,
                                         RectangleBase innerRect,
-                                        std::vector<RectangleBase*> objects,
+                                        std::map<std::string, std::vector<RectangleBase*> > data,
                                         std::map<std::string, std::string> opts)
 {
     float outerL = outerRect.getLBound();
@@ -83,18 +83,25 @@ bool LayoutManager::perimeterArrange( RectangleBase outerRect,
     float innerD = innerRect.getDBound();
     
     return perimeterArrange( outerL, outerR, outerU, outerD, innerL, innerR,
-                                innerU, innerD, objects );
+                                innerU, innerD, data );
 }
 
 bool LayoutManager::perimeterArrange( float outerL, float outerR,
                                         float outerU, float outerD,
                                         float innerL, float innerR,
                                         float innerU, float innerD,
-                                        std::vector<RectangleBase*> objects,
+                                        std::map<std::string, std::vector<RectangleBase*> > data,
                                         std::map<std::string, std::string> opts)
 {
     //printf( "LayoutManager::perimeter: outer inners: %f,%f %f,%f\n",
     //        outerL, outerR, outerU, outerD );
+    if ( data.find("objects") == data.end() )
+    {
+        printf( "ZOMG:::: perimeterArrange was not passed an 'objects'\n" );
+        return false;
+    }
+    std::vector<RectangleBase*> objects = data["objects"];
+
 
     float topRatio = (innerR-innerL) / ((outerU-outerD)+(innerR-innerL));
     float sideRatio = (outerU-outerD) / ((outerU-outerD)+(innerR-innerL));
@@ -124,9 +131,12 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
         //printf( "arranging objects %d to %d to top\n", 0, end-1 );
         for ( int i = 0; i < end; i++ )
             topObjs.push_back( objects[i] );
+
+        data["objects"] = topObjs;
+
         // constant on top is for space for text
         gridArrange( innerL, innerR, outerU-0.8f, innerU, true, false, true,
-                     topObjs, topNum, 1 );
+                     data, topNum, 1 );
     }
 
     end = topNum + sideNum;
@@ -136,8 +146,11 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
         //printf( "arranging objects %d to %d to right\n", topNum, end-1 );
         for ( int i = topNum; i < end; i++ )
             rightObjs.push_back( objects[i] );
+
+        data["objects"] = rightObjs;
+
         gridArrange( innerR, outerR, outerU, outerD, false, true, true,
-                     rightObjs, 1, sideNum );
+                     data, 1, sideNum );
     }
 
     end = topNum + sideNum + bottomNum;
@@ -148,8 +161,11 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
         //        end-1 );
         for ( int i = end-1; i >= topNum + sideNum; i-- )
             bottomObjs.push_back( objects[i] );
+
+        data["objects"] = bottomObjs;
+
         gridArrange( innerL, innerR, innerD, outerD, true, false, true,
-                     bottomObjs, bottomNum, 1 );
+                     data, bottomNum, 1 );
     }
 
     if ( sideNum > 0 )
@@ -158,15 +174,19 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
         //        topNum + sideNum + bottomNum, objects.size()-1 );
         for ( int i = objects.size()-1; i >= topNum + sideNum + bottomNum; i-- )
             leftObjs.push_back( objects[i] );
+
+        data["objects"] = leftObjs;
+
         gridArrange( outerL, innerL, outerU, outerD, false, true, true,
-                     leftObjs, 1, sideNum );
+                     data, 1, sideNum );
     }
+    // TODO - return the conjunction of the above gridArrange return values
     return true;
 }
 
 bool LayoutManager::gridArrange( RectangleBase outerRect,
                                     bool horiz, bool edge, bool resize,
-                                    std::vector<RectangleBase*> objects,
+                                    std::map<std::string, std::vector<RectangleBase*> > data,
                                     int numX, int numY )
 {
     float outerL = outerRect.getLBound();
@@ -175,7 +195,7 @@ bool LayoutManager::gridArrange( RectangleBase outerRect,
     float outerD = outerRect.getDBound();
     
     return gridArrange( outerL, outerR, outerU, outerD, horiz, edge,
-                            resize, objects, numX, numY );
+                            resize, data, numX, numY );
 }
 
 // Little utility... should be phased out with a better usage of std::map
@@ -186,7 +206,7 @@ bool LayoutManager::gridArrange(float outerL, float outerR,
                                 float outerU, float outerD,
                                 float innerL, float innerR,
                                 float innerU, float innerD,
-                                std::vector<RectangleBase*> objects,
+                                std::map<std::string, std::vector<RectangleBase*> > data,
                                 std::map<std::string, std::string> opts )
 {
     // Setup opts defaults
@@ -208,16 +228,24 @@ bool LayoutManager::gridArrange(float outerL, float outerR,
                        str2bool(opts["horiz"]),
                        str2bool(opts["edge"]),
                        str2bool(opts["resize"]),
-                       objects,
+                       data,
                        str2int(opts["numX"]),
                        str2int(opts["numY"]));
 }
 bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
                                     float outerD,
                                     bool horiz, bool edge, bool resize,
-                                    std::vector<RectangleBase*> objects,
+                                    std::map<std::string, std::vector<RectangleBase*> > data,
                                     int numX, int numY )
 {
+    // Extract object data
+    if ( data.find("objects") == data.end() )
+    {
+        printf( "ZOMG:::: gridArrange was not passed an 'objects'\n" );
+        return false;
+    }
+    std::vector<RectangleBase*> objects = data["objects"];
+
     if ( objects.size() == 0 )
         return false;
 
@@ -426,13 +454,18 @@ bool LayoutManager::focus( float innerL, float innerR, float innerU,
     //printf( "LayoutManager::focusing, inner rect %f %f %f %f\n", innerL, innerR,
     //        innerU, innerD );
 
+    std::map<std::string, std::vector<RectangleBase*> > a_data =
+        std::map<std::string, std::vector<RectangleBase*> >();
+    a_data["objects"] = inners;
+
     bool grid = gridArrange( gridInnerL, gridInnerR, gridInnerU, gridInnerD,
                                  true, false, true,
-                                 inners );
+                                 a_data );
+    a_data["objects"] = outers;
     perimeterArrange( innerL, innerR, innerU, innerD,
                         perimeterInnerL, perimeterInnerR,
                         perimeterInnerU, perimeterInnerD,
-                          outers );
+                        a_data );
 
     return grid;
 }

@@ -817,9 +817,12 @@ void gravManager::addNewSource( VideoSource* s )
         layouts->focus( getScreenRect(), outerObjs, innerObj );
     }
 
-    if ( gridAuto )
-        layouts->arrange(
-            "grid", getScreenRect(), getEarthRect(), getMovableObjects() );
+    if ( gridAuto ) {
+        std::map<std::string, std::vector<RectangleBase*> > data = \
+            std::map<std::string, std::vector<RectangleBase*> >();
+        data["objects"] = getMovableObjects();
+        layouts->arrange("grid", getScreenRect(), getEarthRect(), data);
+    }
 
     unlockSources();
 }
@@ -869,9 +872,12 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
         }
     }
 
-    if ( gridAuto )
-        layouts->arrange(
-            "grid", getScreenRect(), getEarthRect(), getMovableObjects() );
+    if ( gridAuto ) {
+        std::map<std::string, std::vector<RectangleBase*> > data = \
+            std::map<std::string, std::vector<RectangleBase*> >();
+        data["objects"] = getMovableObjects();
+        layouts->arrange("grid", getScreenRect(), getEarthRect(), data);
+    }
 
     // we need to do videosource's delete somewhere else, since this function
     // might be on a second thread, which would crash since the videosource

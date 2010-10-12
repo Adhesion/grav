@@ -99,9 +99,14 @@ void Runway::rearrange()
         ss << objects.size();
         opts["numX"] = ss.str();
         opts["numY"] = "1";
+
+        std::map<std::string, std::vector<RectangleBase*> > data = \
+            std::map<std::string, std::vector<RectangleBase*> >();
+        data["objects"] = objects;
+
         layouts.arrange("grid", 0, 0, 0, 0,
                         getLBound(), getRBound(), getUBound(), getDBound(),
-                        objects, opts);
+                        data, opts);
     }
     // vertical
     else if ( orientation == 1 )
@@ -111,9 +116,14 @@ void Runway::rearrange()
         opts["numX"] = "1";
         opts["numY"] = ss.str();
         opts["horiz"] = "False";
+        
+        std::map<std::string, std::vector<RectangleBase*> > data = \
+            std::map<std::string, std::vector<RectangleBase*> >();
+        data["objects"] = objects;
+
         layouts.arrange("grid", 0, 0, 0, 0,
                         getLBound(), getRBound(), getUBound(), getDBound(),
-                        objects, opts);
+                        data, opts);
     }
 }
 
