@@ -30,7 +30,7 @@ EVT_IDLE(gravApp::idleHandler)
 END_EVENT_TABLE(); // this ; is not necessary, just makes eclipse's syntax
                    // parser shut up
 
-bool gravApp::threadDebug = true;
+bool gravApp::threadDebug = false;
 int gravApp::threadCounter = 0;
 
 bool gravApp::OnInit()
@@ -141,13 +141,13 @@ bool gravApp::OnInit()
     {
         printf ( "grav::initializing video address %s\n",
                     initialVideoAddresses[i].c_str() );
-        sessionTree->addSession( initialVideoAddresses[i], false );
+        sessionTree->addSession( initialVideoAddresses[i], false, false );
     }
     for ( unsigned int i = 0; i < initialAudioAddresses.size(); i++ )
     {
         printf ( "grav::initializing audio address %s\n",
                     initialAudioAddresses[i].c_str() );
-        sessionTree->addSession( initialAudioAddresses[i], true );
+        sessionTree->addSession( initialAudioAddresses[i], true, false );
     }
 
     printf( "grav:init function complete\n" );

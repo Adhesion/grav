@@ -58,32 +58,38 @@ void SessionTreeControl::setSessionManager( SessionManager* s )
     sessionManager = s;
 }
 
-void SessionTreeControl::addSession( std::string address, bool audio )
+void SessionTreeControl::addSession( std::string address, bool audio,
+                                        bool rotate )
 {
-    if ( !audio )
+    bool added = false;
+    wxTreeItemId node;
+    wxTreeItemId current;
+    if ( rotate )
     {
-        if ( sessionManager->initSession( address, false ) )
-        {
-            AppendItem( videoNodeID, wxString( address.c_str(), wxConvUTF8 ) );
-            Expand( videoNodeID );
-        }
-        else
-        {
-            // TODO throw error dialog
-        }
+        // rotate only for video for now
+        node = videoNodeID;
+        sessionManager->addRotatedSession( address, false );
+        added = true;
     }
     else
     {
-        if ( sessionManager->initSession( address, true ) )
-        {
-            AppendItem( audioNodeID, wxString( address.c_str(), wxConvUTF8 ) );
-            Expand( audioNodeID );
-        }
-        else
-        {
-            // TODO throw error dialog
-        }
+        node = audio ? audioNodeID : videoNodeID;
+        added = sessionManager->initSession( address, audio );
     }
+
+    if ( added )
+    {
+        current = AppendItem( node, wxString( address.c_str(),
+                                            wxConvUTF8 ) );
+        Expand( node );
+    }
+    else
+    {
+        // TODO throw error dialog
+    }
+
+    if ( rotate )
+        SetItemBackgroundColour( current, *wxBLUE );
 }
 
 void SessionTreeControl::removeSession( std::string address )
@@ -180,7 +186,7 @@ void SessionTreeControl::addVideoSessionEvent( wxCommandEvent& evt )
     if ( dialog.ShowModal() == wxID_OK )
     {
         std::string address( dialog.GetValue().char_str() );
-        addSession( address, false );
+        addSession( address, false, false );
     }
 }
 
@@ -192,7 +198,7 @@ void SessionTreeControl::addAudioSessionEvent( wxCommandEvent& evt )
     if ( dialog.ShowModal() == wxID_OK )
     {
         std::string address( dialog.GetValue().char_str() );
-        addSession( address, true );
+        addSession( address, true, false );
     }
 }
 

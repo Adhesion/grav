@@ -25,7 +25,7 @@ public:
     SessionTreeControl( wxWindow* parent );
     void setSessionManager( SessionManager* s );
 
-    void addSession( std::string address, bool audio );
+    void addSession( std::string address, bool audio, bool rotate );
     void removeSession( std::string address );
     wxTreeItemId findSession( wxTreeItemId root, std::string address );
 

@@ -25,7 +25,7 @@
 <option id="gnu.cpp.compiler.option.other.other.1695020194" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 `freetype-config --cflags` `vpmedia-config --cppflags` `wx-config --cppflags`" valueType="string"/>
 <option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1624274799" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 <option id="gnu.cpp.compiler.option.debugging.other.605119311" name="Other debugging flags" superClass="gnu.cpp.compiler.option.debugging.other" value="" valueType="string"/>
-<option id="gnu.cpp.compiler.option.preprocessor.def.282337952" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+<option id="gnu.cpp.compiler.option.preprocessor.def.282337952" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 <listOptionValue builtIn="false" value="__STDC_CONSTANT_MACROS"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1173713866" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -63,6 +63,9 @@
 <tool id="cdt.managedbuild.tool.gnu.archiver.base.1856652250" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 </toolChain>
 </folderInfo>
+<sourceEntries>
+<entry excluding="PythonTools.h|PythonTools.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+</sourceEntries>
 </configuration>
 </storageModule>
 <storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
@@ -358,6 +361,9 @@
 <tool id="cdt.managedbuild.tool.gnu.archiver.base.2073532166" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 </toolChain>
 </folderInfo>
+<sourceEntries>
+<entry excluding="PythonTools.h|PythonTools.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+</sourceEntries>
 </configuration>
 </storageModule>
 <storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
