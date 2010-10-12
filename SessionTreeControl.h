@@ -36,6 +36,7 @@ public:
     void addAudioSessionEvent( wxCommandEvent& evt );
     void toggleEnableSessionEvent( wxCommandEvent& evt );
     void removeSessionEvent( wxCommandEvent& evt );
+    void rotateEvent( wxCommandEvent& evt );
 
     static int addVideoID;
     static int addAudioID;

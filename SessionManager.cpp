@@ -158,22 +158,32 @@ void SessionManager::rotate( bool audio )
 {
     lockSessions();
 
-    if ( rotatePos != -1 )
-        lastRotateSession = videoRotateList[ rotatePos ];
     int numSessions = (int)videoRotateList.size();
+    if ( numSessions == 0 )
+    {
+        unlockSessions();
+        return;
+    }
+    if ( rotatePos != -1 && numSessions > 1 )
+        lastRotateSession = videoRotateList[ rotatePos ];
     if ( ++rotatePos >= numSessions )
     {
         rotatePos = 0;
     }
 
     unlockSessions();
-    removeSession( lastRotateSession );
+
+    if ( numSessions > 1 )
+        removeSession( lastRotateSession );
     initSession( videoRotateList[ rotatePos ], false );
 }
 
 std::string SessionManager::getCurrentRotateSession()
 {
-    return videoRotateList[ rotatePos ];
+    if ( rotatePos != -1 && rotatePos < (int)videoRotateList.size() )
+        return videoRotateList[ rotatePos ];
+    else
+        return "";
 }
 
 std::string SessionManager::getLastRotateSession()

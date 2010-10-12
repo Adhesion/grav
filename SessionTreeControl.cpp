@@ -37,8 +37,10 @@ SessionTreeControl::SessionTreeControl( wxWindow* parent ) :
     Expand( rootID );
 
     wxMenu* sessionMenu = new wxMenu();
-    sessionMenu->Append( addVideoID, _("Add video session") );
-    sessionMenu->Append( addAudioID, _("Add audio session") );
+    sessionMenu->Append( addVideoID, _("Add video session...") );
+    sessionMenu->Append( addAudioID, _("Add audio session...") );
+    sessionMenu->AppendSeparator();
+    sessionMenu->Append( rotateID, _("Rotate video sessions") );
 
     // add menubar to parent frame here - kind of clunky
     wxMenuBar* menubar = new wxMenuBar;
@@ -160,6 +162,7 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
     wxMenu rightClickMenu;
 
     std::string text = std::string( GetItemText( evt.GetItem() ).char_str() );
+    // when right clicking on a session
     if ( text.compare( "Video" ) != 0 && text.compare( "Audio" ) != 0 &&
             text.compare( "Sessions" ) != 0 )
     {
@@ -176,15 +179,20 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
                     wxCommandEventHandler(
                             SessionTreeControl::removeSessionEvent ) );
     }
+    // right clicked on video group or main group
     if ( text.compare( "Video" ) == 0 || text.compare( "Sessions" ) == 0 )
     {
-        rightClickMenu.Append( addVideoID, _("Add video session") );
+        rightClickMenu.Append( addVideoID, _("Add video session...") );
         Connect( addVideoID, wxEVT_COMMAND_MENU_SELECTED,
             wxCommandEventHandler( SessionTreeControl::addVideoSessionEvent ) );
+        rightClickMenu.Append( rotateID, _("Rotate video sessions") );
+        Connect( rotateID, wxEVT_COMMAND_MENU_SELECTED,
+            wxCommandEventHandler( SessionTreeControl::rotateEvent ) );
     }
+    // right clicked on audio group or main group
     if ( text.compare( "Audio" ) == 0 || text.compare( "Sessions" ) == 0 )
     {
-        rightClickMenu.Append( addAudioID, _("Add audio session") );
+        rightClickMenu.Append( addAudioID, _("Add audio session...") );
         Connect( addAudioID, wxEVT_COMMAND_MENU_SELECTED,
             wxCommandEventHandler( SessionTreeControl::addAudioSessionEvent ) );
     }
@@ -236,4 +244,11 @@ void SessionTreeControl::removeSessionEvent( wxCommandEvent& evt )
     std::string selectedAddress = std::string(
                                      GetItemText( GetSelection() ).char_str() );
     removeSession( selectedAddress );
+}
+
+void SessionTreeControl::rotateEvent( wxCommandEvent& evt )
+{
+    printf( "rotate event: have %i sessions\n",
+            sessionManager->getVideoSessionCount() );
+    rotateVideoSessions();
 }
