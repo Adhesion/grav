@@ -104,8 +104,9 @@ void Runway::rearrange()
             std::map<std::string, std::vector<RectangleBase*> >();
         data["objects"] = objects;
 
-        layouts.arrange("grid", 0, 0, 0, 0,
+        layouts.arrange("grid", 
                         getLBound(), getRBound(), getUBound(), getDBound(),
+                        0, 0, 0, 0,
                         data, opts);
     }
     // vertical
@@ -121,8 +122,9 @@ void Runway::rearrange()
             std::map<std::string, std::vector<RectangleBase*> >();
         data["objects"] = objects;
 
-        layouts.arrange("grid", 0, 0, 0, 0,
+        layouts.arrange("grid",
                         getLBound(), getRBound(), getUBound(), getDBound(),
+                        0, 0, 0, 0,
                         data, opts);
     }
 }
