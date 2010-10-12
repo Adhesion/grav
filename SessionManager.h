@@ -3,6 +3,8 @@
  *
  * Definition of a class for managing audio/video sessions - adding, removing,
  * disabling, rotating through many, etc. Thread-safe.
+ * This is the lower-level code - any clients should call the relevant methods
+ * in SessionTreeControl in order to keep the GUI synced up.
  *
  * Created on: Sep 28, 2010
  * @author Andrew Ford

@@ -3,6 +3,8 @@
  *
  * Definition of the SessionTreeControl, which is a tree structure for storing
  * audio & video sessions as displayed in the side window.
+ * This should be the higher-level client interface for adding/removing/etc
+ * sessions.
  *
  * Created on: Sep 13, 2010
  * @author Andrew Ford

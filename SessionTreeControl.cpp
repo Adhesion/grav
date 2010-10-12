@@ -62,13 +62,27 @@ void SessionTreeControl::addSession( std::string address, bool audio )
 {
     if ( !audio )
     {
-        AppendItem( videoNodeID, wxString( address.c_str(), wxConvUTF8 ) );
-        Expand( videoNodeID );
+        if ( sessionManager->initSession( address, false ) )
+        {
+            AppendItem( videoNodeID, wxString( address.c_str(), wxConvUTF8 ) );
+            Expand( videoNodeID );
+        }
+        else
+        {
+            // TODO throw error dialog
+        }
     }
     else
     {
-        AppendItem( audioNodeID, wxString( address.c_str(), wxConvUTF8 ) );
-        Expand( audioNodeID );
+        if ( sessionManager->initSession( address, true ) )
+        {
+            AppendItem( audioNodeID, wxString( address.c_str(), wxConvUTF8 ) );
+            Expand( audioNodeID );
+        }
+        else
+        {
+            // TODO throw error dialog
+        }
     }
 }
 
@@ -82,7 +96,14 @@ void SessionTreeControl::removeSession( std::string address )
         return;
     }
 
-    Delete( item );
+    if ( sessionManager->removeSession( address ) )
+    {
+        Delete( item );
+    }
+    else
+    {
+        // TODO throw error dialog
+    }
 }
 
 wxTreeItemId SessionTreeControl::findSession( wxTreeItemId root,
@@ -159,10 +180,7 @@ void SessionTreeControl::addVideoSessionEvent( wxCommandEvent& evt )
     if ( dialog.ShowModal() == wxID_OK )
     {
         std::string address( dialog.GetValue().char_str() );
-        if ( sessionManager->initSession( address, false ) )
-        {
-            addSession( address, false );
-        }
+        addSession( address, false );
     }
 }
 
@@ -174,10 +192,7 @@ void SessionTreeControl::addAudioSessionEvent( wxCommandEvent& evt )
     if ( dialog.ShowModal() == wxID_OK )
     {
         std::string address( dialog.GetValue().char_str() );
-        if ( sessionManager->initSession( address, true ) )
-        {
-            addSession( address, true );
-        }
+        addSession( address, true );
     }
 }
 
@@ -198,8 +213,5 @@ void SessionTreeControl::removeSessionEvent( wxCommandEvent& evt )
 {
     std::string selectedAddress = std::string(
                                      GetItemText( GetSelection() ).char_str() );
-    if ( sessionManager->removeSession( selectedAddress ) )
-    {
-        removeSession( selectedAddress );
-    }
+    removeSession( selectedAddress );
 }

@@ -133,24 +133,22 @@ bool gravApp::OnInit()
     grav->setBorderTex( "border.png" );
     
     vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
-    
+
     mapRTP();
 
+    sessionTree->setSessionManager( sessionManager );
     for ( unsigned int i = 0; i < initialVideoAddresses.size(); i++ )
     {
         printf ( "grav::initializing video address %s\n",
                     initialVideoAddresses[i].c_str() );
-        if ( sessionManager->initSession( initialVideoAddresses[i], false ) )
-            sessionTree->addSession( initialVideoAddresses[i], false );
+        sessionTree->addSession( initialVideoAddresses[i], false );
     }
     for ( unsigned int i = 0; i < initialAudioAddresses.size(); i++ )
     {
         printf ( "grav::initializing audio address %s\n",
                     initialAudioAddresses[i].c_str() );
-        if ( sessionManager->initSession( initialAudioAddresses[i], true ) )
-            sessionTree->addSession( initialAudioAddresses[i], true );
+        sessionTree->addSession( initialAudioAddresses[i], true );
     }
-    sessionTree->setSessionManager( sessionManager );
 
     printf( "grav:init function complete\n" );
     return true;
