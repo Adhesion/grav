@@ -18,6 +18,7 @@ CPP_SRCS += \
 ../Runway.cpp \
 ../SessionManager.cpp \
 ../SessionTreeControl.cpp \
+../SideFrame.cpp \
 ../TreeControl.cpp \
 ../TreeNode.cpp \
 ../Vector.cpp \
@@ -42,6 +43,7 @@ OBJS += \
 ./Runway.o \
 ./SessionManager.o \
 ./SessionTreeControl.o \
+./SideFrame.o \
 ./TreeControl.o \
 ./TreeNode.o \
 ./Vector.o \
@@ -66,6 +68,7 @@ CPP_DEPS += \
 ./Runway.d \
 ./SessionManager.d \
 ./SessionTreeControl.d \
+./SideFrame.d \
 ./TreeControl.d \
 ./TreeNode.d \
 ./Vector.d \

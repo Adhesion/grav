@@ -35,25 +35,6 @@ SessionTreeControl::SessionTreeControl( wxWindow* parent ) :
     videoNodeID = AppendItem( rootID, _("Video") );
     audioNodeID = AppendItem( rootID, _("Audio") );
     Expand( rootID );
-
-    wxMenu* sessionMenu = new wxMenu();
-    sessionMenu->Append( addVideoID, _("Add video session...") );
-    sessionMenu->Append( addAudioID, _("Add audio session...") );
-    sessionMenu->AppendSeparator();
-    sessionMenu->Append( rotateID, _("Rotate video sessions") );
-
-    // add menubar to parent frame here - kind of clunky
-    wxMenuBar* menubar = new wxMenuBar;
-    menubar->Append( sessionMenu, _("Sessions") );
-    wxWindow* tempParent = this;
-    while ( tempParent && dynamic_cast<Frame*>( tempParent ) == NULL )
-        tempParent = tempParent->GetParent();
-    Frame* topFrame = dynamic_cast<Frame*>( tempParent );
-    if ( topFrame != NULL )
-    {
-        Frame* topFrame = dynamic_cast<Frame*>( tempParent );
-        topFrame->SetMenuBar( menubar );
-    }
 }
 
 void SessionTreeControl::setSessionManager( SessionManager* s )
@@ -202,6 +183,7 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
 
 // TODO make these use the same code and not be stupid - might necessitate
 // making a custom dialog class or secondary radio button dialog choice
+// note this is duplicated in SideFrame
 void SessionTreeControl::addVideoSessionEvent( wxCommandEvent& evt )
 {
     wxTextEntryDialog dialog( this, _("Enter session in format address/port"),

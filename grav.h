@@ -21,6 +21,7 @@
 class GLCanvas;
 class Timer;
 class Frame;
+class SideFrame;
 class gravManager;
 class TreeControl;
 class SessionTreeControl;
@@ -71,7 +72,7 @@ private:
     wxCmdLineParser parser;
     
     Frame* mainFrame;
-    Frame* treeFrame;
+    SideFrame* treeFrame;
     wxPanel* treePanel;
     wxNotebook* treeNotebook;
     

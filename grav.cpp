@@ -18,6 +18,7 @@
 #include "VideoListener.h"
 #include "AudioManager.h"
 #include "Frame.h"
+#include "SideFrame.h"
 
 #include <VPMedia/VPMLog.h>
 #include <VPMedia/VPMPayloadDecoderFactory.h>
@@ -67,7 +68,7 @@ bool gravApp::OnInit()
     // forces resize - for some reason it doesn't draw inner contents until
     // resized
     int treeWidth = 251; int treeHeight = 501;
-    treeFrame = new Frame( mainFrame, -1, _("grav menu"),
+    treeFrame = new SideFrame( mainFrame, -1, _("grav menu"),
                             wxPoint( treeX, treeY ),
                             wxSize( treeWidth, treeHeight ) );
     treeFrame->Show( true );
