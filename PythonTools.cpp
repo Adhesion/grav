@@ -1,5 +1,6 @@
 
 #include "PythonTools.h"
+#include <iostream>
 
 PythonTools::PythonTools()
 {
@@ -37,49 +38,44 @@ PyObject* PythonTools::vtol(std::vector<std::string> v)
     return list;
 }
 
-PyObject* PythonTools::call( std::string _mod, std::string _func,
+PyObject* PythonTools::call( std::string _script, std::string _func,
                              PyObject* args )
 {
-    PyObject *module, *func, *name, *result;
-    name = PyString_FromString(_mod.c_str());
-    module = PyImport_Import(name);
-    Py_DECREF(name);
+    PyObject *main_m, *main_d;
+    PyObject *func, *result;
+    int i = 0;
+    main_m = PyImport_AddModule("__main__");
+    main_d = PyModule_GetDict(main_m);
+    
+    FILE* file_1 = fopen(_script.c_str(), "r");
+    PyRun_File(file_1, _script.c_str(), Py_file_input, main_d, main_d);
 
-    if ( module == NULL ) {
-        PyErr_Print();
-        fprintf(stderr, "Failed to load module \"%s\"\n", _mod.c_str());
-        return NULL;
-    }
-
-    func = PyObject_GetAttrString(module, _func.c_str());
+    func = PyDict_GetItemString(main_d, _func.c_str());
     if ( func == NULL ) {
         PyErr_Print();
         fprintf(stderr, "Failed to load function \"%s\"\n", _func.c_str());
-        Py_DECREF(module);
+        Py_DECREF(main_d);  Py_DECREF(main_m);  Py_DECREF(func);
         return NULL;
     }
     if ( ! PyCallable_Check(func) ) {
         PyErr_Print();
         fprintf(stderr, "Attribute \"%s\" is not callable.\n", _func.c_str());
-        Py_DECREF(module);
-        Py_DECREF(func);
+        Py_DECREF(main_d);  Py_DECREF(main_m);  Py_DECREF(func);
         return NULL;
     }
 
-    // The real work:
     result = PyObject_CallObject(func, args);
-
+    
     if ( result == NULL ) {
         PyErr_Print();
         fprintf(stderr, "Call failed.\n");
-        Py_DECREF(module);
-        Py_DECREF(func);
+        Py_DECREF(main_d);  Py_DECREF(main_m);  Py_DECREF(func);
         return NULL;
     }
+
     return result;
 }
 
-#include <iostream>
 /* Just a test... */
 int main(int argc, char *argv[])
 {
@@ -89,19 +85,16 @@ int main(int argc, char *argv[])
     v.push_back("oh noes");
     PyObject* list = ptools.vtol(v);
     std::vector<std::string> res = ptools.ltov(list);
-    std::cout << "(if you can see this.. it worked.)\n";
     for ( int i = 0; i < res.size(); i++ ) {
         fprintf(stdout, "'%s'\n", res[i].c_str());
     }
-    std::cout << "(did it work?)\n";
-    std::cout << "(trying a function call now)\n";
-    PyObject* pRes = ptools.call("grav.py_scripts.test", "test_function", list);
-    std::cout << "(converting the output)\n";
-    res = ptools.ltov(list);
-    std::cout << "(printing the output)\n";
+    PyObject* tuple = PyTuple_New(1);
+    PyTuple_SetItem(tuple, 0, list);
+    PyObject* pRes = ptools.call("grav/py_scripts/test.py",
+                                 "test_function", tuple);
+    res = ptools.ltov(pRes);
     for ( int i = 0; i < res.size(); i++ ) {
         fprintf(stdout, "'%s'\n", res[i].c_str());
     }
-    std::cout << "(done)\n";
     Py_DECREF(list);
 }
