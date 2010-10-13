@@ -98,7 +98,7 @@ bool SessionManager::removeSession( std::string addr )
 
     std::vector<SessionEntry>::iterator it = sessions.begin();
     while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
-        it++;
+        ++it;
 
     if ( it == sessions.end() )
     {
@@ -127,7 +127,7 @@ void SessionManager::removeRotatedSession( std::string addr, bool audio )
     lockSessions();
     std::vector<std::string>::iterator vrlit = videoRotateList.begin();
     while ( vrlit != videoRotateList.end() && (*vrlit).compare( addr ) != 0 )
-        vrlit++;
+        ++vrlit;
     if ( vrlit == videoRotateList.end() )
     {
         // if addr not found, exit
@@ -140,7 +140,7 @@ void SessionManager::removeRotatedSession( std::string addr, bool audio )
         // find session & remove it from main list if it's active
         std::vector<SessionEntry>::iterator it2 = sessions.begin();
         while ( it2 != sessions.end() && (*it2).address.compare( addr ) != 0 )
-            it2++;
+            ++it2;
         if ( it2 == sessions.end() )
         {
             unlockSessions();
@@ -173,7 +173,7 @@ void SessionManager::rotate( bool audio )
 
     unlockSessions();
 
-    if ( numSessions > 1 )
+    if ( numSessions > 1 && lastRotateSession.compare( "" ) != 0 )
         removeSession( lastRotateSession );
     initSession( videoRotateList[ rotatePos ], false );
 }
@@ -196,7 +196,8 @@ bool SessionManager::setSessionEnable( std::string addr, bool set )
     lockSessions();
 
     std::vector<SessionEntry>::iterator it = sessions.begin();
-    while ( (*it).address.compare( addr ) != 0 ) it++;
+    while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
+        ++it;
     if ( it == sessions.end() )
     {
         unlockSessions();
@@ -213,7 +214,8 @@ bool SessionManager::isSessionEnabled( std::string addr )
     lockSessions();
 
     std::vector<SessionEntry>::iterator it = sessions.begin();
-    while ( (*it).address.compare( addr ) != 0 ) it++;
+    while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
+        ++it;
     if ( it == sessions.end() )
     {
         unlockSessions();

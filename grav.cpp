@@ -142,7 +142,7 @@ bool gravApp::OnInit()
     {
         printf ( "grav::initializing video address %s\n",
                     initialVideoAddresses[i].c_str() );
-        sessionTree->addSession( initialVideoAddresses[i], false, false );
+        sessionTree->addSession( initialVideoAddresses[i], false, videoRotate );
     }
     for ( unsigned int i = 0; i < initialAudioAddresses.size(); i++ )
     {
@@ -270,6 +270,8 @@ bool gravApp::handleArgs()
     enableShaders = parser.Found( _("enable-shaders") );
 
     startFullscreen = parser.Found( _("fullscreen") );
+
+    videoRotate = parser.Found( _("video-rotate") );
 
     grav->setAutoFocusRotate( parser.Found( _("automatic") ) );
 

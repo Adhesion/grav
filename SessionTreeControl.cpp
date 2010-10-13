@@ -45,6 +45,7 @@ void SessionTreeControl::setSessionManager( SessionManager* s )
 void SessionTreeControl::addSession( std::string address, bool audio,
                                         bool rotate )
 {
+    printf( "tree control adding session, rotate is %i\n", rotate );
     bool added = false;
     wxTreeItemId node;
     wxTreeItemId current;

@@ -112,6 +112,8 @@ private:
 
     bool startFullscreen;
 
+    bool videoRotate;
+
     int windowWidth, windowHeight;
 
 };
@@ -163,6 +165,11 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     {
         wxCMD_LINE_SWITCH, _("ga"), _("gridauto"),
             _("rearrange objects in grid on source add/remove")
+    },
+
+    {
+        wxCMD_LINE_SWITCH, _("vr"), _("video-rotate"),
+            _("periodically rotate through supplied video addresses")
     },
 
     {
