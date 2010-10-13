@@ -48,6 +48,7 @@ private:
     wxTreeItemId rootID;
     wxTreeItemId videoNodeID;
     wxTreeItemId audioNodeID;
+    wxTreeItemId rotatedVideoNodeID;
 
     SessionManager* sessionManager;
 

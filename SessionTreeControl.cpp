@@ -51,8 +51,13 @@ void SessionTreeControl::addSession( std::string address, bool audio,
     wxTreeItemId current;
     if ( rotate )
     {
-        // rotate only for video for now
-        node = videoNodeID;
+        // make rotated video group if not there
+        if ( !rotatedVideoNodeID.IsOk() )
+        {
+            rotatedVideoNodeID = AppendItem( videoNodeID, _("Rotated Video") );
+        }
+        node = rotatedVideoNodeID;
+        // note rotate is only for video fro now
         sessionManager->addRotatedSession( address, false );
         added = true;
     }
@@ -87,13 +92,19 @@ void SessionTreeControl::removeSession( std::string address )
         return;
     }
 
-    if ( sessionManager->removeSession( address ) )
+    if ( GetItemParent( item ) == videoNodeID )
     {
-        Delete( item );
+        if ( sessionManager->removeSession( address ) )
+            Delete( item );
+        else
+        {
+            // TODO throw error dialog, maybe make consistent with part below
+        }
     }
-    else
+    else if ( GetItemParent( item ) == rotatedVideoNodeID )
     {
-        // TODO throw error dialog
+        sessionManager->removeRotatedSession( address, false );
+        Delete( item );
     }
 }
 
