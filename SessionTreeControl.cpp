@@ -55,6 +55,7 @@ void SessionTreeControl::addSession( std::string address, bool audio,
         if ( !rotatedVideoNodeID.IsOk() )
         {
             rotatedVideoNodeID = AppendItem( videoNodeID, _("Rotated Video") );
+            Expand( videoNodeID );
         }
         node = rotatedVideoNodeID;
         // note rotate is only for video fro now
@@ -92,6 +93,7 @@ void SessionTreeControl::removeSession( std::string address )
         return;
     }
 
+    // figure out whether it's a rotated session or not here
     if ( GetItemParent( item ) == videoNodeID )
     {
         if ( sessionManager->removeSession( address ) )
@@ -155,35 +157,49 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
     wxMenu rightClickMenu;
 
     std::string text = std::string( GetItemText( evt.GetItem() ).char_str() );
+    wxTreeItemId item = evt.GetItem();
+    wxTreeItemId parent = GetItemParent( item );
+
     // when right clicking on a session
-    if ( text.compare( "Video" ) != 0 && text.compare( "Audio" ) != 0 &&
-            text.compare( "Sessions" ) != 0 )
+    if ( ( parent == videoNodeID || parent == audioNodeID ||
+            parent == rotatedVideoNodeID ) && item != rotatedVideoNodeID )
     {
-        wxString toggleLabel = sessionManager->isSessionEnabled( text ) ?
-                _("Disable") : _("Enable");
-        rightClickMenu.Append( toggleEnableID, toggleLabel );
         rightClickMenu.Append( removeID, _("Remove") );
         // TODO static evt_menu binding (at top) doesn't seem to work for
         // these, so doing runtime connect
-        Connect( toggleEnableID, wxEVT_COMMAND_MENU_SELECTED,
-                    wxCommandEventHandler(
-                            SessionTreeControl::toggleEnableSessionEvent) );
         Connect( removeID, wxEVT_COMMAND_MENU_SELECTED,
                     wxCommandEventHandler(
                             SessionTreeControl::removeSessionEvent ) );
+        // only add enable/disable if it's a real session, not a rotated one
+        if ( parent == videoNodeID || parent == audioNodeID )
+        {
+            wxString toggleLabel = sessionManager->isSessionEnabled( text ) ?
+                            _("Disable") : _("Enable");
+            rightClickMenu.Append( toggleEnableID, toggleLabel );
+            Connect( toggleEnableID, wxEVT_COMMAND_MENU_SELECTED,
+                        wxCommandEventHandler(
+                                SessionTreeControl::toggleEnableSessionEvent) );
+        }
     }
+
     // right clicked on video group or main group
-    if ( text.compare( "Video" ) == 0 || text.compare( "Sessions" ) == 0 )
+    if ( item == videoNodeID || item == rootID )
     {
         rightClickMenu.Append( addVideoID, _("Add video session...") );
         Connect( addVideoID, wxEVT_COMMAND_MENU_SELECTED,
             wxCommandEventHandler( SessionTreeControl::addVideoSessionEvent ) );
+    }
+
+    // right click on rotated video group
+    if ( item == rotatedVideoNodeID )
+    {
         rightClickMenu.Append( rotateID, _("Rotate video sessions") );
         Connect( rotateID, wxEVT_COMMAND_MENU_SELECTED,
             wxCommandEventHandler( SessionTreeControl::rotateEvent ) );
     }
+
     // right clicked on audio group or main group
-    if ( text.compare( "Audio" ) == 0 || text.compare( "Sessions" ) == 0 )
+    if ( item == audioNodeID || item == rootID )
     {
         rightClickMenu.Append( addAudioID, _("Add audio session...") );
         Connect( addAudioID, wxEVT_COMMAND_MENU_SELECTED,
