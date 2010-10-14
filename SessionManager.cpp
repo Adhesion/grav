@@ -81,7 +81,7 @@ bool SessionManager::initSession( std::string address, bool audio )
 
     printf( "SessionManager::initialized %s session on %s\n", type.c_str(),
                 address.c_str() );
-    *counter++;
+    (*counter)++;
     entry.sessionTS = random32();
     entry.address = address;
     entry.audio = audio;
