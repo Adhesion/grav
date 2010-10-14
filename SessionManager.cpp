@@ -19,6 +19,7 @@
 #include "SessionManager.h"
 #include "VideoListener.h"
 #include "AudioManager.h"
+#include "grav.h"
 
 SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
     : videoSessionListener( vl ), audioSessionListener( al )
@@ -96,6 +97,7 @@ bool SessionManager::removeSession( std::string addr )
 {
     lockSessions();
 
+    printf( "SessionManager::attempting to remove session %s\n", addr.c_str() );
     std::vector<SessionEntry>::iterator it = sessions.begin();
     while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
         ++it;
@@ -125,9 +127,13 @@ void SessionManager::addRotatedSession( std::string addr, bool audio )
 void SessionManager::removeRotatedSession( std::string addr, bool audio )
 {
     lockSessions();
+    int i = 0;
     std::vector<std::string>::iterator vrlit = videoRotateList.begin();
     while ( vrlit != videoRotateList.end() && (*vrlit).compare( addr ) != 0 )
+    {
         ++vrlit;
+        i++;
+    }
     if ( vrlit == videoRotateList.end() )
     {
         // if addr not found, exit
@@ -137,6 +143,10 @@ void SessionManager::removeRotatedSession( std::string addr, bool audio )
     else
     {
         videoRotateList.erase( vrlit );
+        // shift rotate position back if what we're removing if before or at it,
+        // so we don't skip any
+        if ( i <= rotatePos )
+            rotatePos--;
         // find session & remove it from main list if it's active
         std::vector<SessionEntry>::iterator it2 = sessions.begin();
         while ( it2 != sessions.end() && (*it2).address.compare( addr ) != 0 )
@@ -159,23 +169,35 @@ void SessionManager::rotate( bool audio )
     lockSessions();
 
     int numSessions = (int)videoRotateList.size();
+    int lastRotatePos = rotatePos;
+    if ( lastRotatePos != -1 )
+        lastRotateSession = videoRotateList[ rotatePos ];
     if ( numSessions == 0 )
     {
         unlockSessions();
         return;
     }
-    if ( rotatePos != -1 && numSessions > 1 )
-        lastRotateSession = videoRotateList[ rotatePos ];
     if ( ++rotatePos >= numSessions )
     {
         rotatePos = 0;
     }
-
+    printf( "about to rotate: pos %i, session %s, last session %s\n", rotatePos,
+            videoRotateList[ rotatePos ].c_str(), lastRotateSession.c_str() );
     unlockSessions();
 
-    if ( numSessions > 1 && lastRotateSession.compare( "" ) != 0 )
+    // only remove & rotate if there is a valid old one & it isn't the same as
+    // current
+    if ( lastRotateSession.compare( "" ) != 0 &&
+            lastRotateSession.compare( videoRotateList[ rotatePos ] ) != 0 )
+    {
         removeSession( lastRotateSession );
-    initSession( videoRotateList[ rotatePos ], false );
+        initSession( videoRotateList[ rotatePos ], false );
+    }
+    // case for first rotate
+    else if ( lastRotatePos == -1 )
+    {
+        initSession( videoRotateList[ rotatePos ], false );
+    }
 }
 
 std::string SessionManager::getCurrentRotateSession()
@@ -233,7 +255,7 @@ bool SessionManager::iterateSessions()
     // mutex should do this but this thread seems way too eager
     if ( pause )
     {
-        printf( "Sessions temporarily paused...\n" );
+        //printf( "Sessions temporarily paused...\n" );
         wxMicroSleep( 10 );
     }
 
@@ -248,7 +270,7 @@ bool SessionManager::iterateSessions()
             sessions[i].session->iterate( sessions[i].sessionTS++ );
         haveSessions = haveSessions || sessions[i].enabled;
     }
-    if ( sessions.size() >= 1 )
+    if ( sessions.size() >= 1 && gravApp::threadDebug )
     {
         if ( sessions[0].sessionTS % 1000 == 0 )
         {

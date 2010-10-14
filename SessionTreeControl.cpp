@@ -144,10 +144,10 @@ void SessionTreeControl::rotateVideoSessions()
     wxTreeItemId last =    findSession( videoNodeID,
                                sessionManager->getLastRotateSession() );
 
-    if ( current.IsOk() )
-        SetItemBackgroundColour( current, *wxRED );
     if ( last.IsOk() )
         SetItemBackgroundColour( last, *wxBLUE );
+    if ( current.IsOk() )
+        SetItemBackgroundColour( current, *wxRED );
 }
 
 void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
