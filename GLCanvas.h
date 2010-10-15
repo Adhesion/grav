@@ -9,7 +9,6 @@
  */
 
 #include <wx/glcanvas.h>
-#include <wx/timer.h>
 
 #include <sys/time.h>
 
@@ -47,30 +46,6 @@ private:
     // it if need be
     RenderTimer* renderTimer;
 
-};
-
-class RenderTimer : public wxTimer
-{
-    
-public:
-    RenderTimer( GLCanvas* c, int i );
-    void Notify();
-    void Start();
-    
-    // print number of microseconds since last call
-    void printTiming();
-    time_t getTiming();
-    void resetTiming();
-
-private:
-    GLCanvas* canvas;
-
-    // interval between timer firing, in milliseconds
-    int interval;
-
-    struct timeval time;
-    time_t lastTimeMS;
-    
 };
 
 #endif /*GLCANVAS_H_*/

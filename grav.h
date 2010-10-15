@@ -20,6 +20,7 @@
 
 class GLCanvas;
 class RenderTimer;
+class RotateTimer;
 class Frame;
 class SideFrame;
 class gravManager;
@@ -83,6 +84,10 @@ private:
     
     int timerInterval;
     int timerIntervalUS;
+
+    bool autoVideoSessionRotate;
+    int rotateIntervalMS;
+    RotateTimer* rotateTimer;
 
     gravManager* grav;
 
@@ -170,6 +175,12 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     {
         wxCMD_LINE_SWITCH, _("vsr"), _("video-session-rotate"),
             _("periodically rotate through supplied video addresses")
+    },
+
+    {
+        wxCMD_LINE_OPTION, _("avsr"), _("auto-video-session-rotate"),
+            _("rotate video sessions every [num] seconds"),
+            wxCMD_LINE_VAL_NUMBER
     },
 
     {

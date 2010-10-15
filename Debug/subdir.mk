@@ -19,6 +19,7 @@ CPP_SRCS += \
 ../SessionManager.cpp \
 ../SessionTreeControl.cpp \
 ../SideFrame.cpp \
+../Timers.cpp \
 ../TreeControl.cpp \
 ../TreeNode.cpp \
 ../Vector.cpp \
@@ -44,6 +45,7 @@ OBJS += \
 ./SessionManager.o \
 ./SessionTreeControl.o \
 ./SideFrame.o \
+./Timers.o \
 ./TreeControl.o \
 ./TreeNode.o \
 ./Vector.o \
@@ -69,6 +71,7 @@ CPP_DEPS += \
 ./SessionManager.d \
 ./SessionTreeControl.d \
 ./SideFrame.d \
+./Timers.d \
 ./TreeControl.d \
 ./TreeNode.d \
 ./Vector.d \

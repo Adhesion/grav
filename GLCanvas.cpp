@@ -8,6 +8,7 @@
 #include "gravManager.h"
 #include "GLCanvas.h"
 #include "InputHandler.h"
+#include "Timers.h"
 
 BEGIN_EVENT_TABLE(GLCanvas, wxGLCanvas)
 EVT_PAINT(GLCanvas::handlePaintEvent)
@@ -97,49 +98,4 @@ void GLCanvas::stopTimer()
 void GLCanvas::setTimer( RenderTimer* t )
 {
     renderTimer = t;
-}
-
-RenderTimer::RenderTimer( GLCanvas* c, int i ) :
-    canvas( c ), interval( i )
-{
-    gettimeofday( &time, NULL );
-    lastTimeMS = time.tv_usec;
-}
-
-void RenderTimer::Notify()
-{
-    canvas->draw();
-    printTiming();
-}
-
-void RenderTimer::Start()
-{
-    printf( "Timer::starting at interval %i\n", interval);
-    wxTimer::Start( interval );
-}
-
-void RenderTimer::printTiming()
-{
-    time_t diff = getTiming();
-    printf( "%lu\n", (unsigned long)diff );
-
-    resetTiming();
-}
-
-time_t RenderTimer::getTiming()
-{
-    gettimeofday( &time, NULL );
-    time_t diff;
-
-    if ( lastTimeMS > time.tv_usec )
-        diff = (time.tv_usec+1000000) - lastTimeMS;
-    else
-        diff = time.tv_usec - lastTimeMS;
-
-    return diff;
-}
-
-void RenderTimer::resetTiming()
-{
-    lastTimeMS = time.tv_usec;
 }

@@ -19,6 +19,7 @@
 #include "AudioManager.h"
 #include "Frame.h"
 #include "SideFrame.h"
+#include "Timers.h"
 
 #include <VPMedia/VPMLog.h>
 #include <VPMedia/VPMPayloadDecoderFactory.h>
@@ -153,6 +154,10 @@ bool gravApp::OnInit()
         sessionTree->addSession( initialAudioAddresses[i], true, false );
     }
 
+    rotateTimer = new RotateTimer( sessionTree );
+    if ( autoVideoSessionRotate )
+        rotateTimer->Start( rotateIntervalMS );
+
     printf( "grav:init function complete\n" );
     return true;
 }
@@ -173,22 +178,11 @@ int gravApp::OnExit()
     // and those set the grav manager's tree to null and stop the timer
     // respectively
     delete timer;
+    delete rotateTimer;
 
     delete sessionManager;
     delete videoSessionListener;
     delete audioSessionListener;
-    /*if ( videoInitialized )
-    {
-        for ( unsigned int i = 0; i < videoSessions.size(); i++ )
-            delete videoSessions[i];
-
-    }
-    if ( audioEnabled && audioInitialized )
-    {
-        for ( unsigned int i = 0; i < audioSessions.size(); i++ )
-            delete audioSessions[i];
-
-    }*/
 
     delete grav;
 
@@ -296,7 +290,21 @@ bool gravApp::handleArgs()
         timerInterval = 16;
         timerIntervalUS = 16667;
     }
-    printf( "microsecond timer is %i\n", timerIntervalUS );
+
+    long int rotateIntervalS;
+    if ( parser.Found( _("avsr"), &rotateIntervalS ) )
+    {
+        autoVideoSessionRotate = true;
+        // this is pretty dumb that the second value is a long int and the
+        // millisecond interval is a regular int, but that's what the timer
+        // input is for Start(), oh well
+        rotateIntervalMS = (int)rotateIntervalS * 1000;
+    }
+    else
+    {
+        autoVideoSessionRotate = false;
+        rotateIntervalMS = -1;
+    }
 
     return true;
 }
