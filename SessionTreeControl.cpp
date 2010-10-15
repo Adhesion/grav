@@ -58,7 +58,7 @@ void SessionTreeControl::addSession( std::string address, bool audio,
             Expand( videoNodeID );
         }
         node = rotatedVideoNodeID;
-        // note rotate is only for video fro now
+        // note rotate is only for video for now
         sessionManager->addRotatedSession( address, false );
         added = true;
     }

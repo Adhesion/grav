@@ -140,6 +140,7 @@ public:
     void setInput( InputHandler* i );
     void setTree( TreeControl* t );
     void setAudio( AudioManager* a );
+    void setVideoListener( VideoListener* v );
     /*
      * Note, this should be called after GL setup since it needs to calculate
      * the text size, which depends on the font being set up.
@@ -187,6 +188,9 @@ private:
     
     Runway* runway;
 
+    // mostly just to grab the number of sources for arrangement purposes
+    VideoListener* videoListener;
+
     std::string headerString;
     bool useHeader;
     FTBBox headerTextBox;
@@ -230,8 +234,6 @@ private:
     bool useRunway;
     bool gridAuto;
     bool autoFocusRotate;
-
-    int sourceCount;
 
 };
 

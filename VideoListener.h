@@ -17,8 +17,8 @@ class VPMVideoSink;
 class GLCanvas;
 class wxStopWatch;
 
-static void newFrameCallbackTest( VPMVideoSink* sink, int buffer_idx,
-                                void* user_data );
+//static void newFrameCallbackTest( VPMVideoSink* sink, int buffer_idx,
+//                                void* user_data );
  
 class VideoListener : public VPMSessionListener
 {
@@ -43,14 +43,20 @@ public:
 
     void setTimer( wxStopWatch* t );
 
+    int getSourceCount();
+
 private:
     gravManager* grav;
     wxStopWatch* timer;
-    
+
     // initial starting points for videos
     float x;
     float y;
-    
+    float initialX;
+    float initialY;
+
+    int sourceCount;
+
 };
 
 #endif /*VIDEOLISTENER_H_*/

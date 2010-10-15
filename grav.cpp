@@ -127,12 +127,13 @@ bool gravApp::OnInit()
     canvas->PushEventHandler( input );
     canvas->SetFocus();
     canvas->setTimer( timer );
-    
+
     grav->setEarth( earth );
     grav->setInput( input );
     grav->setTree( sourceTree );
     grav->setBorderTex( "border.png" );
-    
+    grav->setVideoListener( videoSessionListener );
+
     vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
 
     mapRTP();

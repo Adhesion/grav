@@ -69,8 +69,6 @@ gravManager::gravManager()
     audioFocusTrigger = false;
     audio = NULL;
 
-    sourceCount = 0;
-
     sourceMutex = mutex_create();
     lockCount = 0;
 }
@@ -805,36 +803,40 @@ void gravManager::addNewSource( VideoSource* s )
     drawnObjects->push_back( s );
     s->updateName();
 
-    sourceCount++;
-
     // tree add needs to be done on main thread since WX accesses the tree in
     // other places (ie, not thread safe, and this could be on a separate
     // thread)
     if ( tree != NULL )
         objectsToAddToTree->push_back( (RectangleBase*)s );
 
-    if ( useRunway && sourceCount > 9 )
-        runway->add( s );
-    else if ( !useRunway )
+    // do extra placement stuff
+    // execute automatic mode layout again if it's on...
+    if ( autoFocusRotate )
     {
-        std::vector<RectangleBase*> outerObjs = getMovableObjects();
-        std::vector<RectangleBase*> innerObj( outerObjs.end()-1,
+        std::vector<RectangleBase*> tempOuterObjs = getMovableObjects();
+        std::vector<RectangleBase*> tempInnerObj( outerObjs.end()-1,
                                                 outerObjs.end() );
         outerObjs.erase( outerObjs.end()-1 );
 
         std::map<std::string, std::vector<RectangleBase*> > data = \
             std::map<std::string, std::vector<RectangleBase*> >();
-        data["inners"] = innerObjs;
-        data["outers"] = outerObjs;
+        data["inners"] = tempInnerObj;
+        data["outers"] = tempOuterObjs;
         layouts->arrange( "focus", getScreenRect(), RectangleBase(), data );
     }
-
-    if ( gridAuto ) {
+    // ...or rearrange it as a grid if the option is set...
+    else if ( gridAuto )
+    {
         std::map<std::string, std::vector<RectangleBase*> > data = \
             std::map<std::string, std::vector<RectangleBase*> >();
         data["objects"] = getMovableObjects();
         layouts->arrange("grid", getScreenRect(), getEarthRect(), data);
     }
+    // otherwise add to runway if we're using it & have >9 videos
+    else if ( useRunway && videoListener->getSourceCount() > 9 )
+        runway->add( s );
+    // base case will just use placement defined in VideoListener (9 grid with
+    // stacking)
 
     unlockSources();
 }
@@ -1036,6 +1038,11 @@ void gravManager::setAudio( AudioManager* a )
         audioEnabled = false;
 
     audio = a;
+}
+
+void gravManager::setVideoListener( VideoListener* v )
+{
+    videoListener = v;
 }
 
 void gravManager::setHeaderString( std::string h )

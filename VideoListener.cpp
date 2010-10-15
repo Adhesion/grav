@@ -19,8 +19,12 @@
 VideoListener::VideoListener( gravManager* g ) :
     grav( g )
 {
-    x = -7.5f;
-    y = 5.7f;
+    initialX = -7.5f;
+    initialY = 5.7f;
+    x = initialX;
+    y = initialY;
+
+    sourceCount = 0;
 }
 
 void
@@ -34,6 +38,7 @@ VideoListener::vpmsession_source_created(VPMSession &session,
 
     if ( d )
     {
+        sourceCount++;
         VPMVideoFormat format = d->getOutputFormat();
         VPMVideoBufferSink *sink;
 
@@ -77,6 +82,12 @@ VideoListener::vpmsession_source_created(VPMSession &session,
             x = -7.5f;
             y -= 5.9f;
         }
+        // reset to top
+        if ( y < -11.0f )
+        {
+            x = initialX + ( 0.5f * ( sourceCount / 9 ) );
+            y = initialY - ( 0.5f * ( sourceCount / 9 ) );
+        }
     }
 }
 
@@ -92,6 +103,7 @@ VideoListener::vpmsession_source_deleted(VPMSession &session,
     {
         if ( (*si)->getssrc() == ssrc )
         {
+            sourceCount--;
             grav->deleteSource( si );
             return;
         }
@@ -187,7 +199,12 @@ void VideoListener::setTimer( wxStopWatch* t )
     timer = t;
 }
 
-static void newFrameCallbackTest( VPMVideoSink* sink, int buffer_idx,
+int VideoListener::getSourceCount()
+{
+    return sourceCount;
+}
+
+/*static void newFrameCallbackTest( VPMVideoSink* sink, int buffer_idx,
                                 void* user_data )
 {
     wxStopWatch* timer = (wxStopWatch*)user_data;
@@ -197,4 +214,4 @@ static void newFrameCallbackTest( VPMVideoSink* sink, int buffer_idx,
         if ( time > 38 || time < 28 ) printf( "VideoListener::WARNING: time > 38ms or < 28ms (%lu)\n", time );
         timer->Start( 0 );
     }
-}
+}*/
