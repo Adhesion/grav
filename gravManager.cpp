@@ -814,9 +814,9 @@ void gravManager::addNewSource( VideoSource* s )
     if ( autoFocusRotate )
     {
         std::vector<RectangleBase*> tempOuterObjs = getMovableObjects();
-        std::vector<RectangleBase*> tempInnerObj( outerObjs.end()-1,
-                                                outerObjs.end() );
-        outerObjs.erase( outerObjs.end()-1 );
+        std::vector<RectangleBase*> tempInnerObj( tempOuterObjs.end()-1,
+                                                    tempOuterObjs.end() );
+        tempOuterObjs.erase( tempOuterObjs.end()-1 );
 
         std::map<std::string, std::vector<RectangleBase*> > data = \
             std::map<std::string, std::vector<RectangleBase*> >();
