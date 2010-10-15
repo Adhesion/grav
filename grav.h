@@ -112,7 +112,7 @@ private:
 
     bool startFullscreen;
 
-    bool videoRotate;
+    bool videoSessionRotate;
 
     int windowWidth, windowHeight;
 
@@ -168,7 +168,7 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     },
 
     {
-        wxCMD_LINE_SWITCH, _("vr"), _("video-rotate"),
+        wxCMD_LINE_SWITCH, _("vsr"), _("video-session-rotate"),
             _("periodically rotate through supplied video addresses")
     },
 
