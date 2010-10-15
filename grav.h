@@ -19,7 +19,7 @@
 #include <vector>
 
 class GLCanvas;
-class Timer;
+class RenderTimer;
 class Frame;
 class SideFrame;
 class gravManager;
@@ -77,7 +77,7 @@ private:
     wxNotebook* treeNotebook;
     
     GLCanvas* canvas;
-    Timer* timer;
+    RenderTimer* timer;
     TreeControl* sourceTree;
     SessionTreeControl* sessionTree;
     

@@ -94,31 +94,31 @@ void GLCanvas::stopTimer()
     renderTimer->Stop();
 }
 
-void GLCanvas::setTimer( Timer* t )
+void GLCanvas::setTimer( RenderTimer* t )
 {
     renderTimer = t;
 }
 
-Timer::Timer( GLCanvas* c, int i ) :
+RenderTimer::RenderTimer( GLCanvas* c, int i ) :
     canvas( c ), interval( i )
 {
     gettimeofday( &time, NULL );
     lastTimeMS = time.tv_usec;
 }
 
-void Timer::Notify()
+void RenderTimer::Notify()
 {
     canvas->draw();
     printTiming();
 }
 
-void Timer::Start()
+void RenderTimer::Start()
 {
     printf( "Timer::starting at interval %i\n", interval);
     wxTimer::Start( interval );
 }
 
-void Timer::printTiming()
+void RenderTimer::printTiming()
 {
     time_t diff = getTiming();
     printf( "%lu\n", (unsigned long)diff );
@@ -126,7 +126,7 @@ void Timer::printTiming()
     resetTiming();
 }
 
-time_t Timer::getTiming()
+time_t RenderTimer::getTiming()
 {
     gettimeofday( &time, NULL );
     time_t diff;
@@ -139,7 +139,7 @@ time_t Timer::getTiming()
     return diff;
 }
 
-void Timer::resetTiming()
+void RenderTimer::resetTiming()
 {
     lastTimeMS = time.tv_usec;
 }

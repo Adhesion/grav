@@ -14,7 +14,7 @@
 #include <sys/time.h>
 
 class gravManager;
-class Timer;
+class RenderTimer;
 
 class GLCanvas : public wxGLCanvas
 {
@@ -30,7 +30,7 @@ public:
     void GLreshape( int w, int h );
     
     void stopTimer();
-    void setTimer( Timer* t );
+    void setTimer( RenderTimer* t );
 
 private:
     gravManager* grav;
@@ -45,15 +45,15 @@ private:
 
     // if draw is being called by a timer, have a reference to it so we can stop
     // it if need be
-    Timer* renderTimer;
+    RenderTimer* renderTimer;
 
 };
 
-class Timer : public wxTimer
+class RenderTimer : public wxTimer
 {
     
 public:
-    Timer( GLCanvas* c, int i );
+    RenderTimer( GLCanvas* c, int i );
     void Notify();
     void Start();
     

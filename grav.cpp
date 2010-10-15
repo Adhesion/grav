@@ -113,7 +113,7 @@ bool gravApp::OnInit()
         grav->setHeaderString( "RIT Global Collaboration Grid" );
 
     //printf( "hide root? %i\n", tree->HasFlag( wxTR_HIDE_ROOT ) );
-    timer = new Timer( canvas, timerInterval );
+    timer = new RenderTimer( canvas, timerInterval );
     //timer->Start();
     //wxStopWatch* t2 = new wxStopWatch();
     //videoSession_listener->setTimer( t2 );
