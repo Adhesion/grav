@@ -8,12 +8,12 @@
  * @author Andrew Ford
  */
 
-#include "gravManager.h"
 #include "Frame.h"
 #include "GLCanvas.h"
 #include "InputHandler.h"
 #include "VideoInfoDialog.h"
 #include "SessionTreeControl.h"
+#include "gravManager.h"
 
 BEGIN_EVENT_TABLE(Frame, wxFrame)
 EVT_CLOSE(Frame::OnCloseWindow)
