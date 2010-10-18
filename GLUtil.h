@@ -8,8 +8,6 @@
  * @author Andrew Ford
  */
 
-#include <GL/glew.h>
-
 // TODO glxew is platform specific, add some #defs to only include it on
 // supported platforms (just linux?)
 #include <GL/glxew.h>
@@ -73,7 +71,7 @@ public:
     void screenToWorld( Point screenPoint, Point& worldPoint );
     
     /**
-     * Uses GLEW to load a shader (.vert and .frag) from files and returns a
+     * Uses GLEW to load a shader (vert and frag) from the string and returns a
      * reference to the program.
      */
     GLuint loadShaders( const char* location );

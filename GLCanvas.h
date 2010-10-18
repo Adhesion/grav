@@ -8,6 +8,8 @@
  * @author Andrew Ford
  */
 
+#include "GLUtil.h"
+
 #include <wx/glcanvas.h>
 
 #include <sys/time.h>
