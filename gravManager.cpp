@@ -165,20 +165,24 @@ void gravManager::draw()
     // same for remove
     if ( objectsToRemoveFromTree->size() > 0 && tree != NULL )
     {
+        //printf( "removing %i objects from tree\n", objectsToRemoveFromTree->size() );
         for ( unsigned int i = 0; i < objectsToRemoveFromTree->size(); i++ )
         {
             tree->removeObject( (*objectsToRemoveFromTree)[i] );
         }
         objectsToRemoveFromTree->clear();
+        //printf( "done removing objs from tree\n" );
     }
     // delete sources that need to be deleted - see deleteSource for the reason
     if ( objectsToDelete->size() > 0 )
     {
+        //printf( "deleting %i objects\n", objectsToDelete->size() );
         for ( unsigned int i = 0; i < objectsToDelete->size(); i++ )
         {
             delete (*objectsToDelete)[i];
         }
         objectsToDelete->clear();
+        //printf( "done deleting objects\n" );
     }
 
     // draw point on geographical position, selected ones on top (and bigger)
@@ -381,9 +385,12 @@ void gravManager::ungroupAll()
         Group* g = (*it).second;
         if ( g != NULL )
         {
+            // even though group will remove its children in its destructor,
+            // we should do it here first to make sure the children get readded
+            // to the tree properly when the group is removed from the tree
             g->removeAll();
             removeFromLists( g );
-            delete g;
+            objectsToDelete->push_back( g );
             
             printf( "single group deleted\n" );
         }
@@ -906,8 +913,11 @@ void gravManager::deleteGroup( Group* g )
 {
     lockSources();
 
+    g->removeAll();
     removeFromLists( g );
-    delete g;
+    // need to delete groups later as well, since we need to remove them from
+    // the tree first
+    objectsToDelete->push_back( g );
 
     unlockSources();
 }

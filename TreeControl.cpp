@@ -72,6 +72,8 @@ void TreeControl::addObject( RectangleBase* obj )
 
 void TreeControl::removeObject( RectangleBase* obj )
 {
+    //printf( "TreeControl::removeObject: %s\n",
+    //                    obj->getName().c_str() );
     wxTreeItemId item = findObject( rootID, obj );
     if ( !item.IsOk() )
     {
@@ -84,6 +86,8 @@ void TreeControl::removeObject( RectangleBase* obj )
     // root
     if ( obj->isGroup() )
     {
+        //printf( "TreeControl::removeObject: was group, removing %i children\n",
+        //        GetChildrenCount( item ) );
         wxTreeItemId parent = rootID;
         wxTreeItemIdValue temp;
         wxTreeItemId current = GetFirstChild( item, temp );
@@ -94,6 +98,8 @@ void TreeControl::removeObject( RectangleBase* obj )
             if ( data != NULL )
             {
                 RectangleBase* obj = data->getObject();
+                //printf( "TreeControl::removeObject: adding child %s to root\n",
+                //            obj->getName().c_str() );
                 addObject( obj );
             }
             current = GetNextChild( item, temp );
