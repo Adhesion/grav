@@ -39,12 +39,14 @@ public:
     void toggleEnableSessionEvent( wxCommandEvent& evt );
     void removeSessionEvent( wxCommandEvent& evt );
     void rotateEvent( wxCommandEvent& evt );
+    void setEncryptionEvent( wxCommandEvent& evt );
 
     static int addVideoID;
     static int addAudioID;
     static int toggleEnableID;
     static int removeID;
     static int rotateID;
+    static int setEncryptionID;
 
 private:
     wxTreeItemId rootID;

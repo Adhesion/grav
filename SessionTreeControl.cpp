@@ -23,6 +23,7 @@ int SessionTreeControl::addAudioID = wxNewId();
 int SessionTreeControl::toggleEnableID = wxNewId();
 int SessionTreeControl::removeID = wxNewId();
 int SessionTreeControl::rotateID = wxNewId();
+int SessionTreeControl::setEncryptionID = wxNewId();
 
 SessionTreeControl::SessionTreeControl() :
     wxTreeCtrl( NULL, wxID_ANY )
@@ -160,7 +161,7 @@ void SessionTreeControl::rotateVideoSessions()
 
 bool SessionTreeControl::setEncryptionKey( std::string addr, std::string key )
 {
-    sessionManager->setEncryptionKey( addr, key );
+    return sessionManager->setEncryptionKey( addr, key );
 }
 
 void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
@@ -176,6 +177,7 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
             parent == rotatedVideoNodeID ) && item != rotatedVideoNodeID )
     {
         // only add enable/disable if it's a real session, not a rotated one
+        // also add encryption set
         if ( parent == videoNodeID || parent == audioNodeID )
         {
             wxString toggleLabel = sessionManager->isSessionEnabled( text ) ?
@@ -184,6 +186,12 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
             Connect( toggleEnableID, wxEVT_COMMAND_MENU_SELECTED,
                         wxCommandEventHandler(
                                 SessionTreeControl::toggleEnableSessionEvent) );
+
+            rightClickMenu.Append( setEncryptionID,
+                                    _("Set encryption key...") );
+            Connect( setEncryptionID, wxEVT_COMMAND_MENU_SELECTED,
+                        wxCommandEventHandler(
+                                SessionTreeControl::setEncryptionEvent) );
         }
 
         rightClickMenu.Append( removeID, _("Remove") );
@@ -273,4 +281,19 @@ void SessionTreeControl::rotateEvent( wxCommandEvent& evt )
     printf( "rotate event: have %i sessions\n",
             sessionManager->getVideoSessionCount() );
     rotateVideoSessions();
+}
+
+void SessionTreeControl::setEncryptionEvent( wxCommandEvent& evt )
+{
+    std::string selectedAddress = std::string(
+                                    GetItemText( GetSelection() ).char_str() );
+    std::string desc = "Set encryption key for " + selectedAddress;
+    wxTextEntryDialog dialog( this, _("Enter encryption key"),
+                                wxString( desc.c_str(), wxConvUTF8 ) );
+
+    if ( dialog.ShowModal() == wxID_OK )
+    {
+        std::string key( dialog.GetValue().char_str() );
+        setEncryptionKey( selectedAddress, key );
+    }
 }

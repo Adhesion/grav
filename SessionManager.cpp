@@ -262,6 +262,7 @@ bool SessionManager::setEncryptionKey( std::string addr, std::string key )
         return false;
     }
 
+    //printf( "SessionManager::setting key for %s to [%s]\n", addr.c_str(), key.c_str() );
     (*it).encryptionKey = key;
     (*it).session->setEncryptionKey( key.c_str() );
 
