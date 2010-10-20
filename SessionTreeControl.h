@@ -31,6 +31,8 @@ public:
 
     void rotateVideoSessions();
 
+    bool setEncryptionKey( std::string addr, std::string key );
+
     void itemRightClick( wxTreeEvent& evt );
     void addVideoSessionEvent( wxCommandEvent& evt );
     void addAudioSessionEvent( wxCommandEvent& evt );

@@ -24,6 +24,7 @@ class mutex;
 
 typedef struct {
     std::string address;
+    std::string encryptionKey;
     bool audio;
     bool enabled;
     VPMSession* session;
@@ -58,6 +59,8 @@ public:
 
     bool setSessionEnable( std::string addr, bool set );
     bool isSessionEnabled( std::string addr );
+
+    bool setEncryptionKey( std::string addr, std::string key );
 
     /*
      * Returns true if there were enabled sessions to iterate.

@@ -146,12 +146,20 @@ bool gravApp::OnInit()
                     initialVideoAddresses[i].c_str() );
         sessionTree->addSession( initialVideoAddresses[i], false,
                                     videoSessionRotate );
+
+        if ( haveVideoKey )
+            sessionTree->setEncryptionKey( initialVideoAddresses[i],
+                                            initialVideoKey );
     }
     for ( unsigned int i = 0; i < initialAudioAddresses.size(); i++ )
     {
         printf ( "grav::initializing audio address %s\n",
                     initialAudioAddresses[i].c_str() );
         sessionTree->addSession( initialAudioAddresses[i], true, false );
+
+        if ( haveAudioKey )
+            sessionTree->setEncryptionKey( initialAudioAddresses[i],
+                                            initialAudioKey );
     }
 
     rotateTimer = new RotateTimer( sessionTree );
@@ -304,6 +312,20 @@ bool gravApp::handleArgs()
     {
         autoVideoSessionRotate = false;
         rotateIntervalMS = -1;
+    }
+
+    wxString videoKeyWX;
+    haveVideoKey = parser.Found( _("video-key"), &videoKeyWX );
+    if ( haveVideoKey )
+    {
+        initialVideoKey = std::string( (char*)videoKeyWX.char_str() );
+    }
+
+    wxString audioKeyWX;
+    haveAudioKey = parser.Found( _("audio-key"), &audioKeyWX );
+    if ( haveAudioKey )
+    {
+        initialAudioKey = std::string( (char*)audioKeyWX.char_str() );
     }
 
     return true;

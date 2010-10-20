@@ -249,6 +249,26 @@ bool SessionManager::isSessionEnabled( std::string addr )
     return ret;
 }
 
+bool SessionManager::setEncryptionKey( std::string addr, std::string key )
+{
+    lockSessions();
+
+    std::vector<SessionEntry>::iterator it = sessions.begin();
+    while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
+        ++it;
+    if ( it == sessions.end() )
+    {
+        unlockSessions();
+        return false;
+    }
+
+    (*it).encryptionKey = key;
+    (*it).session->setEncryptionKey( key.c_str() );
+
+    unlockSessions();
+    return true;
+}
+
 bool SessionManager::iterateSessions()
 {
     // kind of a hack to force this to wait, when removing etc.

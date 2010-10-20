@@ -110,6 +110,11 @@ private:
 
     SessionManager* sessionManager;
 
+    bool haveVideoKey;
+    bool haveAudioKey;
+    std::string initialVideoKey;
+    std::string initialAudioKey;
+
     std::string header;
     bool headerSet;
 
@@ -181,6 +186,18 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
         wxCMD_LINE_OPTION, _("avsr"), _("auto-video-session-rotate"),
             _("rotate video sessions every [num] seconds"),
             wxCMD_LINE_VAL_NUMBER
+    },
+
+    {
+        wxCMD_LINE_OPTION, _("vk"), _("video-key"),
+            _("encryption key for initial video sessions"),
+            wxCMD_LINE_VAL_STRING
+    },
+
+    {
+        wxCMD_LINE_OPTION, _("ak"), _("audio-key"),
+            _("encryption key for initial audio sessions"),
+            wxCMD_LINE_VAL_STRING
     },
 
     {

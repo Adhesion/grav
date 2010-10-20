@@ -158,6 +158,11 @@ void SessionTreeControl::rotateVideoSessions()
     }
 }
 
+bool SessionTreeControl::setEncryptionKey( std::string addr, std::string key )
+{
+    sessionManager->setEncryptionKey( addr, key );
+}
+
 void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
 {
     wxMenu rightClickMenu;
