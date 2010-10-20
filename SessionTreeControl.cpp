@@ -24,6 +24,7 @@ int SessionTreeControl::toggleEnableID = wxNewId();
 int SessionTreeControl::removeID = wxNewId();
 int SessionTreeControl::rotateID = wxNewId();
 int SessionTreeControl::setEncryptionID = wxNewId();
+int SessionTreeControl::disableEncryptionID = wxNewId();
 
 SessionTreeControl::SessionTreeControl() :
     wxTreeCtrl( NULL, wxID_ANY )
@@ -164,6 +165,11 @@ bool SessionTreeControl::setEncryptionKey( std::string addr, std::string key )
     return sessionManager->setEncryptionKey( addr, key );
 }
 
+bool SessionTreeControl::disableEncryption( std::string addr )
+{
+    return sessionManager->disableEncryption( addr );
+}
+
 void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
 {
     wxMenu rightClickMenu;
@@ -192,6 +198,16 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
             Connect( setEncryptionID, wxEVT_COMMAND_MENU_SELECTED,
                         wxCommandEventHandler(
                                 SessionTreeControl::setEncryptionEvent) );
+
+            // add disable encryption option for sessions with encryption
+            if ( sessionManager->isEncryptionEnabled( text ) )
+            {
+                rightClickMenu.Append( disableEncryptionID,
+                                        _("Disable encryption") );
+                Connect( disableEncryptionID, wxEVT_COMMAND_MENU_SELECTED,
+                            wxCommandEventHandler(
+                                  SessionTreeControl::disableEncryptionEvent) );
+            }
         }
 
         rightClickMenu.Append( removeID, _("Remove") );
@@ -296,4 +312,11 @@ void SessionTreeControl::setEncryptionEvent( wxCommandEvent& evt )
         std::string key( dialog.GetValue().char_str() );
         setEncryptionKey( selectedAddress, key );
     }
+}
+
+void SessionTreeControl::disableEncryptionEvent( wxCommandEvent& evt )
+{
+    std::string selectedAddress = std::string(
+                                    GetItemText( GetSelection() ).char_str() );
+    disableEncryption( selectedAddress );
 }

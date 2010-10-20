@@ -262,12 +262,51 @@ bool SessionManager::setEncryptionKey( std::string addr, std::string key )
         return false;
     }
 
-    //printf( "SessionManager::setting key for %s to [%s]\n", addr.c_str(), key.c_str() );
     (*it).encryptionKey = key;
+    (*it).encryptionEnabled = true;
     (*it).session->setEncryptionKey( key.c_str() );
 
     unlockSessions();
     return true;
+}
+
+bool SessionManager::disableEncryption( std::string addr )
+{
+    lockSessions();
+
+    std::vector<SessionEntry>::iterator it = sessions.begin();
+    while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
+        ++it;
+    if ( it == sessions.end() )
+    {
+        unlockSessions();
+        return false;
+    }
+
+    (*it).encryptionEnabled = false;
+    (*it).session->setEncryptionKey( NULL );
+
+    unlockSessions();
+    return true;
+}
+
+bool SessionManager::isEncryptionEnabled( std::string addr )
+{
+    lockSessions();
+
+    std::vector<SessionEntry>::iterator it = sessions.begin();
+    while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
+        ++it;
+    if ( it == sessions.end() )
+    {
+        unlockSessions();
+        return false; // this doesn't quite make sense - should throw some other
+                      // kind of error for session not found?
+    }
+
+    bool ret = (*it).encryptionEnabled;
+    unlockSessions();
+    return ret;
 }
 
 bool SessionManager::iterateSessions()

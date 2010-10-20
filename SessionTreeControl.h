@@ -32,6 +32,7 @@ public:
     void rotateVideoSessions();
 
     bool setEncryptionKey( std::string addr, std::string key );
+    bool disableEncryption( std::string addr );
 
     void itemRightClick( wxTreeEvent& evt );
     void addVideoSessionEvent( wxCommandEvent& evt );
@@ -40,6 +41,7 @@ public:
     void removeSessionEvent( wxCommandEvent& evt );
     void rotateEvent( wxCommandEvent& evt );
     void setEncryptionEvent( wxCommandEvent& evt );
+    void disableEncryptionEvent( wxCommandEvent& evt );
 
     static int addVideoID;
     static int addAudioID;
@@ -47,6 +49,7 @@ public:
     static int removeID;
     static int rotateID;
     static int setEncryptionID;
+    static int disableEncryptionID;
 
 private:
     wxTreeItemId rootID;
