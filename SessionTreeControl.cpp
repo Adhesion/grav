@@ -175,12 +175,6 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
     if ( ( parent == videoNodeID || parent == audioNodeID ||
             parent == rotatedVideoNodeID ) && item != rotatedVideoNodeID )
     {
-        rightClickMenu.Append( removeID, _("Remove") );
-        // TODO static evt_menu binding (at top) doesn't seem to work for
-        // these, so doing runtime connect
-        Connect( removeID, wxEVT_COMMAND_MENU_SELECTED,
-                    wxCommandEventHandler(
-                            SessionTreeControl::removeSessionEvent ) );
         // only add enable/disable if it's a real session, not a rotated one
         if ( parent == videoNodeID || parent == audioNodeID )
         {
@@ -191,6 +185,13 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
                         wxCommandEventHandler(
                                 SessionTreeControl::toggleEnableSessionEvent) );
         }
+
+        rightClickMenu.Append( removeID, _("Remove") );
+        // TODO static evt_menu binding (at top) doesn't seem to work for
+        // these, so doing runtime connect
+        Connect( removeID, wxEVT_COMMAND_MENU_SELECTED,
+                    wxCommandEventHandler(
+                            SessionTreeControl::removeSessionEvent ) );
     }
 
     // right clicked on video group or main group
