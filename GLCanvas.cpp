@@ -23,6 +23,8 @@ GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
     SetSize( wxSize( width, height ) );
     glContext = new wxGLContext( this );
     SetCurrent( *glContext );
+
+    drawStopWatch.Start();
 }
 
 GLCanvas::~GLCanvas()
@@ -37,6 +39,9 @@ void GLCanvas::handlePaintEvent( wxPaintEvent& evt )
 
 void GLCanvas::draw()
 {
+    lastNonDrawTime = drawStopWatch.Time();
+    drawStopWatch.Start();
+
     if( !IsShown() ) return;
     
     SetCurrent( *glContext );
@@ -46,6 +51,9 @@ void GLCanvas::draw()
         grav->draw();
     
     SwapBuffers();
+
+    lastDrawTime = drawStopWatch.Time();
+    drawStopWatch.Start();
 }
 
 void GLCanvas::resize( wxSizeEvent& evt )
@@ -98,4 +106,14 @@ void GLCanvas::stopTimer()
 void GLCanvas::setTimer( RenderTimer* t )
 {
     renderTimer = t;
+}
+
+long GLCanvas::getDrawTime()
+{
+    return lastDrawTime;
+}
+
+long GLCanvas::getNonDrawTime()
+{
+    return lastNonDrawTime;
 }

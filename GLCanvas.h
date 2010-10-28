@@ -33,6 +33,9 @@ public:
     void stopTimer();
     void setTimer( RenderTimer* t );
 
+    long getDrawTime();
+    long getNonDrawTime();
+
 private:
     gravManager* grav;
     wxGLContext* glContext;
@@ -47,6 +50,10 @@ private:
     // if draw is being called by a timer, have a reference to it so we can stop
     // it if need be
     RenderTimer* renderTimer;
+
+    wxStopWatch drawStopwatch;
+    long lastDrawTime;
+    long lastNonDrawTime;
 
 };
 
