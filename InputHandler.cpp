@@ -550,11 +550,11 @@ void InputHandler::mouseLeftHeldMove( int x, int y )
 {
     // glut screen coords are y-flipped relative to GL screen coords
     y = grav->getWindowHeight() - y;
-    
+
     // old method for getting world coords for current mouse pos
     //GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
     //                        &mouseX, &mouseY, &mouseZ );
-    
+
     // ray intersect-based click method
     Point nearScreen( x, y, 0.0f );
     Point farScreen( x, y, 0.5f );
@@ -646,7 +646,7 @@ bool InputHandler::selectVideos()
             selectU = selectD = mouseY;
             //lastBoxed = false;
         }
-        
+
         bool intersect = (*si)->intersect( selectL, selectR, selectU, selectD )
                             && (*si)->isSelectable();
         

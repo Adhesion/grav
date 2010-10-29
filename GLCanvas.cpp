@@ -24,7 +24,13 @@ GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
     glContext = new wxGLContext( this );
     SetCurrent( *glContext );
 
-    drawStopWatch.Start();
+    drawStopwatch.Start();
+    lastDrawTime = 0;
+    lastNonDrawTime = 0;
+    lastDrawTimeMax = 0;
+    lastNonDrawTimeMax = 0;
+    counter = 0;
+    counterMax = 5;
 }
 
 GLCanvas::~GLCanvas()
@@ -39,8 +45,8 @@ void GLCanvas::handlePaintEvent( wxPaintEvent& evt )
 
 void GLCanvas::draw()
 {
-    lastNonDrawTime = drawStopWatch.Time();
-    drawStopWatch.Start();
+    lastNonDrawTime = drawStopwatch.Time();
+    drawStopwatch.Start();
 
     if( !IsShown() ) return;
     
@@ -52,8 +58,8 @@ void GLCanvas::draw()
     
     SwapBuffers();
 
-    lastDrawTime = drawStopWatch.Time();
-    drawStopWatch.Start();
+    lastDrawTime = drawStopwatch.Time();
+    drawStopwatch.Start();
 }
 
 void GLCanvas::resize( wxSizeEvent& evt )
@@ -68,7 +74,7 @@ void GLCanvas::resize( wxSizeEvent& evt )
 void GLCanvas::GLreshape( int w, int h )
 {
     glViewport(0, 0, w, h);
-  
+
     if (w > h)
     {
         screen_height = 1.0;

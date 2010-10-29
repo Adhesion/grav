@@ -71,6 +71,9 @@ gravManager::gravManager()
 
     sourceMutex = mutex_create();
     lockCount = 0;
+
+    graphicsDebugView = true;
+    pixelCount = 0;
 }
 
 gravManager::~gravManager()
@@ -347,6 +350,35 @@ void gravManager::draw()
         const char* text = headerString.c_str();
         GLUtil::getInstance()->getMainFont()->Render( text );
         glDisable( GL_BLEND );
+
+        glPopMatrix();
+    }
+
+    // graphics debug drawing
+    if ( graphicsDebugView )
+    {
+        glPushMatrix();
+
+        long drawTime = canvas->getDrawTime();
+        float color = (33.0f - (float)drawTime) / 17.0f;
+        glColor4f( 1.0f, color, color, 0.8f );
+        glTranslatef( screenRectFull.getRBound() * 0.3f,
+                    screenRectFull.getUBound() * 0.9f, 0.0f );
+        float debugScale = textScale / 2.5f;
+        glScalef( debugScale, debugScale, debugScale );
+        /*std::string debugText;
+        debugText += canvas->getDrawTime();
+        debugText += videoListener->getPixelCount();
+                std::string( "Draw time: " ) + canvas->getDrawTime() +
+                    std::string( "\nNon-draw time: " ) + canvas->getNonDrawTime() +
+                            std::string( "\nPixel count:\n" ) +
+                                    videoListener->getPixelCount();*/
+        char text[100];
+        sprintf( text, "Draw time: %ld  Non-draw time: %ld  Pixel count:%ld",
+                canvas->getDrawTime(), canvas->getNonDrawTime(),
+                videoListener->getPixelCount() );
+        //printf( "%s\n", text );
+        GLUtil::getInstance()->getMainFont()->Render( text );
 
         glPopMatrix();
     }
@@ -1053,6 +1085,11 @@ void gravManager::setAudio( AudioManager* a )
 void gravManager::setVideoListener( VideoListener* v )
 {
     videoListener = v;
+}
+
+void gravManager::setCanvas( GLCanvas* c )
+{
+	canvas = c;
 }
 
 void gravManager::setHeaderString( std::string h )

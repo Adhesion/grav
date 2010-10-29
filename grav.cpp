@@ -134,6 +134,7 @@ bool gravApp::OnInit()
     grav->setTree( sourceTree );
     grav->setBorderTex( "border.png" );
     grav->setVideoListener( videoSessionListener );
+    grav->setCanvas( canvas );
 
     vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
 

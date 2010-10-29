@@ -44,6 +44,8 @@ public:
     void setTimer( wxStopWatch* t );
 
     int getSourceCount();
+    long getPixelCount();
+    void updatePixelCount( long mod );
 
 private:
     gravManager* grav;
@@ -56,6 +58,7 @@ private:
     float initialY;
 
     int sourceCount;
+    long pixelCount;
 
 };
 

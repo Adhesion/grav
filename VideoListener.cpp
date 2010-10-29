@@ -25,6 +25,7 @@ VideoListener::VideoListener( gravManager* g ) :
     y = initialY;
 
     sourceCount = 0;
+    pixelCount = 0;
 }
 
 void
@@ -68,7 +69,8 @@ VideoListener::vpmsession_source_created(VPMSession &session,
 
         //printf( "creating new source at %f,%f\n", x, y );
         
-        VideoSource* source = new VideoSource( &session, ssrc, sink, x, y );
+        VideoSource* source = new VideoSource( &session, this, ssrc, sink, x,
+													y );
         grav->addNewSource( source );
         
         // new frame callback mostly just used for testing
@@ -202,6 +204,17 @@ void VideoListener::setTimer( wxStopWatch* t )
 int VideoListener::getSourceCount()
 {
     return sourceCount;
+}
+
+long VideoListener::getPixelCount()
+{
+	return pixelCount;
+}
+
+void VideoListener::updatePixelCount( long mod )
+{
+	pixelCount += mod;
+	printf( "pixelcount now %ld\n", pixelCount );
 }
 
 /*static void newFrameCallbackTest( VPMVideoSink* sink, int buffer_idx,

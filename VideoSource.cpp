@@ -5,14 +5,17 @@
  */
 
 #include "VideoSource.h"
+#include "VideoListener.h"
 #include "GLUtil.h"
 #include <cmath>
 
 #include <VPMedia/video/VPMVideoDecoder.h>
 
-VideoSource::VideoSource( VPMSession* _session, uint32_t _ssrc,
-                            VPMVideoBufferSink* vs, float _x, float _y ) :
-    RectangleBase( _x, _y ), session( _session ), ssrc( _ssrc ), videoSink( vs )
+VideoSource::VideoSource( VPMSession* _session, VideoListener* l,
+							uint32_t _ssrc, VPMVideoBufferSink* vs,
+							float _x, float _y ) :
+    RectangleBase( _x, _y ), session( _session ), listener( l ), ssrc( _ssrc ),
+		videoSink( vs )
 {
     vwidth = videoSink->getImageWidth();
     vheight = videoSink->getImageHeight();
@@ -258,8 +261,10 @@ void VideoSource::draw()
 
 void VideoSource::resizeBuffer()
 {
+	listener->updatePixelCount( -( vwidth * vheight ) );
     vwidth = videoSink->getImageWidth();
     vheight = videoSink->getImageHeight();
+    listener->updatePixelCount(  vwidth * vheight );
     
     if ( vheight > 0 )
         aspect = (float)vwidth / (float)vheight;

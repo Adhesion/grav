@@ -14,12 +14,14 @@
 #include <VPMedia/video/VPMVideoBufferSink.h>
 #include <VPMedia/VPMSession.h>
 
+class VideoListener;
+
 class VideoSource : public RectangleBase
 {
 
 public:
-    VideoSource( VPMSession* _session, uint32_t _ssrc, VPMVideoBufferSink* vs,
-                    float x, float y );
+    VideoSource( VPMSession* _session, VideoListener* l, uint32_t _ssrc,
+					VPMVideoBufferSink* vs, float x, float y );
     ~VideoSource();
     
     void draw();
@@ -68,6 +70,8 @@ private:
     // reference to the session that this video comes from - needed for grabbing
     // metadata from RTCP/SDES
     VPMSession* session;
+    // reference to listener that made it, to update pixel counts
+    VideoListener* listener;
 
     // synchronization source, from rtp
     uint32_t ssrc;

@@ -141,6 +141,7 @@ public:
     void setTree( TreeControl* t );
     void setAudio( AudioManager* a );
     void setVideoListener( VideoListener* v );
+    void setCanvas( GLCanvas* c );
     /*
      * Note, this should be called after GL setup since it needs to calculate
      * the text size, which depends on the font being set up.
@@ -191,6 +192,8 @@ private:
     // mostly just to grab the number of sources for arrangement purposes
     VideoListener* videoListener;
 
+    GLCanvas* canvas;
+
     std::string headerString;
     bool useHeader;
     FTBBox headerTextBox;
@@ -234,6 +237,9 @@ private:
     bool useRunway;
     bool gridAuto;
     bool autoFocusRotate;
+
+    bool graphicsDebugView;
+    long pixelCount;
 
 };
 

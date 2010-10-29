@@ -29,7 +29,7 @@ public:
     void draw();
     void resize( wxSizeEvent& evt );
     void GLreshape( int w, int h );
-    
+
     void stopTimer();
     void setTimer( RenderTimer* t );
 
@@ -40,10 +40,10 @@ private:
     gravManager* grav;
     wxGLContext* glContext;
     DECLARE_EVENT_TABLE()
-    
+
     void testDraw();
     void testKey( wxKeyEvent& evt );
-    
+
     // tracks the aspect ratio of the screen for reshaping
     float screen_width, screen_height;
 
@@ -51,9 +51,15 @@ private:
     // it if need be
     RenderTimer* renderTimer;
 
+    // for measuring the draw time
     wxStopWatch drawStopwatch;
     long lastDrawTime;
     long lastNonDrawTime;
+    // for calculating averages
+    long lastDrawTimeMax;
+    long lastNonDrawTimeMax;
+    int counter;
+    int counterMax;
 
 };
 
