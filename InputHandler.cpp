@@ -37,21 +37,21 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     clickedInside = false;
     leftButtonHeld = false;
     ctrlHeld = false;
-    shiftHeld = false;
-    altHeld = false;
+    modifiers = 0;
 }
 
 InputHandler::~InputHandler()
-{ 
+{
     delete tempSelectedObjects;
     // all other pointers are owned by the main class
 }
 
 void InputHandler::wxKeyDown( wxKeyEvent& evt )
 {
-    shiftHeld = ( evt.GetModifiers() == wxMOD_SHIFT );
+    /*shiftHeld = ( evt.GetModifiers() == wxMOD_SHIFT );
     altHeld = ( evt.GetModifiers() == wxMOD_ALT );
-    ctrlHeld = ( evt.GetModifiers() == wxMOD_CMD );
+    ctrlHeld = ( evt.GetModifiers() == wxMOD_CMD );*/
+    modifiers = evt.GetModifiers();
 
     processKeyboard( evt.GetKeyCode(), 0, 0 );
 
@@ -75,7 +75,8 @@ void InputHandler::wxMouseLDown( wxMouseEvent& evt )
         ctrlHeld = true;
     else
         ctrlHeld = false;
-    
+    //modifiers = evt.GetModifiers();
+
     leftClick( evt.GetPosition().x, evt.GetPosition().y );
     evt.Skip();
 }
@@ -104,20 +105,20 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     /*printf( "Char pressed is %c (%i)\n", key, key );
     printf( "keycode is %i\n", keyCode );
     printf( "x,y in processKeyboard is %i,%i\n", x, y );
-    printf( "is shift held? %i\n", shiftHeld );
-    printf( "is ctrl held? %i\n", ctrlHeld );
-    printf( "is alt held? %i\n", altHeld );*/
+    printf( "is shift (only) held? %i\n", modifiers == wxMOD_SHIFT );
+    printf( "is ctrl (only) held? %i\n", modifiers == wxMOD_CMD );
+    printf( "is alt (only) held? %i\n", modifiers == wxMOD_ALT );*/
     std::vector<VideoSource*>::const_iterator si;
     // how much to scale when doing -/+: flipped in the former case
     float scaleAmt = 0.25f;
-    
+
     std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
     std::map<std::string, std::vector<RectangleBase*> > data = \
         std::map<std::string, std::vector<RectangleBase*> >();
 
     // TODO reorder this to make some sort of sense
     switch( key ) {
-    
+
     case 'K':
         printf( "current sources selected: %i\n",
                     grav->getSelectedObjects()->size() );
@@ -160,7 +161,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         break;
 
     case 'R':
-        if ( altHeld )
+        if ( modifiers == wxMOD_ALT )
         {
             grav->setRunwayUsage( !grav->usingRunway() );
             grav->clearSelected();
@@ -176,7 +177,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
 
     case 'I':
         // ctrl-I -> invert selection
-        if ( ctrlHeld )
+        if ( modifiers == wxMOD_CMD )
         {
             for ( unsigned int i = 0; i < movableObjects.size(); i++ )
             {
@@ -295,7 +296,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         for ( si = grav->getSources()->begin();
                 si != grav->getSources()->end(); ++si )
         {
-            if ( shiftHeld || (*si)->isSelected() )
+            if ( modifiers == wxMOD_SHIFT || (*si)->isSelected() )
             {
                 (*si)->scaleNative();
                 if ( (*si)->isGrouped() )
@@ -313,7 +314,9 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         break;*/
 
     case 'F':
-        if ( !shiftHeld && grav->getSelectedObjects()->size() > 0 )
+        // just f - focus, ie selected to middle, others around
+        if ( modifiers == wxMOD_NONE &&
+                grav->getSelectedObjects()->size() > 0 )
         {
             std::map<std::string, std::vector<RectangleBase*> > data = \
                 std::map<std::string, std::vector<RectangleBase*> >();
@@ -322,7 +325,9 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
             layouts.arrange( "focus", grav->getScreenRect(),
                               RectangleBase(), data );
         }
-        else if ( shiftHeld && grav->getSelectedObjects()->size() == 1 )
+        // shift F - fullscreen selected single
+        else if ( modifiers == wxMOD_SHIFT &&
+                    grav->getSelectedObjects()->size() == 1 )
         {
             (*grav->getSelectedObjects())[0]->fillToRect(grav->getScreenRect());
         }
@@ -352,18 +357,18 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         break;
 
     case 'W':
-        grav->setCamZ(grav->getCamZ()-1);
+        //grav->setCamZ(grav->getCamZ()-1);
         break;
     case 'S':
-        grav->setCamZ(grav->getCamZ()+1);
+        //grav->setCamZ(grav->getCamZ()+1);
         break;
     case 'A':
-        if ( altHeld )
+        if ( modifiers == wxMOD_ALT )
         {
             grav->setAutoFocusRotate( !grav->usingAutoFocusRotate() );
             grav->resetAutoCounter();
         }
-        else if ( ctrlHeld )
+        else if ( modifiers == wxMOD_CMD )
         {
             grav->clearSelected();
             for ( unsigned int i = 0; i < movableObjects.size(); i++ )
@@ -373,10 +378,15 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
             }
         }
         else
-            grav->setCamX(grav->getCamX()-1);
+            //grav->setCamX(grav->getCamX()-1);
         break;
     case 'D':
-        grav->setCamX(grav->getCamX()+1);
+        // ctrl-shift-d - graphics debug view
+        if ( modifiers == ( wxMOD_SHIFT | wxMOD_CMD ) )
+        {
+            grav->setGraphicsDebugMode( !grav->getGraphicsDebugMode() );
+        }
+        //grav->setCamX(grav->getCamX()+1);
         break;
 
     case '-':
@@ -386,13 +396,13 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         grav->scaleSelectedObjects( scaleAmt );
         break;
     case '=':
-        if ( shiftHeld )
+        if ( modifiers == wxMOD_SHIFT )
             grav->scaleSelectedObjects( scaleAmt );
         break;
 
     // enter - alt-enter for fullscreen
     case 13:
-        if ( altHeld )
+        if ( modifiers == wxMOD_ALT )
         {
             mainFrame->ShowFullScreen( !mainFrame->IsFullScreen() );
         }
@@ -429,7 +439,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
 
     // space, disabled temporarily
     case WXK_SPACE:
-        grav->addTestObject();
+        //grav->addTestObject();
         break;
     }
 }
@@ -439,9 +449,9 @@ void InputHandler::leftClick( int x, int y )
     // glut screen coords are y-flipped relative to GL screen coords
     //printf( "window height? %i\n", grav->getWindowHeight() );
     y = grav->getWindowHeight() - y;
-    
+
     grav->setBoxSelectDrawing( false );
-    
+
     // old method for getting world coords for current mouse pos
     //GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.99087065,
     //                            &mouseX, &mouseY, &mouseZ );
@@ -480,10 +490,10 @@ void InputHandler::leftClick( int x, int y )
         {
             float movePosX = mouseX; float movePosY = mouseY;
             std::vector<RectangleBase*>::const_iterator sli;
-            
+
             float avgX = 0.0f, avgY = 0.0f;
             int num = grav->getSelectedObjects()->size();
-            
+
             if ( num == 1 )
             {
                 (*(grav->getSelectedObjects()))[0]->move( movePosX, movePosY );
@@ -494,7 +504,7 @@ void InputHandler::leftClick( int x, int y )
             else
             {
                 // average the vals
-                for ( sli = grav->getSelectedObjects()->begin(); 
+                for ( sli = grav->getSelectedObjects()->begin();
                        sli != grav->getSelectedObjects()->end();
                        sli++ )
                 {
@@ -503,9 +513,9 @@ void InputHandler::leftClick( int x, int y )
                 }
                 avgX = avgX / num;
                 avgY = avgY / num;
-            
+
                 // move and set them to be unselected
-                for ( sli = grav->getSelectedObjects()->begin(); 
+                for ( sli = grav->getSelectedObjects()->begin();
                        sli != grav->getSelectedObjects()->end();
                        sli++ )
                 {
@@ -524,7 +534,7 @@ void InputHandler::leftClick( int x, int y )
         //leftButtonHeld = false;
         //clickedInside = true;
     }
-    
+
     // either way the left button is now held
     leftButtonHeld = true;
 }
@@ -537,7 +547,7 @@ void InputHandler::leftRelease( int x, int y )
         grav->getSelectedObjects()->push_back( (*tempSelectedObjects)[i] );
     tempSelectedObjects->clear();
     leftButtonHeld = false;
-    
+
     // if we were doing drag movement, deselect all
     if ( dragging && grav->getHoldCounter() > 10 )
     {
@@ -605,7 +615,7 @@ void InputHandler::mouseLeftHeldMove( int x, int y )
     // intersecting with an object at first, then not intersecting later
     else if ( leftButtonHeld )
     {
-        for ( std::vector<RectangleBase*>::iterator sli = 
+        for ( std::vector<RectangleBase*>::iterator sli =
                                     tempSelectedObjects->begin();
               sli != tempSelectedObjects->end(); sli++ )
             (*sli)->setSelect(false);
@@ -613,7 +623,7 @@ void InputHandler::mouseLeftHeldMove( int x, int y )
         selectVideos();
         grav->setBoxSelectDrawing( true );
     }
-    
+
     dragPrevX = mouseX;
     dragPrevY = mouseY;
 }
@@ -621,12 +631,12 @@ void InputHandler::mouseLeftHeldMove( int x, int y )
 bool InputHandler::selectVideos()
 {
     bool videoSelected = false;
-    
+
     std::vector<RectangleBase*>::reverse_iterator si;
     // reverse means we'll get the video that's on top first, since videos
     // later in the list will render on top of previous ones
     std::vector<RectangleBase*>::const_iterator sli;
-    
+
     for ( si = grav->getDrawnObjects()->rbegin();
             si != grav->getDrawnObjects()->rend(); si++ )
     {
@@ -649,19 +659,19 @@ bool InputHandler::selectVideos()
 
         bool intersect = (*si)->intersect( selectL, selectR, selectU, selectD )
                             && (*si)->isSelectable();
-        
+
         // for click-and-drag movement
         clickedInside = intersect && !leftButtonHeld;
-        
+
         if ( intersect )
         {
             // clear the list of selected if we're clicking on a new video
             if ( !leftButtonHeld && !(*si)->isSelected() && !ctrlHeld )
                 grav->clearSelected();
-            
+
             videoSelected = true;
             RectangleBase* temp = (*si);
-            
+
             if ( !temp->isSelected() )
             {
                 if ( temp->isGrouped() )
@@ -671,7 +681,7 @@ bool InputHandler::selectVideos()
                     if ( g->isLocked() )
                         temp = (RectangleBase*)g;
                 }
-                
+
                 temp->setSelect( true );
                 // if we're doing a box selection, add it to the temp list
                 if ( leftButtonHeld )
@@ -690,7 +700,7 @@ bool InputHandler::selectVideos()
                     sli++;
                 grav->getSelectedObjects()->erase( sli );
             }
-            
+
             // take the selected video and put it at the end of the list so
             // it'll be rendered on top - but only if we just clicked on it
             if ( !leftButtonHeld )
@@ -703,7 +713,7 @@ bool InputHandler::selectVideos()
                     distance( si, grav->getDrawnObjects()->rend() );
                 grav->moveToTop( current );*/
                 grav->moveToTop( temp );
-                
+
                 break; // so we only select one video per click
                        // when single-clicking
             }
@@ -713,7 +723,7 @@ bool InputHandler::selectVideos()
             //printf( "InputHandler::selectVideos: did not intersect\n" );
         }
     }
-    
+
     return videoSelected;
 }
 

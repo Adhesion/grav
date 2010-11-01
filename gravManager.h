@@ -164,6 +164,7 @@ public:
     Runway* getRunway();
 
     void setGraphicsDebugMode( bool g );
+    bool getGraphicsDebugMode();
 
 private:
 

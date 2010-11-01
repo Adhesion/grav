@@ -28,24 +28,24 @@ typedef double GLdouble;
 
 class InputHandler : public wxEvtHandler
 {
-    
+
 public:
     InputHandler( Earth* e, gravManager* g, Frame* f );
     ~InputHandler();
-    
+
     void wxKeyDown( wxKeyEvent& evt );
     void wxCharEvt( wxKeyEvent& evt );
     void wxMouseMove( wxMouseEvent& evt );
     void wxMouseLDown( wxMouseEvent& evt );
     void wxMouseLUp( wxMouseEvent& evt );
     void wxMouseRDown( wxMouseEvent& evt );
-    
+
     void processKeyboard( int keyCode, int x, int y );
-    
+
     void leftClick( int x, int y );
     void leftRelease( int x, int y );
     void mouseLeftHeldMove( int x, int y );
-    
+
     bool selectVideos();
     static int propertyID;
 
@@ -55,14 +55,14 @@ public:
     bool isLeftButtonHeld();
     float getDragStartX(); float getDragStartY();
     float getDragEndX(); float getDragEndY();
-    
-private:   
+
+private:
     std::vector<RectangleBase*>* tempSelectedObjects;
     Earth* earth;
-    
+
     // parent class
     gravManager* grav;
-    
+
     // main gui window so we can trigger the proper quit sequence
     Frame* mainFrame;
 
@@ -70,9 +70,9 @@ private:
 
     // special input modifiers like CTRL
     int special;
-    
+
     GLdouble mouseX, mouseY, mouseZ;
-    
+
     // start & end pos for click-and-dragging
     float dragStartX;
     float dragStartY;
@@ -82,19 +82,20 @@ private:
     // distance
     float dragPrevX;
     float dragPrevY;
-    
+
     bool leftButtonHeld;
 
-    // note shiftheld and altheld are for when ONLY those are held down - maybe
-    // change this to be more consistent
+    // this should only be for mouse callbacks
     bool ctrlHeld;
-    bool shiftHeld;
-    bool altHeld;
     bool clickedInside;
     bool dragging;
-    
+
+    // use wx modifiers for keyboard callback - to easily check for "shift only"
+    // "ctrl only" etc.
+    int modifiers;
+
     DECLARE_EVENT_TABLE()
-    
+
 };
 
 #endif /*INPUTHANDLER_H_*/

@@ -1180,3 +1180,8 @@ void gravManager::setGraphicsDebugMode( bool g )
 {
     graphicsDebugView = g;
 }
+
+bool gravManager::getGraphicsDebugMode()
+{
+    return graphicsDebugView;
+}
