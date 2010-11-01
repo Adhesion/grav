@@ -44,9 +44,9 @@ private:
      */
     virtual bool OnInit();
     virtual int OnExit();
-    
+
     DECLARE_EVENT_TABLE()
-    
+
     void idleHandler( wxIdleEvent& evt );
 
     /**
@@ -54,7 +54,7 @@ private:
      * Primarily for setting the video/audio/etc addresses.
      */
     bool handleArgs();
-    
+
     /**
      * Map RTP payloads that aren't determined statically by the RFC
      * (those that are have already been mapped in VPMedia)
@@ -71,17 +71,17 @@ private:
     void iterateSessions();
 
     wxCmdLineParser parser;
-    
+
     Frame* mainFrame;
     SideFrame* treeFrame;
     wxPanel* treePanel;
     wxNotebook* treeNotebook;
-    
+
     GLCanvas* canvas;
     RenderTimer* timer;
     TreeControl* sourceTree;
     SessionTreeControl* sessionTree;
-    
+
     int timerInterval;
     int timerIntervalUS;
 

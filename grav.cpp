@@ -40,7 +40,7 @@ bool gravApp::OnInit()
     grav = new gravManager();
     windowWidth = 900; windowHeight = 550; // defaults - should be command line
     // grav's windowwidth/height will be set by the glcanvas's resize callback
-    
+
     parser.SetCmdLine( argc, argv );
 
     videoSessionListener = new VideoListener( grav );
@@ -118,10 +118,10 @@ bool gravApp::OnInit()
     //timer->Start();
     //wxStopWatch* t2 = new wxStopWatch();
     //videoSession_listener->setTimer( t2 );
-    
+
     Earth* earth = new Earth();
     InputHandler* input = new InputHandler( earth, grav, mainFrame );
-    
+
     // add the input handler to the chain of things that can handle
     // events & give the canvas focus so we don't have to click on it to
     // start sending key events
@@ -202,6 +202,7 @@ int gravApp::OnExit()
 
 void gravApp::idleHandler( wxIdleEvent& evt )
 {
+    // start secondary thread if not running
     if ( usingThreads && !threadRunning )
     {
         grav->setThreads( usingThreads );
@@ -212,18 +213,27 @@ void gravApp::idleHandler( wxIdleEvent& evt )
     if ( !usingThreads )
         sessionManager->iterateSessions();
 
-    // note this is the method for rendering on idle, with a limiter to 16ms
-    // (60fps)
-    unsigned long time = (unsigned long)timer->getTiming();
-    if ( time > (unsigned long)timerIntervalUS )
+    if ( timerIntervalUS > 0 )
     {
-        //printf( "%lu\n", time );
-        canvas->draw();
-        timer->resetTiming();
+        // this is the method for rendering on idle, with a limiter to 16ms
+        // (60fps)
+        unsigned long time = (unsigned long)timer->getTiming();
+        if ( time > (unsigned long)timerIntervalUS )
+        {
+            //printf( "%lu\n", time );
+            canvas->draw();
+            timer->resetTiming();
+        }
+        else
+        {
+            wxMilliSleep( 1 );
+        }
     }
-    else
+    // otherwise (if fps value isn't set) just constantly draw - if vsync is on,
+    // will be limited to vsync
+    else if ( timerIntervalUS == 0 )
     {
-        wxMilliSleep( 1 );
+        canvas->draw();
     }
 
     evt.RequestMore();
@@ -294,10 +304,12 @@ bool gravApp::handleArgs()
             timerIntervalUS = 16667;
         }
     }
+    // if fps isn't set, set these vals to 0 so the idle handler will just
+    // constantly draw
     else
     {
-        timerInterval = 16;
-        timerIntervalUS = 16667;
+        timerInterval = 0;
+        timerIntervalUS = 0;
     }
 
     long int rotateIntervalS;
