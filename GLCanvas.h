@@ -37,6 +37,9 @@ public:
     long getNonDrawTime();
     float getFPS();
 
+    void setDebugTimerUsage( bool d );
+    bool getDebugTimerUsage();
+
 private:
     gravManager* grav;
     wxGLContext* glContext;
@@ -68,6 +71,8 @@ private:
     wxStopWatch fpsStopwatch;
     int fpsCounter;
     float fpsResult;
+
+    bool useDebugTimers;
 
 };
 

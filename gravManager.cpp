@@ -72,7 +72,7 @@ gravManager::gravManager()
     sourceMutex = mutex_create();
     lockCount = 0;
 
-    graphicsDebugView = true;
+    graphicsDebugView = false;
     pixelCount = 0;
 }
 
@@ -1179,6 +1179,7 @@ Runway* gravManager::getRunway()
 void gravManager::setGraphicsDebugMode( bool g )
 {
     graphicsDebugView = g;
+    canvas->setDebugTimerUsage( g );
 }
 
 bool gravManager::getGraphicsDebugMode()

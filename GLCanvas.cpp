@@ -24,7 +24,6 @@ GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
     glContext = new wxGLContext( this );
     SetCurrent( *glContext );
 
-    drawStopwatch.Start();
     lastDrawTime = 0;
     lastNonDrawTime = 0;
     lastDrawTimeMax = 0;
@@ -32,9 +31,10 @@ GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
     counter = 0;
     counterMax = 5;
 
-    fpsStopwatch.Start();
     fpsCounter = 0;
     fpsResult = 0;
+
+    useDebugTimers = false;
 }
 
 GLCanvas::~GLCanvas()
@@ -49,9 +49,12 @@ void GLCanvas::handlePaintEvent( wxPaintEvent& evt )
 
 void GLCanvas::draw()
 {
-    lastNonDrawTime = drawStopwatch.Time();
-    lastNonDrawTimeMax += lastNonDrawTime;
-    drawStopwatch.Start();
+    if ( useDebugTimers )
+    {
+        lastNonDrawTime = drawStopwatch.Time();
+        lastNonDrawTimeMax += lastNonDrawTime;
+        drawStopwatch.Start();
+    }
 
     if( !IsShown() ) return;
 
@@ -63,26 +66,29 @@ void GLCanvas::draw()
 
     SwapBuffers();
 
-    lastDrawTime = drawStopwatch.Time();
-    lastDrawTimeMax += lastDrawTime;
-    drawStopwatch.Start();
-
-    counter = (counter+1) % counterMax;
-    if ( counter == 0 )
+    if ( useDebugTimers )
     {
-        lastDrawTimeAvg = lastDrawTimeMax / (float)counterMax;
-        lastNonDrawTimeAvg = lastNonDrawTimeMax / (float)counterMax;
-        lastDrawTimeMax = 0;
-        lastNonDrawTimeMax = 0;
-    }
+        lastDrawTime = drawStopwatch.Time();
+        lastDrawTimeMax += lastDrawTime;
+        drawStopwatch.Start();
 
-    fpsCounter++;
-    long elapsed = fpsStopwatch.Time();
-    if ( elapsed > 1000 )
-    {
-        fpsResult = (float)fpsCounter * 1000.0f / (float)elapsed;
-        fpsCounter = 0;
-        fpsStopwatch.Start();
+        counter = (counter+1) % counterMax;
+        if ( counter == 0 )
+        {
+            lastDrawTimeAvg = lastDrawTimeMax / (float)counterMax;
+            lastNonDrawTimeAvg = lastNonDrawTimeMax / (float)counterMax;
+            lastDrawTimeMax = 0;
+            lastNonDrawTimeMax = 0;
+        }
+
+        fpsCounter++;
+        long elapsed = fpsStopwatch.Time();
+        if ( elapsed > 500 )
+        {
+            fpsResult = (float)fpsCounter * 1000.0f / (float)elapsed;
+            fpsCounter = 0;
+            fpsStopwatch.Start();
+        }
     }
 }
 
@@ -151,4 +157,21 @@ long GLCanvas::getNonDrawTime()
 float GLCanvas::getFPS()
 {
     return fpsResult;
+}
+
+void GLCanvas::setDebugTimerUsage( bool d )
+{
+    useDebugTimers = d;
+    if ( d )
+        fpsStopwatch.Start();
+    else
+    {
+        fpsStopwatch.Pause();
+        fpsCounter = 0;
+    }
+}
+
+bool GLCanvas::getDebugTimerUsage()
+{
+    return useDebugTimers;
 }
