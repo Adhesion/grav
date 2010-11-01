@@ -68,11 +68,11 @@ VideoListener::vpmsession_source_created(VPMSession &session,
         d->connectVideoProcessor(sink);
 
         //printf( "creating new source at %f,%f\n", x, y );
-        
+
         VideoSource* source = new VideoSource( &session, this, ssrc, sink, x,
 													y );
         grav->addNewSource( source );
-        
+
         // new frame callback mostly just used for testing
         //sink->addNewFrameCallback( &newFrameCallbackTest, (void*)timer );
 
@@ -93,7 +93,7 @@ VideoListener::vpmsession_source_created(VPMSession &session,
     }
 }
 
-void 
+void
 VideoListener::vpmsession_source_deleted(VPMSession &session,
                     uint32_t ssrc,
                     const char *reason)
@@ -116,29 +116,29 @@ VideoListener::vpmsession_source_deleted(VPMSession &session,
     //printf( "VideoListener::source_deleted: ERROR: ssrc not found?\n" );
 }
 
-void 
+void
 VideoListener::vpmsession_source_description(VPMSession &session,
                     uint32_t ssrc)
 {
   // Ignore
 }
 
-void 
-VideoListener::vpmsession_source_app(VPMSession &session, 
-                uint32_t ssrc, 
-                const char *app , 
-                const char *data, 
+void
+VideoListener::vpmsession_source_app(VPMSession &session,
+                uint32_t ssrc,
+                const char *app ,
+                const char *data,
                 uint32_t data_len)
 {
     //printf( "RTP app data received\n" );
     //printf( "app: %s\n", app );
     //printf( "data: %s\n", data );
-    
+
     std::string appS( app, 4 );
     std::string dataS( data, data_len );
     //printf( "listener::RTCP_APP: %s,%s\n", appS.c_str(), dataS.c_str() );
     //printf( "listener::RTCP_APP: data length is %i\n", data_len );
-    
+
     if ( appS.compare( "site" ) == 0 && grav->usingSiteIDGroups() )
     {
         grav->lockSources();
@@ -147,7 +147,7 @@ VideoListener::vpmsession_source_app(VPMSession &session,
         // reason, so chop those off
         dataS = std::string( dataS, 0, 32 );
         std::vector<VideoSource*>::iterator i = grav->getSources()->begin();
-        
+
         // sometimes, if groups are enabled by default, we can get RTCP APP
         // before we get any sources added, resulting in a crash when we try
         // and dereference the sources pointer - so skip this if we don't have
@@ -157,7 +157,7 @@ VideoListener::vpmsession_source_app(VPMSession &session,
             grav->unlockSources();
             return;
         }
-        
+
         while ( (*i)->getssrc() != ssrc )
         {
             ++i;
@@ -167,21 +167,21 @@ VideoListener::vpmsession_source_app(VPMSession &session,
                 return;
             }
         }
-        
+
         if ( !(*i)->isGrouped() )
         {
             Group* g;
             std::map<std::string,Group*>::iterator mapi =
                                      grav->getSiteIDGroups()->find(dataS);
-            
+
             if ( mapi == grav->getSiteIDGroups()->end() )
                 g = grav->createSiteIDGroup( dataS );
             else
                 g = mapi->second;
-            
+
             (*i)->setSiteID( dataS );
             g->add( *i );
-            
+
             // adding & removing will replace the object under its group
             if ( grav->getTree() )
             {
@@ -214,7 +214,6 @@ long VideoListener::getPixelCount()
 void VideoListener::updatePixelCount( long mod )
 {
 	pixelCount += mod;
-	printf( "pixelcount now %ld\n", pixelCount );
 }
 
 /*static void newFrameCallbackTest( VPMVideoSink* sink, int buffer_idx,

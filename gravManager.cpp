@@ -362,8 +362,7 @@ void gravManager::draw()
         long drawTime = canvas->getDrawTime();
         float color = (33.0f - (float)drawTime) / 17.0f;
         glColor4f( 1.0f, color, color, 0.8f );
-        glTranslatef( screenRectFull.getRBound() * 0.05f,
-                    screenRectFull.getUBound() * 0.9f, 0.0f );
+        glTranslatef( 0.0f, screenRectFull.getUBound() * 0.9f, 0.0f );
         float debugScale = textScale / 2.5f;
         glScalef( debugScale, debugScale, debugScale );
         /*std::string debugText;
@@ -374,8 +373,9 @@ void gravManager::draw()
                             std::string( "\nPixel count:\n" ) +
                                     videoListener->getPixelCount();*/
         char text[100];
-        sprintf( text, "Draw time: %ld  Non-draw time: %ld  Pixel count:%ld "
-                "FPS: %f",
+        sprintf( text,
+                "Draw time: %3ld  Non-draw time: %3ld  Pixel count: %8ld """
+                "FPS: %2.2f",
                 canvas->getDrawTime(), canvas->getNonDrawTime(),
                 videoListener->getPixelCount(), canvas->getFPS() );
         //printf( "%s\n", text );
