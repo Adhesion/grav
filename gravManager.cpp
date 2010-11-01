@@ -374,7 +374,7 @@ void gravManager::draw()
                                     videoListener->getPixelCount();*/
         char text[100];
         sprintf( text,
-                "Draw time: %3ld  Non-draw time: %3ld  Pixel count: %8ld """
+                "Draw time: %3ld  Non-draw time: %3ld  Pixel count: %8ld "
                 "FPS: %2.2f",
                 canvas->getDrawTime(), canvas->getNonDrawTime(),
                 videoListener->getPixelCount(), canvas->getFPS() );
