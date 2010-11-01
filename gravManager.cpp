@@ -95,15 +95,15 @@ gravManager::~gravManager()
 }
 
 void gravManager::draw()
-{   
+{
     // don't draw if either of these objects haven't been initialized yet
     if ( !earth || !input ) return;
-    
+
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    
+
     glLoadIdentity();
     gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
-    
+
     // audio test drawing
     /*if ( audioEnabled )
     {
@@ -112,7 +112,7 @@ void gravManager::draw()
         printf( "level: %f\n", level );
         gluSphere( sphereQuad, level * 50.0f, 200, 200 );
     }*/
-    
+
     // set it to update names only every 30 frames
     bool updateNames = false;
     if ( drawCounter > 29 )
@@ -120,18 +120,18 @@ void gravManager::draw()
         updateNames = true;
         drawCounter = 0;
     }
-    
+
     // polygon offset to fix z-fighting of coplanar polygons (videos)
     // disabled, since making the depth buffer read-only in some area takes
     // care of this issue
     //glEnable( GL_POLYGON_OFFSET_FILL );
     //glPolygonOffset( 0.1, 1.0 );
-    
+
     //glPolygonMode( GL_FRONT, GL_FILL );
     //float pOffset = 0.1;
-    
+
     std::vector<RectangleBase*>::const_iterator si;
-    
+
     lockSources();
 
     // periodically automatically rearrange if on automatic - take last object
@@ -211,13 +211,13 @@ void gravManager::draw()
             drawEarthPoint( (*si)->getLat(), (*si)->getLon(), 6.0f );
         }
     }
-    
+
     earth->draw();
-    
+
     // this makes the depth buffer read-only for this bit - this prevents
     // z-fighting on the videos which are coplanar
     glDepthMask( GL_FALSE );
-    
+
     //printf( "glutDisplay::drawing objects\n" );
     // iterate through all objects to be drawn, and draw
     for ( si = drawnObjects->begin(); si != drawnObjects->end(); si++ )
@@ -231,7 +231,7 @@ void gravManager::draw()
             if ( (*si)->updateName() && tree )
                 tree->updateObjectName( (*si) );
         }
-        
+
         // only draw if not grouped - groups are responsible for
         // drawing their members
         if ( !(*si)->isGrouped() )
@@ -273,14 +273,14 @@ void gravManager::draw()
             //printf( "%s is grouped, not drawing\n", (*si)->getName().c_str() );
             //printf( "its group is %s\n", (*si)->getGroup()->getName().c_str() );
         }
-        //printf( "glutDisplay: siteID: %s level %f\n", 
+        //printf( "glutDisplay: siteID: %s level %f\n",
         //        (*si)->getSiteID().c_str(),
         //        audioSession_listener.getLevel( (*si)->getSiteID().c_str() ) );
     }
     // back to writeable z-buffer for proper earth/line rendering
     glDepthMask( GL_TRUE );
     //printf( "glutDisplay::done drawing objects\n" );
-    
+
     // do the audio focus if it triggered
     if ( audioEnabled && audio->getSourceCount() > 0 )
     {
@@ -305,34 +305,34 @@ void gravManager::draw()
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        
+
         // the main box
         glBegin(GL_QUADS);
-        
+
         glColor4f( 0.1f, 0.2f, 1.0f, holdCounter/25.0f * 0.25f );
-        
+
         glVertex3f(input->getDragStartX(), input->getDragStartY(), 0.0f);
         glVertex3f(input->getDragEndX(), input->getDragStartY(), 0.0f);
         glVertex3f(input->getDragEndX(), input->getDragEndY(), 0.0f);
         glVertex3f(input->getDragStartX(), input->getDragEndY(), 0.0f);
-        
+
         glEnd();
-        
+
         // the outline
         glBegin(GL_LINE_LOOP);
-        
+
         glColor4f( 0.5f, 0.6f, 1.0f, holdCounter/25.0f * 0.25f );
-        
+
         glVertex3f(input->getDragStartX(), input->getDragStartY(), 0.0f);
         glVertex3f(input->getDragEndX(), input->getDragStartY(), 0.0f);
         glVertex3f(input->getDragEndX(), input->getDragEndY(), 0.0f);
         glVertex3f(input->getDragStartX(), input->getDragEndY(), 0.0f);
-        
+
         glEnd();
-        
+
         glDisable(GL_BLEND);
     }
-    
+
     // header text drawing
     if ( useHeader )
     {
@@ -362,7 +362,7 @@ void gravManager::draw()
         long drawTime = canvas->getDrawTime();
         float color = (33.0f - (float)drawTime) / 17.0f;
         glColor4f( 1.0f, color, color, 0.8f );
-        glTranslatef( screenRectFull.getRBound() * 0.3f,
+        glTranslatef( screenRectFull.getRBound() * 0.05f,
                     screenRectFull.getUBound() * 0.9f, 0.0f );
         float debugScale = textScale / 2.5f;
         glScalef( debugScale, debugScale, debugScale );
@@ -374,9 +374,10 @@ void gravManager::draw()
                             std::string( "\nPixel count:\n" ) +
                                     videoListener->getPixelCount();*/
         char text[100];
-        sprintf( text, "Draw time: %ld  Non-draw time: %ld  Pixel count:%ld",
+        sprintf( text, "Draw time: %ld  Non-draw time: %ld  Pixel count:%ld "
+                "FPS: %f",
                 canvas->getDrawTime(), canvas->getNonDrawTime(),
-                videoListener->getPixelCount() );
+                videoListener->getPixelCount(), canvas->getFPS() );
         //printf( "%s\n", text );
         GLUtil::getInstance()->getMainFont()->Render( text );
 
@@ -384,12 +385,12 @@ void gravManager::draw()
     }
 
     glFlush();
-    
+
     //glDisable( GL_POLYGON_OFFSET_FILL );
-    
+
     //glutSwapBuffers(); // TODO: change this with wx's buffer-swapping? done?
     // works in glcanvas's draw?
-    
+
     if ( !input->isLeftButtonHeld() && holdCounter > 0 )
         holdCounter-=2;
     else
@@ -423,7 +424,7 @@ void gravManager::ungroupAll()
             g->removeAll();
             removeFromLists( g );
             objectsToDelete->push_back( g );
-            
+
             printf( "single group deleted\n" );
         }
     }
@@ -454,7 +455,7 @@ void gravManager::moveToTop( std::vector<RectangleBase*>::iterator i )
     RectangleBase* temp = (*i);
     drawnObjects->erase( i );
     drawnObjects->push_back( temp );
-    
+
     Group* g = dynamic_cast<Group*>( temp );
     if ( g != NULL )
     {
@@ -475,17 +476,17 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     float tx = vecX + sx;
     float ty = vecY + sy;
     float tz = vecZ + sz;
-    
+
     int iter = 15;
     float zdist = destz-tz;
     float maxzdist = (earth->getZ()+earth->getRadius())-destz;
     float distanceScale = fabs(zdist/maxzdist);
     int i = 0;
-    
+
     glLineWidth( 2.0f );
     glBegin( GL_LINE_STRIP );
     glVertex3f( sx, sy, sz );
-    
+
     while ( zdist > 1.0f )
     {
         glVertex3f( tx, ty, tz );
@@ -496,7 +497,7 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
         float ypush = 0.0f;
         //float curDistX = fabs(tx-earth->getX());
         //float curDistY = fabs(ty-earth->getY());
-        
+
         // this will push out the current point on the line away from the
         // earth so it doesn't clip, scaled based on how far we are from the
         // destination
@@ -504,7 +505,7 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
         ypush = 1.5f * distanceScale;
         if ( tx < earth->getX() ) xpush *= -1.0f;
         if ( ty < earth->getY() ) ypush *= -1.0f;
-        
+
         // move the current point forward, based on progressively averaging
         // the earth-pointing-out vector with the vector pointing towards
         // the destination point
@@ -516,7 +517,7 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
                 + ypush;
         tz += (vecZ * weight) +
                 ((destz-tz) * (1.0f-weight));
-                
+
         zdist = destz-tz;
         distanceScale = fabs(zdist/maxzdist);
         i++;
@@ -527,30 +528,30 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     // -0.05f is so the line doesn't poke through the objects
     glVertex3f( destx, desty, destz-0.05f );
     glEnd();
-    
+
     // new method
     /*
     float earthx, earthy, earthz;
     earth->convertLatLong( lat, lon, earthx, earthy, earthz );
-    
+
     // this vector starts out as the one pointing into the lat/lon point,
     // along the line to the center of the earth
     float earthVecX = (earthx - earth->getX()) * -0.2f;
     float earthVecY = (earthy - earth->getY()) * -0.2f;
     float earthVecZ = (earthz - earth->getZ()) * -0.2f;
-    
+
     // this assumes that the general direction between the destination points
     // and the earth is along the z-axis
-    
+
     glColor3f( 0.0f, 1.0f, 0.0f );
     glLineWidth( 2.0f );
-    
+
     float fx = earthx;
     float fy = earthy;
     float fz;
-    
+
     // if the point isn't blocked by the earth, draw straight line
-    
+
     // move the first target point towards the camera based on how far the
     // object is from the earth point in x/y
     float xydiff = (abs(destx-earthx)+abs(desty-earthy))/
@@ -566,11 +567,11 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
         fz = earth->getZ() + abs((earthz-earth->getZ()));
     }
     fz = std::min( fz+xydiff, destz-1.0f );
-    
+
     // shift the x/y out a bit on the edges
     fx += destx-earthx/7.0f;
     fy += desty-earthy/7.0f;
-    
+
     // go out to the radius of the earth, then average the path
     // to travel progressively from -Z to the vector pointing directly to the
     // point on the earth
@@ -579,7 +580,7 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     int iter = ceil( abs(zDist/2.0f) );
     printf( "%i iterations\n", iter );
     //printf( "in averaging mode\n" );
-    
+
     // find the radius point
     float rx, ry, rz;
     rz = earth->getZ();
@@ -591,10 +592,10 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     rx = earth->getX() + (xDist*(earth->getRadius()*1.7f/curRadius));
     ry = earth->getY() + (yDist*(earth->getRadius()*1.7f/curRadius));
     printf( "radiuspoint: %f,%f,%f\n", rx,ry,rz );
-    
+
     // draw & average the vectors
     float tx = destx, ty = desty, tz = destz;
-    */  
+    */
     //glVertex3f( destx, desty, destz );
     /*printf( "earth x,y: %f,%f\n", earthx, earthy );
     printf( "fx,fy,fz: %f,%f,%f\n", fx, fy, fz );
@@ -607,7 +608,7 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     vecs[2][0] = 0.0f;  vecs[2][1] = 0.0f;  vecs[2][2] = -0.5f;
     vecs[3][0] = earthVecX; vecs[3][1] = earthVecY;
                 vecs[3][2] = earthVecZ;*/
-    
+
     /*glBegin( GL_LINE_STRIP );
     for ( int n = 0; n < 1; n++ )
     {
@@ -625,7 +626,7 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
         }
     }
     glEnd();*/
-    
+
     /*
     // method: add the start vector, averaging in the pointing-in vector, then
     // if we get close to the earth, average in the pointing-out vector
@@ -638,7 +639,7 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     float startVecZ = (fz-destz)/7.0f;
     float vecX = startVecX; float vecY = startVecY; float vecZ = startVecZ;
     int count = 0;
-    
+
     glColor3f( 0.0f, 0.0f, 1.0f );
     glBegin(GL_LINE_STRIP);
     while ( count < iter )
@@ -646,7 +647,7 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
         glVertex3f( tx, ty, tz );
         tx += vecX; ty += vecY; tz += vecZ;
         float weight = ((float)(iter-count))/(float)iter;
-        
+
         vecX = (vecX*weight)+(earthVecX*(1-weight));
         vecY = (vecY*weight)+(earthVecY*(1-weight));
         vecZ = (vecZ*weight)+(earthVecZ*(1-weight));
@@ -658,7 +659,7 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     }
     glVertex3f( earthx, earthy, earthz );
     glEnd();
-    
+
     // test render of lines with no averaging
     glColor3f( 1.0f, 0.0f, 0.0f );
     glBegin(GL_LINE_STRIP);
@@ -701,7 +702,7 @@ void gravManager::setWindowSize( int w, int h )
     windowWidth = w;
     windowHeight = h;
     GLdouble screenL, screenR, screenU, screenD;
-    
+
     GLUtil* glUtil = GLUtil::getInstance();
     GLdouble dummy; // for Z which we don't need
     // update the screen size (in world space) coordinates
@@ -1173,4 +1174,9 @@ void gravManager::setAutoFocusRotate( bool a )
 Runway* gravManager::getRunway()
 {
     return runway;
+}
+
+void gravManager::setGraphicsDebugMode( bool g )
+{
+    graphicsDebugView = g;
 }

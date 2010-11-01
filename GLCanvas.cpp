@@ -17,7 +17,7 @@ END_EVENT_TABLE()
 
 GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
                         int width, int height ) :
-    wxGLCanvas( parent, wxID_ANY, attributes, wxDefaultPosition, 
+    wxGLCanvas( parent, wxID_ANY, attributes, wxDefaultPosition,
                 wxDefaultSize, 0, wxT("grav GLCanvas")), grav( g )
 {
     SetSize( wxSize( width, height ) );
@@ -31,6 +31,10 @@ GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
     lastNonDrawTimeMax = 0;
     counter = 0;
     counterMax = 5;
+
+    fpsStopwatch.Start();
+    fpsCounter = 0;
+    fpsResult = 0;
 }
 
 GLCanvas::~GLCanvas()
@@ -46,20 +50,40 @@ void GLCanvas::handlePaintEvent( wxPaintEvent& evt )
 void GLCanvas::draw()
 {
     lastNonDrawTime = drawStopwatch.Time();
+    lastNonDrawTimeMax += lastNonDrawTime;
     drawStopwatch.Start();
 
     if( !IsShown() ) return;
-    
+
     SetCurrent( *glContext );
     wxPaintDC( this );
-    
+
     if ( grav != NULL )
         grav->draw();
-    
+
     SwapBuffers();
 
     lastDrawTime = drawStopwatch.Time();
+    lastDrawTimeMax += lastDrawTime;
     drawStopwatch.Start();
+
+    counter = (counter+1) % counterMax;
+    if ( counter == 0 )
+    {
+        lastDrawTimeAvg = lastDrawTimeMax / (float)counterMax;
+        lastNonDrawTimeAvg = lastNonDrawTimeMax / (float)counterMax;
+        lastDrawTimeMax = 0;
+        lastNonDrawTimeMax = 0;
+    }
+
+    fpsCounter++;
+    long elapsed = fpsStopwatch.Time();
+    if ( elapsed > 1000 )
+    {
+        fpsResult = (float)fpsCounter * 1000.0f / (float)elapsed;
+        fpsCounter = 0;
+        fpsStopwatch.Start();
+    }
 }
 
 void GLCanvas::resize( wxSizeEvent& evt )
@@ -85,10 +109,10 @@ void GLCanvas::GLreshape( int w, int h )
         screen_height = (float)h/(float)w;
         screen_width = 1.0;
     }
-    
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(-screen_width/10.0, screen_width/10.0, 
+    glFrustum(-screen_width/10.0, screen_width/10.0,
               -screen_height/10.0, screen_height/10.0,
               0.1, 50.0);
 
@@ -97,7 +121,7 @@ void GLCanvas::GLreshape( int w, int h )
     gluLookAt(grav->getCamX(), grav->getCamY(), grav->getCamZ(),
               0.0, 0.0, -25.0,
               0.0, 1.0, 0.0);
-    
+
     // note this should be done last since stuff inside setwindowsize
     // (finding the world space bounds for the screen) depends on the matrices
     // above being accurate
@@ -116,10 +140,15 @@ void GLCanvas::setTimer( RenderTimer* t )
 
 long GLCanvas::getDrawTime()
 {
-    return lastDrawTime;
+    return lastDrawTimeAvg;
 }
 
 long GLCanvas::getNonDrawTime()
 {
-    return lastNonDrawTime;
+    return lastNonDrawTimeAvg;
+}
+
+float GLCanvas::getFPS()
+{
+    return fpsResult;
 }

@@ -30,7 +30,7 @@ class Runway;
 
 class gravManager
 {
-    
+
 public:
     gravManager();
     ~gravManager();
@@ -43,37 +43,37 @@ public:
 
     void clearSelected();
     void ungroupAll();
-    
+
     void addTestObject();
-    
+
     /*
      * For moving videos to the top of the drawnObjects (for both drawing and
      * selection)
      */
     void moveToTop( RectangleBase* object );
     void moveToTop( std::vector<RectangleBase*>::iterator i );
-    
-    void drawCurvedEarthLine( float lat, float lon, 
+
+    void drawCurvedEarthLine( float lat, float lon,
                               float destx, float desty, float destz );
     void drawEarthPoint( float lat, float lon, float size );
-                                    
+
     void setBoxSelectDrawing( bool draw );
     int getWindowWidth(); int getWindowHeight();
     void setWindowWidth( int w ); void setWindowHeight( int h );
     void setWindowSize( int w, int h );
-    
+
     /*
      * Are siteID groups being used? (getter/setter)
      */
     bool usingSiteIDGroups();
     void setSiteIDGrouping( bool site );
-    
+
     /*
      * Add to the counter used to control the drawing of the selection box.
      */
     void incrementHoldCounter();
     int getHoldCounter();
-    
+
     void resetAutoCounter();
 
     /*
@@ -90,7 +90,7 @@ public:
     std::vector<RectangleBase*>* getDrawnObjects();
     std::vector<RectangleBase*>* getSelectedObjects();
     std::map<std::string,Group*>* getSiteIDGroups();
-    
+
     /*
      * "Movable" being defined as selectable non-groups, ie, things that will
      * be moved by the user-initiated arrangements.
@@ -102,7 +102,7 @@ public:
      */
     std::vector<RectangleBase*> getUnselectedObjects();
 
-    /* 
+    /*
      * Manage sources in the main list of sources as well as in the lists of
      * drawn & selected objects.
      * Latter is an iterator so as not to have to loop through the list of
@@ -113,7 +113,7 @@ public:
      */
     void addNewSource( VideoSource* s );
     void deleteSource( std::vector<VideoSource*>::iterator si );
-    
+
     void deleteGroup( Group* g );
     void removeFromLists( RectangleBase* obj );
 
@@ -123,19 +123,19 @@ public:
      * class has to be done before that).
      */
     void setBorderTex( std::string border );
-    
-    /* 
+
+    /*
      * Creates a group for siteID-based grouping, with the data string as the
      * name, adds it to the list, and returns a pointer to it.
      */
     Group* createSiteIDGroup( std::string data );
-    
+
     float getCamX(); float getCamY(); float getCamZ();
     void setCamX( float x ); void setCamY( float y ); void setCamZ( float z );
-    
+
     RectangleBase getScreenRect( bool full = false );
     RectangleBase getEarthRect();
-    
+
     void setEarth( Earth* e );
     void setInput( InputHandler* i );
     void setTree( TreeControl* t );
@@ -147,7 +147,7 @@ public:
      * the text size, which depends on the font being set up.
      */
     void setHeaderString( std::string h );
-    
+
     TreeControl* getTree();
 
     void lockSources();
@@ -163,8 +163,10 @@ public:
     void setAutoFocusRotate( bool a );
     Runway* getRunway();
 
+    void setGraphicsDebugMode( bool g );
+
 private:
-    
+
     std::vector<VideoSource*>* sources;
     std::vector<RectangleBase*>* drawnObjects;
     std::vector<RectangleBase*>* selectedObjects;
@@ -181,12 +183,12 @@ private:
     Earth* earth;
 
     InputHandler* input;
-    
+
     TreeControl* tree; // we need a reference to the GUI tree so we can
                        // update the names and add new objects
-    
+
     LayoutManager* layouts;
-    
+
     Runway* runway;
 
     // mostly just to grab the number of sources for arrangement purposes
@@ -205,7 +207,7 @@ private:
     bool audioFocusTrigger;
 
     bool drawSelectionBox;
-    
+
     // dimensions of the drawing window in pixels
     int windowWidth, windowHeight;
     // rectangle that represents the boundaries of the drawing area in world
@@ -215,21 +217,21 @@ private:
     // rectangle that roughly defines where the earth is relative to the camera
     RectangleBase earthRect;
     void recalculateRectSizes();
-    
+
     // background texture for groups & video objects
     GLuint borderTex;
     int borderWidth;
     int borderHeight;
-    
+
     int holdCounter;
     int drawCounter;
     int autoCounter;
     bool enableSiteIDGroups;
-    
+
     float camX;
     float camY;
     float camZ;
-    
+
     bool usingThreads;
     mutex* sourceMutex;
     int lockCount;

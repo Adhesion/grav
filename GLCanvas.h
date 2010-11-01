@@ -35,6 +35,7 @@ public:
 
     long getDrawTime();
     long getNonDrawTime();
+    float getFPS();
 
 private:
     gravManager* grav;
@@ -55,11 +56,18 @@ private:
     wxStopWatch drawStopwatch;
     long lastDrawTime;
     long lastNonDrawTime;
+
     // for calculating averages
     long lastDrawTimeMax;
     long lastNonDrawTimeMax;
+    long lastDrawTimeAvg;
+    long lastNonDrawTimeAvg;
     int counter;
     int counterMax;
+
+    wxStopWatch fpsStopwatch;
+    int fpsCounter;
+    float fpsResult;
 
 };
 
