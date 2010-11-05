@@ -38,9 +38,7 @@ std::map<std::string, std::string> PythonTools::dtom( PyObject* d )
     {
         curKey = PyList_GetItem( keyList, i );
         curVal = PyDict_GetItem( d, curKey );
-        results.insert( std::pair<std::string, std::string>(
-                            PyString_AsString( curKey ),
-                            PyString_AsString( curVal ) ) );
+        results[ PyString_AsString( curKey ) ] = PyString_AsString( curVal );
     }
     return results;
 }
@@ -157,8 +155,8 @@ int main(int argc, char *argv[])
     }
     Py_DECREF(list);*/
     std::map<std::string, std::string> testMap;
-    testMap.insert( std::pair<std::string, std::string>("foo", "bar" ) );
-    testMap.insert( std::pair<std::string, std::string>("baz", "womp" ) );
+    testMap[ "foo" ] = "bar";
+    testMap[ "baz" ] = "womp";
     PyObject* testDict = ptools.mtod( testMap );
     std::map<std::string, std::string> testMap2 = ptools.dtom( testDict );
     std::map<std::string, std::string>::iterator it;
