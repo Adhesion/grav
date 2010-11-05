@@ -120,6 +120,7 @@ bool PythonTools::load( std::string module )
 
     FILE* file_1 = fopen( module.c_str(), "r" );
     PyRun_File( file_1, module.c_str(), Py_file_input, main_d, main_d );
+    fclose( file_1 );
 
     curModule = module;
 
