@@ -35,6 +35,14 @@ public:
     /* Vector to List */
     PyObject* vtol( std::vector<std::string> v);
     std::vector<std::string> ltov( PyObject* l );
+
+private:
+    bool load( std::string module );
+    void unload();
+
+    std::string curModule;
+    PyObject *main_m, *main_d; // dictionary/globals/locals for python
+
 };
 
 #endif /*PYTHONTOOLS_H_*/

@@ -4,10 +4,12 @@
 
 PythonTools::PythonTools()
 {
+    curModule = "";
     Py_Initialize();
 }
 PythonTools::~PythonTools()
 {
+    unload();
     Py_Finalize();
 }
 
@@ -73,39 +75,64 @@ PyObject* PythonTools::vtol( std::vector<std::string> v )
 PyObject* PythonTools::call( std::string _script, std::string _func,
                              PyObject* args )
 {
-    PyObject *main_m, *main_d;
     PyObject *func, *result;
     int i = 0;
-    main_m = PyImport_AddModule("__main__");
-    main_d = PyModule_GetDict(main_m);
+    load( _script );
 
-    FILE* file_1 = fopen(_script.c_str(), "r");
-    PyRun_File(file_1, _script.c_str(), Py_file_input, main_d, main_d);
-
-    func = PyDict_GetItemString(main_d, _func.c_str());
+    func = PyDict_GetItemString( main_d, _func.c_str() );
     if ( func == NULL ) {
         PyErr_Print();
-        fprintf(stderr, "Failed to load function \"%s\"\n", _func.c_str());
-        Py_DECREF(main_d);  Py_DECREF(main_m);  Py_DECREF(func);
+        fprintf( stderr, "Failed to load function \"%s\"\n", _func.c_str() );
+        Py_DECREF( func );
         return NULL;
     }
     if ( ! PyCallable_Check(func) ) {
         PyErr_Print();
-        fprintf(stderr, "Attribute \"%s\" is not callable.\n", _func.c_str());
-        Py_DECREF(main_d);  Py_DECREF(main_m);  Py_DECREF(func);
+        fprintf( stderr, "Attribute \"%s\" is not callable.\n", _func.c_str() );
+        Py_DECREF( func );
         return NULL;
     }
 
-    result = PyObject_CallObject(func, args);
+    result = PyObject_CallObject( func, args );
 
     if ( result == NULL ) {
         PyErr_Print();
-        fprintf(stderr, "Call failed.\n");
-        Py_DECREF(main_d);  Py_DECREF(main_m);  Py_DECREF(func);
+        fprintf( stderr, "Call failed.\n" );
+        Py_DECREF( func );
         return NULL;
     }
 
     return result;
+}
+
+bool PythonTools::load( std::string module )
+{
+    // TODO add file modify time check also
+    if ( module.compare( curModule ) == 0 )
+    {
+        return true;
+    }
+    else if ( curModule.compare( "" ) != 0 )
+    {
+        unload();
+    }
+
+    main_m = PyImport_AddModule( "__main__" );
+    main_d = PyModule_GetDict( main_m );
+
+    FILE* file_1 = fopen( module.c_str(), "r" );
+    PyRun_File( file_1, module.c_str(), Py_file_input, main_d, main_d );
+
+    curModule = module;
+
+    return true;
+}
+
+void PythonTools::unload()
+{
+    Py_DECREF( main_d );
+    Py_DECREF( main_m );
+    curModule = "";
 }
 
 /* Just a test... */
