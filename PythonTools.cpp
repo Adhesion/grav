@@ -108,13 +108,18 @@ bool PythonTools::load( std::string module )
     // TODO add file modify time check also
     if ( module.compare( curModule ) == 0 )
     {
+        printf( "PythonTools::load: module %s already loaded, not reloading\n",
+                    module.c_str() );
         return true;
     }
     else if ( curModule.compare( "" ) != 0 )
     {
+        printf( "PythonTools::load: unloading already loaded module %s\n",
+                            curModule.c_str() );
         unload();
     }
 
+    printf( "PythonTools::load: loading module %s\n", module.c_str() );
     main_m = PyImport_AddModule( "__main__" );
     main_d = PyModule_GetDict( main_m );
 
@@ -138,41 +143,55 @@ void PythonTools::unload()
 int main(int argc, char *argv[])
 {
     PythonTools ptools = PythonTools();
-    /*std::vector<std::string> v = std::vector<std::string>();
+    PyObject* tuple;
+    PyObject* pRes;
+
+    // test lists
+    printf( "Testing python function with lists\n" );
+    std::vector<std::string> v = std::vector<std::string>();
     v.push_back("foobar");
     v.push_back("oh noes");
     PyObject* list = ptools.vtol(v);
     std::vector<std::string> res = ptools.ltov(list);
+    printf( "List conversion to python and back:\n" );
     for ( int i = 0; i < res.size(); i++ ) {
         fprintf(stdout, "'%s'\n", res[i].c_str());
     }
-    PyObject* tuple = PyTuple_New(1);
+    tuple = PyTuple_New( 1 );
     PyTuple_SetItem(tuple, 0, list);
-    PyObject* pRes = ptools.call("py/test.py",
-                                 "test_function", tuple);
+    pRes = ptools.call("py/test.py", "test_function", tuple);
     res = ptools.ltov(pRes);
+    printf( "Python function result:\n" );
     for ( int i = 0; i < res.size(); i++ ) {
         fprintf(stdout, "'%s'\n", res[i].c_str());
     }
-    Py_DECREF(list);*/
+    Py_DECREF( list );
+    Py_DECREF( tuple );
+    Py_DECREF( pRes );
+
+    // test maps
+    printf( "Testing python function with map\n" );
     std::map<std::string, std::string> testMap;
     testMap[ "foo" ] = "bar";
     testMap[ "baz" ] = "womp";
     PyObject* testDict = ptools.mtod( testMap );
     std::map<std::string, std::string> testMap2 = ptools.dtom( testDict );
     std::map<std::string, std::string>::iterator it;
+    printf( "Map conversion to python and back:\n" );
     for ( it = testMap2.begin(); it != testMap2.end(); ++it )
     {
         printf( "%s : %s\n", it->first.c_str(), it->second.c_str() );
     }
-    PyObject* tuple = PyTuple_New( 1 );
+    tuple = PyTuple_New( 1 );
     PyTuple_SetItem( tuple, 0, testDict );
-    PyObject* pRes = ptools.call("py/test.py",
-                                 "test_dict_function", tuple);
+    pRes = ptools.call("py/test.py", "test_dict_function", tuple);
     testMap2 = ptools.dtom( pRes );
+    printf( "Python function result:\n" );
     for ( it = testMap2.begin(); it != testMap2.end(); ++it )
     {
         printf( "%s : %s\n", it->first.c_str(), it->second.c_str() );
     }
     Py_DECREF( testDict );
+    Py_DECREF( tuple );
+    Py_DECREF( pRes );
 }
