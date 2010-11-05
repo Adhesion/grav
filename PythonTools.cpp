@@ -11,7 +11,39 @@ PythonTools::~PythonTools()
     Py_Finalize();
 }
 
-std::vector<std::string> PythonTools::ltov(PyObject* l)
+PyObject* PythonTools::mtod( std::map<std::string, std::string> m )
+{
+    PyObject* dict = PyDict_New();
+    PyObject* curKey;
+    PyObject* curVal;
+    std::map<std::string, std::string>::iterator it;
+    for ( it = m.begin(); it != m.end(); ++it )
+    {
+        curKey = PyString_FromString( it->first.c_str() );
+        curVal = PyString_FromString( it->second.c_str() );
+        PyDict_SetItem( dict, curKey, curVal );
+    }
+    return dict;
+}
+
+std::map<std::string, std::string> PythonTools::dtom( PyObject* d )
+{
+    std::map<std::string, std::string> results;
+    PyObject* keyList = PyDict_Keys( d );
+    PyObject* curKey;
+    PyObject* curVal;
+    for ( int i = 0; i < PyList_Size( keyList ); i++ )
+    {
+        curKey = PyList_GetItem( keyList, i );
+        curVal = PyDict_GetItem( d, curKey );
+        results.insert( std::pair<std::string, std::string>(
+                            PyString_AsString( curKey ),
+                            PyString_AsString( curVal ) ) );
+    }
+    return results;
+}
+
+std::vector<std::string> PythonTools::ltov( PyObject* l )
 {
     PyObject* item;
     std::string str;
@@ -25,12 +57,12 @@ std::vector<std::string> PythonTools::ltov(PyObject* l)
     return results;
 }
 
-PyObject* PythonTools::vtol(std::vector<std::string> v)
+PyObject* PythonTools::vtol( std::vector<std::string> v )
 {
     PyObject *list = PyList_New(0);
     PyObject *item;
     std::vector<std::string>::iterator i;
-    for ( i = v.begin(); i != v.end(); i++ )
+    for ( i = v.begin(); i != v.end(); ++i )
     {
         item = PyString_FromString((*i).c_str());
         PyList_Append(list, item);
@@ -46,7 +78,7 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
     int i = 0;
     main_m = PyImport_AddModule("__main__");
     main_d = PyModule_GetDict(main_m);
-    
+
     FILE* file_1 = fopen(_script.c_str(), "r");
     PyRun_File(file_1, _script.c_str(), Py_file_input, main_d, main_d);
 
@@ -65,7 +97,7 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
     }
 
     result = PyObject_CallObject(func, args);
-    
+
     if ( result == NULL ) {
         PyErr_Print();
         fprintf(stderr, "Call failed.\n");
@@ -80,7 +112,7 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
 int main(int argc, char *argv[])
 {
     PythonTools ptools = PythonTools();
-    std::vector<std::string> v = std::vector<std::string>();
+    /*std::vector<std::string> v = std::vector<std::string>();
     v.push_back("foobar");
     v.push_back("oh noes");
     PyObject* list = ptools.vtol(v);
@@ -96,5 +128,25 @@ int main(int argc, char *argv[])
     for ( int i = 0; i < res.size(); i++ ) {
         fprintf(stdout, "'%s'\n", res[i].c_str());
     }
-    Py_DECREF(list);
+    Py_DECREF(list);*/
+    std::map<std::string, std::string> testMap;
+    testMap.insert( std::pair<std::string, std::string>("foo", "bar" ) );
+    testMap.insert( std::pair<std::string, std::string>("baz", "womp" ) );
+    PyObject* testDict = ptools.mtod( testMap );
+    std::map<std::string, std::string> testMap2 = ptools.dtom( testDict );
+    std::map<std::string, std::string>::iterator it;
+    for ( it = testMap2.begin(); it != testMap2.end(); ++it )
+    {
+        printf( "%s : %s\n", it->first.c_str(), it->second.c_str() );
+    }
+    PyObject* tuple = PyTuple_New( 1 );
+    PyTuple_SetItem( tuple, 0, testDict );
+    PyObject* pRes = ptools.call("py/test.py",
+                                 "test_dict_function", tuple);
+    testMap2 = ptools.dtom( pRes );
+    for ( it = testMap2.begin(); it != testMap2.end(); ++it )
+    {
+        printf( "%s : %s\n", it->first.c_str(), it->second.c_str() );
+    }
+    Py_DECREF( testDict );
 }

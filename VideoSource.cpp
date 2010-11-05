@@ -48,7 +48,7 @@ void VideoSource::draw()
     //animateValues();
     // to draw the border/text/common stuff
     RectangleBase::draw();
-    
+
     // set up our position
     glPushMatrix();
 
@@ -57,11 +57,11 @@ void VideoSource::draw()
     glRotatef( zAngle, 0.0, 0.0, 1.0 );
 
     glTranslatef(x,y,z);
-    
+
     //glDepthMask( GL_FALSE );
     //glDepthRange (0.0, 0.9);
     //glPolygonOffset( 0.2, 0.8 );
-    
+
     float s = 1.0;
     float t = 1.0;
     // if the texture id hasn't been initialized yet, this must be the
@@ -74,13 +74,13 @@ void VideoSource::draw()
     {
         resizeBuffer();
     }
-    
+
     s = (float)vwidth/(float)tex_width;
     //if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
     //    t = (float)(3*vheight/2)/(float)tex_height;
     //else
     t = (float)vheight/(float)tex_height;
-    
+
     // X & Y distances from center to edge
     float Xdist = aspect*scaleX/2;
     float Ydist = scaleY/2;
@@ -248,7 +248,7 @@ void VideoSource::draw()
 
         glEnd();
     }
-    
+
     // see above
     if ( useAlpha )
     {
@@ -265,33 +265,33 @@ void VideoSource::resizeBuffer()
     vwidth = videoSink->getImageWidth();
     vheight = videoSink->getImageHeight();
     listener->updatePixelCount(  vwidth * vheight );
-    
+
     if ( vheight > 0 )
         aspect = (float)vwidth / (float)vheight;
     else
         aspect = 1.33f;
-    
+
     tex_width = GLUtil::getInstance()->pow2(vwidth);
     if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
         tex_height = GLUtil::getInstance()->pow2( 3*vheight/2 );
     else
         tex_height = GLUtil::getInstance()->pow2( vheight );
-    
+
     printf( "image size is %ix%i\n", vwidth, vheight );
     printf( "texture size is %ix%i\n", tex_width, tex_height );
-    
+
     // if it's not the first time we're allocating a texture
     // (ie, it's a resize) delete the previous texture
     if ( !init ) glDeleteTextures( 1, &texid );
     glGenTextures(1, &texid);
-    
+
     glBindTexture(GL_TEXTURE_2D, texid);
-    
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    
+
     unsigned char *buffer = new unsigned char[tex_width * tex_height * 3];
     memset(buffer, 128, tex_width * tex_height * 3);
     glTexImage2D( GL_TEXTURE_2D,
@@ -323,19 +323,19 @@ void VideoSource::scaleNative()
     // conversion for any point at worldZ=0
     GLUtil::getInstance()->screenToWorld( (double)0, (double)0, 0.990991f,
                             &topLeftX, &topLeftY, &topLeftZ );
-    
+
     //printf( "top left of the screen in world coords is %f,%f,%f\n",
     //        topLeftX, topLeftY, topLeftZ );
-    
+
     // now get the world space position of the video dimensions
     GLdouble dimX; GLdouble dimY; GLdouble dimZ;
     GLUtil::getInstance()->screenToWorld( (GLdouble)vwidth, (GLdouble)vheight,
                                                 0.990991f,
                                             &dimX, &dimY, &dimZ );
-    
+
     //printf( "video dims in world coords are %f,%f,%f\n",
     //        dimX, dimY, dimZ );
-    
+
     // the difference between top-left and where the video would be is
     // equal to the size of the video dimensions in world coords
     setScale( (dimX-topLeftX)/aspect, dimY-topLeftY );
@@ -358,7 +358,7 @@ bool VideoSource::updateName()
     bool nameChanged = false;
     std::string sdesName = getMetadata( VPMSession::VPMSESSION_SDES_NAME );
     std::string sdesCname = getMetadata( VPMSession::VPMSESSION_SDES_CNAME );
-    
+
     if ( sdesName != "" && sdesName != name )
     {
         name = sdesName;
@@ -372,11 +372,11 @@ bool VideoSource::updateName()
         nameChanged = true;
         printf( "in updateName, got cname: %s\n", altName.c_str() );
     }
-    
+
     // if we don't have a proper name yet just use cname
     if ( name == "" && sdesCname != "" )
         name = sdesCname;
-    
+
     // also update the location info
     std::string loc = getMetadata( VPMSession::VPMSESSION_SDES_LOC );
     size_t pos = loc.find( ',' );
@@ -387,7 +387,7 @@ bool VideoSource::updateName()
         lat = strtod( latS.c_str(), NULL );
         lon = strtod( lonS.c_str(), NULL );
     }
-    
+
     if ( nameChanged )
         updateTextBounds();
     return nameChanged;
