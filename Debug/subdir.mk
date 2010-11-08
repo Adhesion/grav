@@ -14,6 +14,7 @@ CPP_SRCS += \
 ../LayoutManager.cpp \
 ../PNGLoader.cpp \
 ../Point.cpp \
+../PythonTools.cpp \
 ../RectangleBase.cpp \
 ../Runway.cpp \
 ../SessionManager.cpp \
@@ -23,6 +24,7 @@ CPP_SRCS += \
 ../TreeControl.cpp \
 ../TreeNode.cpp \
 ../Vector.cpp \
+../VenueClientController.cpp \
 ../VideoInfoDialog.cpp \
 ../VideoListener.cpp \
 ../VideoSource.cpp \
@@ -40,6 +42,7 @@ OBJS += \
 ./LayoutManager.o \
 ./PNGLoader.o \
 ./Point.o \
+./PythonTools.o \
 ./RectangleBase.o \
 ./Runway.o \
 ./SessionManager.o \
@@ -49,6 +52,7 @@ OBJS += \
 ./TreeControl.o \
 ./TreeNode.o \
 ./Vector.o \
+./VenueClientController.o \
 ./VideoInfoDialog.o \
 ./VideoListener.o \
 ./VideoSource.o \
@@ -66,6 +70,7 @@ CPP_DEPS += \
 ./LayoutManager.d \
 ./PNGLoader.d \
 ./Point.d \
+./PythonTools.d \
 ./RectangleBase.d \
 ./Runway.d \
 ./SessionManager.d \
@@ -75,6 +80,7 @@ CPP_DEPS += \
 ./TreeControl.d \
 ./TreeNode.d \
 ./Vector.d \
+./VenueClientController.d \
 ./VideoInfoDialog.d \
 ./VideoListener.d \
 ./VideoSource.d \

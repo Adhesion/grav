@@ -27,6 +27,8 @@ public:
     ~PythonTools();
 
     PyObject* call( std::string module, std::string func, PyObject* args );
+    PyObject* call( std::string module, std::string func, std::string arg );
+    PyObject* call( std::string module, std::string func );
 
     /* Map to Dict */
     PyObject* mtod( std::map<std::string, std::string> m );

@@ -74,7 +74,6 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
                              PyObject* args )
 {
     PyObject *func, *result;
-    int i = 0;
     load( _script );
 
     func = PyDict_GetItemString( main_d, _func.c_str() );
@@ -100,7 +99,32 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
         return NULL;
     }
 
+    Py_DECREF( func );
     return result;
+}
+
+PyObject* PythonTools::call( std::string _script, std::string _func,
+                                std::string arg )
+{
+    PyObject* tuple = PyTuple_New( 0 );
+    PyObject* str = PyString_FromString( arg.c_str() );
+    PyTuple_SetItem( tuple, 0, str );
+    PyObject* pRes;
+
+    pRes = call( _script, _func, tuple );
+    Py_DECREF( tuple );
+    Py_DECREF( str );
+    return pRes;
+}
+
+PyObject* PythonTools::call( std::string _script, std::string _func )
+{
+    PyObject* tuple = PyTuple_New( 0 );
+    PyObject* pRes;
+
+    pRes = call( _script, _func, tuple );
+    Py_DECREF( tuple );
+    return pRes;
 }
 
 bool PythonTools::load( std::string module )
@@ -140,7 +164,7 @@ void PythonTools::unload()
 }
 
 /* Just a test... */
-int main(int argc, char *argv[])
+/*int main(int argc, char *argv[])
 {
     PythonTools ptools = PythonTools();
     PyObject* tuple;
@@ -194,4 +218,14 @@ int main(int argc, char *argv[])
     Py_DECREF( testDict );
     Py_DECREF( tuple );
     Py_DECREF( pRes );
-}
+
+    tuple = PyTuple_New( 0 );
+    pRes = ptools.call( "py/test.py", "test_unicode", tuple );
+    char* charResult = PyString_AsString( pRes );
+    //std::string unicodemaybe( charResult );
+    //printf( "std string conv: %s\n", unicodemaybe.c_str() );
+    printf( "orig: %s\n", charResult );
+
+    Py_DECREF( tuple );
+    Py_DECREF( pRes );
+}*/

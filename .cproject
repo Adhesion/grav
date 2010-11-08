@@ -48,6 +48,7 @@
 <listOptionValue builtIn="false" value="avcodec"/>
 <listOptionValue builtIn="false" value="avutil"/>
 <listOptionValue builtIn="false" value="swscale"/>
+<listOptionValue builtIn="false" value="python2.6"/>
 </option>
 <option id="gnu.cpp.link.option.paths.2006448142" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="stringList">
 <listOptionValue builtIn="false" value="."/>
@@ -63,8 +64,9 @@
 <tool id="cdt.managedbuild.tool.gnu.archiver.base.1856652250" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 </toolChain>
 </folderInfo>
+<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.965868493.939681467" name="PythonTools.h" rcbsApplicability="disable" resourcePath="PythonTools.h" toolsToInvoke=""/>
 <sourceEntries>
-<entry excluding="PythonTools.h|PythonTools.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 </sourceEntries>
 </configuration>
 </storageModule>
