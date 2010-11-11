@@ -27,6 +27,7 @@ class InputHandler;
 class TreeControl;
 class LayoutManager;
 class Runway;
+class VenueClientController;
 
 class gravManager
 {
@@ -166,6 +167,8 @@ public:
     void setGraphicsDebugMode( bool g );
     bool getGraphicsDebugMode();
 
+    void toggleShowVenueClientController();
+
 private:
 
     std::vector<VideoSource*>* sources;
@@ -196,6 +199,8 @@ private:
     VideoListener* videoListener;
 
     GLCanvas* canvas;
+
+    VenueClientController* venueClientController;
 
     std::string headerString;
     bool useHeader;

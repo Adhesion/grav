@@ -1,15 +1,37 @@
+/**
+ * @file PythonTools.h
+ * Contains a bucket class with utilities to call python
+ * Relied heavily on the python documentation available at:
+ *      http://docs.python.org/extending/embedding.html
+ *
+ * To compile:
+ *      g++ -L/usr/lib/python2.6/ -lpython2.6 -I/usr/include PythonTools.cpp
+ *
+ * @author Ralph Bean
+ * @modified Andrew Ford
+ */
 
 #include "PythonTools.h"
 #include <iostream>
 
 PythonTools::PythonTools()
 {
-    curModule = "";
+    main_m = NULL;
+    main_d = NULL;
     Py_Initialize();
+    main_m = PyImport_AddModule( "__main__" );
+    main_d = PyModule_GetDict( main_m );
+
+    entryModule = "py/entry.py";
+    entryFunc = "entryFunc";
+
+    FILE* file_1 = fopen( entryModule.c_str(), "r" );
+    PyRun_File( file_1, entryModule.c_str(), Py_file_input, main_d, main_d );
+    fclose( file_1 );
 }
+
 PythonTools::~PythonTools()
 {
-    unload();
     Py_Finalize();
 }
 
@@ -70,120 +92,149 @@ PyObject* PythonTools::vtol( std::vector<std::string> v )
     return list;
 }
 
+void PythonTools::inspect_object( PyObject *o )
+{
+    fprintf( stdout, "Inspecting Random Object!\n");
+
+    PyObject *item, *value, *value_s;
+    std::string attr, value_stl;
+
+    PyObject* l = PyObject_Dir( o );
+    for ( int i = 0; i < PyList_Size( l ); i++ )
+    {
+        item = PyList_GetItem(l, i);
+        attr = std::string(PyString_AsString(item));
+
+        fprintf( stdout, "(o)%s -> ", attr.c_str() );
+
+        value = PyObject_GetAttr( o, item );
+        value_s = PyObject_Str( value );
+        value_stl = std::string( PyString_AsString( value_s ) );
+
+        fprintf( stdout, "%s\n", value_stl.c_str()  );
+
+        Py_DECREF(value_s);
+        Py_DECREF(value);
+    }
+    Py_DECREF(l);
+}
+
+void PythonTools::inspect_dictionary( PyObject *dict )
+{
+    inspect_object( main_m );
+
+    PyObject *key, *value;
+    PyObject *kstr, *vstr;
+    std::string stl_kstr, stl_vstr;
+
+    Py_ssize_t pos = 0;
+
+    fprintf( stdout, "Inspecting Dictionary\n");
+    while (PyDict_Next(dict, &pos, &key, &value)) {
+        kstr = PyObject_Str(key);
+        stl_kstr = PyString_AsString(kstr);
+
+        fprintf( stdout, "(d)%s -> ", stl_kstr.c_str() );
+        std::cout.flush();
+
+        vstr = PyObject_Str(value);
+        stl_vstr = PyString_AsString(vstr);
+
+        fprintf( stdout, "%s\n", stl_vstr.c_str()  );
+
+        Py_DECREF(kstr);
+        Py_DECREF(vstr);
+    }
+    fprintf( stdout, "*salutes* Done Inspecting Dictionary\n");
+}
+
 PyObject* PythonTools::call( std::string _script, std::string _func,
                              PyObject* args )
 {
     PyObject *func, *result;
-    load( _script );
 
-    func = PyDict_GetItemString( main_d, _func.c_str() );
-    if ( func == NULL ) {
+    func = PyDict_GetItemString( main_d, entryFunc.c_str() );
+    if ( func == NULL )
+    {
         PyErr_Print();
-        fprintf( stderr, "Failed to load function \"%s\"\n", _func.c_str() );
-        Py_DECREF( func );
+        fprintf( stderr, "Failed to load function \"%s\"\n",
+                    entryFunc.c_str() );
         return NULL;
     }
-    if ( ! PyCallable_Check(func) ) {
+    if ( ! PyCallable_Check(func) )
+    {
         PyErr_Print();
-        fprintf( stderr, "Attribute \"%s\" is not callable.\n", _func.c_str() );
-        Py_DECREF( func );
+        fprintf( stderr, "Attribute \"%s\" is not callable.\n",
+                    entryFunc.c_str() );
         return NULL;
     }
 
-    result = PyObject_CallObject( func, args );
+    PyObject* entryArgs;
+    if ( args == NULL )
+    {
+        entryArgs= PyTuple_New( 2 );
+        PyTuple_SetItem( entryArgs, 0, PyString_FromString( _script.c_str() ) );
+        PyTuple_SetItem( entryArgs, 1, PyString_FromString( _func.c_str() ) );
+    }
+    else
+    {
+        entryArgs= PyTuple_New( 3 );
+        PyTuple_SetItem( entryArgs, 0, PyString_FromString( _script.c_str() ) );
+        PyTuple_SetItem( entryArgs, 1, PyString_FromString( _func.c_str() ) );
+        PyTuple_SetItem( entryArgs, 2, args );
+    }
 
-    if ( result == NULL ) {
+    result = PyObject_CallObject( func, entryArgs );
+
+    if ( result == NULL )
+    {
         PyErr_Print();
         fprintf( stderr, "Call failed.\n" );
-        Py_DECREF( func );
         return NULL;
     }
 
-    Py_DECREF( func );
+    Py_DECREF( entryArgs );
     return result;
 }
 
 PyObject* PythonTools::call( std::string _script, std::string _func,
                                 std::string arg )
 {
-    PyObject* tuple = PyTuple_New( 0 );
     PyObject* str = PyString_FromString( arg.c_str() );
-    PyTuple_SetItem( tuple, 0, str );
     PyObject* pRes;
 
-    pRes = call( _script, _func, tuple );
-    Py_DECREF( tuple );
-    Py_DECREF( str );
+    pRes = call( _script, _func, str );
     return pRes;
 }
 
 PyObject* PythonTools::call( std::string _script, std::string _func )
 {
-    PyObject* tuple = PyTuple_New( 0 );
     PyObject* pRes;
-
-    pRes = call( _script, _func, tuple );
-    Py_DECREF( tuple );
+    pRes = call( _script, _func, NULL );
     return pRes;
 }
-
-bool PythonTools::load( std::string module )
-{
-    // TODO add file modify time check also
-    if ( module.compare( curModule ) == 0 )
-    {
-        printf( "PythonTools::load: module %s already loaded, not reloading\n",
-                    module.c_str() );
-        return true;
-    }
-    else if ( curModule.compare( "" ) != 0 )
-    {
-        printf( "PythonTools::load: unloading already loaded module %s\n",
-                            curModule.c_str() );
-        unload();
-    }
-
-    printf( "PythonTools::load: loading module %s\n", module.c_str() );
-    main_m = PyImport_AddModule( "__main__" );
-    main_d = PyModule_GetDict( main_m );
-
-    FILE* file_1 = fopen( module.c_str(), "r" );
-    PyRun_File( file_1, module.c_str(), Py_file_input, main_d, main_d );
-    fclose( file_1 );
-
-    curModule = module;
-
-    return true;
-}
-
-void PythonTools::unload()
-{
-    Py_DECREF( main_d );
-    Py_DECREF( main_m );
-    curModule = "";
-}
-
 /* Just a test... */
-/*int main(int argc, char *argv[])
+int oldmain(int argc, char *argv[])
 {
     PythonTools ptools = PythonTools();
     PyObject* tuple;
     PyObject* pRes;
+    std::vector<std::string> res;
 
     // test lists
-    printf( "Testing python function with lists\n" );
+    /*printf( "Testing python function with lists\n" );
     std::vector<std::string> v = std::vector<std::string>();
     v.push_back("foobar");
     v.push_back("oh noes");
     PyObject* list = ptools.vtol(v);
-    std::vector<std::string> res = ptools.ltov(list);
+    res = ptools.ltov(list);
     printf( "List conversion to python and back:\n" );
     for ( int i = 0; i < res.size(); i++ ) {
         fprintf(stdout, "'%s'\n", res[i].c_str());
     }
     tuple = PyTuple_New( 1 );
     PyTuple_SetItem(tuple, 0, list);
-    pRes = ptools.call("py/test.py", "test_function", tuple);
+    pRes = ptools.call("py/testFunctions", "test_function", tuple);
     res = ptools.ltov(pRes);
     printf( "Python function result:\n" );
     for ( int i = 0; i < res.size(); i++ ) {
@@ -191,10 +242,12 @@ void PythonTools::unload()
     }
     Py_DECREF( list );
     Py_DECREF( tuple );
-    Py_DECREF( pRes );
+    Py_DECREF( pRes );*/
+
+    //ptools.unload();
 
     // test maps
-    printf( "Testing python function with map\n" );
+    /*printf( "Testing python function with map\n" );
     std::map<std::string, std::string> testMap;
     testMap[ "foo" ] = "bar";
     testMap[ "baz" ] = "womp";
@@ -208,7 +261,7 @@ void PythonTools::unload()
     }
     tuple = PyTuple_New( 1 );
     PyTuple_SetItem( tuple, 0, testDict );
-    pRes = ptools.call("py/test.py", "test_dict_function", tuple);
+    pRes = ptools.call("py/testFunctions", "test_dict_function", tuple);
     testMap2 = ptools.dtom( pRes );
     printf( "Python function result:\n" );
     for ( it = testMap2.begin(); it != testMap2.end(); ++it )
@@ -217,10 +270,10 @@ void PythonTools::unload()
     }
     Py_DECREF( testDict );
     Py_DECREF( tuple );
-    Py_DECREF( pRes );
+    Py_DECREF( pRes );*/
 
-    tuple = PyTuple_New( 0 );
-    pRes = ptools.call( "py/test.py", "test_unicode", tuple );
+    /*tuple = PyTuple_New( 0 );
+    pRes = ptools.call( "py/testFunctions", "test_unicode", tuple );
     char* charResult = PyString_AsString( pRes );
     //std::string unicodemaybe( charResult );
     //printf( "std string conv: %s\n", unicodemaybe.c_str() );
@@ -228,4 +281,86 @@ void PythonTools::unload()
 
     Py_DECREF( tuple );
     Py_DECREF( pRes );
-}*/
+
+    tuple = PyTuple_New( 0 );
+    pRes = ptools.call( "py/testFunctions", "test_unicode", tuple );
+    charResult = PyString_AsString( pRes );
+    //std::string unicodemaybe( charResult );
+    //printf( "std string conv: %s\n", unicodemaybe.c_str() );
+    printf( "orig: %s\n", charResult );
+
+    Py_DECREF( tuple );
+    Py_DECREF( pRes );*/
+
+    /*tuple = PyTuple_New( 0 );
+    pRes = ptools.call( "py/AGTools.py", "GetVenueClients", tuple );
+    res = ptools.ltov( pRes );
+    printf( "AGTools function result:\n" );
+    for ( int i = 0; i < res.size(); i++ ) {
+        fprintf(stdout, "'%s'\n", res[i].c_str());
+    }
+
+    Py_DECREF( tuple );
+    Py_DECREF( pRes );*/
+}
+
+int main_2(int argc, char *argv[])
+{
+    PythonTools ptools = PythonTools();
+    PyObject* pRes;
+    std::vector<std::string> res;
+
+    for ( int q = 0; q < 5; q++ )
+    {
+
+        printf( "Testing python function with lists\n" );
+        std::vector<std::string> v = std::vector<std::string>();
+        v.push_back("foobar");
+        v.push_back("oh noes");
+        PyObject* list = ptools.vtol(v);
+        res = ptools.ltov(list);
+        printf( "List conversion to python and back:\n" );
+        for ( int i = 0; i < res.size(); i++ ) {
+            fprintf(stdout, "'%s'\n", res[i].c_str());
+        }
+        pRes = ptools.call("testFunctions", "test_function", list);
+        res = ptools.ltov(pRes);
+        printf( "Python function result:\n" );
+        for ( int i = 0; i < res.size(); i++ ) {
+            fprintf(stdout, "'%s'\n", res[i].c_str());
+        }
+        Py_DECREF( pRes );
+
+        printf( "Testing python function with lists\n" );
+        v = std::vector<std::string>();
+        v.push_back("foobar");
+        v.push_back("oh noes");
+        list = ptools.vtol(v);
+        res = ptools.ltov(list);
+        printf( "List conversion to python and back:\n" );
+        for ( int i = 0; i < res.size(); i++ ) {
+            fprintf(stdout, "'%s'\n", res[i].c_str());
+        }
+        pRes = ptools.call("/home/user/src/grav/py/testFunctions.py", "test_function", list);
+        res = ptools.ltov(pRes);
+        printf( "Python function result:\n" );
+        for ( int i = 0; i < res.size(); i++ ) {
+            fprintf(stdout, "'%s'\n", res[i].c_str());
+        }
+        Py_DECREF( pRes );
+
+        printf( "Testing AGTools\n" );
+        //tuple = PyTuple_New( 0 );
+        pRes = ptools.call( "AGTools", "GetVenueClients", NULL );
+        res = ptools.ltov( pRes );
+        printf( "AGTools getvenueclient function result:\n" );
+        for ( int i = 0; i < res.size(); i++ ) {
+            fprintf(stdout, "'%s'\n", res[i].c_str());
+        }
+
+        //Py_DECREF( tuple );
+        Py_DECREF( pRes );
+
+        sleep(1);
+    }
+}

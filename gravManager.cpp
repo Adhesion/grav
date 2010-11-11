@@ -20,6 +20,7 @@
 #include "VideoListener.h"
 #include "TreeControl.h"
 #include "LayoutManager.h"
+#include "VenueClientController.h"
 
 #include "gravManager.h"
 
@@ -74,6 +75,8 @@ gravManager::gravManager()
 
     graphicsDebugView = false;
     pixelCount = 0;
+
+    venueClientController = new VenueClientController();
 }
 
 gravManager::~gravManager()
@@ -90,6 +93,8 @@ gravManager::~gravManager()
     delete objectsToDelete;
     delete objectsToAddToTree;
     delete objectsToRemoveFromTree;
+
+    delete venueClientController;
 
     mutex_free( sourceMutex );
 }
@@ -1185,4 +1190,10 @@ void gravManager::setGraphicsDebugMode( bool g )
 bool gravManager::getGraphicsDebugMode()
 {
     return graphicsDebugView;
+}
+
+void gravManager::toggleShowVenueClientController()
+{
+    // TODO just debug stuff here for now
+    venueClientController->printExitMap();
 }

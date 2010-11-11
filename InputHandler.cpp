@@ -343,6 +343,10 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
             grav->setSiteIDGrouping( true );
         break;
 
+    case 'V':
+        if ( modifiers == wxMOD_CMD )
+            grav->toggleShowVenueClientController();
+
     case 'X':
         for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
                         i++ )
