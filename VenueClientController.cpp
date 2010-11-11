@@ -33,7 +33,7 @@ void VenueClientController::getVenueClient()
         // TODO just take first for now - maybe if multiple found, prompt user?
         venueClientUrl = venueClients[0];
     }
-    Py_DECREF( pRes );
+    Py_XDECREF( pRes );
 }
 
 void VenueClientController::updateExitMap()
@@ -51,13 +51,17 @@ void VenueClientController::updateExitMap()
     PyObject* pRes = pyTools.call( "AGTools", "GetExits",
                                     venueClientUrl );
     exitMap = pyTools.dtom( pRes );
-    Py_DECREF( pRes );
+    Py_XDECREF( pRes );
 }
 
 void VenueClientController::printExitMap()
 {
     updateExitMap();
 
+    if ( venueClientUrl.compare( "" ) == 0 )
+    {
+        return;
+    }
     printf( "VenueClientController::printExitMap: from venue client at %s\n",
                 venueClientUrl.c_str() );
     std::map<std::string, std::string>::iterator it;

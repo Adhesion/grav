@@ -47,6 +47,8 @@ private:
     std::string entryModule;
     std::string entryFunc;
 
+    bool init;
+
 };
 
 #endif /*PYTHONTOOLS_H_*/

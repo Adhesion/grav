@@ -16,6 +16,7 @@
 
 PythonTools::PythonTools()
 {
+    init = false;
     main_m = NULL;
     main_d = NULL;
     Py_Initialize();
@@ -26,8 +27,17 @@ PythonTools::PythonTools()
     entryFunc = "entryFunc";
 
     FILE* file_1 = fopen( entryModule.c_str(), "r" );
-    PyRun_File( file_1, entryModule.c_str(), Py_file_input, main_d, main_d );
-    fclose( file_1 );
+    if ( file_1 != NULL )
+    {
+        PyRun_File( file_1, entryModule.c_str(), Py_file_input, main_d, main_d );
+        fclose( file_1 );
+        init = true;
+    }
+    else
+    {
+        printf( "PythonTools::ERROR: entry script not found - python "
+                "integration not available\n" );
+    }
 }
 
 PythonTools::~PythonTools()
@@ -53,28 +63,34 @@ PyObject* PythonTools::mtod( std::map<std::string, std::string> m )
 std::map<std::string, std::string> PythonTools::dtom( PyObject* d )
 {
     std::map<std::string, std::string> results;
-    PyObject* keyList = PyDict_Keys( d );
-    PyObject* curKey;
-    PyObject* curVal;
-    for ( int i = 0; i < PyList_Size( keyList ); i++ )
+    if ( d != NULL )
     {
-        curKey = PyList_GetItem( keyList, i );
-        curVal = PyDict_GetItem( d, curKey );
-        results[ PyString_AsString( curKey ) ] = PyString_AsString( curVal );
+        PyObject* keyList = PyDict_Keys( d );
+        PyObject* curKey;
+        PyObject* curVal;
+        for ( int i = 0; i < PyList_Size( keyList ); i++ )
+        {
+            curKey = PyList_GetItem( keyList, i );
+            curVal = PyDict_GetItem( d, curKey );
+            results[ PyString_AsString( curKey ) ] = PyString_AsString( curVal );
+        }
     }
     return results;
 }
 
 std::vector<std::string> PythonTools::ltov( PyObject* l )
 {
-    PyObject* item;
-    std::string str;
     std::vector<std::string> results = std::vector<std::string>();
-    for ( int i = 0; i < PyList_Size(l); i++ )
+    if ( l != NULL )
     {
-        item = PyList_GetItem(l, i);
-        str = std::string(PyString_AsString(item));
-        results.push_back(str);
+        PyObject* item;
+        std::string str;
+        for ( int i = 0; i < PyList_Size(l); i++ )
+        {
+            item = PyList_GetItem(l, i);
+            str = std::string(PyString_AsString(item));
+            results.push_back(str);
+        }
     }
     return results;
 }
@@ -151,6 +167,12 @@ void PythonTools::inspect_dictionary( PyObject *dict )
 PyObject* PythonTools::call( std::string _script, std::string _func,
                              PyObject* args )
 {
+    if ( !init )
+    {
+        printf( "PythonTools::call: ERROR: PyTools not initialized\n" );
+        return NULL;
+    }
+
     PyObject *func, *result;
 
     func = PyDict_GetItemString( main_d, entryFunc.c_str() );
