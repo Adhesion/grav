@@ -22,6 +22,11 @@ typedef struct {
     float A;
 } RGBAColor;
 
+enum TextStyle {
+    TOPTEXT,
+    CENTEREDTEXT
+};
+
 // we need to do forward declaration since rectanglebase and group circularly
 // reference each other
 class Group;
@@ -207,7 +212,11 @@ public:
      * GL draw function to render the object.
      */
     virtual void draw();
-    void drawBorder();
+    /*
+     * Draw main back texture, assumes position is set up beforehand
+     * (ie, no pushmatrix/popmatrix, gltranslate, etc.
+     */
+    void drawBorder( float Xdist, float Ydist, float s, float t );
 
 protected:
     // position in world space (center of the object)
@@ -245,7 +254,7 @@ protected:
     // amount to scale the text relative to the total size
     float relativeTextScale;
     // temp thing for calculating size - possible change to an enum
-    bool textAtTop;
+    TextStyle titleStyle;
 
     // size of the border relative to total size
     float borderScale;

@@ -55,7 +55,7 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     font = other.font;
     relativeTextScale = other.relativeTextScale;
     borderScale = other.borderScale;
-    textAtTop = other.textAtTop;
+    titleStyle = other.titleStyle;
 
     borderTex = other.borderTex;
     twidth = other.twidth; theight = other.theight;
@@ -101,7 +101,7 @@ void RectangleBase::setDefaults()
     debugDraw = false;
 
     relativeTextScale = 0.0009;
-    textAtTop = true;
+    titleStyle = TOPTEXT;
 
     borderScale = 0.04;
 
@@ -149,9 +149,9 @@ float RectangleBase::getTotalWidth()
 float RectangleBase::getTotalHeight()
 {
     float h = getHeight() + ( 2.0f * getBorderSize() );
-    if ( textAtTop )
+    if ( titleStyle == TOPTEXT )
     {
-        h+= getTextOffset() + getTextHeight();
+        h += getTextOffset() + getTextHeight();
     }
     return h;
 }
@@ -234,9 +234,9 @@ float RectangleBase::getBorderScale()
 
 float RectangleBase::getTextHeight()
 {
-    // this ignores the lower point, since 0.0 in its coordinate system is the
-    // baseline
-    return ( textBounds.Upper().Yf() * getTextScale() ) + getTextOffset();
+    // this ignores textBounds.Lower(), since 0.0 in its coordinate system is
+    // the baseline
+    return textBounds.Upper().Yf() * getTextScale();
 }
 
 float RectangleBase::getTextWidth()
@@ -264,7 +264,7 @@ float RectangleBase::getCenterOffsetX()
 
 float RectangleBase::getCenterOffsetY()
 {
-    if ( textAtTop )
+    if ( titleStyle == TOPTEXT )
     {
         float textRatio = ( getTextHeight() + getTextOffset() ) / getHeight();
         return textRatio * getDestHeight() / 2.0f;
@@ -696,59 +696,39 @@ void RectangleBase::draw()
 
         glEnd();
 
+        glBegin( GL_LINES );
+
+        glColor4f( borderColor.R/3.5f,
+                   borderColor.G/1.0f,
+                   borderColor.B/2.3f,
+                   borderColor.A/2.0f );
+
+        glVertex3f(-Xdist, 0.0, 0.0);
+        glVertex3f(Xdist, 0.0, 0.0);
+
+        glVertex3f(0.0, Ydist, 0.0);
+        glVertex3f(0.0, -Ydist, 0.0);
+
         glDisable( GL_BLEND );
     }
 
-    glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    //glBlendFunc( GL_ONE, GL_ONE );
-
-    /*printf( "DRAWPRE\n" );
-    GLenum  gl_error = glGetError();
-    for (; (gl_error); gl_error = glGetError()) {
-        fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
-    }*/
-
-    glEnable( GL_TEXTURE_2D );
-    glBindTexture( GL_TEXTURE_2D, borderTex );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-
-    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-    glPixelStorei( GL_UNPACK_ROW_LENGTH, twidth );
-
-    glBegin( GL_QUADS );
-    // set the border color
-    glColor4f( borderColor.R-(effectVal*3.0f),
-               borderColor.G-(effectVal*3.0f),
-               borderColor.B+(effectVal*6.0f),
-               borderColor.A+(effectVal*3.0f) );
-
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(-Xdist, -Ydist, 0.0);
-
-    glTexCoord2f(0.0, t);
-    glVertex3f(-Xdist, Ydist, 0.0);
-
-    glTexCoord2f(s, t);
-    glVertex3f(Xdist, Ydist, 0.0);
-
-    glTexCoord2f(s, 0.0);
-    glVertex3f(Xdist, -Ydist, 0.0);
-
-    glEnd();
-    glDisable( GL_BLEND );
-    glDisable( GL_TEXTURE_2D );
+    drawBorder( Xdist, Ydist, s, t );
 
     glPushMatrix();
 
     float textYPos = 0.0f;
-    if ( textAtTop )
+    float textXPos = 0.0f;
+    if ( titleStyle == TOPTEXT )
     {
-        textYPos = getHeight()/2.0f + getBorderSize() + getTextOffset();
+        textXPos = -getWidth() / 2.0f;
+        textYPos = ( getHeight() / 2.0f ) + getBorderSize() + getTextOffset();
     }
+    else if ( titleStyle == CENTEREDTEXT )
+    {
+        textXPos = -getTextWidth() / 2.0f;
+        textYPos = -getTextHeight() / 2.0f;
+    }
+
     float scaleFactor = getTextScale();
 
     /*if ( isGroup() )
@@ -757,7 +737,7 @@ void RectangleBase::draw()
         scaleFactor *= 0.75f;
     }*/
 
-    glTranslatef( -getWidth()/2.0f, textYPos, 0.0f );
+    glTranslatef( textXPos, textYPos, 0.0f );
     //glRasterPos2f( -getWidth()/2.0f, getHeight()/2.0f+yOffset );
     glScalef( scaleFactor, scaleFactor, scaleFactor );
 
@@ -813,9 +793,43 @@ void RectangleBase::draw()
     xAngle += 0.01f;*/
 }
 
-void RectangleBase::drawBorder()
+void RectangleBase::drawBorder( float Xdist, float Ydist, float s, float t )
 {
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
+    glEnable( GL_TEXTURE_2D );
+    glBindTexture( GL_TEXTURE_2D, borderTex );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
+    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+    glPixelStorei( GL_UNPACK_ROW_LENGTH, twidth );
+
+    glBegin( GL_QUADS );
+    // set the border color
+    glColor4f( borderColor.R-(effectVal*3.0f),
+               borderColor.G-(effectVal*3.0f),
+               borderColor.B+(effectVal*6.0f),
+               borderColor.A+(effectVal*3.0f) );
+
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(-Xdist, -Ydist, 0.0);
+
+    glTexCoord2f(0.0, t);
+    glVertex3f(-Xdist, Ydist, 0.0);
+
+    glTexCoord2f(s, t);
+    glVertex3f(Xdist, Ydist, 0.0);
+
+    glTexCoord2f(s, 0.0);
+    glVertex3f(Xdist, -Ydist, 0.0);
+
+    glEnd();
+    glDisable( GL_BLEND );
+    glDisable( GL_TEXTURE_2D );
 }
 
 void RectangleBase::animateValues()

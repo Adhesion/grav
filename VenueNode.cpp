@@ -11,7 +11,8 @@
 
 VenueNode::VenueNode()
 {
-    textAtTop = false;
+    titleStyle = CENTEREDTEXT;
     borderScale = 0.0f;
     userMovable = false;
+    selectable = true;
 }
