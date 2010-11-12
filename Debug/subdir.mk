@@ -25,6 +25,7 @@ CPP_SRCS += \
 ../TreeNode.cpp \
 ../Vector.cpp \
 ../VenueClientController.cpp \
+../VenueNode.cpp \
 ../VideoInfoDialog.cpp \
 ../VideoListener.cpp \
 ../VideoSource.cpp \
@@ -53,6 +54,7 @@ OBJS += \
 ./TreeNode.o \
 ./Vector.o \
 ./VenueClientController.o \
+./VenueNode.o \
 ./VideoInfoDialog.o \
 ./VideoListener.o \
 ./VideoSource.o \
@@ -81,6 +83,7 @@ CPP_DEPS += \
 ./TreeNode.d \
 ./Vector.d \
 ./VenueClientController.d \
+./VenueNode.d \
 ./VideoInfoDialog.d \
 ./VideoListener.d \
 ./VideoSource.d \

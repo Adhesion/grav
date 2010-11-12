@@ -13,6 +13,7 @@ Runway::Runway( float _x, float _y ) :
 {
     locked = false;
     selectable = false;
+    userMovable = false;
     orientation = 1;
     setName( "Runway" );
     intersectCounter = 0;
@@ -104,7 +105,7 @@ void Runway::rearrange()
             std::map<std::string, std::vector<RectangleBase*> >();
         data["objects"] = objects;
 
-        layouts.arrange("grid", 
+        layouts.arrange("grid",
                         getLBound(), getRBound(), getUBound(), getDBound(),
                         0, 0, 0, 0,
                         data, opts);
@@ -117,7 +118,7 @@ void Runway::rearrange()
         opts["numX"] = "1";
         opts["numY"] = ss.str();
         opts["horiz"] = "False";
-        
+
         std::map<std::string, std::vector<RectangleBase*> > data = \
             std::map<std::string, std::vector<RectangleBase*> >();
         data["objects"] = objects;

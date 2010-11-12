@@ -35,7 +35,7 @@ public:
     RectangleBase( float _x, float _y );
     RectangleBase( const RectangleBase& other );
     virtual ~RectangleBase();
-    
+
     void setDefaults();
 
     /*
@@ -82,7 +82,7 @@ public:
      */
     virtual void move( float _x, float _y );
     virtual void setPos( float _x, float _y );
-    
+
     /*
      * Change the size of the object.
      */
@@ -92,14 +92,14 @@ public:
      * resize their members or not.
      */
     virtual void setScale( float xs, float ys, bool resizeMembers );
-    
+
     /*
      * Change the selected size to be equal to the argument given, preserving
      * aspect ratio.
      */
     virtual void setWidth( float w );
     virtual void setHeight( float h );
-    
+
     /*
      * Change the total size, ie, including borders and text, while preserving
      * aspect ratio.
@@ -122,26 +122,32 @@ public:
     float getDestX(); float getDestY();
     float getScaleX(); float getScaleY();
     float getLat(); float getLon();
-    
+
     void setName( std::string s );
     void setSiteID( std::string sid );
     std::string getName();
     std::string getSubName();
     std::string getAltName();
     std::string getSiteID();
-    
+
     bool isSelected();
     bool isSelectable();
     void setSelect( bool select );
     virtual void setSelectable( bool s );
     void setEffectVal( float f );
     void setAnimation( bool anim );
-    
+
+    /*
+     * Whether the object is movable by the user - controls whether move() calls
+     * go through in InputHandler which should be the single entry point.
+     */
+    bool isUserMovable();
+
     /*
      * Is this object a member of a group?
      */
     bool isGrouped();
-    
+
     /*
      * Is this object a group itself?
      */
@@ -174,22 +180,22 @@ public:
      * name from its members.
      */
     bool usingFinalName();
-    
+
     virtual bool updateName();
     void updateTextBounds();
     void setSubstring( int start, int end );
-    
+
     /*
      * Checks whether this object intersects with another rectangle, defined
      * either by its specific points or an existing rectangle object.
-     * 
+     *
      * @param L,R,U,D   floating-point values that determine the EDGES
      *                  (left, right, up, down) of the rectangle to be
      *                  checked - not the points.
      */
     bool intersect( float L, float R, float U, float D );
     bool intersect( RectangleBase* other );
-    
+
     // set/get enable/disable for rendering
     // this means different things for different subclasses - in base it means
     // nothing, videosource uses it to disable rendering, runway makes it
@@ -201,7 +207,8 @@ public:
      * GL draw function to render the object.
      */
     virtual void draw();
-    
+    void drawBorder();
+
 protected:
     // position in world space (center of the object)
     float x,y,z;
@@ -211,19 +218,19 @@ protected:
     float scaleX, scaleY;
     float destScaleX, destScaleY;
     Vector normal;
-    
+
     // value for the amplitude of the audio connection
     float effectVal;
-    
+
     // for global positioning
     float lat, lon;
-    
+
     RGBAColor borderColor;
     RGBAColor destBColor;
     RGBAColor baseBColor;
     RGBAColor secondaryColor;
     RGBAColor destSecondaryColor;
-    
+
     std::string name;
     std::string altName;
     std::string siteID;
@@ -232,11 +239,13 @@ protected:
     bool finalName;
     // if name ends up being wider than the object itself, cut off with ellipsis
     int cutoffPos;
-    
+
     FTFont* font;
     FTBBox textBounds;
     // amount to scale the text relative to the total size
     float relativeTextScale;
+    // temp thing for calculating size - possible change to an enum
+    bool textAtTop;
 
     // size of the border relative to total size
     float borderScale;
@@ -244,9 +253,10 @@ protected:
     // width/height of our border/background texture in
     // pixels
     int twidth, theight;
-    
+
     bool selected;
     bool selectable;
+    bool userMovable;
     bool grouped;
     Group* myGroup;
     bool locked;
@@ -254,10 +264,10 @@ protected:
 
     bool enableRendering;
     bool debugDraw;
-    
+
     bool animated;
     void animateValues();
-    
+
 };
 
 #endif /*RECTANGLEBASE_H_*/

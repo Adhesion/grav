@@ -813,7 +813,7 @@ std::vector<RectangleBase*> gravManager::getMovableObjects()
     for ( unsigned int i = 0; i < drawnObjects->size(); i++ )
     {
         if ( !(*drawnObjects)[i]->isGrouped() &&
-                (*drawnObjects)[i]->isSelectable() )
+                (*drawnObjects)[i]->isUserMovable() )
         {
             objects.push_back( (*drawnObjects)[i] );
         }

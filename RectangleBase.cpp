@@ -32,17 +32,17 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     destScaleX = other.destScaleX; destScaleY = other.destScaleY;
     xAngle = other.xAngle; yAngle = other.yAngle; zAngle = other.zAngle;
     normal = other.normal;
-    
+
     effectVal = other.effectVal;
-    
+
     lat = other.lat; lon = other.lon;
-    
+
     borderColor = other.borderColor;
     destBColor = other.destBColor;
     baseBColor = other.baseBColor;
     secondaryColor = other.secondaryColor;
     destSecondaryColor = other.destSecondaryColor;
-    
+
     enableRendering = other.enableRendering;
     debugDraw = other.debugDraw;
 
@@ -51,13 +51,18 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     nameStart = other.nameStart; nameEnd = other.nameEnd;
     finalName = other.finalName;
     cutoffPos = other.cutoffPos;
-    
+
     font = other.font;
-    
+    relativeTextScale = other.relativeTextScale;
+    borderScale = other.borderScale;
+    textAtTop = other.textAtTop;
+
     borderTex = other.borderTex;
     twidth = other.twidth; theight = other.theight;
-    
+
     selected = other.selected;
+    selectable = other.selectable;
+    userMovable = other.userMovable;
     grouped = other.grouped;
     myGroup = other.myGroup;
     animated = other.animated;
@@ -67,11 +72,11 @@ RectangleBase::~RectangleBase()
 {
     if ( isGrouped() )
         myGroup->remove( this );
-    
+
     // if this is set externally, then we shouldn't delete it since other
     // things might be using it
     //glDeleteTextures( 1, &borderTex );
-    
+
     // font is not deleted here since the default is to use the global one from
     // GLUtil, and that will delete it
 }
@@ -88,13 +93,15 @@ void RectangleBase::setDefaults()
 
     selected = false;
     selectable = true;
+    userMovable = true;
     showLockStatus = false;
     locked = false;
-    
+
     enableRendering = true;
     debugDraw = false;
 
     relativeTextScale = 0.0009;
+    textAtTop = true;
 
     borderScale = 0.04;
 
@@ -114,12 +121,12 @@ void RectangleBase::setDefaults()
     myGroup = NULL;
     twidth = 0; theight = 0;
     effectVal = 0.0f;
-    
+
     // TODO: this should be dynamic
     lat = 43.165556f; lon = -77.611389f;
-    
+
     font = GLUtil::getInstance()->getMainFont();
-    
+
     //borderTex = PNGLoader::loadPNG( "/home/andrew/work/src/grav/Debug/border.png",
     //                                twidth, theight );
 }
@@ -141,8 +148,12 @@ float RectangleBase::getTotalWidth()
 
 float RectangleBase::getTotalHeight()
 {
-    return getHeight() + ( 2.0f * getBorderSize() ) + getTextOffset() +
-            getTextHeight();
+    float h = getHeight() + ( 2.0f * getBorderSize() );
+    if ( textAtTop )
+    {
+        h+= getTextOffset() + getTextHeight();
+    }
+    return h;
 }
 
 float RectangleBase::getDestWidth()
@@ -253,8 +264,13 @@ float RectangleBase::getCenterOffsetX()
 
 float RectangleBase::getCenterOffsetY()
 {
-    float textRatio = ( getTextHeight() + getTextOffset() ) / getHeight();
-    return textRatio * getDestHeight() / 2.0f;
+    if ( textAtTop )
+    {
+        float textRatio = ( getTextHeight() + getTextOffset() ) / getHeight();
+        return textRatio * getDestHeight() / 2.0f;
+    }
+    else
+        return 0.0f;
 }
 
 void RectangleBase::move( float _x, float _y )
@@ -327,7 +343,6 @@ void RectangleBase::fillToRect( float innerL, float innerR,
     move( ( innerR + innerL ) / 2.0f,
           ( ( innerU + innerD ) / 2.0f ) - getCenterOffsetY() );
 }
-
 
 void RectangleBase::setTexture( GLuint tex, int width, int height )
 {
@@ -462,6 +477,11 @@ void RectangleBase::setAnimation( bool anim )
     animated = anim;
 }
 
+bool RectangleBase::isUserMovable()
+{
+    return userMovable;
+}
+
 bool RectangleBase::isGrouped()
 {
     return ( myGroup != NULL );
@@ -593,7 +613,7 @@ bool RectangleBase::intersect( float L, float R, float U, float D )
     float right = getX() + getWidth()/2;
     float bottom = getY() - getHeight()/2;
     float top = getY() + getHeight()/2;
-    
+
     return !(L > right || R < left || D > top || U < bottom);
 }
 
@@ -604,7 +624,7 @@ bool RectangleBase::intersect( RectangleBase* other )
     float right = other->getX() + other->getWidth()/2;
     float bottom = other->getY() - other->getHeight()/2;
     float top = other->getY() + other->getHeight()/2;
-    
+
     return intersect( left, right, top, bottom );
 }
 
@@ -621,7 +641,7 @@ bool RectangleBase::getRendering()
 void RectangleBase::draw()
 {
     animateValues();
-    
+
     // set up our position
     glPushMatrix();
 
@@ -630,7 +650,7 @@ void RectangleBase::draw()
     glRotatef( xAngle, 1.0, 0.0, 0.0 );
     glRotatef( yAngle, 0.0, 1.0, 0.0 );
     glRotatef( zAngle, 0.0, 0.0, 1.0 );
-    
+
     // draw the border first
     float s = (float)twidth / (float)GLUtil::getInstance()->pow2( twidth );
     float t = (float)theight / (float)GLUtil::getInstance()->pow2( theight );
@@ -682,39 +702,33 @@ void RectangleBase::draw()
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     //glBlendFunc( GL_ONE, GL_ONE );
-    
+
     /*printf( "DRAWPRE\n" );
     GLenum  gl_error = glGetError();
     for (; (gl_error); gl_error = glGetError()) {
         fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
     }*/
-    
+
     glEnable( GL_TEXTURE_2D );
     glBindTexture( GL_TEXTURE_2D, borderTex );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    
+
     glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
     glPixelStorei( GL_UNPACK_ROW_LENGTH, twidth );
-    
-    /*printf( "DRAWPOSTBIND\n" );
-    gl_error = glGetError();
-    for (; (gl_error); gl_error = glGetError()) {
-        fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
-    }*/
-    
+
     glBegin( GL_QUADS );
     // set the border color
-    glColor4f( borderColor.R-(effectVal*3.0f), 
-               borderColor.G-(effectVal*3.0f), 
+    glColor4f( borderColor.R-(effectVal*3.0f),
+               borderColor.G-(effectVal*3.0f),
                borderColor.B+(effectVal*6.0f),
                borderColor.A+(effectVal*3.0f) );
-    
+
     glTexCoord2f(0.0, 0.0);
     glVertex3f(-Xdist, -Ydist, 0.0);
-    
+
     glTexCoord2f(0.0, t);
     glVertex3f(-Xdist, Ydist, 0.0);
 
@@ -723,26 +737,18 @@ void RectangleBase::draw()
 
     glTexCoord2f(s, 0.0);
     glVertex3f(Xdist, -Ydist, 0.0);
-    
-    /*printf( "DRAWPOSTCOORD\n" );
-    gl_error = glGetError();
-    for (; (gl_error); gl_error = glGetError()) {
-        fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
-    }*/
-    
+
     glEnd();
     glDisable( GL_BLEND );
     glDisable( GL_TEXTURE_2D );
 
-    /*printf( "DRAWPOSTPOST\n" );
-    gl_error = glGetError();
-    for (; (gl_error); gl_error = glGetError()) {
-        fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
-    }*/
-
     glPushMatrix();
 
-    float yOffset = getBorderSize() + getTextOffset();
+    float textYPos = 0.0f;
+    if ( textAtTop )
+    {
+        textYPos = getHeight()/2.0f + getBorderSize() + getTextOffset();
+    }
     float scaleFactor = getTextScale();
 
     /*if ( isGroup() )
@@ -751,7 +757,7 @@ void RectangleBase::draw()
         scaleFactor *= 0.75f;
     }*/
 
-    glTranslatef( -getWidth()/2.0f, getHeight()/2.0f+yOffset, 0.0f );
+    glTranslatef( -getWidth()/2.0f, textYPos, 0.0f );
     //glRasterPos2f( -getWidth()/2.0f, getHeight()/2.0f+yOffset );
     glScalef( scaleFactor, scaleFactor, scaleFactor );
 
@@ -784,14 +790,14 @@ void RectangleBase::draw()
         const char* nc = renderedName.c_str();
         font->Render(nc);
     }
-    
+
     glDisable( GL_BLEND );
     glDisable( GL_LINE_SMOOTH );
-    
+
     glPopMatrix();
-    
+
     glPopMatrix(); // from initial position setup
-    
+
     /*float spacing = 0.20f;
     //float i = -name.length()*spacing/2.0f;
     float i = -getWidth();
@@ -805,6 +811,11 @@ void RectangleBase::draw()
     /*zAngle += 0.5f;
     yAngle += 0.1f;
     xAngle += 0.01f;*/
+}
+
+void RectangleBase::drawBorder()
+{
+
 }
 
 void RectangleBase::animateValues()

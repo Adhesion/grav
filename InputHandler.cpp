@@ -500,7 +500,11 @@ void InputHandler::leftClick( int x, int y )
 
             if ( num == 1 )
             {
-                (*(grav->getSelectedObjects()))[0]->move( movePosX, movePosY );
+                if ( (*(grav->getSelectedObjects()))[0]->isUserMovable() )
+                {
+                    (*(grav->getSelectedObjects()))[0]->move( movePosX,
+                                                                movePosY );
+                }
                 (*(grav->getSelectedObjects()))[0]->setSelect( false );
             }
             // if moving >1, center the videos around the click point
@@ -523,8 +527,11 @@ void InputHandler::leftClick( int x, int y )
                        sli != grav->getSelectedObjects()->end();
                        sli++ )
                 {
-                    (*sli)->move( movePosX + ((*sli)->getX()-avgX),
-                                   movePosY + ((*sli)->getY()-avgY) );
+                    if ( (*sli)->isUserMovable() )
+                    {
+                        (*sli)->move( movePosX + ((*sli)->getX()-avgX),
+                                       movePosY + ((*sli)->getY()-avgY) );
+                    }
                     (*sli)->setSelect( false );
                 }
             }
@@ -600,12 +607,8 @@ void InputHandler::mouseLeftHeldMove( int x, int y )
             // since group members are controlled by the group somewhat,
             // calling setpos on both groups and members here will result
             // in a double move (if they're both selected)
-            if ( !(*sli)->isGrouped() )
-            {
-                (*sli)->setPos( (dragEndX-dragPrevX) + (*sli)->getX(),
-                                (dragEndY-dragPrevY) + (*sli)->getY() );
-            }
-            else if ( !(*sli)->getGroup()->isSelected() )
+            if ( (*sli)->isUserMovable() &&
+                 ( !(*sli)->isGrouped() || !(*sli)->getGroup()->isSelected() ) )
             {
                 (*sli)->setPos( (dragEndX-dragPrevX) + (*sli)->getX(),
                                 (dragEndY-dragPrevY) + (*sli)->getY() );
