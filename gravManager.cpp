@@ -76,7 +76,7 @@ gravManager::gravManager()
     graphicsDebugView = false;
     pixelCount = 0;
 
-    venueClientController = new VenueClientController();
+    venueClientController = NULL; // just for before it gets set
 }
 
 gravManager::~gravManager()
@@ -93,8 +93,6 @@ gravManager::~gravManager()
     delete objectsToDelete;
     delete objectsToAddToTree;
     delete objectsToRemoveFromTree;
-
-    delete venueClientController;
 
     mutex_free( sourceMutex );
 }
@@ -720,6 +718,10 @@ void gravManager::setWindowSize( int w, int h )
     screenRectFull.setScale( screenR-screenL, screenU-screenD );
 
     recalculateRectSizes();
+
+    if ( venueClientController != NULL )
+        venueClientController->setScale( screenRectSub.getDestWidth() * 0.9f,
+                                     screenRectSub.getDestHeight() * 0.9f );
 }
 
 void gravManager::recalculateRectSizes()
@@ -960,17 +962,26 @@ void gravManager::deleteGroup( Group* g )
     unlockSources();
 }
 
-void gravManager::removeFromLists( RectangleBase* obj )
+void gravManager::removeFromLists( RectangleBase* obj, bool treeRemove )
 {
+    printf( "gravManager::removing %s from lists\n", obj->getName().c_str()  );
+    printf( "gravManager::%i objs in drawnobjs\n", drawnObjects->size() );
     // remove it from the tree
-    if ( tree )
+    if ( tree && treeRemove )
     {
         objectsToRemoveFromTree->push_back( obj );
     }
 
     // remove it from drawnobjects, if it is being drawn
     std::vector<RectangleBase*>::iterator i = drawnObjects->begin();
-    while ( (*i) != obj ) i++;
+    while ( (*i) != obj && i != drawnObjects->end() ) i++;
+
+    //printf( "gravManager::confirmed found %s from lists\n", (*i)->getName().c_str()  );
+    for ( unsigned int i = 0; i < drawnObjects->size(); i++ )
+    {
+        RectangleBase* obj = (*drawnObjects)[i];
+        printf( "drawnobj %i : %s\n", i, obj->getName().c_str() );
+    }
 
     // TODO: confirm this (checking whether it actually is in drawnobjects
     //                      or not)
@@ -1098,6 +1109,20 @@ void gravManager::setCanvas( GLCanvas* c )
 	canvas = c;
 }
 
+void gravManager::setVenueClientController( VenueClientController* vcc )
+{
+    // if setting a new one, stop drawing the old one
+    if ( venueClientController != NULL )
+    {
+        std::vector<RectangleBase*>::iterator i = drawnObjects->begin();
+        while ( i != drawnObjects->end() && (*i) != venueClientController )
+            i++;
+        drawnObjects->erase( i );
+    }
+    venueClientController = vcc;
+    drawnObjects->push_back( venueClientController );
+}
+
 void gravManager::setHeaderString( std::string h )
 {
     headerString = h;
@@ -1195,5 +1220,7 @@ bool gravManager::getGraphicsDebugMode()
 void gravManager::toggleShowVenueClientController()
 {
     // TODO just debug stuff here for now
-    venueClientController->printExitMap();
+    if ( venueClientController != NULL )
+        venueClientController->setRendering(
+                                    !venueClientController->getRendering() );
 }

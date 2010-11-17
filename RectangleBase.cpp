@@ -709,6 +709,8 @@ void RectangleBase::draw()
         glVertex3f(0.0, Ydist, 0.0);
         glVertex3f(0.0, -Ydist, 0.0);
 
+        glEnd();
+
         glDisable( GL_BLEND );
     }
 

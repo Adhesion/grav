@@ -18,6 +18,10 @@ class VenueNode : public RectangleBase
 public:
     VenueNode();
 
+    void draw();
+
+    bool updateName();
+
 private:
 
 };

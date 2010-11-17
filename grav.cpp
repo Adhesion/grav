@@ -20,6 +20,7 @@
 #include "Frame.h"
 #include "SideFrame.h"
 #include "Timers.h"
+#include "VenueClientController.h"
 
 #include <VPMedia/VPMLog.h>
 #include <VPMedia/VPMPayloadDecoderFactory.h>
@@ -121,6 +122,7 @@ bool gravApp::OnInit()
 
     Earth* earth = new Earth();
     InputHandler* input = new InputHandler( earth, grav, mainFrame );
+    venueClientController = new VenueClientController( 0.0f, 0.0f, grav );
 
     // add the input handler to the chain of things that can handle
     // events & give the canvas focus so we don't have to click on it to
@@ -135,6 +137,7 @@ bool gravApp::OnInit()
     grav->setBorderTex( "border.png" );
     grav->setVideoListener( videoSessionListener );
     grav->setCanvas( canvas );
+    grav->setVenueClientController( venueClientController );
 
     vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
 
@@ -193,6 +196,7 @@ int gravApp::OnExit()
     delete videoSessionListener;
     delete audioSessionListener;
 
+    delete venueClientController;
     delete grav;
 
     GLUtil::getInstance()->cleanupGL();

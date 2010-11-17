@@ -16,19 +16,32 @@
 #include <map>
 
 #include "PythonTools.h"
-#include "RectangleBase.h"
+#include "Group.h"
 
-class VenueClientController : public RectangleBase
+class gravManager;
+
+class VenueClientController : public Group
 {
 
 public:
-    VenueClientController();
+    VenueClientController( float _x, float _y, gravManager* g );
 
     void draw();
+
+    /*
+     * These remove variants remove the member objects entirely (including
+     * remove from main lists and delete) since this object effectively owns
+     * them.
+     */
+    void remove( RectangleBase* object, bool move = true );
+    std::vector<RectangleBase*>::iterator remove(
+                    std::vector<RectangleBase*>::iterator i, bool move = true );
 
     void getVenueClient();
     void updateExitMap();
     void printExitMap();
+
+    bool updateName();
     void setRendering( bool r );
 
 private:
@@ -37,6 +50,8 @@ private:
     std::string venueClientUrl;
 
     PythonTools pyTools;
+
+    gravManager* grav;
 
 };
 

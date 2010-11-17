@@ -29,8 +29,6 @@ public:
     // the runway bounds
     void checkMemberIntersect();
 
-    void setRendering( bool r );
-
 private:
     // 0 means horizontal, 1 means vertical
     int orientation;

@@ -116,7 +116,7 @@ public:
     void deleteSource( std::vector<VideoSource*>::iterator si );
 
     void deleteGroup( Group* g );
-    void removeFromLists( RectangleBase* obj );
+    void removeFromLists( RectangleBase* obj, bool treeRemove = true );
 
     /*
      * This would be done in the constructor, but it has to be done after
@@ -143,6 +143,7 @@ public:
     void setAudio( AudioManager* a );
     void setVideoListener( VideoListener* v );
     void setCanvas( GLCanvas* c );
+    void setVenueClientController( VenueClientController* vcc );
     /*
      * Note, this should be called after GL setup since it needs to calculate
      * the text size, which depends on the font being set up.

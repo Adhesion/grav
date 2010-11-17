@@ -18,10 +18,11 @@ Group::Group( float _x, float _y ) :
     baseBColor.A = 0.7f;
     destBColor = baseBColor;
     name = std::string( "Group" );
-    
+
     locked = true;
     showLockStatus = true;
-    
+    allowHiding = false;
+
     buffer = 1.0f;
 }
 
@@ -34,9 +35,9 @@ void Group::draw()
 {
     //animateValues();
     //printf( "drawing group at %f,%f\n", x, y );
-    
+
     RectangleBase::draw();
-    
+
     //printf( "drawing %i objects in group\n", objects.size() );
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
@@ -50,13 +51,13 @@ void Group::add( RectangleBase* object )
     object->setGroup( this );
     printf( "added %s to group %s\n", object->getName().c_str(),
                                         getName().c_str() );
-    
+
     printf( "now rearranging %i objects\n", objects.size() );
     rearrange();
-    
+
     for ( unsigned int i = 0; i < objects.size(); i++ )
         objects[i]->updateName();
-    
+
     updateName();
 }
 
@@ -74,11 +75,26 @@ void Group::remove( RectangleBase* object, bool move )
         rearrange();
 }
 
+std::vector<RectangleBase*>::iterator Group::remove(
+                            std::vector<RectangleBase*>::iterator i, bool move )
+{
+    //printf( "removing %s from group %s\n", object->getName().c_str(),
+    //                                    getName().c_str() );
+    (*i)->setGroup( NULL );
+    (*i)->setSubstring( -1, -1 );
+
+    std::vector<RectangleBase*>::iterator ret = objects.erase( i );
+    if ( objects.size() > 0 && move )
+        rearrange();
+    return ret;
+}
+
 void Group::removeAll()
 {
-    for ( unsigned int i = 0; i < objects.size(); )
+    std::vector<RectangleBase*>::iterator i = objects.begin();
+    while ( i != objects.end() )
     {
-        remove( objects[i], false );
+        i = remove( i, false );
     }
 }
 
@@ -102,7 +118,7 @@ void Group::rearrange()
     // it doesn't make sense to rearrange 0 objects, plus having objects.size
     // = 0 will cause div by 0 crashes later
     if ( objects.size() == 0 ) return;
-    
+
     float largestWidth = 0.0f, largestHeight = 0.0f; // for finding the biggest
                                                      // object in the group
 
@@ -111,7 +127,7 @@ void Group::rearrange()
         largestWidth = std::max( largestWidth, objects[i]->getWidth() );
         largestHeight = std::max( largestHeight, objects[i]->getHeight() );
     }
-    
+
     int numCol = ceil( sqrt( objects.size() ) );
     int numRow = objects.size() / numCol + ( objects.size() % numCol > 0 );
     //printf( "Group:: group %s (%fx%f, %f,%f) rearranging\n", name.c_str(),
@@ -161,7 +177,7 @@ void Group::rearrange()
 bool Group::updateName()
 {
     if ( objects.size() == 0 ) return false;
-    
+
     bool membersFinalized = true;
     bool nameChanged = false;
     std::string oldName = name;
@@ -169,20 +185,20 @@ bool Group::updateName()
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
         membersFinalized = membersFinalized && objects[i]->usingFinalName();
-        shortestLength = std::min( shortestLength, 
+        shortestLength = std::min( shortestLength,
                                     (int)objects[i]->getName().length() );
     }
-    
+
     // only try to create the name if all the members have their correct
     // names (ie, NAME vs CNAME)
     if ( !membersFinalized ) return false;
-    
+
     //printf( "group members names finalized, finding common string...\n" );
-    
+
     int splitPos = 0;
     int startParen = -1;
     int endParen = -1;
-    
+
     if ( objects.size() > 1 )
     {
         // loop through the characters and find the position of the end of the
@@ -198,7 +214,7 @@ bool Group::updateName()
             splitPos++;
         }
         splitPos--;
-        
+
         // if there are parentheses, split the strings based on the closest
         // left paren to the left of the difference position (if found)
         startParen = objects[0]->getName().rfind( '(', splitPos );
@@ -236,12 +252,12 @@ bool Group::updateName()
         if ( endParen != -1 && startParen != -1 )
             splitPos = startParen;
     }
-    
+
     // set the group's name to the common substring, and the members' names
     // to the remainder
     name = objects[0]->getName().substr(0, splitPos);
     nameChanged = name.compare( oldName ) != 0;
-    
+
     //printf( "common substr is %s, up to pos %i\n", name.c_str(), splitPos );
     for ( unsigned int k = 0; k < objects.size(); k++ )
     {
@@ -265,7 +281,7 @@ bool Group::updateName()
         //printf( "object name (remainder) set to %s\n",
         //                    objects[k]->getSubName().c_str() );
     }
-    
+
     if ( nameChanged )
         updateTextBounds();
     finalName = true;
@@ -277,7 +293,7 @@ void Group::move( float _x, float _y )
     //printf( "moving group\n" );
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
-        objects[i]->move( _x + objects[i]->getDestX() - destX, 
+        objects[i]->move( _x + objects[i]->getDestX() - destX,
                           _y + objects[i]->getDestY() - destY );
     }
     RectangleBase::move( _x, _y );
@@ -287,7 +303,7 @@ void Group::setPos( float _x, float _y )
 {
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
-        objects[i]->setPos( _x + objects[i]->getDestX() - destX, 
+        objects[i]->setPos( _x + objects[i]->getDestX() - destX,
                             _y + objects[i]->getDestY() - destY );
     }
     RectangleBase::setPos( _x, _y );
@@ -312,7 +328,7 @@ void Group::setScale( float xs, float ys, bool resizeMembers )
         printf( "Group::setScale: scaling group %s to %f,%f, ratio is %f/%f\n",
                     name.c_str(), xs, ys, Xratio, Yratio );
         float min = std::min( Xratio, Yratio );
-        
+
         for ( unsigned int i = 0; i < objects.size(); i++ )
         {
             float objScaleX = (objects[i]->getScaleX() * min);
@@ -321,7 +337,7 @@ void Group::setScale( float xs, float ys, bool resizeMembers )
             float Ydist = objects[i]->getDestY() - destY;
             Xdist *= Xratio;
             Ydist *= Yratio;
-            
+
             // if the object scale values are close to the group's scale values,
             // then make it a bit smaller
             if ( (objScaleX >= (xs-0.5f)) || (objScaleY >= (ys-0.5f)) )
@@ -331,5 +347,45 @@ void Group::setScale( float xs, float ys, bool resizeMembers )
             objects[i]->setScale( objScaleX, objScaleY );
             objects[i]->move( destX+Xdist, destY+Ydist );
         }*/
+    }
+}
+
+void Group::setRendering( bool r )
+{
+    //printf( "Runway::setting rendering to %i\n", r );
+    enableRendering = r;
+
+    if ( allowHiding )
+    {
+        if ( !r )
+        {
+            destBColor.A = 0.0f;
+            // set children to unselected just in case they're selected - user will
+            // probably end up moving them accidentally
+            for ( unsigned int i = 0; i < objects.size(); i++ )
+            {
+                objects[i]->setSelect( false );
+            }
+        }
+        else
+            destBColor.A = baseBColor.A;
+
+        for ( unsigned int i = 0; i < objects.size(); i++ )
+        {
+            RGBAColor col = objects[i]->getBaseColor();
+            RGBAColor col2 = objects[i]->getSecondaryColor();
+            if ( !r )
+            {
+                col.A = 0.0f;
+                col2.A = 0.0f;
+            }
+            // note secondary color is going to lose its previous alpha here,
+            // TODO fix this somehow? adding a base-secondary-color seems excessive
+            else
+                col2.A = 1.0f;
+            objects[i]->setColor( col );
+            objects[i]->setSecondaryColor( col2 );
+            objects[i]->setSelectable( r );
+        }
     }
 }

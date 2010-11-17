@@ -29,6 +29,7 @@ class SessionTreeControl;
 class VideoListener;
 class AudioManager;
 class SessionManager;
+class VenueClientController;
 
 class gravApp : public wxApp
 {
@@ -90,6 +91,7 @@ private:
     RotateTimer* rotateTimer;
 
     gravManager* grav;
+    VenueClientController* venueClientController;
 
     bool usingThreads;
     bool threadRunning;
