@@ -720,8 +720,13 @@ void gravManager::setWindowSize( int w, int h )
     recalculateRectSizes();
 
     if ( venueClientController != NULL )
+    {
         venueClientController->setScale( screenRectSub.getDestWidth() * 0.9f,
                                      screenRectSub.getDestHeight() * 0.9f );
+        //printf( "in setwindowsize, set VCC scale to %fx%f\n",
+        //        screenRectSub.getDestWidth() * 0.9f,
+        //        screenRectSub.getDestHeight() * 0.9f );
+    }
 }
 
 void gravManager::recalculateRectSizes()
@@ -962,10 +967,13 @@ void gravManager::deleteGroup( Group* g )
     unlockSources();
 }
 
+void gravManager::addToDrawList( RectangleBase* obj )
+{
+    drawnObjects->push_back( obj );
+}
+
 void gravManager::removeFromLists( RectangleBase* obj, bool treeRemove )
 {
-    printf( "gravManager::removing %s from lists\n", obj->getName().c_str()  );
-    printf( "gravManager::%i objs in drawnobjs\n", drawnObjects->size() );
     // remove it from the tree
     if ( tree && treeRemove )
     {
@@ -974,14 +982,7 @@ void gravManager::removeFromLists( RectangleBase* obj, bool treeRemove )
 
     // remove it from drawnobjects, if it is being drawn
     std::vector<RectangleBase*>::iterator i = drawnObjects->begin();
-    while ( (*i) != obj && i != drawnObjects->end() ) i++;
-
-    //printf( "gravManager::confirmed found %s from lists\n", (*i)->getName().c_str()  );
-    for ( unsigned int i = 0; i < drawnObjects->size(); i++ )
-    {
-        RectangleBase* obj = (*drawnObjects)[i];
-        printf( "drawnobj %i : %s\n", i, obj->getName().c_str() );
-    }
+    while ( i != drawnObjects->end() && (*i) != obj ) i++;
 
     // TODO: confirm this (checking whether it actually is in drawnobjects
     //                      or not)

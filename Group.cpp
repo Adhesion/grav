@@ -49,10 +49,10 @@ void Group::add( RectangleBase* object )
 {
     objects.push_back( object );
     object->setGroup( this );
-    printf( "added %s to group %s\n", object->getName().c_str(),
-                                        getName().c_str() );
+    //printf( "added %s to group %s\n", object->getName().c_str(),
+    //                                    getName().c_str() );
 
-    printf( "now rearranging %i objects\n", objects.size() );
+    //printf( "now rearranging %i objects\n", objects.size() );
     rearrange();
 
     for ( unsigned int i = 0; i < objects.size(); i++ )

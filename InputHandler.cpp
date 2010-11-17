@@ -645,7 +645,7 @@ bool InputHandler::selectVideos()
     std::vector<RectangleBase*>::const_iterator sli;
 
     for ( si = grav->getDrawnObjects()->rbegin();
-            si != grav->getDrawnObjects()->rend(); si++ )
+            si != grav->getDrawnObjects()->rend(); ++si )
     {
         // rectangle that defines the selection area
         float selectL, selectR, selectU, selectD;

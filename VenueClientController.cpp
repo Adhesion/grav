@@ -30,7 +30,7 @@ VenueClientController::VenueClientController( float _x, float _y,
     destBColor.A = 0.0f;
     borderColor = destBColor;
     setRendering( false );
-    setScale( 15.0f, 15.0f );
+    setScale( 13.0f, 13.0f );
 }
 
 void VenueClientController::draw()
@@ -122,7 +122,7 @@ void VenueClientController::updateExitMap()
     {
         VenueNode* node = new VenueNode();
         node->setName( i->first );
-
+        grav->addToDrawList( node );
         add( node );
     }
 }
@@ -158,39 +158,15 @@ bool VenueClientController::updateName()
 
 void VenueClientController::setRendering( bool r )
 {
-    // TODO this is the same as Runway, should abstract this somehow?
-    printf( "VCC::setting rendering to %i\n", r );
-    enableRendering = r;
-    printExitMap();
-
-    if ( !r )
+    Group::setRendering( r );
+    /*if ( !r )
     {
-        destBColor.A = 0.0f;
-        // set children to unselected just in case they're selected - user will
-        // probably end up moving them accidentally
+        // move objects for a nice animation effect
         for ( unsigned int i = 0; i < objects.size(); i++ )
         {
-            objects[i]->setSelect( false );
+            objects[i]->move( getX(), getY() );
         }
     }
     else
-        destBColor.A = baseBColor.A;
-
-    for ( unsigned int i = 0; i < objects.size(); i++ )
-    {
-        RGBAColor col = objects[i]->getBaseColor();
-        RGBAColor col2 = objects[i]->getSecondaryColor();
-        if ( !r )
-        {
-            col.A = 0.0f;
-            col2.A = 0.0f;
-        }
-        // note secondary color is going to lose its previous alpha here,
-        // TODO fix this somehow? adding a base-secondary-color seems excessive
-        else
-            col2.A = 1.0f;
-        objects[i]->setColor( col );
-        objects[i]->setSecondaryColor( col2 );
-        objects[i]->setSelectable( r );
-    }
+        rearrange();*/
 }

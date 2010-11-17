@@ -114,8 +114,8 @@ public:
      */
     void addNewSource( VideoSource* s );
     void deleteSource( std::vector<VideoSource*>::iterator si );
-
     void deleteGroup( Group* g );
+    void addToDrawList( RectangleBase* obj );
     void removeFromLists( RectangleBase* obj, bool treeRemove = true );
 
     /*
