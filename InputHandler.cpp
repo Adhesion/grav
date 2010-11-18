@@ -346,6 +346,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     case 'V':
         if ( modifiers == wxMOD_CMD )
             grav->toggleShowVenueClientController();
+        break;
 
     case 'X':
         for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
@@ -381,7 +382,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
                 grav->getSelectedObjects()->push_back( movableObjects[i] );
             }
         }
-        else
+        //else
             //grav->setCamX(grav->getCamX()-1);
         break;
     case 'D':
@@ -390,7 +391,8 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         {
             grav->setGraphicsDebugMode( !grav->getGraphicsDebugMode() );
         }
-        //grav->setCamX(grav->getCamX()+1);
+        //else
+            //grav->setCamX(grav->getCamX()+1);
         break;
 
     case '-':
@@ -443,7 +445,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
 
     // space, disabled temporarily
     case WXK_SPACE:
-        grav->addTestObject();
+        //grav->addTestObject();
         break;
     }
 }
@@ -462,7 +464,7 @@ void InputHandler::leftClick( int x, int y )
     //printf( "leftClick::old method got %f,%f,%f\n", mouseX, mouseY, mouseZ );
 
     // ray intersect-based click method
-    Point nearScreen( x, y, 0.0f );
+    /*Point nearScreen( x, y, 0.0f );
     Point farScreen( x, y, 0.5f );
     Point near, far;
     GLUtil::getInstance()->screenToWorld( nearScreen, near );
@@ -474,6 +476,13 @@ void InputHandler::leftClick( int x, int y )
     Point intersect;
     bool rayRetVal = grav->getScreenRect().findRayIntersect( r, intersect );
     if ( !rayRetVal )
+        return;*/
+
+    Point intersect;
+    bool ret = GLUtil::getInstance()->screenToRectIntersect( x, y,
+                                                          grav->getScreenRect(),
+                                                          intersect );
+    if ( !ret )
         return;
     mouseX = intersect.getX();
     mouseY = intersect.getY();
@@ -577,7 +586,7 @@ void InputHandler::mouseLeftHeldMove( int x, int y )
     //                        &mouseX, &mouseY, &mouseZ );
 
     // ray intersect-based click method
-    Point nearScreen( x, y, 0.0f );
+    /*Point nearScreen( x, y, 0.0f );
     Point farScreen( x, y, 0.5f );
     Point near, far;
     GLUtil::getInstance()->screenToWorld( nearScreen, near );
@@ -589,6 +598,13 @@ void InputHandler::mouseLeftHeldMove( int x, int y )
     Point intersect;
     bool rayRetVal = grav->getScreenRect().findRayIntersect( r, intersect );
     if ( !rayRetVal )
+        return;*/
+
+    Point intersect;
+    bool ret = GLUtil::getInstance()->screenToRectIntersect( x, y,
+                                                          grav->getScreenRect(),
+                                                          intersect );
+    if ( !ret )
         return;
     mouseX = intersect.getX();
     mouseY = intersect.getY();

@@ -86,7 +86,7 @@ void GLUtil::updateMatrices()
 void GLUtil::printMatrices()
 {
     updateMatrices();
-    
+
     printf( "printing modelview matrix:\n[" );
     int c = 0;
     for ( int i = 0; i < 16; i++ )
@@ -100,7 +100,7 @@ void GLUtil::printMatrices()
         else c+=4;
     }
     c = 0;
-    
+
     /*printf( "printing modelview matrix row-major (wrong)\n[" );
     for ( int i = 0; i < 16; i++ )
     {
@@ -111,7 +111,7 @@ void GLUtil::printMatrices()
             printf( " " );
     }
     c=0;*/
-    
+
     printf( "printing projection matrix\n[" );
     for ( int i = 0; i < 16; i++ )
     {
@@ -125,7 +125,7 @@ void GLUtil::printMatrices()
         else c+=4;
     }
     c = 0;
-    
+
     printf( "printing viewport matrix\n[" );
     for ( int i = 0; i < 4; i++ )
     {
@@ -142,7 +142,7 @@ void GLUtil::worldToScreen( GLdouble x, GLdouble y, GLdouble z,
                                 GLdouble* scrX, GLdouble* scrY, GLdouble* scrZ )
 {
     updateMatrices();
-    
+
     GLint ret = gluProject( x, y, z, modelview, projection, viewport,
                             scrX, scrY, scrZ );
     if ( ret == 0 )
@@ -163,7 +163,7 @@ void GLUtil::screenToWorld( GLdouble scrX, GLdouble scrY, GLdouble scrZ,
                                 GLdouble* x, GLdouble* y, GLdouble* z )
 {
     updateMatrices();
-    
+
     gluUnProject( scrX, scrY, scrZ, modelview, projection, viewport,
                     x, y, z );
 }
@@ -178,26 +178,41 @@ void GLUtil::screenToWorld( Point screenPoint, Point& worldPoint )
     worldPoint.setZ( (float)worldZ );
 }
 
+bool GLUtil::screenToRectIntersect( GLdouble x, GLdouble y, RectangleBase rect,
+                                        Point& intersect )
+{
+    Point nearScreen( x, y, 0.0f );
+    Point farScreen( x, y, 0.5f );
+    Point near, far;
+    GLUtil::getInstance()->screenToWorld( nearScreen, near );
+    GLUtil::getInstance()->screenToWorld( farScreen, far );
+
+    Ray r;
+    r.location = near;
+    r.direction = far - near;
+    return rect.findRayIntersect( r, intersect );
+}
+
 GLuint GLUtil::loadShaders( const char* location )
 {
     /*std::string vertLoc;
     std::string fragLoc;
-    
+
     vertLoc = std::string(location) + std::string(".vert");
     fragLoc = std::string(location) + std::string(".frag");*/
-    
+
     GLuint vertexShader = glCreateShader( GL_VERTEX_SHADER );
     GLuint fragmentShader = glCreateShader( GL_FRAGMENT_SHADER );
-    
+
     glShaderSource( vertexShader, 1, (const GLchar**)&vert420, NULL );
     glShaderSource( fragmentShader, 1, (const GLchar**)&frag420, NULL );
-    
+
     glCompileShader( vertexShader );
-    
+
     // get error info for compiling vertex shader
     GLint vertexCompiled = 0;
     glGetShaderiv( vertexShader, GL_COMPILE_STATUS, &vertexCompiled );
-    
+
     GLint logLength; GLint numWritten;
     glGetShaderiv( vertexShader, GL_INFO_LOG_LENGTH, &logLength );
     char* message = new char[logLength];
@@ -205,20 +220,20 @@ GLuint GLUtil::loadShaders( const char* location )
     printf( "GLUtil::loadShaders: vertex compilation info log (%i): %s\n",
                 numWritten, message );
     delete message;
-    
+
     glCompileShader( fragmentShader );
-    
+
     // get error info for compiling fragment shader
     GLint fragmentCompiled = 0;
     glGetShaderiv( vertexShader, GL_COMPILE_STATUS, &fragmentCompiled );
-    
+
     glGetShaderiv( fragmentShader, GL_INFO_LOG_LENGTH, &logLength );
     message = new char[logLength];
     glGetShaderInfoLog( fragmentShader, logLength, &numWritten, message );
     printf( "GLUtil::loadShaders: fragment compilation info log (%i): %s\n",
                 numWritten, message );
     delete message;
-    
+
     if ( vertexCompiled == 0 || fragmentCompiled == 0 )
     {
         printf( "GLUtil::loadShaders: shaders failed to compile\n" );
@@ -226,24 +241,24 @@ GLuint GLUtil::loadShaders( const char* location )
     }
     printf( "GLUtil::loadShaders: shaders compiled (vertex: %i, fragment: %i); "
             "linking...\n", vertexCompiled, fragmentCompiled );
-    
+
     // create program & attempt to link
     GLuint program = glCreateProgram();
-    
+
     glAttachShader( program, vertexShader );
     glAttachShader( program, fragmentShader );
-    
+
     glLinkProgram( program );
     GLint linked = 0;
     glGetProgramiv( program, GL_LINK_STATUS, &linked );
-    
+
     glGetProgramiv( program, GL_INFO_LOG_LENGTH, &logLength );
     message = new char[logLength];
     glGetProgramInfoLog( program, logLength, &numWritten, message );
     printf( "GLUtil::loadShaders: program info log (%i): %s\n",
                 numWritten, message );
     delete message;
-    
+
     if ( linked == 0 )
     {
         printf( "GLUtil::loadShaders: shaders failed to link\n" );
@@ -251,7 +266,7 @@ GLuint GLUtil::loadShaders( const char* location )
     }
     printf( "GLUtil::loadShaders: linked (status: %i), returning program %i\n",
                 linked, program );
-    
+
     return program;
 }
 
@@ -316,7 +331,7 @@ GLUtil::GLUtil()
     "                         y + (cb*1.7734),\n"
     "                         alpha );\n"
     "}\n";
-    
+
     vert420 =
     "uniform float xOffset;\n"
     "uniform float yOffset;\n"

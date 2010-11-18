@@ -324,6 +324,11 @@ void RectangleBase::setTotalHeight( float h )
     setHeight( newHeight );
 }
 
+void RectangleBase::setBorderScale( float b )
+{
+    borderScale = b;
+}
+
 void RectangleBase::fillToRect( RectangleBase r )
 {
     fillToRect(r.getLBound(), r.getRBound(), r.getUBound(), r.getDBound());

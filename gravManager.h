@@ -238,6 +238,9 @@ private:
     float camX;
     float camY;
     float camZ;
+    float origCamX;
+    float origCamY;
+    float origCamZ;
 
     bool usingThreads;
     mutex* sourceMutex;

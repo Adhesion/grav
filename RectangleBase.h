@@ -71,7 +71,8 @@ public:
      * Parts of letters that fall under the line (y, g, j, etc) will go in that
      * space.
      */
-    float getTextHeight(); float getTextWidth();
+    float getTextHeight();
+    float getTextWidth();
     float getTextScale();
     float getTextOffset();
 
@@ -111,6 +112,11 @@ public:
      */
     void setTotalWidth( float w );
     void setTotalHeight( float h );
+
+    /*
+     * Set the scale of the border, relative to vertical scaling.
+     */
+    void setBorderScale( float b );
 
     /*
      * Fill to another rectangle.

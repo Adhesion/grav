@@ -32,6 +32,9 @@ gravManager::gravManager()
     camX = 0.0f;
     camY = 0.0f;
     camZ = 9.0f;
+    origCamX = camX;
+    origCamY = camY;
+    origCamZ = camZ;
 
     sources = new std::vector<VideoSource*>();
     drawnObjects = new std::vector<RectangleBase*>();
@@ -43,10 +46,26 @@ gravManager::gravManager()
     objectsToRemoveFromTree = new std::vector<RectangleBase*>();
 
     layouts = new LayoutManager();
+
     screenRectFull.setName( "screen rectangle full" );
     screenRectFull.setAnimation( false );
+    RGBAColor fullColor;
+    fullColor.R = 0.7f;
+    fullColor.G = 0.7f;
+    fullColor.B = 0.2f,
+    fullColor.A = 0.6f;
+    screenRectFull.setColor( fullColor );
+    screenRectFull.setBorderScale( 0.0f );
+
     screenRectSub.setName( "screen rectangle sub" );
     screenRectSub.setAnimation( false );
+    RGBAColor subColor;
+    subColor.R = 0.2f;
+    subColor.G = 0.7f;
+    subColor.B = 0.6f,
+    subColor.A = 0.6f;
+    screenRectSub.setColor( subColor );
+    screenRectSub.setBorderScale( 0.0f );
 
     earthRect.setAnimation( false );
     earthRect.setPos( 0.0f, 0.0f );
@@ -280,9 +299,6 @@ void gravManager::draw()
         //        (*si)->getSiteID().c_str(),
         //        audioSession_listener.getLevel( (*si)->getSiteID().c_str() ) );
     }
-    // back to writeable z-buffer for proper earth/line rendering
-    glDepthMask( GL_TRUE );
-    //printf( "glutDisplay::done drawing objects\n" );
 
     // do the audio focus if it triggered
     if ( audioEnabled && audio->getSourceCount() > 0 )
@@ -386,6 +402,10 @@ void gravManager::draw()
 
         glPopMatrix();
     }
+
+    // back to writeable z-buffer for proper earth/line rendering
+    glDepthMask( GL_TRUE );
+    //printf( "glutDisplay::done drawing objects\n" );
 
     glFlush();
 
@@ -705,14 +725,49 @@ void gravManager::setWindowSize( int w, int h )
     windowWidth = w;
     windowHeight = h;
     GLdouble screenL, screenR, screenU, screenD;
-
     GLUtil* glUtil = GLUtil::getInstance();
+
+    /*
     GLdouble dummy; // for Z which we don't need
     // update the screen size (in world space) coordinates
     glUtil->screenToWorld( (GLdouble)windowWidth, (GLdouble)windowHeight,
                           0.99087065, &screenR, &screenU, &dummy );
     glUtil->screenToWorld( (GLdouble)0.0f, (GLdouble)0.0f,
-                          0.99087065, &screenL, &screenD, &dummy );
+                          0.99087065, &screenL, &screenD, &dummy );*/
+
+    // reset cam to original spot in order to project from correct spot and find
+    // the rectangle relative/facing to the original camera position
+    float oldCamX = camX;
+    float oldCamY = camY;
+    float oldCamZ = camZ;
+    setCamX( origCamX );
+    setCamY( origCamY );
+    setCamZ( origCamZ );
+
+    // to properly update matrices - maybe put this somewhere else
+    glLoadIdentity();
+    gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
+
+    // note this still uses the old screen rect - assumes it stays on the same
+    // plane, since the raytrace method ignores the rect boundaries
+    Point topRight, bottomLeft;
+    glUtil->screenToRectIntersect( (GLdouble)windowWidth,
+                                   (GLdouble)windowHeight,
+                                   getScreenRect( true ), topRight );
+    glUtil->screenToRectIntersect( 0.0f, 0.0f, getScreenRect( true ),
+                                    bottomLeft );
+
+    screenL = bottomLeft.getX();
+    screenR = topRight.getX();
+    screenU = topRight.getY();
+    screenD = bottomLeft.getY();
+
+    setCamX( oldCamX );
+    setCamY( oldCamY );
+    setCamZ( oldCamZ );
+
+    glLoadIdentity();
+    gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
 
     screenRectFull.setPos( (screenL+screenR)/2.0f, (screenU+screenD)/2.0f);
     screenRectFull.setScale( screenR-screenL, screenU-screenD );
