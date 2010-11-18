@@ -16,10 +16,11 @@ VenueClientController::VenueClientController( float _x, float _y,
     : Group( _x, _y ), grav( g )
 {
     locked = false;
-    selectable = false;
+    selectable = true;
     userMovable = false;
     allowHiding = true;
     setName( "Venues" );
+    debugDraw = true;
 
     updateExitMap();
     baseBColor.R = 0.7f;
@@ -35,7 +36,8 @@ VenueClientController::VenueClientController( float _x, float _y,
 
 void VenueClientController::draw()
 {
-    animateValues();
+    //animateValues();
+    RectangleBase::draw();
 
     if ( borderColor.A < 0.01f )
         return;
@@ -149,6 +151,11 @@ void VenueClientController::printExitMap()
         printf( "%i: %s\n", i, objects[i]->getSubName().c_str() );
     }
 }
+
+//void VenueClientController::rearrange()
+//{
+//
+//}
 
 bool VenueClientController::updateName()
 {

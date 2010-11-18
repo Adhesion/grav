@@ -131,7 +131,8 @@ void Group::rearrange()
     int numCol = ceil( sqrt( objects.size() ) );
     int numRow = objects.size() / numCol + ( objects.size() % numCol > 0 );
     //printf( "Group:: group %s (%fx%f, %f,%f) rearranging\n", name.c_str(),
-    //            getWidth(), getHeight(), destX, destY );
+    //            getDestWidth(), getDestHeight(), destX, destY );
+    //printf( "Group::cols %i rows %i\n", numCol, numRow );
 
     // resize the group based on the aspect ratios of the current member(s)
     if ( objects.size() == 1 )
@@ -146,6 +147,7 @@ void Group::rearrange()
     {
         float aspect = getDestWidth() / getDestHeight();
         float newAspect = (numCol*1.33f) / numRow;
+        //printf( "Group::rearrange: old aspect %f new aspect %f\n", aspect, newAspect );
         if ( newAspect > aspect )
             RectangleBase::setScale( destScaleX * (newAspect/aspect),
                                         destScaleY );
@@ -154,18 +156,19 @@ void Group::rearrange()
                                         destScaleY * (aspect/newAspect) );
     }
 
+    //printf( "Group:: group %s now (%fx%f, %f,%f); rearranging\n", name.c_str(),
+    //                getDestWidth(), getDestHeight(), destX, destY );
 
-    // Setup options for the grid layout
-    std::map<std::string, std::string> opts = \
-        std::map<std::string, std::string>();
-    std::ostringstream ss;
-    ss << numCol;
-    opts["numX"] = ss.str();
-    ss << "\r" << numRow;
-    opts["numY"] = ss.str();
+    std::map<std::string, std::string> opts;
 
-    std::map<std::string, std::vector<RectangleBase*> > data = \
-        std::map<std::string, std::vector<RectangleBase*> >();
+    char x[10];
+    char y[10];
+    sprintf( x, "%i", numCol );
+    sprintf( y, "%i", numRow );
+    opts["numX"] = x;
+    opts["numY"] = y;
+
+    std::map<std::string, std::vector<RectangleBase*> > data;
     data["objects"] = objects;
 
     layouts.arrange("grid",

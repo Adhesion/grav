@@ -41,6 +41,8 @@ public:
     void updateExitMap();
     void printExitMap();
 
+    //void rearrange();
+
     bool updateName();
     void setRendering( bool r );
 

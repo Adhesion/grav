@@ -77,12 +77,12 @@ bool LayoutManager::perimeterArrange( RectangleBase outerRect,
     float outerR = outerRect.getRBound();
     float outerU = outerRect.getUBound();
     float outerD = outerRect.getDBound();
-    
+
     float innerL = innerRect.getLBound();
     float innerR = innerRect.getRBound();
     float innerU = innerRect.getUBound();
     float innerD = innerRect.getDBound();
-    
+
     return perimeterArrange( outerL, outerR, outerU, outerD, innerL, innerR,
                                 innerU, innerD, data );
 }
@@ -194,7 +194,7 @@ bool LayoutManager::gridArrange( RectangleBase outerRect,
     float outerR = outerRect.getRBound();
     float outerU = outerRect.getUBound();
     float outerD = outerRect.getDBound();
-    
+
     return gridArrange( outerL, outerR, outerU, outerD, horiz, edge,
                             resize, data, numX, numY );
 }
@@ -222,7 +222,7 @@ bool LayoutManager::gridArrange(float outerL, float outerR,
          i != dflt.end(); i++)
     {
         // If the value wasn't specified by our caller, then load the default
-        if ( opts.find(i->first) == opts.end() ) 
+        if ( opts.find(i->first) == opts.end() )
             opts[i->first] = i->second;
     }
 
@@ -271,29 +271,30 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
         objects[0]->fillToRect( outerL, outerR, outerU, outerD );
         return true;
     }
-    
-    // printf( "grid:outers: %f,%f %f,%f\n", outerL, outerR, outerU, outerD );
-    
+
+    //printf( "grid:outers: %f,%f %f,%f\n", outerL, outerR, outerU, outerD );
+    //printf( "grid:numx %i numy %i\n", numX, numY );
+
     float span; // height of rows if going horizontally,
                 // width of columns if going vertically
     float stride; // distance to move each time
     float curX, curY;
     float edgeL = outerL, edgeR = outerR, edgeU = outerU, edgeD = outerD;
-    
+
     // set up span and stride, etc differently for horizontal vs vertical
     // arrangement
     if ( horiz )
     {
         span = (outerU-outerD) / numY;
         stride = (outerR-outerL) / numX;
-        
+
         edgeL = outerL + 0.2f + (stride / 2);
         edgeR = outerR - 0.2f - (stride / 2);
         //printf( "grid: edges are %f,%f\n", edgeL, edgeR );
         if ( edge ) stride = (edgeR-edgeL) / std::max(1, (numX-1));
-        
+
         curY = outerU - (span/2.0f);
-        
+
         if ( numX == 1 )
             curX = (outerR+outerL)/2.0f;
         else
@@ -308,13 +309,13 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
     {
         span = (outerR-outerL) / numX;
         stride = (outerU-outerD) / numY;
-        
+
         edgeU = outerU - 0.2f - (stride / 2);
         edgeD = outerD + 0.2f + (stride / 2);
         if ( edge ) stride = (edgeU-edgeD) / std::max(1, (numY-1));
 
         curX = outerL + (span/2.0f);
-        
+
         if ( numY == 1 )
             curY = (outerU+outerD)/2.0f;
         else
@@ -325,11 +326,11 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
                 curY = outerU - (stride/2.0f);
         }
     }
-    
+
     //printf( "grid: starting at %f,%f\n", curX, curY );
     //printf( "grid: stride is %f\n", stride );
     //printf( "grid: span is %f\n", span );
-    
+
     // if we're resizing them, do it on a first pass so the calculations later
     // are correct
     if ( resize )
@@ -367,13 +368,13 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
             }
         }
     }
-    
+
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
         //printf( "grid: moving object %i to %f,%f\n", i, curX, curY );
         objects[i]->move( curX, curY - objects[i]->getCenterOffsetY() );
         int objectsLeft = (int)objects.size() - i - 1;
-        
+
         if ( horiz )
         {
             curX += stride;
@@ -412,7 +413,7 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
             }
         }
     }
-    
+
     return true;
 }
 
@@ -436,7 +437,7 @@ bool LayoutManager::focus( RectangleBase innerRect, RectangleBase outerRect,
 }
 
 bool LayoutManager::focus( float innerL, float innerR,
-                           float innerU, float innerD, 
+                           float innerU, float innerD,
                            float outerL, float outerR,
                            float outerU, float outerD,
                            std::map<std::string, std::vector<RectangleBase*> > data,
@@ -466,7 +467,7 @@ bool LayoutManager::focus( float innerL, float innerR,
          i != dflt.end(); i++)
     {
         // If the value wasn't specified by our caller, then load the default
-        if ( opts.find(i->first) == opts.end() ) 
+        if ( opts.find(i->first) == opts.end() )
             opts[i->first] = i->second;
     }
 

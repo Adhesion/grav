@@ -17,11 +17,14 @@ try:
         from AccessGrid.interfaces.VenueClient_client import VenueClientIW
 
         client = VenueClientIW(clientURL)
-        if not client.IsValid():
-            print "Error: venue client at ", clientURL, " not valid"
-            return {}
-        else:
-            return client
+        try:
+            if not client.IsValid():
+                raise ValueError, "Error: venue client at %s not valid" % clientUrl
+            else:
+                return client
+        except Exception, e:
+            print e
+            return None
 
     def GetExits(clientURL):
         client = GetClient(clientURL)
