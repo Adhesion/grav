@@ -158,10 +158,12 @@ void VenueClientController::rearrange()
     std::map<std::string, std::vector<RectangleBase*> > data;
     data["objects"] = objects;
 
-    layouts.arrange("perimeter",
-                    getLBound(), getRBound(), getUBound(), getDBound(),
-                    -5.0f, 5.0f, 5.0f, -5.0f,
-                    data, opts);
+    RectangleBase smaller = *this;
+    // uneven since most screens will be widescreen - so make vertical area
+    // bigger so objects on top/bottom are bigger and text more readable
+    smaller.setScale( smaller.getScaleX() * 0.6f,
+                        smaller.getScaleY() * 0.45f );
+    layouts.arrange( "perimeter", *this, smaller, data, opts );
 }
 
 bool VenueClientController::updateName()
