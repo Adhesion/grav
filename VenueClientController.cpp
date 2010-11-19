@@ -16,11 +16,11 @@ VenueClientController::VenueClientController( float _x, float _y,
     : Group( _x, _y ), grav( g )
 {
     locked = false;
-    selectable = true;
+    selectable = false;
     userMovable = false;
     allowHiding = true;
     setName( "Venues" );
-    debugDraw = true;
+    debugDraw = false;
 
     updateExitMap();
     baseBColor.R = 0.7f;
@@ -36,8 +36,7 @@ VenueClientController::VenueClientController( float _x, float _y,
 
 void VenueClientController::draw()
 {
-    //animateValues();
-    RectangleBase::draw();
+    animateValues();
 
     if ( borderColor.A < 0.01f )
         return;
@@ -152,10 +151,18 @@ void VenueClientController::printExitMap()
     }
 }
 
-//void VenueClientController::rearrange()
-//{
-//
-//}
+void VenueClientController::rearrange()
+{
+    std::map<std::string, std::string> opts;
+
+    std::map<std::string, std::vector<RectangleBase*> > data;
+    data["objects"] = objects;
+
+    layouts.arrange("perimeter",
+                    getLBound(), getRBound(), getUBound(), getDBound(),
+                    -5.0f, 5.0f, 5.0f, -5.0f,
+                    data, opts);
+}
 
 bool VenueClientController::updateName()
 {
@@ -166,7 +173,7 @@ bool VenueClientController::updateName()
 void VenueClientController::setRendering( bool r )
 {
     Group::setRendering( r );
-    /*if ( !r )
+    if ( !r )
     {
         // move objects for a nice animation effect
         for ( unsigned int i = 0; i < objects.size(); i++ )
@@ -175,5 +182,5 @@ void VenueClientController::setRendering( bool r )
         }
     }
     else
-        rearrange();*/
+        rearrange();
 }

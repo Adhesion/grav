@@ -778,6 +778,7 @@ void gravManager::setWindowSize( int w, int h )
     {
         venueClientController->setScale( screenRectSub.getDestWidth() * 0.9f,
                                      screenRectSub.getDestHeight() * 0.9f );
+        venueClientController->rearrange();
         //printf( "in setwindowsize, set VCC scale to %fx%f\n",
         //        screenRectSub.getDestWidth() * 0.9f,
         //        screenRectSub.getDestHeight() * 0.9f );
