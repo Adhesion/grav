@@ -40,6 +40,37 @@ public:
     void wxMouseLUp( wxMouseEvent& evt );
     void wxMouseRDown( wxMouseEvent& evt );
 
+    void handlePrintSelected();
+    void handleRearrangeGroups();
+    void handleUpdateGroupNames();
+    void handlePerimeterArrange();
+    void handleGridArrange();
+    void handleFocusArrange();
+    void handleFullscreenSelectedSingle();
+    void handleRunwayToggle();
+    void handleInvertSelection();
+    void handleInformation();
+    void handleToggleGroupLocks();
+    void handleMuteSelected();
+    void handleRandomTest();
+    void handleNativeScaleAll();
+    void handleNativeScaleSelected();
+    void handleMoveAllToCenter();
+    void handleToggleSiteGrouping();
+    void handleToggleShowVenueClientController();
+    void handleToggleRenderingSelected();
+    void handleZoomout();
+    void handleZoomin();
+    void handleToggleAutoFocusRotate();
+    void handleSelectAll();
+    void handleToggleGraphicsDebug();
+    void handleDownscaleSelected();
+    void handleUpscaleSelected();
+    void handleToggleFullscreen();
+    void handleQuit();
+    void handleClearSelected();
+    void handleAddTestObject();
+
     void processKeyboard( int keyCode, int x, int y );
 
     void leftClick( int x, int y );

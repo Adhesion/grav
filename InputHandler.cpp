@@ -96,11 +96,311 @@ void InputHandler::wxMouseRDown( wxMouseEvent& evt )
         mainFrame->PopupMenu( &rightClickMenu, evt.GetPosition() );
     }
 }
+void InputHandler::handlePrintSelected()
+{
+    printf( "current sources selected: %i\n",
+            grav->getSelectedObjects()->size() );
+    for ( unsigned int i = 0; i < grav->getSelectedObjects()->size(); i++ )
+    {
+        printf( "%s\n", (*(grav->getSelectedObjects()))[i]->getName().c_str() );
+    }
+}
+void InputHandler::handleRearrangeGroups()
+{
+    printf( "rearranging groups...\n" );
+    for ( unsigned int i = 0; i < grav->getSelectedObjects()->size(); i++ )
+    {
+        Group* g = dynamic_cast<Group*>(
+            (*(grav->getSelectedObjects()))[i] );
+        if ( g != NULL )
+        {
+            g->rearrange();
+        }
+    }
+}
+void InputHandler::handleUpdateGroupNames()
+{
+    printf( "updating group names...\n" );
+    std::map<std::string,Group*>::iterator mapi;
+    mapi = grav->getSiteIDGroups()->begin();
+    for ( ; mapi != grav->getSiteIDGroups()->end(); mapi++ )
+    {
+        mapi->second->updateName();
+    }
+}
+void InputHandler::handlePerimeterArrange()
+{
+    std::map<std::string, std::vector<RectangleBase*> > data;
+    data["objects"] = grav->getMovableObjects();
+    layouts.arrange(
+        "perimeter", grav->getScreenRect(), grav->getEarthRect(), data );
+}
+void InputHandler::handleGridArrange()
+{
+    std::map<std::string, std::vector<RectangleBase*> > data;
+    data["objects"] = grav->getMovableObjects();
+    layouts.arrange( "grid", grav->getScreenRect(), RectangleBase(), data );
+}
+void InputHandler::handleFocusArrange()
+{
+    if ( grav->getSelectedObjects()->size() > 0 )
+    {
+        std::map<std::string, std::vector<RectangleBase*> > data;
+        data["outers"] = grav->getUnselectedObjects();
+        data["inners"] = *(grav->getSelectedObjects());
+        layouts.arrange( "focus", grav->getScreenRect(),
+                          RectangleBase(), data );
+    }
+}
+void InputHandler::handleFullscreenSelectedSingle()
+{
+    if ( grav->getSelectedObjects()->size() == 1 )
+    {
+        (*grav->getSelectedObjects())[0]->fillToRect(grav->getScreenRect());
+    }
+}
+
+void InputHandler::handleRunwayToggle()
+{
+    grav->setRunwayUsage( !grav->usingRunway() );
+    grav->clearSelected();
+}
+void InputHandler::handleInvertSelection()
+{
+    std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
+    for ( unsigned int i = 0; i < movableObjects.size(); i++ )
+    {
+        RectangleBase* obj = movableObjects[i];
+        obj->setSelect( !obj->isSelected() );
+        if ( obj->isSelected() )
+        {
+            grav->getSelectedObjects()->push_back( obj );
+        }
+        else
+        {
+            std::vector<RectangleBase*>::iterator it =
+                    grav->getSelectedObjects()->begin();
+            while ( (*it) != obj ) it++;
+            grav->getSelectedObjects()->erase( it );
+        }
+    }
+}
+void InputHandler::handleInformation()
+{
+    std::vector<VideoSource*>::const_iterator si;
+    printf( "We currently have %i sources.\n",
+             grav->getSources()->size() );
+    printf( "We currently have %i objects in drawnObjects.\n",
+             grav->getDrawnObjects()->size() );
+    printf( "Screen size is %f x %f\n",
+            grav->getScreenRect().getWidth(),
+            grav->getScreenRect().getHeight() );
+
+    for ( si = grav->getSources()->begin();
+            si != grav->getSources()->end(); si++ )
+    {
+        printf( "name: %s\n",
+            (*si)->getMetadata(
+                VPMSession::VPMSESSION_SDES_NAME).c_str() );
+        printf( "stored name: %s\n", (*si)->getName().c_str() );
+        printf( "cname: %s\n",
+            (*si)->getMetadata(
+                VPMSession::VPMSESSION_SDES_CNAME).c_str() );
+        printf( "stored altname: %s\n", (*si)->getAltName().c_str() );
+        printf( "loc: %s\n",
+            (*si)->getMetadata(
+                VPMSession::VPMSESSION_SDES_LOC).c_str() );
+        printf( "ssrc 0x%08x (%d)\n", (*si)->getssrc(),
+                    (*si)->getssrc() );
+        printf( "\tpos (world): %f,%f\n",
+                (*si)->getX(), (*si)->getY() );
+        GLdouble scrX; GLdouble scrY; GLdouble scrZ;
+        GLUtil::getInstance()->worldToScreen( (GLdouble)(*si)->getX(),
+                        (GLdouble)(*si)->getY(),
+                        (GLdouble)(*si)->getZ(),
+                        &scrX, &scrY, &scrZ);
+        printf( "\tpos (screen): %f,%f,%f\n", scrX, scrY, scrZ );
+        printf( "\tis grouped? %i\n", (*si)->isGrouped() );
+
+        printf( "\tDescription of codec: %s\n",
+                    (*si)->getPayloadDesc() );
+        printf( "\tis muted? %i\n", (*si)->isMuted() );
+
+        printf( "\tSize: %f x %f\n", (*si)->getWidth(),
+                    (*si)->getHeight() );
+        printf( "\tText size: %f x %f\n", (*si)->getTextWidth(),
+                    (*si)->getTextHeight() );
+    }
+    printf( "DrawnObjects:\n" );
+    for ( unsigned int i = 0; i < grav->getDrawnObjects()->size(); i++ )
+    {
+        RectangleBase* temp = (*(grav->getDrawnObjects()))[i];
+        printf( "%s (%fx%f)\n", temp->getName().c_str(),
+                temp->getDestWidth(), temp->getDestHeight() );
+    }
+}
+void InputHandler::handleToggleGroupLocks() {
+    for ( unsigned int i = 0; i < grav->getSelectedObjects()->size(); i++ )
+    {
+        RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
+        if ( temp->isGroup() )
+        {
+            Group* g = dynamic_cast<Group*>(temp);
+            printf( "InputHandler::l:group %s locked? %i\n",
+                        g->getName().c_str(), g->isLocked() );
+            g->changeLock();
+            printf( "after: %i\n", g->isLocked() );
+        }
+    }
+}
+void InputHandler::handleMuteSelected()
+{
+    std::vector<VideoSource*>::const_iterator si;
+    for ( si = grav->getSources()->begin();
+                    si != grav->getSources()->end(); ++si )
+    {
+        if ( (*si)->isSelected() )
+        {
+            (*si)->toggleMute();
+            // add it to the runway if we're using it, it's visible, etc.
+            if ( !(*si)->isGrouped() && (*si)->isMuted() &&
+                    grav->usingRunway() &&
+                    grav->getRunway()->getRendering() )
+            {
+                grav->getRunway()->add( (*si) );
+                (*si)->setSelect( false );
+            }
+        }
+    }
+    grav->clearSelected();
+}
+void InputHandler::handleRandomTest()
+{
+    printf( "random32: %i\n", random32() );
+    printf( "random32max: %i\n", random32_max() );
+}
+void InputHandler::handleNativeScaleAll()
+{
+    std::vector<VideoSource*>::const_iterator si;
+    for ( si = grav->getSources()->begin();
+            si != grav->getSources()->end(); ++si )
+    {
+        (*si)->scaleNative();
+        if ( (*si)->isGrouped() )
+            (*si)->getGroup()->rearrange();
+    }
+}
+void InputHandler::handleNativeScaleSelected()
+{
+    std::vector<VideoSource*>::const_iterator si;
+    for ( si = grav->getSources()->begin();
+            si != grav->getSources()->end(); ++si )
+    {
+        if ( (*si)->isSelected() )
+        {
+            (*si)->scaleNative();
+            if ( (*si)->isGrouped() )
+                (*si)->getGroup()->rearrange();
+        }
+    }
+}
+void InputHandler::handleMoveAllToCenter()
+{
+    std::vector<VideoSource*>::const_iterator si;
+    for ( si = grav->getSources()->begin();
+            si != grav->getSources()->end(); ++si )
+    {
+        (*si)->move( 0.0f, 0.0f );
+    }
+}
+
+void InputHandler::handleToggleSiteGrouping()
+{
+    // TODO -- condense this with a bang
+    if ( grav->usingSiteIDGroups() )
+    {
+        grav->setSiteIDGrouping( false );
+        grav->ungroupAll();
+    }
+    else
+    {
+        grav->setSiteIDGrouping( true );
+    }
+}
+void InputHandler::handleToggleShowVenueClientController()
+{
+    grav->toggleShowVenueClientController();
+}
+void InputHandler::handleToggleRenderingSelected()
+{
+    for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
+                    i++ )
+    {
+        RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
+        VideoSource* tempVS = dynamic_cast<VideoSource*>( temp );
+        if ( tempVS != NULL )
+        {
+            tempVS->setRendering( !tempVS->getRendering() );
+        }
+    }
+}
+void InputHandler::handleZoomout()
+{
+        grav->setCamZ(grav->getCamZ()+1);
+}
+void InputHandler::handleZoomin()
+{
+        grav->setCamZ(grav->getCamZ()-1);
+}
+void InputHandler::handleToggleAutoFocusRotate()
+{
+    grav->setAutoFocusRotate( !grav->usingAutoFocusRotate() );
+    grav->resetAutoCounter();
+}
+void InputHandler::handleSelectAll()
+{
+    std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
+    grav->clearSelected();
+    for ( unsigned int i = 0; i < movableObjects.size(); i++ )
+    {
+        movableObjects[i]->setSelect( true );
+        grav->getSelectedObjects()->push_back( movableObjects[i] );
+    }
+}
+void InputHandler::handleToggleGraphicsDebug()
+{
+    grav->setGraphicsDebugMode( !grav->getGraphicsDebugMode() );
+}
+void InputHandler::handleDownscaleSelected()
+{
+    float scaleAmt = 0.25f;
+    grav->scaleSelectedObjects( scaleAmt * -1.0f );
+}
+void InputHandler::handleUpscaleSelected()
+{
+    float scaleAmt = 0.25f;
+    grav->scaleSelectedObjects( scaleAmt );
+}
+void InputHandler::handleToggleFullscreen()
+{
+    mainFrame->ShowFullScreen( !mainFrame->IsFullScreen() );
+}
+void InputHandler::handleQuit()
+{
+    mainFrame->Close();
+}
+void InputHandler::handleClearSelected()
+{
+    grav->clearSelected();
+}
+void InputHandler::handleAddTestObject()
+{
+    grav->addTestObject();
+}
 
 void InputHandler::processKeyboard( int keyCode, int x, int y )
 {
     std::vector<VPMVideoBufferSink*>::iterator t;
-    std::map<std::string,Group*>::iterator mapi;
     unsigned char key = (unsigned char)keyCode;
     /*printf( "Char pressed is %c (%i)\n", key, key );
     printf( "keycode is %i\n", keyCode );
@@ -108,70 +408,39 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     printf( "is shift (only) held? %i\n", modifiers == wxMOD_SHIFT );
     printf( "is ctrl (only) held? %i\n", modifiers == wxMOD_CMD );
     printf( "is alt (only) held? %i\n", modifiers == wxMOD_ALT );*/
-    std::vector<VideoSource*>::const_iterator si;
     // how much to scale when doing -/+: flipped in the former case
-    float scaleAmt = 0.25f;
 
-    std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
     std::map<std::string, std::vector<RectangleBase*> > data = \
         std::map<std::string, std::vector<RectangleBase*> >();
 
     // TODO reorder this to make some sort of sense
+    
     switch( key ) {
 
     case 'K':
-        printf( "current sources selected: %i\n",
-                    grav->getSelectedObjects()->size() );
-        for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
-                i++ )
-        {
-            printf( "%s\n",
-                (*(grav->getSelectedObjects()))[i]->getName().c_str() );
-        }
+        handlePrintSelected();
         break;
 
     case 'T':
-        printf( "rearranging groups...\n" );
-        for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
-                i++ )
-        {
-            Group* g = dynamic_cast<Group*>(
-                            (*(grav->getSelectedObjects()))[i] );
-            if ( g != NULL )
-            {
-                g->rearrange();
-            }
-        }
+        handleRearrangeGroups();
         break;
 
     case 'U':
-        printf( "updating group names...\n" );
-        mapi = grav->getSiteIDGroups()->begin();
-        for ( ; mapi != grav->getSiteIDGroups()->end(); mapi++ )
-        {
-            mapi->second->updateName();
-        }
+        handleUpdateGroupNames();
         break;
 
     case 'P':
-        data["objects"] = movableObjects;
-        layouts.arrange("perimeter",
-                        grav->getScreenRect(), grav->getEarthRect(),
-                        data);
+        handlePerimeterArrange();
         break;
 
     case 'R':
         if ( modifiers == wxMOD_ALT )
         {
-            grav->setRunwayUsage( !grav->usingRunway() );
-            grav->clearSelected();
+            handleRunwayToggle();
         }
         else
         {
-            data["objects"] = movableObjects;
-            layouts.arrange("grid",
-                            grav->getScreenRect(), RectangleBase(),
-                            data);
+            handleGridArrange();
         }
         break;
 
@@ -179,248 +448,129 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         // ctrl-I -> invert selection
         if ( modifiers == wxMOD_CMD )
         {
-            for ( unsigned int i = 0; i < movableObjects.size(); i++ )
-            {
-                RectangleBase* obj = movableObjects[i];
-                obj->setSelect( !obj->isSelected() );
-                if ( obj->isSelected() )
-                {
-                    grav->getSelectedObjects()->push_back( obj );
-                }
-                else
-                {
-                    std::vector<RectangleBase*>::iterator it =
-                            grav->getSelectedObjects()->begin();
-                    while ( (*it) != obj ) it++;
-                    grav->getSelectedObjects()->erase( it );
-                }
-            }
+            handleInvertSelection();
         }
         else
         {
-            printf( "We currently have %i sources.\n",
-                     grav->getSources()->size() );
-            printf( "We currently have %i objects in drawnObjects.\n",
-                     grav->getDrawnObjects()->size() );
-            printf( "Screen size is %f x %f\n",
-                    grav->getScreenRect().getWidth(),
-                    grav->getScreenRect().getHeight() );
-
-            for ( si = grav->getSources()->begin();
-                    si != grav->getSources()->end(); si++ )
-            {
-                printf( "name: %s\n",
-                    (*si)->getMetadata(
-                        VPMSession::VPMSESSION_SDES_NAME).c_str() );
-                printf( "stored name: %s\n", (*si)->getName().c_str() );
-                printf( "cname: %s\n",
-                    (*si)->getMetadata(
-                        VPMSession::VPMSESSION_SDES_CNAME).c_str() );
-                printf( "stored altname: %s\n", (*si)->getAltName().c_str() );
-                printf( "loc: %s\n",
-                    (*si)->getMetadata(
-                        VPMSession::VPMSESSION_SDES_LOC).c_str() );
-                printf( "ssrc 0x%08x (%d)\n", (*si)->getssrc(),
-                            (*si)->getssrc() );
-                printf( "\tpos (world): %f,%f\n",
-                        (*si)->getX(), (*si)->getY() );
-                GLdouble scrX; GLdouble scrY; GLdouble scrZ;
-                GLUtil::getInstance()->worldToScreen( (GLdouble)(*si)->getX(),
-                                (GLdouble)(*si)->getY(),
-                                (GLdouble)(*si)->getZ(),
-                                &scrX, &scrY, &scrZ);
-                printf( "\tpos (screen): %f,%f,%f\n", scrX, scrY, scrZ );
-                printf( "\tis grouped? %i\n", (*si)->isGrouped() );
-
-                printf( "\tDescription of codec: %s\n",
-                            (*si)->getPayloadDesc() );
-                printf( "\tis muted? %i\n", (*si)->isMuted() );
-
-                printf( "\tSize: %f x %f\n", (*si)->getWidth(),
-                            (*si)->getHeight() );
-                printf( "\tText size: %f x %f\n", (*si)->getTextWidth(),
-                            (*si)->getTextHeight() );
-            }
-            printf( "DrawnObjects:\n" );
-            for ( unsigned int i = 0; i < grav->getDrawnObjects()->size(); i++ )
-            {
-                RectangleBase* temp = (*(grav->getDrawnObjects()))[i];
-                printf( "%s (%fx%f)\n", temp->getName().c_str(),
-                        temp->getDestWidth(), temp->getDestHeight() );
-            }
+            handleInformation();
         }
         break;
 
     case 'L':
-        for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
-                i++ )
-        {
-            RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
-            if ( temp->isGroup() )
-            {
-                Group* g = dynamic_cast<Group*>(temp);
-                printf( "InputHandler::l:group %s locked? %i\n",
-                            g->getName().c_str(), g->isLocked() );
-                g->changeLock();
-                printf( "after: %i\n", g->isLocked() );
-            }
-        }
+        handleToggleGroupLocks();
         break;
 
     case 'M':
-        for ( si = grav->getSources()->begin();
-                        si != grav->getSources()->end(); ++si )
-        {
-            if ( (*si)->isSelected() )
-            {
-                (*si)->toggleMute();
-                // add it to the runway if we're using it, it's visible, etc.
-                if ( !(*si)->isGrouped() && (*si)->isMuted() &&
-                        grav->usingRunway() &&
-                        grav->getRunway()->getRendering() )
-                {
-                    grav->getRunway()->add( (*si) );
-                    (*si)->setSelect( false );
-                }
-            }
-        }
-        grav->clearSelected();
+        handleMuteSelected();
         break;
 
     case 'O':
-        printf( "random32: %i\n", random32() );
-        printf( "random32max: %i\n", random32_max() );
+        handleRandomTest();
         break;
 
     case 'N':
-        for ( si = grav->getSources()->begin();
-                si != grav->getSources()->end(); ++si )
+        if ( modifiers == wxMOD_SHIFT )
         {
-            if ( modifiers == wxMOD_SHIFT || (*si)->isSelected() )
-            {
-                (*si)->scaleNative();
-                if ( (*si)->isGrouped() )
-                    (*si)->getGroup()->rearrange();
-            }
+            handleNativeScaleAll();
+        }
+        else
+        {
+            handleNativeScaleSelected();
         }
         break;
 
-    /*case '0':
-        for ( si = grav->getSources()->begin();
-                si != grav->getSources()->end(); ++si )
-        {
-            (*si)->move( 0.0f, 0.0f );
-        }
-        break;*/
+    case '0':
+        handleMoveAllToCenter();
+        break;
 
     case 'F':
         // just f - focus, ie selected to middle, others around
-        if ( modifiers == wxMOD_NONE &&
-                grav->getSelectedObjects()->size() > 0 )
+        if ( modifiers == wxMOD_NONE )
         {
-            std::map<std::string, std::vector<RectangleBase*> > data = \
-                std::map<std::string, std::vector<RectangleBase*> >();
-            data["outers"] = grav->getUnselectedObjects();
-            data["inners"] = *(grav->getSelectedObjects());
-            layouts.arrange( "focus", grav->getScreenRect(),
-                              RectangleBase(), data );
+            handleFocusArrange();
         }
         // shift F - fullscreen selected single
-        else if ( modifiers == wxMOD_SHIFT &&
-                    grav->getSelectedObjects()->size() == 1 )
+        else if ( modifiers == wxMOD_SHIFT )
         {
-            (*grav->getSelectedObjects())[0]->fillToRect(grav->getScreenRect());
+            handleFullscreenSelectedSingle();
         }
         break;
 
     case 'G':
-        if ( grav->usingSiteIDGroups() )
-        {
-            grav->setSiteIDGrouping( false );
-            grav->ungroupAll();
-        }
-        else
-            grav->setSiteIDGrouping( true );
+        handleToggleSiteGrouping();
         break;
 
     case 'V':
         if ( modifiers == wxMOD_CMD )
-            grav->toggleShowVenueClientController();
+            handleToggleShowVenueClientController();
         break;
 
     case 'X':
-        for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
-                        i++ )
-        {
-            RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
-            VideoSource* tempVS = dynamic_cast<VideoSource*>( temp );
-            if ( tempVS != NULL )
-            {
-                tempVS->setRendering( !tempVS->getRendering() );
-            }
-        }
+        handleToggleRenderingSelected();
         break;
 
     case 'W':
-        //grav->setCamZ(grav->getCamZ()-1);
+        handleZoomin();
         break;
     case 'S':
-        //grav->setCamZ(grav->getCamZ()+1);
+        handleZoomout();
         break;
+
     case 'A':
         if ( modifiers == wxMOD_ALT )
         {
-            grav->setAutoFocusRotate( !grav->usingAutoFocusRotate() );
-            grav->resetAutoCounter();
+            handleToggleAutoFocusRotate();
         }
         else if ( modifiers == wxMOD_CMD )
         {
-            grav->clearSelected();
-            for ( unsigned int i = 0; i < movableObjects.size(); i++ )
-            {
-                movableObjects[i]->setSelect( true );
-                grav->getSelectedObjects()->push_back( movableObjects[i] );
-            }
+            handleSelectAll();
         }
-        //else
-            //grav->setCamX(grav->getCamX()-1);
         break;
     case 'D':
         // ctrl-shift-d - graphics debug view
         if ( modifiers == ( wxMOD_SHIFT | wxMOD_CMD ) )
         {
-            grav->setGraphicsDebugMode( !grav->getGraphicsDebugMode() );
+            handleToggleGraphicsDebug();
         }
-        //else
-            //grav->setCamX(grav->getCamX()+1);
         break;
 
     case '-':
-        grav->scaleSelectedObjects( scaleAmt * -1.0f );
+        handleDownscaleSelected();
         break;
+    // TDB -- what is going on here with + and = ?
     case '+':
-        grav->scaleSelectedObjects( scaleAmt );
+        handleUpscaleSelected();
         break;
     case '=':
         if ( modifiers == wxMOD_SHIFT )
-            grav->scaleSelectedObjects( scaleAmt );
+            handleUpscaleSelected();
         break;
 
     // enter - alt-enter for fullscreen
     case 13:
         if ( modifiers == wxMOD_ALT )
         {
-            mainFrame->ShowFullScreen( !mainFrame->IsFullScreen() );
+            handleToggleFullscreen();
         }
         break;
 
     case 'Q':
     case 'q':
     case 27:
-        mainFrame->Close();
+        handleQuit();
+        break;
+
+    case ' ':
+        handleAddTestObject();
+        break;
+    
+    // backspace: deselect videos
+    case '\b':
+        handleClearSelected();
         break;
     }
 
+    // TBD -- how do we reconcile this with the map?
     switch ( keyCode )
     {
     // u/d/l/r arrow keys, for WX
@@ -438,15 +588,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         earth->rotate( 0.0f, 0.0f, 2.0f );
         break;
 
-    // backspace: deselect videos
-    case WXK_BACK:
-        grav->clearSelected();
-        break;
 
-    // space, disabled temporarily
-    case WXK_SPACE:
-        //grav->addTestObject();
-        break;
     }
 }
 
