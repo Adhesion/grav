@@ -63,9 +63,11 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     lookup[ktoh('X')] = &InputHandler::handleToggleRenderingSelected;
     lookup[ktoh('Q')] = &InputHandler::handleQuit;
     lookup[ktoh('q')] = &InputHandler::handleQuit; // TBD -- is this necessary?
-    lookup[ktoh('\e')] = &InputHandler::handleQuit; // (escape)
-    lookup[ktoh((unsigned char)13, wxMOD_ALT)] =    // (enter)
+    lookup[ktoh('\e')] = &InputHandler::handleQuit;
+    unprintables['\e'] = "(escape)";
+    lookup[ktoh((unsigned char)13, wxMOD_ALT)] =
                         &InputHandler::handleToggleFullscreen;
+    unprintables[(unsigned char)13] = "(enter)";
     lookup[ktoh('R', wxMOD_ALT)] =
                         &InputHandler::handleRunwayToggle;
     lookup[ktoh('V', wxMOD_CMD)] =
@@ -74,7 +76,8 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     /* Selection */
     lookup[ktoh('A', wxMOD_CMD)] = &InputHandler::handleSelectAll;
     lookup[ktoh('I', wxMOD_CMD)] = &InputHandler::handleInvertSelection;
-    lookup[ktoh('\b')] = &InputHandler::handleClearSelected; // (backspace)
+    lookup[ktoh('\b')] = &InputHandler::handleClearSelected;
+    unprintables['\b'] = "(backspace)";
 
     /* Misc Manipulation */
     lookup[ktoh('-')] = &InputHandler::handleDownscaleSelected;
@@ -467,13 +470,22 @@ unsigned char InputHandler::htok( int hash ) {
 }
 /* Hash to String representation */
 std::string InputHandler::htos( int hash ) {
+    char key = htok( hash );
+    std::map<char, std::string>::iterator upIter = unprintables.find(key);
+
     std::string shi = (hash & wxMOD_SHIFT) ? "shift" : "";
     std::string alt = (hash & wxMOD_ALT) ? "alt" : "";
     std::string cmd = (hash & wxMOD_CMD) ? "ctrl" : "";
 
     std::ostringstream sstr;
     sstr << std::setw(7) << shi << std::setw(7) << alt << std::setw(7) << cmd;
-    sstr << std::setw(5) << htok( hash );
+    sstr << std::setw(10);
+
+    if ( upIter != unprintables.end() )
+        sstr << unprintables[key];
+    else
+        sstr << key;
+
     return sstr.str();
 }
 
