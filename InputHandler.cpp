@@ -38,6 +38,7 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     leftButtonHeld = false;
     ctrlHeld = false;
     modifiers = 0;
+    lookup[' '] = &InputHandler::handleAddTestObject;
 }
 
 InputHandler::~InputHandler()
@@ -414,21 +415,13 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         std::map<std::string, std::vector<RectangleBase*> >();
 
     // TODO reorder this to make some sort of sense
-    typedef void (InputHandler::*MFP)(void);
-    std::map<unsigned char, MFP> lookup;
+    // Lookup the pressed key in our map of method pointers
     std::map<unsigned char, MFP>::iterator lookupIter;
-    lookup[' '] = &InputHandler::handleAddTestObject;
-
     lookupIter = lookup.find(key); 
     if( lookupIter != lookup.end() )
-    {
-        //MFP fp = (*lookupIter->second);
-        MFP fp = lookup[key];
-        (this->*fp)();
-    }
+        (this->*(lookup[key]))();
     else
-        printf( "no cmd for key\n" );
-        
+        printf( "No handler for key '%c' registered.\n", key );
     
     switch( key ) {
 /*    case ' ':

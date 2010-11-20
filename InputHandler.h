@@ -26,6 +26,9 @@ class Frame;
 
 typedef double GLdouble;
 
+class InputHandler;
+typedef void (InputHandler::*MFP)(void);
+
 class InputHandler : public wxEvtHandler
 {
 
@@ -98,6 +101,8 @@ private:
     Frame* mainFrame;
 
     LayoutManager layouts;
+
+    std::map<unsigned char, MFP> lookup;
 
     // special input modifiers like CTRL
     int special;
