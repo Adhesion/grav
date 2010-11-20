@@ -38,7 +38,38 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     leftButtonHeld = false;
     ctrlHeld = false;
     modifiers = 0;
+    // TODO -- also here populate another map of keys to 'help strings'
+
+    // Here we register which keys do what (declarative programming).
+    /* Debug keys */
     lookup[' '] = &InputHandler::handleAddTestObject;
+    lookup['K'] = &InputHandler::handlePrintSelected;
+    lookup['O'] = &InputHandler::handleRandomTest;
+    lookup['0'] = &InputHandler::handleMoveAllToCenter;
+
+    /* Misc Management */
+    lookup['T'] = &InputHandler::handleRearrangeGroups;
+    lookup['U'] = &InputHandler::handleUpdateGroupNames;
+    lookup['L'] = &InputHandler::handleToggleGroupLocks;
+    lookup['G'] = &InputHandler::handleToggleSiteGrouping;
+    lookup['X'] = &InputHandler::handleToggleRenderingSelected;
+    lookup['Q'] = &InputHandler::handleQuit;
+    lookup['q'] = &InputHandler::handleQuit; // TBD -- is this necessary?
+    lookup['\e'] = &InputHandler::handleQuit; // (escape)
+
+    /* Misc Manipulation */
+    lookup['-'] = &InputHandler::handleDownscaleSelected;
+    lookup['+'] = &InputHandler::handleUpscaleSelected; // TDB -- dup?
+    lookup['='] = &InputHandler::handleUpscaleSelected; // TBD -- dup?
+    lookup['M'] = &InputHandler::handleMuteSelected;
+    lookup['\b'] = &InputHandler::handleClearSelected; // (backspace)
+
+    /* Navigation */
+    lookup['W'] = &InputHandler::handleZoomin;
+    lookup['S'] = &InputHandler::handleZoomout;
+
+    /* Different Layouts */
+    lookup['P'] = &InputHandler::handlePerimeterArrange;
 }
 
 InputHandler::~InputHandler()
@@ -424,25 +455,6 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         printf( "No handler for key '%c' registered.\n", key );
     
     switch( key ) {
-/*    case ' ':
-        handleAddTestObject();
-        break;
-*/
-    case 'K':
-        handlePrintSelected();
-        break;
-
-    case 'T':
-        handleRearrangeGroups();
-        break;
-
-    case 'U':
-        handleUpdateGroupNames();
-        break;
-
-    case 'P':
-        handlePerimeterArrange();
-        break;
 
     case 'R':
         if ( modifiers == wxMOD_ALT )
@@ -467,18 +479,6 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         }
         break;
 
-    case 'L':
-        handleToggleGroupLocks();
-        break;
-
-    case 'M':
-        handleMuteSelected();
-        break;
-
-    case 'O':
-        handleRandomTest();
-        break;
-
     case 'N':
         if ( modifiers == wxMOD_SHIFT )
         {
@@ -488,10 +488,6 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         {
             handleNativeScaleSelected();
         }
-        break;
-
-    case '0':
-        handleMoveAllToCenter();
         break;
 
     case 'F':
@@ -507,24 +503,9 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         }
         break;
 
-    case 'G':
-        handleToggleSiteGrouping();
-        break;
-
     case 'V':
         if ( modifiers == wxMOD_CMD )
             handleToggleShowVenueClientController();
-        break;
-
-    case 'X':
-        handleToggleRenderingSelected();
-        break;
-
-    case 'W':
-        handleZoomin();
-        break;
-    case 'S':
-        handleZoomout();
         break;
 
     case 'A':
@@ -545,35 +526,12 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         }
         break;
 
-    case '-':
-        handleDownscaleSelected();
-        break;
-    // TDB -- what is going on here with + and = ?
-    case '+':
-        handleUpscaleSelected();
-        break;
-    case '=':
-        if ( modifiers == wxMOD_SHIFT )
-            handleUpscaleSelected();
-        break;
-
     // enter - alt-enter for fullscreen
     case 13:
         if ( modifiers == wxMOD_ALT )
         {
             handleToggleFullscreen();
         }
-        break;
-
-    case 'Q':
-    case 'q':
-    case 27:
-        handleQuit();
-        break;
-
-    // backspace: deselect videos
-    case '\b':
-        handleClearSelected();
         break;
     }
 
