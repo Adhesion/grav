@@ -17,6 +17,10 @@
 
 #include <VPMedia/random_helper.h>
 
+/* For key formatting */
+#include <sstream>
+#include <iomanip>
+
 BEGIN_EVENT_TABLE(InputHandler, wxEvtHandler)
 EVT_KEY_DOWN(InputHandler::wxKeyDown)
 EVT_CHAR(InputHandler::wxCharEvt)
@@ -461,6 +465,17 @@ int InputHandler::ktoh( unsigned char key, int _modifiers ) {
 unsigned char InputHandler::htok( int hash ) {
     return (unsigned char)(hash >> 4);
 }
+/* Hash to String representation */
+std::string InputHandler::htos( int hash ) {
+    std::string shi = (hash & wxMOD_SHIFT) ? "shift" : "";
+    std::string alt = (hash & wxMOD_ALT) ? "alt" : "";
+    std::string cmd = (hash & wxMOD_CMD) ? "ctrl" : "";
+
+    std::ostringstream sstr;
+    sstr << std::setw(7) << shi << std::setw(7) << alt << std::setw(7) << cmd;
+    sstr << std::setw(5) << htok( hash );
+    return sstr.str();
+}
 
 void InputHandler::processKeyboard( int keyCode, int x, int y )
 {
@@ -481,7 +496,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     if( lookupIter != lookup.end() )
         (this->*(lookup[hash]))();
     else
-        printf( "No handler for key '%i' registered.\n", hash );
+        printf( "No handler for registered for key:\n%s\n", htos(hash).c_str());
     
     // TBD -- how do we reconcile this with the map?
     switch ( keyCode )

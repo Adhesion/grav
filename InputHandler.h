@@ -106,6 +106,7 @@ private:
     int ktoh( unsigned char key ); // key to hash
     int ktoh( unsigned char key, int modifiers ); // key to hash
     unsigned char htok( int keyHash ); // hash to key
+    std::string htos(int keyHash ); // hash to string representation
 
 
     // special input modifiers like CTRL
