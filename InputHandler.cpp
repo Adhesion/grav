@@ -472,14 +472,17 @@ unsigned char InputHandler::htok( int hash ) {
 std::string InputHandler::htos( int hash ) {
     char key = htok( hash );
     std::map<char, std::string>::iterator upIter = unprintables.find(key);
-
-    std::string shi = (hash & wxMOD_SHIFT) ? "shift" : "";
-    std::string alt = (hash & wxMOD_ALT) ? "alt" : "";
-    std::string cmd = (hash & wxMOD_CMD) ? "ctrl" : "";
-
     std::ostringstream sstr;
-    sstr << std::setw(7) << shi << std::setw(7) << alt << std::setw(7) << cmd;
-    sstr << std::setw(10);
+    std::string _mods;
+
+    std::string shi = (hash & wxMOD_SHIFT) ? "shift + " : "";
+    std::string alt = (hash & wxMOD_ALT) ? "alt + " : "";
+    std::string cmd = (hash & wxMOD_CMD) ? "ctrl + " : "";
+
+    sstr << shi << alt << cmd;
+    _mods = sstr.str();
+    sstr.str("");
+    sstr << std::setw(25) << _mods << " ";
 
     if ( upIter != unprintables.end() )
         sstr << unprintables[key];
