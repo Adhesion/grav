@@ -38,7 +38,8 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     leftButtonHeld = false;
     ctrlHeld = false;
     modifiers = 0;
-    // TODO -- also here populate another map of keys to 'help strings'
+
+    // TODO -- also below here, populate another map of keys to 'help strings'
 
     // Here we register which keys do what (declarative programming).
     /* Debug keys */
@@ -65,6 +66,11 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
                         &InputHandler::handleRunwayToggle;
     lookup[ktoh('V', wxMOD_CMD)] =
                         &InputHandler::handleToggleShowVenueClientController;
+    
+    /* Selection */
+    lookup[ktoh('A', wxMOD_CMD)] = &InputHandler::handleSelectAll;
+    lookup[ktoh('I', wxMOD_CMD)] = &InputHandler::handleInvertSelection;
+    lookup[ktoh('\b')] = &InputHandler::handleClearSelected; // (backspace)
 
     /* Misc Manipulation */
     lookup[ktoh('-')] = &InputHandler::handleDownscaleSelected;
@@ -73,11 +79,8 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     lookup[ktoh('F', wxMOD_SHIFT)] =
                         &InputHandler::handleFullscreenSelectedSingle;
     lookup[ktoh('M')] = &InputHandler::handleMuteSelected;
-    lookup[ktoh('\b')] = &InputHandler::handleClearSelected; // (backspace)
     lookup[ktoh('N')] = &InputHandler::handleNativeScaleSelected;
     lookup[ktoh('N', wxMOD_SHIFT)] = &InputHandler::handleNativeScaleAll;
-    lookup[ktoh('A', wxMOD_CMD)] = &InputHandler::handleSelectAll;
-    lookup[ktoh('I', wxMOD_CMD)] = &InputHandler::handleInvertSelection;
 
     /* Navigation */
     lookup[ktoh('W')] = &InputHandler::handleZoomin;
@@ -472,10 +475,6 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     printf( "is alt (only) held? %i\n", modifiers == wxMOD_ALT );*/
     // how much to scale when doing -/+: flipped in the former case
 
-    std::map<std::string, std::vector<RectangleBase*> > data = \
-        std::map<std::string, std::vector<RectangleBase*> >();
-
-    // TODO reorder this to make some sort of sense
     // Lookup the pressed key in our map of method pointers
     std::map<int, MFP>::iterator lookupIter;
     lookupIter = lookup.find(hash); 
