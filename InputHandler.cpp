@@ -414,9 +414,27 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         std::map<std::string, std::vector<RectangleBase*> >();
 
     // TODO reorder this to make some sort of sense
+    typedef void (InputHandler::*MFP)(void);
+    std::map<unsigned char, MFP> lookup;
+    std::map<unsigned char, MFP>::iterator lookupIter;
+    lookup[' '] = &InputHandler::handleAddTestObject;
+
+    lookupIter = lookup.find(key); 
+    if( lookupIter != lookup.end() )
+    {
+        //MFP fp = (*lookupIter->second);
+        MFP fp = lookup[key];
+        (this->*fp)();
+    }
+    else
+        printf( "no cmd for key\n" );
+        
     
     switch( key ) {
-
+/*    case ' ':
+        handleAddTestObject();
+        break;
+*/
     case 'K':
         handlePrintSelected();
         break;
@@ -560,10 +578,6 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
         handleQuit();
         break;
 
-    case ' ':
-        handleAddTestObject();
-        break;
-    
     // backspace: deselect videos
     case '\b':
         handleClearSelected();
