@@ -40,47 +40,36 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     modifiers = 0;
     // TODO -- also here populate another map of keys to 'help strings'
 
-    printf(" *****  Just doing some tests\n");
-    printf("K\n");
-    printf("%i\n", ktoh('K')); // wxMOD_ALT
-    printf("%c\n", htok(ktoh('K')));
-    printf("K\n");
-    printf("%i\n", ktoh('K', wxMOD_ALT)); // wxMOD_ALT
-    printf("%c\n", htok(ktoh('K', wxMOD_ALT)));
-    printf("K\n");
-    printf("%i\n", ktoh('K', wxMOD_ALT | wxMOD_SHIFT)); // wxMOD_ALT
-    printf("%c\n", htok(ktoh('K', wxMOD_ALT | wxMOD_SHIFT)));
-
     // Here we register which keys do what (declarative programming).
     /* Debug keys */
-    lookup[' '] = &InputHandler::handleAddTestObject;
-    lookup['K'] = &InputHandler::handlePrintSelected;
-    lookup['O'] = &InputHandler::handleRandomTest;
-    lookup['0'] = &InputHandler::handleMoveAllToCenter;
+    lookup[ktoh(' ')] = &InputHandler::handleAddTestObject;
+    lookup[ktoh('K')] = &InputHandler::handlePrintSelected;
+    lookup[ktoh('O')] = &InputHandler::handleRandomTest;
+    lookup[ktoh('0')] = &InputHandler::handleMoveAllToCenter;
 
     /* Misc Management */
-    lookup['T'] = &InputHandler::handleRearrangeGroups;
-    lookup['U'] = &InputHandler::handleUpdateGroupNames;
-    lookup['L'] = &InputHandler::handleToggleGroupLocks;
-    lookup['G'] = &InputHandler::handleToggleSiteGrouping;
-    lookup['X'] = &InputHandler::handleToggleRenderingSelected;
-    lookup['Q'] = &InputHandler::handleQuit;
-    lookup['q'] = &InputHandler::handleQuit; // TBD -- is this necessary?
-    lookup['\e'] = &InputHandler::handleQuit; // (escape)
+    lookup[ktoh('T')] = &InputHandler::handleRearrangeGroups;
+    lookup[ktoh('U')] = &InputHandler::handleUpdateGroupNames;
+    lookup[ktoh('L')] = &InputHandler::handleToggleGroupLocks;
+    lookup[ktoh('G')] = &InputHandler::handleToggleSiteGrouping;
+    lookup[ktoh('X')] = &InputHandler::handleToggleRenderingSelected;
+    lookup[ktoh('Q')] = &InputHandler::handleQuit;
+    lookup[ktoh('q')] = &InputHandler::handleQuit; // TBD -- is this necessary?
+    lookup[ktoh('\e')] = &InputHandler::handleQuit; // (escape)
 
     /* Misc Manipulation */
-    lookup['-'] = &InputHandler::handleDownscaleSelected;
-    lookup['+'] = &InputHandler::handleUpscaleSelected; // TDB -- dup?
-    lookup['='] = &InputHandler::handleUpscaleSelected; // TBD -- dup?
-    lookup['M'] = &InputHandler::handleMuteSelected;
-    lookup['\b'] = &InputHandler::handleClearSelected; // (backspace)
+    lookup[ktoh('-')] = &InputHandler::handleDownscaleSelected;
+    lookup[ktoh('+')] = &InputHandler::handleUpscaleSelected; // TDB -- dup?
+    lookup[ktoh('=')] = &InputHandler::handleUpscaleSelected; // TBD -- dup?
+    lookup[ktoh('M')] = &InputHandler::handleMuteSelected;
+    lookup[ktoh('\b')] = &InputHandler::handleClearSelected; // (backspace)
 
     /* Navigation */
-    lookup['W'] = &InputHandler::handleZoomin;
-    lookup['S'] = &InputHandler::handleZoomout;
+    lookup[ktoh('W')] = &InputHandler::handleZoomin;
+    lookup[ktoh('S')] = &InputHandler::handleZoomout;
 
     /* Different Layouts */
-    lookup['P'] = &InputHandler::handlePerimeterArrange;
+    lookup[ktoh('P')] = &InputHandler::handlePerimeterArrange;
 }
 
 InputHandler::~InputHandler()
@@ -456,6 +445,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
 {
     std::vector<VPMVideoBufferSink*>::iterator t;
     unsigned char key = (unsigned char)keyCode;
+    int hash = ktoh(key, this->modifiers);
     /*printf( "Char pressed is %c (%i)\n", key, key );
     printf( "keycode is %i\n", keyCode );
     printf( "x,y in processKeyboard is %i,%i\n", x, y );
@@ -469,12 +459,12 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
 
     // TODO reorder this to make some sort of sense
     // Lookup the pressed key in our map of method pointers
-    std::map<unsigned char, MFP>::iterator lookupIter;
-    lookupIter = lookup.find(key); 
+    std::map<int, MFP>::iterator lookupIter;
+    lookupIter = lookup.find(hash); 
     if( lookupIter != lookup.end() )
-        (this->*(lookup[key]))();
+        (this->*(lookup[hash]))();
     else
-        printf( "No handler for key '%c' registered.\n", key );
+        printf( "No handler for key '%i' registered.\n", hash );
     
     switch( key ) {
 

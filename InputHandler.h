@@ -102,7 +102,7 @@ private:
 
     LayoutManager layouts;
 
-    std::map<unsigned char, MFP> lookup;
+    std::map<int, MFP> lookup;
     int ktoh( unsigned char key ); // key to hash
     int ktoh( unsigned char key, int modifiers ); // key to hash
     unsigned char htok( int keyHash ); // hash to key
