@@ -40,6 +40,17 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     modifiers = 0;
     // TODO -- also here populate another map of keys to 'help strings'
 
+    printf(" *****  Just doing some tests\n");
+    printf("K\n");
+    printf("%i\n", ktoh('K')); // wxMOD_ALT
+    printf("%c\n", htok(ktoh('K')));
+    printf("K\n");
+    printf("%i\n", ktoh('K', wxMOD_ALT)); // wxMOD_ALT
+    printf("%c\n", htok(ktoh('K', wxMOD_ALT)));
+    printf("K\n");
+    printf("%i\n", ktoh('K', wxMOD_ALT | wxMOD_SHIFT)); // wxMOD_ALT
+    printf("%c\n", htok(ktoh('K', wxMOD_ALT | wxMOD_SHIFT)));
+
     // Here we register which keys do what (declarative programming).
     /* Debug keys */
     lookup[' '] = &InputHandler::handleAddTestObject;
@@ -428,6 +439,17 @@ void InputHandler::handleClearSelected()
 void InputHandler::handleAddTestObject()
 {
     grav->addTestObject();
+}
+
+
+/* Key To Hash */
+int InputHandler::ktoh( unsigned char key ) { return ktoh(key, 0); }
+int InputHandler::ktoh( unsigned char key, int _modifiers ) {
+    return ( ((int)key)  << 4 ) | _modifiers;
+}
+/* Hash To Key */
+unsigned char InputHandler::htok( int hash ) {
+    return (unsigned char)(hash >> 4);
 }
 
 void InputHandler::processKeyboard( int keyCode, int x, int y )
