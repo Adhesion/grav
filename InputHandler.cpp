@@ -46,6 +46,9 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     lookup[ktoh('K')] = &InputHandler::handlePrintSelected;
     lookup[ktoh('O')] = &InputHandler::handleRandomTest;
     lookup[ktoh('0')] = &InputHandler::handleMoveAllToCenter;
+    lookup[ktoh('I')] = &InputHandler::handleInformation;
+    lookup[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
+                        &InputHandler::handleToggleGraphicsDebug;
 
     /* Misc Management */
     lookup[ktoh('T')] = &InputHandler::handleRearrangeGroups;
@@ -56,13 +59,25 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     lookup[ktoh('Q')] = &InputHandler::handleQuit;
     lookup[ktoh('q')] = &InputHandler::handleQuit; // TBD -- is this necessary?
     lookup[ktoh('\e')] = &InputHandler::handleQuit; // (escape)
+    lookup[ktoh((unsigned char)13, wxMOD_ALT)] =    // (enter)
+                        &InputHandler::handleToggleFullscreen;
+    lookup[ktoh('R', wxMOD_ALT)] =
+                        &InputHandler::handleRunwayToggle;
+    lookup[ktoh('V', wxMOD_CMD)] =
+                        &InputHandler::handleToggleShowVenueClientController;
 
     /* Misc Manipulation */
     lookup[ktoh('-')] = &InputHandler::handleDownscaleSelected;
     lookup[ktoh('+')] = &InputHandler::handleUpscaleSelected; // TDB -- dup?
     lookup[ktoh('=')] = &InputHandler::handleUpscaleSelected; // TBD -- dup?
+    lookup[ktoh('F', wxMOD_SHIFT)] =
+                        &InputHandler::handleFullscreenSelectedSingle;
     lookup[ktoh('M')] = &InputHandler::handleMuteSelected;
     lookup[ktoh('\b')] = &InputHandler::handleClearSelected; // (backspace)
+    lookup[ktoh('N')] = &InputHandler::handleNativeScaleSelected;
+    lookup[ktoh('N', wxMOD_SHIFT)] = &InputHandler::handleNativeScaleAll;
+    lookup[ktoh('A', wxMOD_CMD)] = &InputHandler::handleSelectAll;
+    lookup[ktoh('I', wxMOD_CMD)] = &InputHandler::handleInvertSelection;
 
     /* Navigation */
     lookup[ktoh('W')] = &InputHandler::handleZoomin;
@@ -70,6 +85,9 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
 
     /* Different Layouts */
     lookup[ktoh('P')] = &InputHandler::handlePerimeterArrange;
+    lookup[ktoh('R')] = &InputHandler::handleGridArrange;
+    lookup[ktoh('F')] = &InputHandler::handleFocusArrange;
+    lookup[ktoh('A', wxMOD_ALT)] = &InputHandler::handleToggleAutoFocusRotate;
 }
 
 InputHandler::~InputHandler()
@@ -466,87 +484,6 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     else
         printf( "No handler for key '%i' registered.\n", hash );
     
-    switch( key ) {
-
-    case 'R':
-        if ( modifiers == wxMOD_ALT )
-        {
-            handleRunwayToggle();
-        }
-        else
-        {
-            handleGridArrange();
-        }
-        break;
-
-    case 'I':
-        // ctrl-I -> invert selection
-        if ( modifiers == wxMOD_CMD )
-        {
-            handleInvertSelection();
-        }
-        else
-        {
-            handleInformation();
-        }
-        break;
-
-    case 'N':
-        if ( modifiers == wxMOD_SHIFT )
-        {
-            handleNativeScaleAll();
-        }
-        else
-        {
-            handleNativeScaleSelected();
-        }
-        break;
-
-    case 'F':
-        // just f - focus, ie selected to middle, others around
-        if ( modifiers == wxMOD_NONE )
-        {
-            handleFocusArrange();
-        }
-        // shift F - fullscreen selected single
-        else if ( modifiers == wxMOD_SHIFT )
-        {
-            handleFullscreenSelectedSingle();
-        }
-        break;
-
-    case 'V':
-        if ( modifiers == wxMOD_CMD )
-            handleToggleShowVenueClientController();
-        break;
-
-    case 'A':
-        if ( modifiers == wxMOD_ALT )
-        {
-            handleToggleAutoFocusRotate();
-        }
-        else if ( modifiers == wxMOD_CMD )
-        {
-            handleSelectAll();
-        }
-        break;
-    case 'D':
-        // ctrl-shift-d - graphics debug view
-        if ( modifiers == ( wxMOD_SHIFT | wxMOD_CMD ) )
-        {
-            handleToggleGraphicsDebug();
-        }
-        break;
-
-    // enter - alt-enter for fullscreen
-    case 13:
-        if ( modifiers == wxMOD_ALT )
-        {
-            handleToggleFullscreen();
-        }
-        break;
-    }
-
     // TBD -- how do we reconcile this with the map?
     switch ( keyCode )
     {
