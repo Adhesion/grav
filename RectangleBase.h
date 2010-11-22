@@ -261,6 +261,7 @@ protected:
     float relativeTextScale;
     // temp thing for calculating size - possible change to an enum
     TextStyle titleStyle;
+    bool coloredText;
 
     // size of the border relative to total size
     float borderScale;

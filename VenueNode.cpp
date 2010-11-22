@@ -13,6 +13,7 @@ VenueNode::VenueNode()
 {
     titleStyle = CENTEREDTEXT;
     relativeTextScale = 0.0015;
+    coloredText = false;
     borderScale = 0.0f;
     userMovable = false;
     selectable = true;

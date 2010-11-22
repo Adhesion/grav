@@ -56,6 +56,7 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     relativeTextScale = other.relativeTextScale;
     borderScale = other.borderScale;
     titleStyle = other.titleStyle;
+    coloredText = other.coloredText;
 
     borderTex = other.borderTex;
     twidth = other.twidth; theight = other.theight;
@@ -102,6 +103,7 @@ void RectangleBase::setDefaults()
 
     relativeTextScale = 0.0009;
     titleStyle = TOPTEXT;
+    coloredText = true;
 
     borderScale = 0.04;
 
@@ -775,6 +777,10 @@ void RectangleBase::draw()
             sprintf( posString, "(%f,%f)", x, y );
             renderedName += posString;
         }
+
+        // color call from before will carry over otherwise
+        if ( !coloredText )
+            glColor4f( 1.0f, 1.0f, 1.0f, borderColor.A );
 
         const char* nc = renderedName.c_str();
         font->Render(nc);
