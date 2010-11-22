@@ -48,58 +48,93 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     // Here we register which keys do what (declarative programming).
     /* Debug keys */
     lookup[ktoh(' ')] = &InputHandler::handleAddTestObject;
+    docstr[ktoh(' ')] = "[debug] Add a test window to the screen.";
+    unprintables[' '] = "(space)";
     lookup[ktoh('K')] = &InputHandler::handlePrintSelected;
+    docstr[ktoh('K')] = "[debug] Print information about selected windows.";
     lookup[ktoh('O')] = &InputHandler::handleRandomTest;
+    docstr[ktoh('O')] = "[debug] Print out randomly generated numbers.";
     lookup[ktoh('0')] = &InputHandler::handleMoveAllToCenter;
+    docstr[ktoh('0')] = "[debug] Move all objects to the center.";
     lookup[ktoh('I')] = &InputHandler::handleInformation;
+    docstr[ktoh('I')] = "[debug] Print information about all objects.";
     lookup[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
                         &InputHandler::handleToggleGraphicsDebug;
+    docstr[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
+                        "[debug] Toggle graphics debugging information.";
 
     /* Misc Management */
     lookup[ktoh('H')] = &InputHandler::handleHelp;
-    docstr[ktoh('H')] = "Prints this help message to the commandline.";
+    docstr[ktoh('H')] = "Print this help message to the commandline.";
     lookup[ktoh('T')] = &InputHandler::handleRearrangeGroups;
+    docstr[ktoh('T')] = "Rearrange groups.";
     lookup[ktoh('U')] = &InputHandler::handleUpdateGroupNames;
+    docstr[ktoh('U')] = "Update group names.";
     lookup[ktoh('L')] = &InputHandler::handleToggleGroupLocks;
+    docstr[ktoh('L')] = "Toggle group locks.";
     lookup[ktoh('G')] = &InputHandler::handleToggleSiteGrouping;
+    docstr[ktoh('G')] = "Toggle site grouping.";
     lookup[ktoh('X')] = &InputHandler::handleToggleRenderingSelected;
+    docstr[ktoh('X')] = "Toggle rendering of selected objects.";
     lookup[ktoh('Q')] = &InputHandler::handleQuit;
+    docstr[ktoh('Q')] = "Quit.";
     lookup[ktoh('q')] = &InputHandler::handleQuit; // TBD -- is this necessary?
+    docstr[ktoh('q')] = "Quit.";
     lookup[ktoh('\e')] = &InputHandler::handleQuit;
+    docstr[ktoh('\e')] = "Quit.";
     unprintables['\e'] = "(escape)";
     lookup[ktoh((unsigned char)13, wxMOD_ALT)] =
                         &InputHandler::handleToggleFullscreen;
+    docstr[ktoh((unsigned char)13, wxMOD_ALT)] = "Toggle fullscreen.";
     unprintables[(unsigned char)13] = "(enter)";
     lookup[ktoh('R', wxMOD_ALT)] =
                         &InputHandler::handleRunwayToggle;
+    docstr[ktoh('R', wxMOD_ALT)] = "Toggle runway visibility.";
     lookup[ktoh('V', wxMOD_CMD)] =
                         &InputHandler::handleToggleShowVenueClientController;
+    docstr[ktoh('V', wxMOD_CMD)] = "Toggle venue client controller visibility.";
     
     /* Selection */
     lookup[ktoh('A', wxMOD_CMD)] = &InputHandler::handleSelectAll;
+    docstr[ktoh('A', wxMOD_CMD)] = "Select all.";
     lookup[ktoh('I', wxMOD_CMD)] = &InputHandler::handleInvertSelection;
+    docstr[ktoh('I', wxMOD_CMD)] = "Invert selection.";
     lookup[ktoh('\b')] = &InputHandler::handleClearSelected;
+    docstr[ktoh('\b')] = "Select none.";
     unprintables['\b'] = "(backspace)";
 
     /* Misc Manipulation */
     lookup[ktoh('-')] = &InputHandler::handleDownscaleSelected;
+    docstr[ktoh('-')] = "Downscale selected objects.";
     lookup[ktoh('+')] = &InputHandler::handleUpscaleSelected; // TDB -- dup?
+    docstr[ktoh('+')] = "Upscale selected objects.";
     lookup[ktoh('=')] = &InputHandler::handleUpscaleSelected; // TBD -- dup?
+    docstr[ktoh('=')] = "Upscale selected objects.";
     lookup[ktoh('F', wxMOD_SHIFT)] =
                         &InputHandler::handleFullscreenSelectedSingle;
+    docstr[ktoh('F', wxMOD_SHIFT)] = "Fullscreen selected object(s).";
     lookup[ktoh('M')] = &InputHandler::handleMuteSelected;
+    docstr[ktoh('M')] = "Mute selected objects.";
     lookup[ktoh('N')] = &InputHandler::handleNativeScaleSelected;
+    docstr[ktoh('N')] = "Scale selected objects to native size.";
     lookup[ktoh('N', wxMOD_SHIFT)] = &InputHandler::handleNativeScaleAll;
+    docstr[ktoh('N', wxMOD_SHIFT)] = "Scale all objects to native size.";
 
     /* Navigation */
     lookup[ktoh('W')] = &InputHandler::handleZoomin;
+    docstr[ktoh('W')] = "Zoom in.";
     lookup[ktoh('S')] = &InputHandler::handleZoomout;
+    docstr[ktoh('S')] = "Zoom out.";
 
     /* Different Layouts */
     lookup[ktoh('P')] = &InputHandler::handlePerimeterArrange;
+    docstr[ktoh('P')] = "Arrange objects around the perimeter of the screen.";
     lookup[ktoh('R')] = &InputHandler::handleGridArrange;
+    docstr[ktoh('R')] = "Arrange objects into a grid.";
     lookup[ktoh('F')] = &InputHandler::handleFocusArrange;
+    docstr[ktoh('F')] = "Rearrange objects to focus on selected objects.";
     lookup[ktoh('A', wxMOD_ALT)] = &InputHandler::handleToggleAutoFocusRotate;
+    docstr[ktoh('A', wxMOD_ALT)] = "Toggle 'automatic' mode.";
 }
 
 InputHandler::~InputHandler()
