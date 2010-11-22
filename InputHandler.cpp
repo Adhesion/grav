@@ -56,6 +56,8 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
                         &InputHandler::handleToggleGraphicsDebug;
 
     /* Misc Management */
+    lookup[ktoh('H')] = &InputHandler::handleHelp;
+    docstr[ktoh('H')] = "Prints this help message to the commandline.";
     lookup[ktoh('T')] = &InputHandler::handleRearrangeGroups;
     lookup[ktoh('U')] = &InputHandler::handleUpdateGroupNames;
     lookup[ktoh('L')] = &InputHandler::handleToggleGroupLocks;
@@ -245,6 +247,16 @@ void InputHandler::handleInvertSelection()
         }
     }
 }
+
+void InputHandler::handleHelp()
+{
+    std::map<int, std::string>::const_iterator di;
+    printf("List of mapped keys:\n");
+    for ( di = docstr.begin(); di != docstr.end(); di++ ) {
+        printf( "%s\t%s\n", htos(di->first).c_str(), di->second.c_str());
+    }
+}
+
 void InputHandler::handleInformation()
 {
     std::vector<VideoSource*>::const_iterator si;

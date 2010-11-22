@@ -73,6 +73,7 @@ public:
     void handleQuit();
     void handleClearSelected();
     void handleAddTestObject();
+    void handleHelp();
 
     void processKeyboard( int keyCode, int x, int y );
 
@@ -104,6 +105,7 @@ private:
 
     std::map<char, std::string> unprintables;
     std::map<int, MFP> lookup;
+    std::map<int, std::string> docstr;
     int ktoh( unsigned char key ); // key to hash
     int ktoh( unsigned char key, int modifiers ); // key to hash
     unsigned char htok( int keyHash ); // hash to key
