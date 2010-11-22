@@ -580,7 +580,9 @@ void RectangleBase::updateTextBounds()
     {
         cutoffPos = -1;
         textBounds = font->BBox( getSubName().c_str() );
-        while ( getTextWidth() > getWidth() )
+        // only do cutoff if title is at top - so if centered (or other?)
+        // display whole name even if it goes out of bounds
+        while ( titleStyle == TOPTEXT && getTextWidth() > getWidth() )
         {
             //relativeTextScale = 0.0009 * ( getWidth() / getTextWidth() );
             if ( nameStart == -1 || nameEnd == -1 )

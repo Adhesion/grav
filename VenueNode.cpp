@@ -12,10 +12,19 @@
 VenueNode::VenueNode()
 {
     titleStyle = CENTEREDTEXT;
+    relativeTextScale = 0.0015;
     borderScale = 0.0f;
     userMovable = false;
     selectable = true;
     //debugDraw = true;
+
+    baseBColor.R = 0.7f;
+    baseBColor.G = 0.7f;
+    baseBColor.B = 1.0f;
+    baseBColor.A = 0.8f;
+    destBColor = baseBColor;
+    destBColor.A = 0.0f;
+    borderColor = destBColor;
 }
 
 void VenueNode::draw()
