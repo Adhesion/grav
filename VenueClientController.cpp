@@ -10,6 +10,7 @@
 #include "VenueClientController.h"
 #include "gravManager.h"
 #include "VenueNode.h"
+#include "PNGLoader.h"
 
 VenueClientController::VenueClientController( float _x, float _y,
                                                 gravManager* g )
@@ -22,7 +23,6 @@ VenueClientController::VenueClientController( float _x, float _y,
     setName( "Venues" );
     debugDraw = false;
 
-    updateExitMap();
     baseBColor.R = 0.7f;
     baseBColor.G = 0.7f;
     baseBColor.B = 1.0f;
@@ -32,6 +32,14 @@ VenueClientController::VenueClientController( float _x, float _y,
     borderColor = destBColor;
     setRendering( false );
     setScale( 13.0f, 13.0f );
+
+    // this should be safe since this constructor normally gets called after
+    // GL stuff gets set up
+    circleWidth = 256;
+    circleHeight = 256;
+    circleTex = PNGLoader::loadPNG( "circle.png", circleWidth, circleHeight );
+
+    updateExitMap();
 }
 
 void VenueClientController::draw()
@@ -123,6 +131,7 @@ void VenueClientController::updateExitMap()
     {
         VenueNode* node = new VenueNode();
         node->setName( i->first );
+        node->setTexture( circleTex, circleWidth, circleHeight );
         grav->addToDrawList( node );
         add( node );
     }
