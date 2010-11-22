@@ -42,27 +42,11 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     leftButtonHeld = false;
     ctrlHeld = false;
     modifiers = 0;
+    bool debug = true;
 
     // TODO -- also below here, populate another map of keys to 'help strings'
 
     // Here we register which keys do what (declarative programming).
-    /* Debug keys */
-    lookup[ktoh(' ')] = &InputHandler::handleAddTestObject;
-    docstr[ktoh(' ')] = "[debug] Add a test window to the screen.";
-    unprintables[' '] = "(space)";
-    lookup[ktoh('K')] = &InputHandler::handlePrintSelected;
-    docstr[ktoh('K')] = "[debug] Print information about selected windows.";
-    lookup[ktoh('O')] = &InputHandler::handleRandomTest;
-    docstr[ktoh('O')] = "[debug] Print out randomly generated numbers.";
-    lookup[ktoh('0')] = &InputHandler::handleMoveAllToCenter;
-    docstr[ktoh('0')] = "[debug] Move all objects to the center.";
-    lookup[ktoh('I')] = &InputHandler::handleInformation;
-    docstr[ktoh('I')] = "[debug] Print information about all objects.";
-    lookup[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
-                        &InputHandler::handleToggleGraphicsDebug;
-    docstr[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
-                        "[debug] Toggle graphics debugging information.";
-
     /* Misc Management */
     lookup[ktoh('H')] = &InputHandler::handleHelp;
     docstr[ktoh('H')] = "Print this help message to the commandline.";
@@ -135,6 +119,25 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     docstr[ktoh('F')] = "Rearrange objects to focus on selected objects.";
     lookup[ktoh('A', wxMOD_ALT)] = &InputHandler::handleToggleAutoFocusRotate;
     docstr[ktoh('A', wxMOD_ALT)] = "Toggle 'automatic' mode.";
+
+    if ( debug ) {
+        /* Debug keys */
+        lookup[ktoh(' ')] = &InputHandler::handleAddTestObject;
+        docstr[ktoh(' ')] = "[debug] Add a test window to the screen.";
+        unprintables[' '] = "(space)";
+        lookup[ktoh('K')] = &InputHandler::handlePrintSelected;
+        docstr[ktoh('K')] = "[debug] Print information about selected windows.";
+        lookup[ktoh('O')] = &InputHandler::handleRandomTest;
+        docstr[ktoh('O')] = "[debug] Print out randomly generated numbers.";
+        lookup[ktoh('0')] = &InputHandler::handleMoveAllToCenter;
+        docstr[ktoh('0')] = "[debug] Move all objects to the center.";
+        lookup[ktoh('I')] = &InputHandler::handleInformation;
+        docstr[ktoh('I')] = "[debug] Print information about all objects.";
+        lookup[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
+                            &InputHandler::handleToggleGraphicsDebug;
+        docstr[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
+                            "[debug] Toggle graphics debugging information.";
+    }
 }
 
 InputHandler::~InputHandler()
