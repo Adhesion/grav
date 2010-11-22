@@ -26,6 +26,9 @@ class Frame;
 
 typedef double GLdouble;
 
+class InputHandler;
+typedef void (InputHandler::*MFP)(void);
+
 class InputHandler : public wxEvtHandler
 {
 
@@ -39,6 +42,38 @@ public:
     void wxMouseLDown( wxMouseEvent& evt );
     void wxMouseLUp( wxMouseEvent& evt );
     void wxMouseRDown( wxMouseEvent& evt );
+
+    void handlePrintSelected();
+    void handleRearrangeGroups();
+    void handleUpdateGroupNames();
+    void handlePerimeterArrange();
+    void handleGridArrange();
+    void handleFocusArrange();
+    void handleFullscreenSelectedSingle();
+    void handleRunwayToggle();
+    void handleInvertSelection();
+    void handleInformation();
+    void handleToggleGroupLocks();
+    void handleMuteSelected();
+    void handleRandomTest();
+    void handleNativeScaleAll();
+    void handleNativeScaleSelected();
+    void handleMoveAllToCenter();
+    void handleToggleSiteGrouping();
+    void handleToggleShowVenueClientController();
+    void handleToggleRenderingSelected();
+    void handleZoomout();
+    void handleZoomin();
+    void handleToggleAutoFocusRotate();
+    void handleSelectAll();
+    void handleToggleGraphicsDebug();
+    void handleDownscaleSelected();
+    void handleUpscaleSelected();
+    void handleToggleFullscreen();
+    void handleQuit();
+    void handleClearSelected();
+    void handleAddTestObject();
+    void handleHelp();
 
     void processKeyboard( int keyCode, int x, int y );
 
@@ -67,6 +102,15 @@ private:
     Frame* mainFrame;
 
     LayoutManager layouts;
+
+    std::map<char, std::string> unprintables;
+    std::map<int, MFP> lookup;
+    std::map<int, std::string> docstr;
+    int ktoh( unsigned char key ); // key to hash
+    int ktoh( unsigned char key, int modifiers ); // key to hash
+    unsigned char htok( int keyHash ); // hash to key
+    std::string htos(int keyHash ); // hash to string representation
+
 
     // special input modifiers like CTRL
     int special;
