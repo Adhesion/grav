@@ -561,7 +561,8 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     if( lookupIter != lookup.end() )
         (this->*(lookup[hash]))();
     else
-        printf( "No handler for registered for key:\n%s\n", htos(hash).c_str());
+        printf( "No handler for registered for key (code is %i):\n%s\n",
+                keyCode, htos(hash).c_str());
     
     // TBD -- how do we reconcile this with the map?
     switch ( keyCode )
