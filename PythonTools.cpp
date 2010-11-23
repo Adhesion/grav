@@ -194,13 +194,24 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
     PyObject* entryArgs;
     if ( args == NULL )
     {
-        entryArgs= PyTuple_New( 2 );
+        entryArgs = PyTuple_New( 2 );
         PyTuple_SetItem( entryArgs, 0, PyString_FromString( _script.c_str() ) );
         PyTuple_SetItem( entryArgs, 1, PyString_FromString( _func.c_str() ) );
     }
+    else if ( PyTuple_Check( args ) )
+    {
+        int num = 2 + PyTuple_Size( args );
+        entryArgs = PyTuple_New( num );
+        PyTuple_SetItem( entryArgs, 0, PyString_FromString( _script.c_str() ) );
+        PyTuple_SetItem( entryArgs, 1, PyString_FromString( _func.c_str() ) );
+        for( int i = 0; i < PyTuple_Size( args ); i++ )
+        {
+            PyTuple_SetItem( entryArgs, i+2, PyTuple_GetItem( args, i ) );
+        }
+    }
     else
     {
-        entryArgs= PyTuple_New( 3 );
+        entryArgs = PyTuple_New( 3 );
         PyTuple_SetItem( entryArgs, 0, PyString_FromString( _script.c_str() ) );
         PyTuple_SetItem( entryArgs, 1, PyString_FromString( _func.c_str() ) );
         PyTuple_SetItem( entryArgs, 2, args );
@@ -235,6 +246,7 @@ PyObject* PythonTools::call( std::string _script, std::string _func )
     pRes = call( _script, _func, NULL );
     return pRes;
 }
+
 /* Just a test... */
 int oldmain(int argc, char *argv[])
 {

@@ -41,6 +41,7 @@ public:
     void wxMouseMove( wxMouseEvent& evt );
     void wxMouseLDown( wxMouseEvent& evt );
     void wxMouseLUp( wxMouseEvent& evt );
+    void wxMouseLDClick( wxMouseEvent& evt );
     void wxMouseRDown( wxMouseEvent& evt );
 
     void handlePrintSelected();
@@ -77,7 +78,7 @@ public:
 
     void processKeyboard( int keyCode, int x, int y );
 
-    void leftClick( int x, int y );
+    void leftClick( int x, int y, bool doubleClick = false );
     void leftRelease( int x, int y );
     void mouseLeftHeldMove( int x, int y );
 

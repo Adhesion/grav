@@ -1,4 +1,4 @@
-/**
+    /**
  * @file PythonTools.h
  * Contains a bucket class with utilities to call python
  * Relied heavily on the python documentation available at:
@@ -35,7 +35,7 @@ public:
     std::map<std::string, std::string> dtom( PyObject* d );
 
     /* Vector to List */
-    PyObject* vtol( std::vector<std::string> v);
+    PyObject* vtol( std::vector<std::string> v );
     std::vector<std::string> ltov( PyObject* l );
 
     /* Print contents to stdout */

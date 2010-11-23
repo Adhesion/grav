@@ -22,6 +22,8 @@ public:
 
     bool updateName();
 
+    void doubleClickAction();
+
 private:
 
 };

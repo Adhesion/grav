@@ -1,5 +1,6 @@
 def entryFunc( module, func, *args, **kwargs ):
     import sys, os
+    #import pprint
     if os.path.sep not in module:
         # case for built-in modules - look in py dir
         # TODO make this a built-in thing, from build system rather than cwd
@@ -18,6 +19,7 @@ def entryFunc( module, func, *args, **kwargs ):
         sys.path.insert(0, path)
         m = __import__(finalModuleName, globals(), locals())
         f = getattr(m, func)
+        #pprint.pprint( args )
         res = f(*args, **kwargs)
         # remove added path from sys path
         sys.path.remove(path)

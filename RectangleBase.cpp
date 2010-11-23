@@ -637,6 +637,11 @@ bool RectangleBase::intersect( RectangleBase* other )
     return intersect( left, right, top, bottom );
 }
 
+void RectangleBase::doubleClickAction()
+{
+    // do nothing for now
+}
+
 void RectangleBase::setRendering( bool r )
 {
     enableRendering = r;

@@ -26,7 +26,7 @@ EVT_KEY_DOWN(InputHandler::wxKeyDown)
 EVT_CHAR(InputHandler::wxCharEvt)
 EVT_MOTION(InputHandler::wxMouseMove)
 EVT_LEFT_DOWN(InputHandler::wxMouseLDown)
-EVT_LEFT_DCLICK(InputHandler::wxMouseLDown)
+EVT_LEFT_DCLICK(InputHandler::wxMouseLDClick)
 EVT_LEFT_UP(InputHandler::wxMouseLUp)
 EVT_RIGHT_DOWN(InputHandler::wxMouseRDown)
 END_EVENT_TABLE()
@@ -77,7 +77,7 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     lookup[ktoh('V', wxMOD_CMD)] =
                         &InputHandler::handleToggleShowVenueClientController;
     docstr[ktoh('V', wxMOD_CMD)] = "Toggle venue client controller visibility.";
-    
+
     /* Selection */
     lookup[ktoh('A', wxMOD_CMD)] = &InputHandler::handleSelectAll;
     docstr[ktoh('A', wxMOD_CMD)] = "Select all.";
@@ -171,6 +171,7 @@ void InputHandler::wxMouseMove( wxMouseEvent& evt )
 
 void InputHandler::wxMouseLDown( wxMouseEvent& evt )
 {
+    // TODO fix these? how to best handle mouse modifiers?
     if ( evt.CmdDown() )
         ctrlHeld = true;
     else
@@ -184,6 +185,19 @@ void InputHandler::wxMouseLDown( wxMouseEvent& evt )
 void InputHandler::wxMouseLUp( wxMouseEvent& evt )
 {
     leftRelease( evt.GetPosition().x, evt.GetPosition().y );
+    evt.Skip();
+}
+
+void InputHandler::wxMouseLDClick( wxMouseEvent& evt )
+{
+    // TODO same as above
+    if ( evt.CmdDown() )
+        ctrlHeld = true;
+    else
+        ctrlHeld = false;
+    //modifiers = evt.GetModifiers();
+
+    leftClick( evt.GetPosition().x, evt.GetPosition().y, true );
     evt.Skip();
 }
 
@@ -557,12 +571,12 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
 
     // Lookup the pressed key in our map of method pointers
     std::map<int, MFP>::iterator lookupIter;
-    lookupIter = lookup.find(hash); 
+    lookupIter = lookup.find(hash);
     if( lookupIter != lookup.end() )
         (this->*(lookup[hash]))();
     else
         printf( "No handler for registered for key:\n%s\n", htos(hash).c_str());
-    
+
     // TBD -- how do we reconcile this with the map?
     switch ( keyCode )
     {
@@ -585,7 +599,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     }
 }
 
-void InputHandler::leftClick( int x, int y )
+void InputHandler::leftClick( int x, int y, bool doubleClick )
 {
     // glut screen coords are y-flipped relative to GL screen coords
     //printf( "window height? %i\n", grav->getWindowHeight() );
@@ -683,7 +697,14 @@ void InputHandler::leftClick( int x, int y )
         }
     }
     // or if we did click on a video...
-    else
+    else if ( doubleClick )
+    {
+        if ( grav->getSelectedObjects()->size() == 1 )
+        {
+            (*grav->getSelectedObjects())[0]->doubleClickAction();
+        }
+    }
+    else // unused old stuff
     {
         // suppress the box selection
         //leftButtonHeld = false;

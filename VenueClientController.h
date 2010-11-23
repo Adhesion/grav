@@ -41,6 +41,8 @@ public:
     void updateExitMap();
     void printExitMap();
 
+    void enterVenue( std::string venueName );
+
     void rearrange();
 
     bool updateName();

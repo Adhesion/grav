@@ -8,6 +8,7 @@
  */
 
 #include "VenueNode.h"
+#include "VenueClientController.h"
 
 VenueNode::VenueNode()
 {
@@ -38,4 +39,15 @@ bool VenueNode::updateName()
 {
     // like runway, this does nothing
     return false;
+}
+
+void VenueNode::doubleClickAction()
+{
+    // we can be pretty sure the parent is a venue client controller, if not
+    // this will do nothing
+    VenueClientController* vcc = dynamic_cast<VenueClientController*>(myGroup);
+    if ( vcc != NULL )
+    {
+        vcc->enterVenue( getName() );
+    }
 }

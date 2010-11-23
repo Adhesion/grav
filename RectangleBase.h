@@ -207,6 +207,11 @@ public:
     bool intersect( float L, float R, float U, float D );
     bool intersect( RectangleBase* other );
 
+    /*
+     * Only used for VenueNode override for now.
+     */
+    virtual void doubleClickAction();
+
     // set/get enable/disable for rendering
     // this means different things for different subclasses - in base it means
     // nothing, videosource uses it to disable rendering, runway makes it

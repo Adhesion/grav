@@ -160,6 +160,23 @@ void VenueClientController::printExitMap()
     }
 }
 
+void VenueClientController::enterVenue( std::string venueName )
+{
+    std::map<std::string, std::string>::iterator it = exitMap.find( venueName );
+    if ( it == exitMap.end() )
+    {
+        printf( "VenueClientController::enterVenue: venue %s not found\n",
+                    venueName.c_str() );
+        return;
+    }
+
+    PyObject* args = PyTuple_New( 2 );
+    PyTuple_SetItem( args, 0, PyString_FromString( venueClientUrl.c_str() ) );
+    PyTuple_SetItem( args, 1, PyString_FromString( it->second.c_str() ) );
+
+    pyTools.call( "AGTools", "EnterVenue", args );
+}
+
 void VenueClientController::rearrange()
 {
     std::map<std::string, std::string> opts;
