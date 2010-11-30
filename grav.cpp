@@ -139,6 +139,8 @@ bool gravApp::OnInit()
     grav->setCanvas( canvas );
     grav->setVenueClientController( venueClientController );
 
+    venueClientController->setSessionControl( sessionTree );
+
     vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
 
     mapRTP();

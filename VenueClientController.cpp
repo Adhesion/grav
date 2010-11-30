@@ -9,6 +9,7 @@
 
 #include "VenueClientController.h"
 #include "gravManager.h"
+#include "SessionTreeControl.h"
 #include "VenueNode.h"
 #include "PNGLoader.h"
 
@@ -30,7 +31,7 @@ VenueClientController::VenueClientController( float _x, float _y,
     destBColor = baseBColor;
     destBColor.A = 0.0f;
     borderColor = destBColor;
-    setRendering( false );
+
     setScale( 13.0f, 13.0f );
 
     // this should be safe since this constructor normally gets called after
@@ -40,6 +41,8 @@ VenueClientController::VenueClientController( float _x, float _y,
     circleTex = PNGLoader::loadPNG( "circle.png", circleWidth, circleHeight );
 
     updateExitMap();
+
+    setRendering( false );
 }
 
 void VenueClientController::draw()
@@ -170,11 +173,48 @@ void VenueClientController::enterVenue( std::string venueName )
         return;
     }
 
+    removeAllVenueStreams();
+
     PyObject* args = PyTuple_New( 2 );
     PyTuple_SetItem( args, 0, PyString_FromString( venueClientUrl.c_str() ) );
     PyTuple_SetItem( args, 1, PyString_FromString( it->second.c_str() ) );
 
     pyTools.call( "AGTools", "EnterVenue", args );
+
+    updateExitMap();
+
+    updateVenueStreams();
+    addAllVenueStreams();
+}
+
+void VenueClientController::updateVenueStreams()
+{
+    std::string type = "video";
+    PyObject* args = PyTuple_New( 2 );
+    PyTuple_SetItem( args, 0, PyString_FromString( venueClientUrl.c_str() ) );
+    PyTuple_SetItem( args, 1, PyString_FromString( type.c_str() ) );
+
+    PyObject* res = pyTools.call( "AGTools", "GetFormattedVenueStreams", args );
+    currentVenueStreams = pyTools.ltov( res );
+    Py_XDECREF( res );
+}
+
+void VenueClientController::removeAllVenueStreams()
+{
+    for ( unsigned int i = 0; i < currentVenueStreams.size(); i++ )
+    {
+        printf( "VenueClientController::remove(): Video stream: %s\n", currentVenueStreams[i].c_str() );
+        sessionControl->removeSession( currentVenueStreams[i] );
+    }
+}
+
+void VenueClientController::addAllVenueStreams()
+{
+    for ( unsigned int i = 0; i < currentVenueStreams.size(); i++ )
+    {
+        printf( "VenueClientController::add(): Video stream: %s\n", currentVenueStreams[i].c_str() );
+        sessionControl->addSession( currentVenueStreams[i], false, false );
+    }
 }
 
 void VenueClientController::rearrange()
@@ -211,4 +251,9 @@ void VenueClientController::setRendering( bool r )
     }
     else
         rearrange();
+}
+
+void VenueClientController::setSessionControl( SessionTreeControl* s )
+{
+    sessionControl = s;
 }

@@ -19,6 +19,7 @@
 #include "Group.h"
 
 class gravManager;
+class SessionTreeControl;
 
 class VenueClientController : public Group
 {
@@ -42,20 +43,28 @@ public:
     void printExitMap();
 
     void enterVenue( std::string venueName );
+    void updateVenueStreams();
+    void removeAllVenueStreams();
+    void addAllVenueStreams();
 
     void rearrange();
 
     bool updateName();
     void setRendering( bool r );
 
+    void setSessionControl( SessionTreeControl* s );
+
 private:
     std::map<std::string, std::string> exitMap;
     std::string currentVenue;
+    std::vector<std::string> currentVenueStreams;
     std::string venueClientUrl;
 
     PythonTools pyTools;
 
     gravManager* grav;
+
+    SessionTreeControl* sessionControl;
 
     // background texture for venue nodes
     GLuint circleTex;
