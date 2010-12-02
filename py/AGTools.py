@@ -66,9 +66,15 @@ try:
         #def criteria(s):
         #    return 'video' in [c.type for c in s.capability]]
         format = lambda s : "%s/%s"%(s.location.GetHost(), s.location.GetPort())
+        key = lambda s : s.encryptionKey or '__NO_KEY__'
         criteria = lambda s : streamType in [c.type for c in s.capability]
 
-        return [format(s) for s in streams if criteria(s)]
+        # if encryptionKey is None - ie, stream is not encrypted - send a dummy
+        # value to signal to grav to not use encryption
+        d = dict([(format(s), key(s)) for s in streams if criteria(s)])
+        import pprint
+        pprint.pprint(d)
+        return d
 
 except:
     import traceback

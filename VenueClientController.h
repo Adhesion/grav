@@ -57,7 +57,8 @@ public:
 private:
     std::map<std::string, std::string> exitMap;
     std::string currentVenue;
-    std::vector<std::string> currentVenueStreams;
+    // map of addresses to encryption keys
+    std::map<std::string, std::string> currentVenueStreams;
     std::string venueClientUrl;
 
     PythonTools pyTools;

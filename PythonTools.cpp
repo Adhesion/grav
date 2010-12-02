@@ -72,7 +72,14 @@ std::map<std::string, std::string> PythonTools::dtom( PyObject* d )
         {
             curKey = PyList_GetItem( keyList, i );
             curVal = PyDict_GetItem( d, curKey );
-            results[ PyString_AsString( curKey ) ] = PyString_AsString( curVal );
+            char* valstr = PyString_AsString( curVal );
+            if ( valstr == NULL )
+                printf( "PythonTools::dtom(): WARNING: value not a string\n" );
+            char* keystr = PyString_AsString( curKey );
+            if ( keystr == NULL )
+                printf( "PythonTools::dtom(): WARNING: key not a string\n" );
+            if ( keystr != NULL && valstr != NULL )
+                results[ keystr ] = valstr;
         }
     }
     return results;

@@ -195,25 +195,35 @@ void VenueClientController::updateVenueStreams()
     PyTuple_SetItem( args, 1, PyString_FromString( type.c_str() ) );
 
     PyObject* res = pyTools.call( "AGTools", "GetFormattedVenueStreams", args );
-    currentVenueStreams = pyTools.ltov( res );
+    currentVenueStreams = pyTools.dtom( res );
     Py_XDECREF( res );
 }
 
 void VenueClientController::removeAllVenueStreams()
 {
-    for ( unsigned int i = 0; i < currentVenueStreams.size(); i++ )
+    std::map<std::string, std::string>::iterator it;
+    for ( it = currentVenueStreams.begin(); it != currentVenueStreams.end();
+            ++it )
     {
-        printf( "VenueClientController::remove(): Video stream: %s\n", currentVenueStreams[i].c_str() );
-        sessionControl->removeSession( currentVenueStreams[i] );
+        printf( "VenueClientController::remove(): Video stream: %s\n", it->first.c_str() );
+        sessionControl->removeSession( it->first );
     }
 }
 
 void VenueClientController::addAllVenueStreams()
 {
-    for ( unsigned int i = 0; i < currentVenueStreams.size(); i++ )
+    std::map<std::string, std::string>::iterator it;
+    for ( it = currentVenueStreams.begin(); it != currentVenueStreams.end();
+            ++it )
     {
-        printf( "VenueClientController::add(): Video stream: %s\n", currentVenueStreams[i].c_str() );
-        sessionControl->addSession( currentVenueStreams[i], false, false );
+        printf( "VenueClientController::add(): Video stream: %s\n", it->first.c_str() );
+        sessionControl->addSession( it->first, false, false );
+        // __NO_KEY__ is a dummy value to indicate there is no encryption on the
+        // stream in question
+        if ( it->second.compare( "__NO_KEY__" ) != 0 )
+        {
+            sessionControl->setEncryptionKey( it->first, it->second );
+        }
     }
 }
 
