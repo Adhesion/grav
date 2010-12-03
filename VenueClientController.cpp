@@ -179,6 +179,8 @@ void VenueClientController::enterVenue( std::string venueName )
     PyTuple_SetItem( args, 0, PyString_FromString( venueClientUrl.c_str() ) );
     PyTuple_SetItem( args, 1, PyString_FromString( it->second.c_str() ) );
 
+    printf( "VCC::calling entervenue on %s to %s\n", venueClientUrl.c_str(), it->second.c_str() );
+
     pyTools.call( "AGTools", "EnterVenue", args );
 
     updateExitMap();

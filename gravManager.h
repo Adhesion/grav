@@ -50,9 +50,13 @@ public:
     /*
      * For moving videos to the top of the drawnObjects (for both drawing and
      * selection)
+     * Bool val is used when checking the object's group to prevent infinite
+     * loops - group checking is done to move groups to top when moving group
+     * members to top
      */
-    void moveToTop( RectangleBase* object );
-    void moveToTop( std::vector<RectangleBase*>::iterator i );
+    void moveToTop( RectangleBase* object, bool checkGrouping = true );
+    void moveToTop( std::vector<RectangleBase*>::iterator i,
+                        bool checkGrouping = true );
 
     void drawCurvedEarthLine( float lat, float lon,
                               float destx, float desty, float destz );

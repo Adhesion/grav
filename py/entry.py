@@ -1,5 +1,5 @@
 def entryFunc( module, func, *args, **kwargs ):
-    import sys, os
+    import sys, os, gc
     #import pprint
     if os.path.sep not in module:
         # case for built-in modules - look in py dir
@@ -20,7 +20,10 @@ def entryFunc( module, func, *args, **kwargs ):
         m = __import__(finalModuleName, globals(), locals())
         f = getattr(m, func)
         #pprint.pprint( args )
+        print "entryFunc calling", func
+        print "GC STUFF:", len(gc.get_objects())
         res = f(*args, **kwargs)
+        print "entryFunc call to", func, "is done."
         # remove added path from sys path
         sys.path.remove(path)
         return res

@@ -42,12 +42,15 @@ try:
         return exitNames
 
     def EnterVenue(clientURL, venueURL):
+        print "EnterVenue:", venueURL
         client = GetClient(clientURL)
         if client == None:
             print "EnterVenue(): Error: getclient failed"
             return
 
+        print "EnterVenue calling clientIW enter function"
         client.EnterVenue(venueURL)
+        print "EnterVenue complete"
 
     def GetFormattedVenueStreams(clientURL, streamType):
         client = GetClient(clientURL)
@@ -75,6 +78,17 @@ try:
         import pprint
         pprint.pprint(d)
         return d
+
+    def VenueMoveTest():
+        import random
+        clientURL = GetVenueClients()[0]
+        client = GetClient(clientURL)
+        exits = GetExits(clientURL)
+        for i in range(1000):
+            j = random.randint(0, len(exits)-1)
+            EnterVenue(clientURL, exits[exits.keys()[j]])
+            exits = GetExits(clientURL)
+            GetFormattedVenueStreams(clientURL, 'video')
 
 except:
     import traceback

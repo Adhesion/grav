@@ -466,24 +466,38 @@ void gravManager::addTestObject()
     obj->setTexture( borderTex, borderWidth, borderHeight );
 }
 
-void gravManager::moveToTop( RectangleBase* object )
+void gravManager::moveToTop( RectangleBase* object, bool checkGrouping )
 {
     std::vector<RectangleBase*>::iterator i = drawnObjects->begin();
     while ( (*i) != object ) i++;
-    moveToTop( i );
+    moveToTop( i, checkGrouping );
 }
 
-void gravManager::moveToTop( std::vector<RectangleBase*>::iterator i )
+void gravManager::moveToTop( std::vector<RectangleBase*>::iterator i,
+                                bool checkGrouping )
 {
     RectangleBase* temp = (*i);
-    drawnObjects->erase( i );
-    drawnObjects->push_back( temp );
+    RectangleBase* orig = temp;
 
-    Group* g = dynamic_cast<Group*>( temp );
-    if ( g != NULL )
+    // find highest group in the chain, to move up group members from the top
+    // of the chain
+    while ( checkGrouping && temp->isGrouped() )
+        temp = temp->getGroup();
+
+    // do this to properly find iterator position, since i != temp now
+    if ( temp != orig )
+        moveToTop( temp, checkGrouping );
+    else
     {
-        for ( int i = 0; i < g->numObjects(); i++ )
-            moveToTop( (*g)[i] );
+        drawnObjects->erase( i );
+        drawnObjects->push_back( temp );
+
+        Group* g = dynamic_cast<Group*>( temp );
+        if ( g != NULL )
+        {
+            for ( int i = 0; i < g->numObjects(); i++ )
+                moveToTop( (*g)[i], false );
+        }
     }
 }
 

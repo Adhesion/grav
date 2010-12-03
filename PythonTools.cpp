@@ -5,7 +5,7 @@
  *      http://docs.python.org/extending/embedding.html
  *
  * To compile:
- *      g++ -L/usr/lib/python2.6/ -lpython2.6 -I/usr/include PythonTools.cpp
+ *      g++ -g -L/usr/lib/python2.6/ -lpython2.6 -I/usr/include PythonTools.cpp
  *
  * @author Ralph Bean
  * @modified Andrew Ford
@@ -13,6 +13,7 @@
 
 #include "PythonTools.h"
 #include <iostream>
+#include <cstdlib>
 
 PythonTools::PythonTools()
 {
@@ -63,7 +64,7 @@ PyObject* PythonTools::mtod( std::map<std::string, std::string> m )
 std::map<std::string, std::string> PythonTools::dtom( PyObject* d )
 {
     std::map<std::string, std::string> results;
-    if ( d != NULL )
+    if ( d != NULL && PyDict_Check( d ) )
     {
         PyObject* keyList = PyDict_Keys( d );
         PyObject* curKey;
@@ -183,6 +184,8 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
     PyObject *func, *result;
 
     func = PyDict_GetItemString( main_d, entryFunc.c_str() );
+    Py_INCREF( func );
+
     if ( func == NULL )
     {
         PyErr_Print();
@@ -213,7 +216,11 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
         PyTuple_SetItem( entryArgs, 1, PyString_FromString( _func.c_str() ) );
         for( int i = 0; i < PyTuple_Size( args ); i++ )
         {
-            PyTuple_SetItem( entryArgs, i+2, PyTuple_GetItem( args, i ) );
+            PyObject* temp = PyTuple_GetItem( args, i );
+            Py_INCREF( temp );
+            // because setitem will steal temp, and getitem returns borrowed, we
+            // need to incref...?
+            PyTuple_SetItem( entryArgs, i+2, temp );
         }
     }
     else
@@ -233,6 +240,7 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
         return NULL;
     }
 
+    Py_DECREF( func );
     Py_DECREF( entryArgs );
     return result;
 }
@@ -403,5 +411,62 @@ int main_2(int argc, char *argv[])
         Py_DECREF( pRes );
 
         sleep(1);
+    }
+}
+
+int loopmain(int argc, char** argv)
+{
+    PythonTools ptools = PythonTools();
+    PyObject* pRes;
+
+    pRes = ptools.call( "AGTools", "GetVenueClients", NULL );
+    std::vector<std::string> clientURLs = ptools.ltov( pRes );
+    Py_DECREF( pRes );
+    std::string clientURL = clientURLs[0];
+
+    pRes = ptools.call( "AGTools", "GetExits", clientURL );
+    std::map<std::string, std::string> exitMap = ptools.dtom( pRes );
+    Py_DECREF( pRes );
+
+    for ( int i = 0; i < 1000000; i++ )
+    {
+        printf( "\n\tOn iteration %i\n", i );
+        int r = rand() % exitMap.size();
+        std::map<std::string, std::string>::iterator it = exitMap.begin();
+        while ( r > 0 )
+        {
+            it++;
+            r--;
+        }
+
+        if ( it->first.compare( "Educational Institution Lobby" ) == 0 )
+        {
+            it++;
+            if ( it == exitMap.end() )
+                it = exitMap.begin();
+        }
+
+        // enter venue
+        PyObject* args = PyTuple_New( 2 );
+        PyTuple_SetItem( args, 0, PyString_FromString( clientURL.c_str() ) );
+        PyTuple_SetItem( args, 1, PyString_FromString( it->second.c_str() ) );
+
+        ptools.call( "AGTools", "EnterVenue", args );
+
+        // update exits
+        pRes = ptools.call( "AGTools", "GetExits", clientURL );
+        exitMap = ptools.dtom( pRes );
+        Py_DECREF( pRes );
+
+        std::string type = "video";
+        args = PyTuple_New( 2 );
+        PyTuple_SetItem( args, 0, PyString_FromString( clientURL.c_str() ) );
+        PyTuple_SetItem( args, 1, PyString_FromString( type.c_str() ) );
+
+        PyObject* res = ptools.call( "AGTools", "GetFormattedVenueStreams", args );
+        std::map<std::string, std::string> currentVenueStreams = ptools.dtom( res );
+        Py_DECREF( res );
+
+        sleep( 2 );
     }
 }
