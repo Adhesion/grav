@@ -187,6 +187,8 @@ void VenueClientController::enterVenue( std::string venueName )
 
     updateVenueStreams();
     addAllVenueStreams();
+
+    setRendering( false );
 }
 
 void VenueClientController::updateVenueStreams()
@@ -262,7 +264,10 @@ void VenueClientController::setRendering( bool r )
         }
     }
     else
+    {
         rearrange();
+        grav->moveToTop( this );
+    }
 }
 
 void VenueClientController::setSessionControl( SessionTreeControl* s )
