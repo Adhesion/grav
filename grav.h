@@ -126,6 +126,8 @@ private:
 
     bool videoSessionRotate;
 
+    bool getAGVenueStreams;
+
     int windowWidth, windowHeight;
 
 };
@@ -181,13 +183,19 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 
     {
         wxCMD_LINE_SWITCH, _("vsr"), _("video-session-rotate"),
-            _("periodically rotate through supplied video addresses")
+            _("add supplied video addresses to rotation list, rather than"
+              "immediately connect to them")
     },
 
     {
         wxCMD_LINE_OPTION, _("avsr"), _("auto-video-session-rotate"),
             _("rotate video sessions every [num] seconds"),
             wxCMD_LINE_VAL_NUMBER
+    },
+
+    {
+        wxCMD_LINE_SWITCH, _("agvs"), _("get-ag-venue-streams"),
+            _("grab video sessions from venue client, if running")
     },
 
     {

@@ -168,6 +168,12 @@ bool gravApp::OnInit()
                                             initialAudioKey );
     }
 
+    if ( getAGVenueStreams )
+    {
+        venueClientController->updateVenueStreams();
+        venueClientController->addAllVenueStreams();
+    }
+
     rotateTimer = new RotateTimer( sessionTree );
     if ( autoVideoSessionRotate )
         rotateTimer->Start( rotateIntervalMS );
@@ -293,6 +299,8 @@ bool gravApp::handleArgs()
     startFullscreen = parser.Found( _("fullscreen") );
 
     videoSessionRotate = parser.Found( _("video-session-rotate") );
+
+    getAGVenueStreams = parser.Found( _("get-ag-venue-streams") );
 
     grav->setAutoFocusRotate( parser.Found( _("automatic") ) );
 
