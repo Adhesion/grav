@@ -428,7 +428,7 @@ int loopmain(int argc, char** argv)
     std::map<std::string, std::string> exitMap = ptools.dtom( pRes );
     Py_DECREF( pRes );
 
-    for ( int i = 0; i < 1000000; i++ )
+    for ( int i = 0; i < 50000; i++ )
     {
         printf( "\n\tOn iteration %i\n", i );
         int r = rand() % exitMap.size();
@@ -467,6 +467,6 @@ int loopmain(int argc, char** argv)
         std::map<std::string, std::string> currentVenueStreams = ptools.dtom( res );
         Py_DECREF( res );
 
-        sleep( 2 );
+        sleep( 30 );
     }
 }
