@@ -55,8 +55,8 @@ try:
     def GetFormattedVenueStreams(clientURL, streamType):
         client = GetClient(clientURL)
         if client == None:
-            print "EnterVenue(): Error: getclient failed"
-            return []
+            print "GetFormattedVenueStreams(): Error: getclient failed"
+            return {}
 
         streams = client.GetStreams()
         for stream in streams:
@@ -78,6 +78,20 @@ try:
         import pprint
         pprint.pprint(d)
         return d
+
+    def GetCurrentVenueName(clientURL):
+        # this is kind of a hack - grabs the name based on the name of the
+        # streams in the venue, if there are any streams
+        client = GetClient(clientURL)
+        if client == None:
+            print "GetCurrentVenueName(): Error: getclient failed"
+            return ""
+
+        streams = client.GetStreams()
+        if len(streams) == 0:
+            return ""
+        else:
+            return streams[0].name
 
     def VenueMoveTest():
         import random

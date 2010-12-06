@@ -203,6 +203,13 @@ void VenueClientController::updateVenueStreams()
     Py_XDECREF( res );
 }
 
+void VenueClientController::updateVenueName()
+{
+    PyObject* res = pyTools.call( "AGTools", "GetCurrentVenueName", NULL );
+    currentVenue = PyString_AsString( res );
+    Py_XDECREF( res );
+}
+
 void VenueClientController::removeAllVenueStreams()
 {
     std::map<std::string, std::string>::iterator it;

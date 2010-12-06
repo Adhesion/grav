@@ -44,6 +44,7 @@ public:
 
     void enterVenue( std::string venueName );
     void updateVenueStreams();
+    void updateVenueName();
     void removeAllVenueStreams();
     void addAllVenueStreams();
 
