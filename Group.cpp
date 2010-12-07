@@ -230,12 +230,14 @@ bool Group::updateName()
     {
         // if there's only one, just split based on the rightmost & outermost
         // matched parens
+        //printf( "Group::updatename: only 1 member: %s (%i)\n", objects[0]->getName().c_str(), objects[0]->getName().length() );
         unsigned int i = objects[0]->getName().length()-1;
         //printf( "name is %s, length is %i, i is %i\n",
         //        objects[0]->getName().c_str(), i+1, i );
         int balance = 0;
         while ( i >= 0 && (balance != 0 || endParen == -1) )
         {
+            //printf( "loop at %i\n", i );
             char c = objects[0]->getName().at(i);
             if ( c == ')' )
             {

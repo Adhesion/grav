@@ -40,8 +40,11 @@ VenueClientController::VenueClientController( float _x, float _y,
     circleHeight = 256;
     circleTex = PNGLoader::loadPNG( "circle.png", circleWidth, circleHeight );
 
+    updateVenueName();
     updateExitMap();
+    updateVenueStreams();
 
+    enableRendering = false;
     setRendering( false );
 }
 
@@ -179,12 +182,14 @@ void VenueClientController::enterVenue( std::string venueName )
     PyTuple_SetItem( args, 0, PyString_FromString( venueClientUrl.c_str() ) );
     PyTuple_SetItem( args, 1, PyString_FromString( it->second.c_str() ) );
 
-    printf( "VCC::calling entervenue on %s to %s\n", venueClientUrl.c_str(), it->second.c_str() );
+    printf( "VCC::calling entervenue on %s to %s\n", venueClientUrl.c_str(),
+                it->second.c_str() );
 
     pyTools.call( "AGTools", "EnterVenue", args );
 
     updateExitMap();
 
+    updateVenueName();
     updateVenueStreams();
     addAllVenueStreams();
 
@@ -205,8 +210,12 @@ void VenueClientController::updateVenueStreams()
 
 void VenueClientController::updateVenueName()
 {
-    PyObject* res = pyTools.call( "AGTools", "GetCurrentVenueName", NULL );
-    currentVenue = PyString_AsString( res );
+    PyObject* res = pyTools.call( "AGTools", "GetCurrentVenueName",
+                                    venueClientUrl.c_str() );
+    if ( res != NULL )
+        currentVenue = PyString_AsString( res );
+    else
+        currentVenue = "";
     Py_XDECREF( res );
 }
 
@@ -216,7 +225,8 @@ void VenueClientController::removeAllVenueStreams()
     for ( it = currentVenueStreams.begin(); it != currentVenueStreams.end();
             ++it )
     {
-        printf( "VenueClientController::remove(): Video stream: %s\n", it->first.c_str() );
+        printf( "VenueClientController::remove(): Video stream: %s\n",
+                    it->first.c_str() );
         sessionControl->removeSession( it->first );
     }
 }
@@ -227,7 +237,8 @@ void VenueClientController::addAllVenueStreams()
     for ( it = currentVenueStreams.begin(); it != currentVenueStreams.end();
             ++it )
     {
-        printf( "VenueClientController::add(): Video stream: %s\n", it->first.c_str() );
+        printf( "VenueClientController::add(): Video stream: %s\n",
+                    it->first.c_str() );
         sessionControl->addSession( it->first, false, false );
         // __NO_KEY__ is a dummy value to indicate there is no encryption on the
         // stream in question
@@ -261,6 +272,27 @@ bool VenueClientController::updateName()
 
 void VenueClientController::setRendering( bool r )
 {
+    //printf( "VCC::setrendering called with val %i\n", r );
+    //printf( "VCC::current val %i\n", enableRendering );
+    // check if venue has changed in the meantime, if so update stuff
+    std::string oldName = currentVenue;
+    updateVenueName();
+    if ( oldName.compare( currentVenue ) != 0 )
+    {
+        //printf( "VCC::setrendering: venues different (old %s, new %s), updating stuff\n", oldName.c_str(), currentVenue.c_str() );
+        updateExitMap();
+        updateVenueStreams();
+    }
+
+    // do nothing if there aren't any venues, otherwise state will get confusing
+    // to the user (ie, shown with no exits, then venue move in AG, next ctrl-v
+    // hit will "hide" nothing, opposite what is expected)
+    if ( exitMap.size() == 0 )
+    {
+        //printf( "VCC::no exit map, setrendering returning\n" );
+        return;
+    }
+
     Group::setRendering( r );
     if ( !r )
     {
@@ -275,6 +307,8 @@ void VenueClientController::setRendering( bool r )
         rearrange();
         grav->moveToTop( this );
     }
+
+    //printf( "VCC::setrendering ending, val now %i\n", enableRendering );
 }
 
 void VenueClientController::setSessionControl( SessionTreeControl* s )
