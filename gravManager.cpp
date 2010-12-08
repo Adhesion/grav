@@ -1263,6 +1263,8 @@ void gravManager::setRunwayUsage( bool run )
 void gravManager::setGridAuto( bool g )
 {
     gridAuto = g;
+    if ( g && useRunway )
+        setRunwayUsage( false );
 }
 
 void gravManager::setAutoFocusRotate( bool a )
