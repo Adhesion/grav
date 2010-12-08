@@ -151,7 +151,7 @@ float RectangleBase::getTotalWidth()
 float RectangleBase::getTotalHeight()
 {
     float h = getHeight() + ( 2.0f * getBorderSize() );
-    if ( titleStyle == TOPTEXT )
+    if ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS )
     {
         h += getTextOffset() + getTextHeight();
     }
@@ -266,13 +266,15 @@ float RectangleBase::getCenterOffsetX()
 
 float RectangleBase::getCenterOffsetY()
 {
-    if ( titleStyle == TOPTEXT )
+    float ret = 0.0f;
+    if ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS )
     {
         float textRatio = ( getTextHeight() + getTextOffset() ) / getHeight();
-        return textRatio * getDestHeight() / 2.0f;
+        ret = textRatio * getDestHeight() / 2.0f;
+        if ( titleStyle == FULLCAPTIONS )
+            ret *= -1.0f;
     }
-    else
-        return 0.0f;
+    return ret;
 }
 
 void RectangleBase::move( float _x, float _y )
@@ -743,6 +745,12 @@ void RectangleBase::draw()
     {
         textXPos = -getTextWidth() / 2.0f;
         textYPos = -getTextHeight() / 2.0f;
+    }
+    else if ( titleStyle == FULLCAPTIONS )
+    {
+        textXPos = -getTextWidth() / 2.0f;
+        textYPos = ( -getHeight() / 2.0f ) - getBorderSize() - getTextOffset() -
+                    getTextHeight();
     }
 
     float scaleFactor = getTextScale();
