@@ -24,7 +24,8 @@ typedef struct {
 
 enum TextStyle {
     TOPTEXT,
-    CENTEREDTEXT
+    CENTEREDTEXT,
+    FULLCAPTIONS
 };
 
 // we need to do forward declaration since rectanglebase and group circularly

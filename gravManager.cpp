@@ -1263,6 +1263,8 @@ void gravManager::setRunwayUsage( bool run )
 void gravManager::setGridAuto( bool g )
 {
     gridAuto = g;
+    if ( g && useRunway )
+        setRunwayUsage( false );
 }
 
 void gravManager::setAutoFocusRotate( bool a )
@@ -1292,6 +1294,9 @@ void gravManager::toggleShowVenueClientController()
 {
     // TODO just debug stuff here for now
     if ( venueClientController != NULL )
+    {
+        //printf( "gravManager::setting VCC rendering, from %i\n", venueClientController->getRendering() );
         venueClientController->setRendering(
                                     !venueClientController->getRendering() );
+    }
 }

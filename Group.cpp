@@ -230,7 +230,8 @@ bool Group::updateName()
     {
         // if there's only one, just split based on the rightmost & outermost
         // matched parens
-        unsigned int i = objects[0]->getName().length()-1;
+        //printf( "Group::updatename: only 1 member\n" );
+        int i = objects[0]->getName().length()-1;
         //printf( "name is %s, length is %i, i is %i\n",
         //        objects[0]->getName().c_str(), i+1, i );
         int balance = 0;
@@ -239,7 +240,7 @@ bool Group::updateName()
             char c = objects[0]->getName().at(i);
             if ( c == ')' )
             {
-                if ( i == objects[0]->getName().length()-1 )
+                if ( i == (int)objects[0]->getName().length()-1 )
                     endParen = i;
                 balance++;
             }
@@ -258,7 +259,10 @@ bool Group::updateName()
 
     // set the group's name to the common substring, and the members' names
     // to the remainder
-    name = objects[0]->getName().substr(0, splitPos);
+    if ( splitPos > 0 )
+        name = objects[0]->getName().substr(0, splitPos);
+    else
+        name = objects[0]->getName();
     nameChanged = name.compare( oldName ) != 0;
 
     //printf( "common substr is %s, up to pos %i\n", name.c_str(), splitPos );
@@ -272,6 +276,7 @@ bool Group::updateName()
             startParen = objects[k]->getName().rfind( '(', splitPos );
             endParen = objects[k]->getName().find( ')', splitPos );
         }
+
         if ( endParen != -1 && startParen != -1 )
         {
             objects[k]->setSubstring( startParen+1, endParen );
