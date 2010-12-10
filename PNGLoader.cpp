@@ -136,6 +136,10 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
         fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
     }
 
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH,
+        pwidth);
+
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, pwidth, pheight, 0, GL_RGBA,
                     GL_UNSIGNED_BYTE, (GLvoid*)buffer );
 
