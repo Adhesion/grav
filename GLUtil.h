@@ -10,7 +10,7 @@
 
 // TODO glxew is platform specific, add some #defs to only include it on
 // supported platforms (just linux?)
-#include <GL/glxew.h>
+#include <GL/glew.h>
 
 #include <FTGL/ftgl.h>
 

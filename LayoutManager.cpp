@@ -200,7 +200,7 @@ bool LayoutManager::gridArrange( RectangleBase outerRect,
 }
 
 // Little utility... should be phased out with a better usage of std::map
-bool str2bool(std::string str) { return str == "True" ? True : False; }
+bool str2bool(std::string str) { return str.compare( "True" ) == 0; }
 int str2int(std::string str) { return atoi(str.c_str()); }
 float str2fl(std::string str) { return atof(str.c_str()); }
 

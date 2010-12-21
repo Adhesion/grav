@@ -2,12 +2,10 @@ cmake_minimum_required(VERSION 2.6)
 project(grav)
 
 find_package(OpenGL REQUIRED)
-find_package(GLUT REQUIRED)
 find_package(PNG REQUIRED)
 
 include_directories(
 	${OPENGL_INCLUDE_DIR}
-	${GLUT_INCLUDE_DIR}
 	${PNG_INCLUDE_DIR}
 	)
 
@@ -30,4 +28,3 @@ set(SOURCES
 	)
 
 add_executable(grav ${SOURCES})
-

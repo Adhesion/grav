@@ -58,13 +58,14 @@ bool GLUtil::initGL()
     mainFont->FaceSize(100);
 
     // TODO this is platform-specific, see the glxew include in glutil.h
-    if ( GLX_SGI_swap_control )
+    // disabled for now, doesn't seem to work
+    /*if ( GLX_SGI_swap_control )
     {
         printf( "GLUtil::have glx sgi swap control\n" );
         glXSwapIntervalSGI( 1 );
     }
     else
-        printf( "GLUtil::no swap control\n" );
+        printf( "GLUtil::no swap control\n" );*/
 
     glEnable( GL_DEPTH_TEST );
 
