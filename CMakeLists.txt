@@ -20,6 +20,8 @@ find_package(FTGL REQUIRED)
 find_package(wxWidgets REQUIRED gl core base)
 find_package(FFmpeg REQUIRED)
 find_package(Common REQUIRED)
+find_package(VPMedia REQUIRED)
+find_package(PythonLibs REQUIRED)
 
 if(wxWidgets_FOUND)
 	include(${wxWidgets_USE_FILE})
@@ -36,6 +38,8 @@ include_directories(
 	${LIBAVUTIL_INCLUDE_DIRS}
 	${LIBSWSCALE_INCLUDE_DIRS}
 	${COMMON_INCLUDE_DIRS}
+	${VPMEDIA_INCLUDE_DIRS}
+	${PYTHON_INCLUDE_DIRS}
 	)
 
 # for ffmpeg
@@ -63,6 +67,9 @@ set(SOURCES
 	Timers.cpp
 	TreeControl.cpp
 	TreeNode.cpp
+	Vector.cpp
+	VenueClientController.cpp
+	VenueNode.cpp
 	VideoInfoDialog.cpp
 	VideoListener.cpp
 	VideoSource.cpp
@@ -77,9 +84,11 @@ target_link_libraries(grav
 	${FREETYPE_LIBRARIES}
 	${FTGL_LIBRARIES}
 	${wxWidgets_LIBRARIES}
+	${VPMEDIA_LIBRARIES}
+	${COMMON_LIBRARIES}
 	${LIBAVCODEC_LIBRARIES}
 	${LIBAVUTIL_LIBRARIES}
 	${LIBSWSCALE_LIBRARIES}
-	${COMMON_LIBRARIES}
+	${PYTHON_LIBRARIES}
 	)
 
