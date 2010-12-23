@@ -19,6 +19,7 @@ find_package(PNG REQUIRED)
 find_package(FTGL REQUIRED)
 find_package(wxWidgets REQUIRED gl core base)
 find_package(FFmpeg REQUIRED)
+find_package(Common REQUIRED)
 
 if(wxWidgets_FOUND)
 	include(${wxWidgets_USE_FILE})
@@ -34,6 +35,7 @@ include_directories(
 	${LIBAVCODEC_INCLUDE_DIRS}
 	${LIBAVUTIL_INCLUDE_DIRS}
 	${LIBSWSCALE_INCLUDE_DIRS}
+	${COMMON_INCLUDE_DIRS}
 	)
 
 # for ffmpeg
@@ -78,5 +80,6 @@ target_link_libraries(grav
 	${LIBAVCODEC_LIBRARIES}
 	${LIBAVUTIL_LIBRARIES}
 	${LIBSWSCALE_LIBRARIES}
+	${COMMON_LIBRARIES}
 	)
 
