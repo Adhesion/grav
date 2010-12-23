@@ -14,6 +14,7 @@ set(CMAKE_MODULE_PATH
 	)
 
 find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
 find_package(PNG REQUIRED)
 find_package(FTGL REQUIRED)
 find_package(wxWidgets REQUIRED gl core base)
@@ -24,6 +25,7 @@ endif(wxWidgets_FOUND)
 
 include_directories(
 	${OPENGL_INCLUDE_DIR}
+	${GLEW_INCLUDE_DIRS}
 	${PNG_INCLUDE_DIR}
 	${FREETYPE_INCLUDE_DIRS}
 	${FTGL_INCLUDE_DIRS}
@@ -64,6 +66,7 @@ add_executable(grav ${SOURCES})
 
 target_link_libraries(grav
 	${OPENGL_LIBRARIES}
+	${GLEW_LIBRARIES}
 	${PNG_LIBRARIES}
 	${FREETYPE_LIBRARIES}
 	${FTGL_LIBRARIES}
