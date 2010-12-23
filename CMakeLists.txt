@@ -18,6 +18,7 @@ find_package(GLEW REQUIRED)
 find_package(PNG REQUIRED)
 find_package(FTGL REQUIRED)
 find_package(wxWidgets REQUIRED gl core base)
+find_package(FFmpeg REQUIRED)
 
 if(wxWidgets_FOUND)
 	include(${wxWidgets_USE_FILE})
@@ -30,6 +31,9 @@ include_directories(
 	${FREETYPE_INCLUDE_DIRS}
 	${FTGL_INCLUDE_DIRS}
 	${wxWidgets_INCLUDE_DIRS}
+	${LIBAVCODEC_INCLUDE_DIRS}
+	${LIBAVUTIL_INCLUDE_DIRS}
+	${LIBSWSCALE_INCLUDE_DIRS}
 	)
 
 # for ffmpeg
@@ -71,5 +75,8 @@ target_link_libraries(grav
 	${FREETYPE_LIBRARIES}
 	${FTGL_LIBRARIES}
 	${wxWidgets_LIBRARIES}
+	${LIBAVCODEC_LIBRARIES}
+	${LIBAVUTIL_LIBRARIES}
+	${LIBSWSCALE_LIBRARIES}
 	)
 
