@@ -5,3 +5,4 @@ Debug/grav
 a.out
 *.pyc
 *.pyo
+Build/*
