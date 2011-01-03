@@ -14,75 +14,78 @@ if(PKG_CONFIG_FOUND)
 		libavcodec>=52
 		)
 	pkg_check_modules(LIBAVUTIL
-		libavutil
+		libavutil>=50
 		)
 	pkg_check_modules(LIBSWSCALE
 		libswscale
 		)
-endif()
-
-if(NOT LIBAVCODEC_FOUND)
+else()
 	message("Warning: could not confirm libavcodec version (pkg-config not available).")
 	message("Ensure your libavcodec version is >= 52 for a clean build.")
 	message(${CMAKE_FIND_LIBRARY_SUFFIXES})
-
-	find_path(
-		LIBAVCODEC_INCLUDE_DIRS
-		libavcodec/avcodec.h
-		HINTS ${LIBAVCODEC_HOME}/include
-		)
-
-	find_library(
-		LIBAVCODEC_LIBRARIES
-		avcodec
-		HINTS ${LIBAVCODEC_HOME}/lib
-		)
-
-	find_path(
-		LIBAVUTIL_INCLUDE_DIRS
-		libavutil/avutil.h
-		HINTS ${LIBAVUTIL_HOME}/include
-		)
-
-	find_library(
-		LIBAVUTIL_LIBRARIES
-		avutil
-		HINTS ${LIBAVUTIL_HOME}/lib
-		)
-
-	find_path(
-		LIBSWSCALE_INCLUDE_DIRS
-		libswscale/swscale.h
-		HINTS ${LIBSWSCALE_HOME}/include
-		)
-
-	find_library(
-		LIBSWSCALE_LIBRARIES
-		swscale
-		HINTS ${LIBSWSCALE_HOME}/lib
-		)
-
-	include(FindPackageHandleStandardArgs)
-
-	find_package_handle_standard_args(
-		LIBAVCODEC
-		DEFAULT_MSG
-		LIBAVCODEC_INCLUDE_DIRS
-		LIBAVCODEC_LIBRARIES
-		)
-
-	find_package_handle_standard_args(
-		LIBAVUTIL
-		DEFAULT_MSG
-		LIBAVUTIL_INCLUDE_DIRS
-		LIBAVUTIL_LIBRARIES
-		)
-
-	find_package_handle_standard_args(
-		LIBSWSCALE
-		DEFAULT_MSG
-		LIBSWSCALE_INCLUDE_DIRS
-		LIBSWSCALE_LIBRARIES
-		)
 endif()
+
+find_path(
+	LIBAVCODEC_INCLUDE_DIR
+	libavcodec/avcodec.h
+	HINTS ${LIBAVCODEC_HOME}/include ${LIBAVCODEC_INCLUDE_DIRS}
+	)
+
+find_library(
+	LIBAVCODEC_LIBRARIES
+	avcodec
+	HINTS ${LIBAVCODEC_HOME}/lib ${LIBAVCODEC_LIBRARY_DIRS}
+	)
+
+find_path(
+	LIBAVUTIL_INCLUDE_DIR
+	libavutil/avutil.h
+	HINTS ${LIBAVUTIL_HOME}/include ${LIBAVUTIL_INCLUDE_DIRS}
+	)
+
+find_library(
+	LIBAVUTIL_LIBRARIES
+	avutil
+	HINTS ${LIBAVUTIL_HOME}/lib ${LIBAVUTIL_LIBRARY_DIRS}
+	)
+
+find_path(
+	LIBSWSCALE_INCLUDE_DIR
+	libswscale/swscale.h
+	HINTS ${LIBSWSCALE_HOME}/include ${LIBSWSCALE_INCLUDE_DIRS}
+	)
+
+find_library(
+	LIBSWSCALE_LIBRARIES
+	swscale
+	HINTS ${LIBSWSCALE_HOME}/lib ${LIBSWSCALE_LIBRARY_DIRS}
+	)
+
+include(FindPackageHandleStandardArgs)
+
+find_package_handle_standard_args(
+	LIBAVCODEC
+	DEFAULT_MSG
+	LIBAVCODEC_INCLUDE_DIR
+	LIBAVCODEC_LIBRARIES
+	)
+
+find_package_handle_standard_args(
+	LIBAVUTIL
+	DEFAULT_MSG
+	LIBAVUTIL_INCLUDE_DIR
+	LIBAVUTIL_LIBRARIES
+	)
+
+find_package_handle_standard_args(
+	LIBSWSCALE
+	DEFAULT_MSG
+	LIBSWSCALE_INCLUDE_DIR
+	LIBSWSCALE_LIBRARIES
+	)
+
+mark_as_advanced(LIBAVCODEC_INCLUDE_DIR LIBAVCODEC_LIBRARIES
+	LIBAVUTIL_INCLUDE_DIR LIBAVUTIL_LIBRARIES
+	LIBSWSCALE_INCLUDE_DIR LIBSWSCALE_LIBRARIES
+	)
 
