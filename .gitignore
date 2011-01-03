@@ -6,3 +6,8 @@ a.out
 *.pyc
 *.pyo
 Build/*
+grav
+cmake_install.cmake
+Makefile
+CMakeFiles
+CMakeCache.txt
