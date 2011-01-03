@@ -40,39 +40,40 @@ include_directories(
 	${COMMON_INCLUDE_DIRS}
 	${VPMEDIA_INCLUDE_DIRS}
 	${PYTHON_INCLUDE_DIRS}
+	include/
 	)
 
 # for ffmpeg
 add_definitions(-D__STDC_CONSTANT_MACROS)
 
 set(SOURCES
-	AudioManager.cpp
-	Earth.cpp
-	Frame.cpp
-	GLCanvas.cpp
-	GLUtil.cpp
-	grav.cpp
-	gravManager.cpp
-	Group.cpp
-	InputHandler.cpp
-	LayoutManager.cpp
-	PNGLoader.cpp
-	Point.cpp
-	PythonTools.cpp
-	RectangleBase.cpp
-	Runway.cpp
-	SessionManager.cpp
-	SessionTreeControl.cpp
-	SideFrame.cpp
-	Timers.cpp
-	TreeControl.cpp
-	TreeNode.cpp
-	Vector.cpp
-	VenueClientController.cpp
-	VenueNode.cpp
-	VideoInfoDialog.cpp
-	VideoListener.cpp
-	VideoSource.cpp
+	src/AudioManager.cpp
+	src/Earth.cpp
+	src/Frame.cpp
+	src/GLCanvas.cpp
+	src/GLUtil.cpp
+	src/grav.cpp
+	src/gravManager.cpp
+	src/Group.cpp
+	src/InputHandler.cpp
+	src/LayoutManager.cpp
+	src/PNGLoader.cpp
+	src/Point.cpp
+	src/PythonTools.cpp
+	src/RectangleBase.cpp
+	src/Runway.cpp
+	src/SessionManager.cpp
+	src/SessionTreeControl.cpp
+	src/SideFrame.cpp
+	src/Timers.cpp
+	src/TreeControl.cpp
+	src/TreeNode.cpp
+	src/Vector.cpp
+	src/VenueClientController.cpp
+	src/VenueNode.cpp
+	src/VideoInfoDialog.cpp
+	src/VideoListener.cpp
+	src/VideoSource.cpp
 	)
 
 add_executable(grav ${SOURCES})
