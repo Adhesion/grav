@@ -22,7 +22,6 @@ if(PKG_CONFIG_FOUND)
 else()
 	message("Warning: could not confirm libavcodec version (pkg-config not available).")
 	message("Ensure your libavcodec version is >= 52 for a clean build.")
-	message(${CMAKE_FIND_LIBRARY_SUFFIXES})
 endif()
 
 find_path(
