@@ -2,6 +2,8 @@
 #
 # Find FFmpeg libs and include paths.
 # Will set INCLUDE_DIRS and LIBRARIES for libavcodec, libavutil and libswscale.
+# Note this is currently not used, since the VPMedia script will grab -I, -L, -l
+# etc from vpmedia-config.
 #
 # Created on: Dec 23, 2010
 # @author Andrew Ford

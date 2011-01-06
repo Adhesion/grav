@@ -1,6 +1,8 @@
 # @file FindCommon.cmake
 #
 # Find UCL common libs and include paths.
+# Note this is currently not used since the VPMedia find script can grab
+# cppflags and ldflags from vpmedia-config.
 #
 # Created on: Dec 23, 2010
 # @author Andrew Ford
