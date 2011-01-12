@@ -62,8 +62,6 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     docstr[ktoh('X')] = "Toggle rendering of selected objects.";
     lookup[ktoh('Q')] = &InputHandler::handleQuit;
     docstr[ktoh('Q')] = "Quit.";
-    lookup[ktoh('q')] = &InputHandler::handleQuit; // TBD -- is this necessary?
-    docstr[ktoh('q')] = "Quit.";
     lookup[ktoh('\e')] = &InputHandler::handleQuit;
     docstr[ktoh('\e')] = "Quit.";
     unprintables['\e'] = "(escape)";
