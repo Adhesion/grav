@@ -6,6 +6,7 @@ a.out
 *.pyc
 *.pyo
 Build/*
+Debug/src
 grav
 cmake_install.cmake
 Makefile
