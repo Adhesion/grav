@@ -212,7 +212,7 @@ void VenueClientController::updateVenueName()
 {
     PyObject* res = pyTools.call( "AGTools", "GetCurrentVenueName",
                                     venueClientUrl.c_str() );
-    if ( res != NULL )
+    if ( res != NULL && res != Py_None )
         currentVenue = PyString_AsString( res );
     else
         currentVenue = "";
