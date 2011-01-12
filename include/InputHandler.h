@@ -74,6 +74,7 @@ public:
     void handleQuit();
     void handleClearSelected();
     void handleAddTestObject();
+    void handleTryDeleteObject();
     void handleHelp();
 
     void processKeyboard( int keyCode, int x, int y );

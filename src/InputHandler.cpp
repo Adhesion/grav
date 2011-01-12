@@ -125,6 +125,10 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
         lookup[ktoh(' ')] = &InputHandler::handleAddTestObject;
         docstr[ktoh(' ')] = "[debug] Add a test window to the screen.";
         unprintables[' '] = "(space)";
+        lookup[ktoh((unsigned char)127)] = &InputHandler::handleTryDeleteObject;
+        docstr[ktoh((unsigned char)127)] = "[debug] Delete selected deletable"
+                                            " objects (test objects)";
+        unprintables[ktoh((unsigned char)127)] = "(delete)";
         lookup[ktoh('K')] = &InputHandler::handlePrintSelected;
         docstr[ktoh('K')] = "[debug] Print information about selected windows.";
         lookup[ktoh('O')] = &InputHandler::handleRandomTest;
@@ -521,7 +525,16 @@ void InputHandler::handleAddTestObject()
 {
     grav->addTestObject();
 }
-
+void InputHandler::handleTryDeleteObject()
+{
+    std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
+    for ( unsigned int i = 0; i < movableObjects.size(); i++ )
+    {
+        RectangleBase* obj = movableObjects[i];
+        if ( obj->isSelected() )
+            grav->tryDeleteObject( obj );
+    }
+}
 
 /* Key To Hash */
 int InputHandler::ktoh( unsigned char key ) { return ktoh(key, 0); }

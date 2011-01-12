@@ -464,6 +464,21 @@ void gravManager::addTestObject()
     obj->setName( "TEST" );
     //runway->add( obj );
     obj->setTexture( borderTex, borderWidth, borderHeight );
+    obj->setUserDeletable( true );
+}
+
+void gravManager::tryDeleteObject( RectangleBase* obj )
+{
+    // note this will only check userdeletable objects. Videos should probably
+    // not be deletable.
+    if ( obj->isUserDeletable() )
+    {
+        // false as second arg to not try to remove it from the tree
+        // TODO fix this maybe, doesn't necessarily fit - only makes sense for
+        // test object case
+        removeFromLists( obj, false );
+        delete obj;
+    }
 }
 
 void gravManager::moveToTop( RectangleBase* object, bool checkGrouping )

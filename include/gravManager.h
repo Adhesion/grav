@@ -46,6 +46,10 @@ public:
     void ungroupAll();
 
     void addTestObject();
+    /*
+     * Delete a user-deletable object. For now, only used for test objects.
+     */
+    void tryDeleteObject( RectangleBase* obj );
 
     /*
      * For moving videos to the top of the drawnObjects (for both drawing and

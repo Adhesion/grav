@@ -64,6 +64,7 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     selected = other.selected;
     selectable = other.selectable;
     userMovable = other.userMovable;
+    userDeletable = other.userDeletable;
     grouped = other.grouped;
     myGroup = other.myGroup;
     animated = other.animated;
@@ -95,6 +96,7 @@ void RectangleBase::setDefaults()
     selected = false;
     selectable = true;
     userMovable = true;
+    userDeletable = false;
     showLockStatus = false;
     locked = false;
 
@@ -489,6 +491,16 @@ void RectangleBase::setAnimation( bool anim )
 bool RectangleBase::isUserMovable()
 {
     return userMovable;
+}
+
+bool RectangleBase::isUserDeletable()
+{
+    return userDeletable;
+}
+
+void RectangleBase::setUserDeletable( bool d )
+{
+    userDeletable = d;
 }
 
 bool RectangleBase::isGrouped()

@@ -156,6 +156,12 @@ public:
     bool isUserMovable();
 
     /*
+     * Whether the user can delete this. Right now, only used for test objects.
+     */
+    bool isUserDeletable();
+    void setUserDeletable( bool d );
+
+    /*
      * Is this object a member of a group?
      */
     bool isGrouped();
@@ -279,6 +285,7 @@ protected:
     bool selected;
     bool selectable;
     bool userMovable;
+    bool userDeletable;
     bool grouped;
     Group* myGroup;
     bool locked;
