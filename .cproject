@@ -64,7 +64,6 @@
 <tool id="cdt.managedbuild.tool.gnu.archiver.base.1856652250" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 </toolChain>
 </folderInfo>
-<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.965868493.939681467" name="PythonTools.h" rcbsApplicability="disable" resourcePath="PythonTools.h" toolsToInvoke=""/>
 <sourceEntries>
 <entry excluding="Build|CMakeFiles" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 </sourceEntries>
