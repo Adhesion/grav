@@ -212,6 +212,7 @@ void InputHandler::wxMouseRDown( wxMouseEvent& evt )
         mainFrame->PopupMenu( &rightClickMenu, evt.GetPosition() );
     }
 }
+
 void InputHandler::handlePrintSelected()
 {
     printf( "current sources selected: %i\n",
@@ -221,6 +222,7 @@ void InputHandler::handlePrintSelected()
         printf( "%s\n", (*(grav->getSelectedObjects()))[i]->getName().c_str() );
     }
 }
+
 void InputHandler::handleRearrangeGroups()
 {
     printf( "rearranging groups...\n" );
@@ -234,6 +236,7 @@ void InputHandler::handleRearrangeGroups()
         }
     }
 }
+
 void InputHandler::handleUpdateGroupNames()
 {
     printf( "updating group names...\n" );
@@ -244,6 +247,7 @@ void InputHandler::handleUpdateGroupNames()
         mapi->second->updateName();
     }
 }
+
 void InputHandler::handlePerimeterArrange()
 {
     std::map<std::string, std::vector<RectangleBase*> > data;
@@ -251,12 +255,14 @@ void InputHandler::handlePerimeterArrange()
     layouts.arrange(
         "perimeter", grav->getScreenRect(), grav->getEarthRect(), data );
 }
+
 void InputHandler::handleGridArrange()
 {
     std::map<std::string, std::vector<RectangleBase*> > data;
     data["objects"] = grav->getMovableObjects();
     layouts.arrange( "grid", grav->getScreenRect(), RectangleBase(), data );
 }
+
 void InputHandler::handleFocusArrange()
 {
     if ( grav->getSelectedObjects()->size() > 0 )
@@ -268,6 +274,7 @@ void InputHandler::handleFocusArrange()
                           RectangleBase(), data );
     }
 }
+
 void InputHandler::handleFullscreenSelectedSingle()
 {
     if ( grav->getSelectedObjects()->size() == 1 )
@@ -281,6 +288,7 @@ void InputHandler::handleRunwayToggle()
     grav->setRunwayUsage( !grav->usingRunway() );
     grav->clearSelected();
 }
+
 void InputHandler::handleInvertSelection()
 {
     std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
@@ -365,6 +373,7 @@ void InputHandler::handleInformation()
                 temp->getDestWidth(), temp->getDestHeight() );
     }
 }
+
 void InputHandler::handleToggleGroupLocks() {
     for ( unsigned int i = 0; i < grav->getSelectedObjects()->size(); i++ )
     {
@@ -379,6 +388,7 @@ void InputHandler::handleToggleGroupLocks() {
         }
     }
 }
+
 void InputHandler::handleMuteSelected()
 {
     std::vector<VideoSource*>::const_iterator si;
@@ -400,11 +410,13 @@ void InputHandler::handleMuteSelected()
     }
     grav->clearSelected();
 }
+
 void InputHandler::handleRandomTest()
 {
     printf( "random32: %i\n", random32() );
     printf( "random32max: %i\n", random32_max() );
 }
+
 void InputHandler::handleNativeScaleAll()
 {
     std::vector<VideoSource*>::const_iterator si;
@@ -416,6 +428,7 @@ void InputHandler::handleNativeScaleAll()
             (*si)->getGroup()->rearrange();
     }
 }
+
 void InputHandler::handleNativeScaleSelected()
 {
     std::vector<VideoSource*>::const_iterator si;
@@ -430,6 +443,7 @@ void InputHandler::handleNativeScaleSelected()
         }
     }
 }
+
 void InputHandler::handleMoveAllToCenter()
 {
     std::vector<VideoSource*>::const_iterator si;
@@ -453,10 +467,12 @@ void InputHandler::handleToggleSiteGrouping()
         grav->setSiteIDGrouping( true );
     }
 }
+
 void InputHandler::handleToggleShowVenueClientController()
 {
     grav->toggleShowVenueClientController();
 }
+
 void InputHandler::handleToggleRenderingSelected()
 {
     for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
@@ -470,19 +486,23 @@ void InputHandler::handleToggleRenderingSelected()
         }
     }
 }
+
 void InputHandler::handleZoomout()
 {
         grav->setCamZ(grav->getCamZ()+1);
 }
+
 void InputHandler::handleZoomin()
 {
         grav->setCamZ(grav->getCamZ()-1);
 }
+
 void InputHandler::handleToggleAutoFocusRotate()
 {
     grav->setAutoFocusRotate( !grav->usingAutoFocusRotate() );
     grav->resetAutoCounter();
 }
+
 void InputHandler::handleSelectAll()
 {
     std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
@@ -493,36 +513,44 @@ void InputHandler::handleSelectAll()
         grav->getSelectedObjects()->push_back( movableObjects[i] );
     }
 }
+
 void InputHandler::handleToggleGraphicsDebug()
 {
     grav->setGraphicsDebugMode( !grav->getGraphicsDebugMode() );
 }
+
 void InputHandler::handleDownscaleSelected()
 {
     float scaleAmt = 0.25f;
     grav->scaleSelectedObjects( scaleAmt * -1.0f );
 }
+
 void InputHandler::handleUpscaleSelected()
 {
     float scaleAmt = 0.25f;
     grav->scaleSelectedObjects( scaleAmt );
 }
+
 void InputHandler::handleToggleFullscreen()
 {
     mainFrame->ShowFullScreen( !mainFrame->IsFullScreen() );
 }
+
 void InputHandler::handleQuit()
 {
     mainFrame->Close();
 }
+
 void InputHandler::handleClearSelected()
 {
     grav->clearSelected();
 }
+
 void InputHandler::handleAddTestObject()
 {
     grav->addTestObject();
 }
+
 void InputHandler::handleTryDeleteObject()
 {
     std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
