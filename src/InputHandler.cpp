@@ -732,16 +732,26 @@ void InputHandler::leftRelease( int x, int y )
     // shift the temporary list of selected objects to the main list to
     // allow for multiple box selection
     for ( unsigned int i = 0; i < tempSelectedObjects->size(); i++ )
+    {
         grav->getSelectedObjects()->push_back( (*tempSelectedObjects)[i] );
+    }
     tempSelectedObjects->clear();
     leftButtonHeld = false;
 
     // if we were doing drag movement, deselect all
-    if ( dragging && grav->getHoldCounter() > 10 )
+    // the getholdcounter check is to prevent user from losing a click selection
+    // if they accidentally drag it a tiny bit
+    if ( dragging && grav->getHoldCounter() > 5 )
     {
         grav->clearSelected();
-        dragging = false;
     }
+
+    // since there is no other way to drag (at the moment) without holding down
+    // the mouse, we're necessarily not dragging anymore
+    // (dragging in this case refers to dragging an object, not a select box)
+    // putting this here rather than in the above if statement prevents box
+    // selection from failing after an accidental small drag
+    dragging = false;
 }
 
 void InputHandler::mouseLeftHeldMove( int x, int y )
