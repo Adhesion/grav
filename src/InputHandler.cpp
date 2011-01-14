@@ -228,10 +228,10 @@ void InputHandler::handleRearrangeGroups()
     printf( "rearranging groups...\n" );
     for ( unsigned int i = 0; i < grav->getSelectedObjects()->size(); i++ )
     {
-        Group* g = dynamic_cast<Group*>(
-            (*(grav->getSelectedObjects()))[i] );
-        if ( g != NULL )
+        RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
+        if ( temp->isGroup() )
         {
+            Group* g = (Group*)temp;
             g->rearrange();
         }
     }
@@ -374,13 +374,14 @@ void InputHandler::handleInformation()
     }
 }
 
-void InputHandler::handleToggleGroupLocks() {
+void InputHandler::handleToggleGroupLocks()
+{
     for ( unsigned int i = 0; i < grav->getSelectedObjects()->size(); i++ )
     {
         RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
         if ( temp->isGroup() )
         {
-            Group* g = dynamic_cast<Group*>(temp);
+            Group* g = (Group*)temp;
             printf( "InputHandler::l:group %s locked? %i\n",
                         g->getName().c_str(), g->isLocked() );
             g->changeLock();

@@ -507,9 +507,9 @@ void gravManager::moveToTop( std::vector<RectangleBase*>::iterator i,
         drawnObjects->erase( i );
         drawnObjects->push_back( temp );
 
-        Group* g = dynamic_cast<Group*>( temp );
-        if ( g != NULL )
+        if ( temp->isGroup() )
         {
+            Group* g = (Group*)temp;
             for ( int i = 0; i < g->numObjects(); i++ )
                 moveToTop( (*g)[i], false );
         }
