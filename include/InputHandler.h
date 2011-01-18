@@ -65,6 +65,8 @@ public:
     void handleToggleRenderingSelected();
     void handleZoomout();
     void handleZoomin();
+    void handleStrafeLeft();
+    void handleStrafeRight();
     void handleToggleAutoFocusRotate();
     void handleSelectAll();
     void handleToggleGraphicsDebug();

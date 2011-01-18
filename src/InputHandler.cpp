@@ -103,6 +103,10 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     docstr[ktoh('N', wxMOD_SHIFT)] = "Scale all objects to native size.";
 
     /* Navigation */
+    lookup[ktoh('A')] = &InputHandler::handleStrafeLeft;
+    docstr[ktoh('A')] = "Strafe left.";
+    lookup[ktoh('D')] = &InputHandler::handleStrafeRight;
+    docstr[ktoh('D')] = "Strafe right.";
     lookup[ktoh('W')] = &InputHandler::handleZoomin;
     docstr[ktoh('W')] = "Zoom in.";
     lookup[ktoh('S')] = &InputHandler::handleZoomout;
@@ -496,6 +500,16 @@ void InputHandler::handleZoomout()
 void InputHandler::handleZoomin()
 {
         grav->setCamZ(grav->getCamZ()-1);
+}
+
+void InputHandler::handleStrafeLeft()
+{
+        grav->setCamX(grav->getCamX()-1);
+}
+
+void InputHandler::handleStrafeRight()
+{
+        grav->setCamX(grav->getCamX()+1);
 }
 
 void InputHandler::handleToggleAutoFocusRotate()
