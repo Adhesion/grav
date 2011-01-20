@@ -57,24 +57,24 @@ Earth::~Earth()
 void Earth::draw()
 {
     glPushMatrix();
-    
+
     glTranslatef( x, y, z );
     glRotatef( xRot-90.0f, 1.0f, 0.0f, 0.0f );
     glRotatef( yRot, 0.0f, 1.0f, 0.0f );
     glRotatef( zRot, 0.0f, 0.0f, 1.0f );
-    
+
     /*glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
     glBegin( GL_LINE );
     glVertex3f( x, y, z );
     glVertex3f( x+10.0f, y, z );
     glEnd();
-    
+
     glColor4f( 0.0f, 1.0f, 0.0f, 1.0f );
     glBegin( GL_LINE );
     glVertex3f( x, y, z );
     glVertex3f( x, y+10.0f, z );
     glEnd();*/
-    
+
     // these show the earth axes
     /*
     glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
@@ -82,13 +82,13 @@ void Earth::draw()
     glVertex3f( 0, 0, 0 );
     glVertex3f( x+50.0f, 0, 0 );
     glEnd();
-    
+
     glColor4f( 0.0f, 1.0f, 0.0f, 1.0f );
     glBegin( GL_LINE );
     glVertex3f( 0, 0, 0 );
     glVertex3f( 0, 0+50.0f, 0 );
     glEnd();
-    
+
     glColor4f( 0.0f, 0.0f, 1.0f, 1.0f );
     glBegin( GL_LINE );
     glVertex3f( 0, 0, 0 );
@@ -100,9 +100,9 @@ void Earth::draw()
 
     // render the sphere using its display list
     glCallList( sphereIndex );
-    
+
     glPopMatrix();
-    
+
     /*testLat++;
     x += moveAmt;
     if ( x > 25.0f || x < -25.0f )
@@ -117,20 +117,20 @@ void Earth::convertLatLong( float lat, float lon, float &ex, float &ey,
     //GLdouble matrix[16];
     //glPushMatrix();
     //GLUtil::printMatrices();
-    
-    
+
+
     /*glTranslatef( x, y, z );
     glRotatef( xRot, 1.0f, 0.0f, 0.0f );
     glRotatef( yRot, 0.0f, 0.0f, 1.0f );
     glRotatef( zRot, 0.0f, 1.0f, 0.0f );
     glGetDoublev( GL_MODELVIEW_MATRIX, matrix );*/
-    
+
     //glPopMatrix();
     //GLUtil::updateMatrices();
     //GLUtil::printMatrices();
     //for ( int i = 0; i < 16; i++ )
     //    matrix[i] = GLUtil::modelview[i];
-    
+
     glPushMatrix();
     glLoadIdentity();
     glTranslatef( x, y, z );
@@ -139,42 +139,42 @@ void Earth::convertLatLong( float lat, float lon, float &ex, float &ey,
     glRotatef( zRot, 0.0f, 1.0f, 0.0f );
     glGetDoublev( GL_MODELVIEW_MATRIX, matrix );
     glPopMatrix();
-    
+
     float rlat = lat;//-90.0f); //-xRot
     float rlon = lon; //+zRot
     //float rlat = lat-xRot-90.0f;
     //float rlon = lon+zRot;
-    
+
     rlat = rlat*PI/180.0f;
     rlon = rlon*PI/180.0f;
-    
+
     float ext = radius * (cos(rlat) * sin(rlon));
     float eyt = radius * (sin(rlat));
     float ezt = radius * (cos(rlat) * cos(rlon));
     //printf( "ex,ey,ez: %f,%f,%f\n", ex, ey, ez );
-    
+
     /*glBegin( GL_LINE );
     glVertex3f( 0.0f, 0.0f, 0.0f );
     glVertex3f( ex, ey, ez );
     glEnd();*/
-    
+
     // column major
     ex = (ext*matrix[0]) + (eyt*matrix[4]) + (ezt*matrix[8]) + matrix[12];
     ey = (ext*matrix[1]) + (eyt*matrix[5]) + (ezt*matrix[9]) + matrix[13];
     ez = (ext*matrix[2]) + (eyt*matrix[6]) + (ezt*matrix[10]) + matrix[14];
     //printf( "x,y,z: %f,%f,%f\n", ex, ey, ez );
-    
+
     // row major
     /*ex = (ex*matrix[0]) + (ey*matrix[1]) + (ez*matrix[2]);// + matrix[3];
     ey = (ex*matrix[4]) + (ey*matrix[5]) + (ez*matrix[5]);// + matrix[7];
     ez = (ex*matrix[8]) + (ey*matrix[9]) + (ez*matrix[10]);// + matrix[11];*/
-    
+
     //printf( "matrix/modelview: %f, %f\n", matrix[1], GLUtil::modelview[1] );
-    
+
     //ex = (ex*GLUtil::modelview[0]) + (ey*GLUtil::modelview[4]) + (ez*GLUtil::modelview[8]) + GLUtil::modelview[12];
     //ey = (ex*GLUtil::modelview[1]) + (ey*GLUtil::modelview[5]) + (ez*GLUtil::modelview[9]) + GLUtil::modelview[13];
     //ez = (ex*GLUtil::modelview[2]) + (ey*GLUtil::modelview[3]) + (ez*GLUtil::modelview[10]) + GLUtil::modelview[14];
-    
+
     //glPopMatrix();
 }
 
@@ -183,6 +183,7 @@ void Earth::rotate( float x, float y, float z )
     xRot += x;
     yRot += y;
     zRot += z;
+    printf( "Earth::rotate: rotation vals now %f,%f,%f\n", xRot, yRot, zRot );
 }
 
 float Earth::getX()
