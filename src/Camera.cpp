@@ -102,6 +102,8 @@ void Camera::moveLookat( Point p )
     destLookat = p;
     if ( !animated )
         lookat = p;
+    else
+        lookatMoving = true;
 }
 
 void Camera::setEarth( Earth* e )
