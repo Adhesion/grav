@@ -21,6 +21,8 @@
 #include "TreeControl.h"
 #include "LayoutManager.h"
 #include "VenueClientController.h"
+#include "Camera.h"
+#include "Point.h"
 
 #include "gravManager.h"
 
@@ -29,12 +31,10 @@ gravManager::gravManager()
     windowWidth = 0; windowHeight = 0; // this should be set immediately
                                        // after init
     holdCounter = 0; drawCounter = 0; autoCounter = 0;
-    camX = 0.0f;
-    camY = 0.0f;
-    camZ = 9.0f;
-    origCamX = camX;
-    origCamY = camY;
-    origCamZ = camZ;
+
+    origCamPoint = Point( 0.0f, 0.0f, 9.0f );
+    Point lookat( 0.0f, 0.0f, -25.0f );
+    cam = new Camera( origCamPoint, lookat );
 
     sources = new std::vector<VideoSource*>();
     drawnObjects = new std::vector<RectangleBase*>();
@@ -109,6 +109,8 @@ gravManager::~gravManager()
 
     delete runway;
 
+    delete cam;
+
     delete objectsToDelete;
     delete objectsToAddToTree;
     delete objectsToRemoveFromTree;
@@ -123,10 +125,11 @@ void gravManager::draw()
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    glLoadIdentity();
-    gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
+    //glLoadIdentity();
+    //gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
 
-    //camera->doGLLookat();
+    cam->animateValues();
+    cam->doGLLookat();
 
     // audio test drawing
     /*if ( audioEnabled )
@@ -768,16 +771,9 @@ void gravManager::setWindowSize( int w, int h )
 
     // reset cam to original spot in order to project from correct spot and find
     // the rectangle relative/facing to the original camera position
-    float oldCamX = camX;
-    float oldCamY = camY;
-    float oldCamZ = camZ;
-    setCamX( origCamX );
-    setCamY( origCamY );
-    setCamZ( origCamZ );
-
-    // to properly update matrices - maybe put this somewhere else
-    glLoadIdentity();
-    gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
+    Point oldCamPoint = cam->getCenter();
+    cam->setCenter( origCamPoint );
+    cam->doGLLookat();
 
     // note this still uses the old screen rect - assumes it stays on the same
     // plane, since the raytrace method ignores the rect boundaries
@@ -793,12 +789,8 @@ void gravManager::setWindowSize( int w, int h )
     screenU = topRight.getY();
     screenD = bottomLeft.getY();
 
-    setCamX( oldCamX );
-    setCamY( oldCamY );
-    setCamZ( oldCamZ );
-
-    glLoadIdentity();
-    gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
+    cam->setCenter( oldCamPoint );
+    cam->doGLLookat();
 
     screenRectFull.setPos( (screenL+screenR)/2.0f, (screenU+screenD)/2.0f);
     screenRectFull.setScale( screenR-screenL, screenU-screenD );
@@ -1121,32 +1113,38 @@ Group* gravManager::createSiteIDGroup( std::string data )
 
 float gravManager::getCamX()
 {
-    return camX;
+    return cam->getCenter().getX();
 }
 
 float gravManager::getCamY()
 {
-    return camY;
+    return cam->getCenter().getY();
 }
 
 float gravManager::getCamZ()
 {
-    return camZ;
+    return cam->getCenter().getZ();
 }
 
 void gravManager::setCamX( float x )
 {
-    camX = x;
+    Point p = cam->getCenter();
+    p.setX( x );
+    cam->moveCenter( p );
 }
 
 void gravManager::setCamY( float y )
 {
-    camY = y;
+    Point p = cam->getCenter();
+    p.setY( y );
+    cam->moveCenter( p );
 }
 
 void gravManager::setCamZ( float z )
 {
-    camZ = z;
+    Point p = cam->getCenter();
+    p.setZ( z );
+    cam->moveCenter( p );
 }
 
 RectangleBase gravManager::getScreenRect( bool full )

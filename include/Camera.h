@@ -10,8 +10,8 @@
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
-class Point;
-class Vector;
+#include "Point.h"
+#include "Vector.h"
 class Earth;
 
 class Camera
@@ -31,9 +31,18 @@ public:
      * TODO abstract that to 'movable' or similar to avoid duplicate code
      */
     void setCenter( float x, float y, float z );
+    void setCenter( Point p );
     void moveCenter( float x, float y, float z );
+    void moveCenter( Point p );
+
+    void setLookat( float x, float y, float z );
+    void setLookat( Point p );
+    void moveLookat( float x, float y, float z );
+    void moveLookat( Point p );
 
     void setEarth( Earth* e );
+
+    void animateValues();
 
 private:
     Point center;
@@ -48,7 +57,6 @@ private:
     Earth* earth;
 
     bool animated;
-    void animateValues();
 
 };
 

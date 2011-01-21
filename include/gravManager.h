@@ -28,6 +28,8 @@ class TreeControl;
 class LayoutManager;
 class Runway;
 class VenueClientController;
+class Camera;
+class Point;
 
 class gravManager
 {
@@ -193,16 +195,20 @@ private:
     std::vector<RectangleBase*> outerObjs;
     std::vector<RectangleBase*> innerObjs;
 
+    LayoutManager* layouts;
+
+    Runway* runway;
+
+    Camera* cam;
+
+    // these following block of pointers are NOT owned by this class
+
     Earth* earth;
 
     InputHandler* input;
 
     TreeControl* tree; // we need a reference to the GUI tree so we can
                        // update the names and add new objects
-
-    LayoutManager* layouts;
-
-    Runway* runway;
 
     // mostly just to grab the number of sources for arrangement purposes
     VideoListener* videoListener;
@@ -243,15 +249,16 @@ private:
     int autoCounter;
     bool enableSiteIDGroups;
 
-    float camX;
+    /*float camX;
     float camY;
     float camZ;
     float origCamX;
     float origCamY;
-    float origCamZ;
+    float origCamZ;*/
+    Point origCamPoint;
 
     bool usingThreads;
-    mutex* sourceMutex;
+    mutex* sourceMutex; // this is owned by us
     int lockCount;
 
     bool useRunway;

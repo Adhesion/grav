@@ -28,7 +28,7 @@ public:
      */
     Vector operator-( const Point& other );
     /*
-     * Returns a new point of adding vector to this point.
+     * Returns a new point: result of adding vector v to this point.
      */
     Point operator+( const Vector& v );
 

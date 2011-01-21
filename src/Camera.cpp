@@ -8,14 +8,14 @@
  */
 
 #include "Camera.h"
-#include "Point.h"
-#include "Vector.h"
 #include "Earth.h"
 
 Camera::Camera( Point c, Point l )
     : center( c ), lookat( l )
 {
-    up( 0.0f, 0.0f, 1.0f );
+    up = Vector( 0.0f, 1.0f, 0.0f );
+    destCenter = center;
+    destLookat = lookat;
     earth = NULL;
     animated = true;
 }
@@ -43,17 +43,56 @@ Vector Camera::getLookatDir()
     return lookat - center;
 }
 
-void setCenter( float x, float y, float z )
+void Camera::setCenter( float x, float y, float z )
 {
-    center( x, y, z );
-    destCenter( x, y, z );
+    center = Point( x, y, z );
+    destCenter = Point( x, y, z );
 }
 
-void moveCenter( float x, float y, float z )
+void Camera::setCenter( Point p )
 {
-    destCenter( x, y, z );
+    center = p;
+    destCenter = p;
+}
+
+void Camera::moveCenter( float x, float y, float z )
+{
+    destCenter = Point( x, y, z );
     if ( !animated )
-        center( x, y, z );
+        center = Point( x, y, z );
+}
+
+void Camera::moveCenter( Point p )
+{
+    destCenter = p;
+    if ( !animated )
+        center = p;
+}
+
+void Camera::setLookat( float x, float y, float z )
+{
+    lookat = Point( x, y, z );
+    destLookat = Point( x, y, z );
+}
+
+void Camera::setLookat( Point p )
+{
+    lookat = p;
+    destLookat = p;
+}
+
+void Camera::moveLookat( float x, float y, float z )
+{
+    destLookat = Point( x, y, z );
+    if ( !animated )
+        lookat = Point( x, y, z );
+}
+
+void Camera::moveLookat( Point p )
+{
+    destLookat = p;
+    if ( !animated )
+        lookat = p;
 }
 
 void Camera::setEarth( Earth* e )
@@ -66,4 +105,9 @@ void Camera::animateValues()
     center = center + ( ( destCenter - center ) / 5.0f );
     lookat = lookat + ( ( destLookat - lookat ) / 5.0f );
     // not doing anim for up vector yet, might have to be different?
+
+    if ( center.findDistance( destCenter ) < 0.01f )
+        center = destCenter;
+    if ( lookat.findDistance( destLookat ) < 0.01f )
+        lookat = destLookat;
 }

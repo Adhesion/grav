@@ -53,6 +53,7 @@ add_definitions(-D__STDC_CONSTANT_MACROS)
 
 set(SOURCES
 	src/AudioManager.cpp
+	src/Camera.cpp
 	src/Earth.cpp
 	src/Frame.cpp
 	src/GLCanvas.cpp
