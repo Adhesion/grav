@@ -1163,6 +1163,7 @@ RectangleBase gravManager::getEarthRect()
 void gravManager::setEarth( Earth* e )
 {
     earth = e;
+    cam->setEarth( e );
 }
 
 void gravManager::setInput( InputHandler* i )

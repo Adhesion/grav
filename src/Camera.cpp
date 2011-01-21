@@ -117,6 +117,13 @@ void Camera::animateValues()
     {
         center = center + ( ( destCenter - center ) / 5.0f );
 
+        // set x rotation axis for earth based on camera direction
+        if ( earth != NULL )
+        {
+            Vector earthVec = earth->getPoint() - center;
+            earth->setXRotationAxis( earthVec.crossProduct( up ) );
+        }
+
         if ( center.findDistance( destCenter ) < 0.01f )
         {
             center = destCenter;

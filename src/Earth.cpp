@@ -7,6 +7,7 @@
 
 #include "Earth.h"
 #include "PNGLoader.h"
+#include "Point.h"
 
 #include <cmath>
 
@@ -17,6 +18,7 @@ Earth::Earth()
     x = 0.0f; y = 0.0f, z = -25.0f;
     radius = 15.0f;
     xRot = 0.0f; yRot = 0.0f; zRot = 0.0f;
+    xRotationAxis = Vector( 1.0f, 0.0f, 0.0f );
     moveAmt = 1.0f;
     earthTex = PNGLoader::loadPNG( "earth.png", texWidth, texHeight );
 
@@ -59,7 +61,8 @@ void Earth::draw()
     glPushMatrix();
 
     glTranslatef( x, y, z );
-    glRotatef( xRot-90.0f, 1.0f, 0.0f, 0.0f );
+    glRotatef( xRot-90.0f, xRotationAxis.getX(), xRotationAxis.getY(),
+            xRotationAxis.getZ() );
     glRotatef( yRot, 0.0f, 1.0f, 0.0f );
     glRotatef( zRot, 0.0f, 0.0f, 1.0f );
 
@@ -134,7 +137,8 @@ void Earth::convertLatLong( float lat, float lon, float &ex, float &ey,
     glPushMatrix();
     glLoadIdentity();
     glTranslatef( x, y, z );
-    glRotatef( xRot, 1.0f, 0.0f, 0.0f );
+    glRotatef( xRot, xRotationAxis.getX(), xRotationAxis.getY(),
+                xRotationAxis.getZ() );
     glRotatef( yRot, 0.0f, 0.0f, 1.0f );
     glRotatef( zRot, 0.0f, 1.0f, 0.0f );
     glGetDoublev( GL_MODELVIEW_MATRIX, matrix );
@@ -201,7 +205,17 @@ float Earth::getZ()
     return z;
 }
 
+Point Earth::getPoint()
+{
+    return Point( x, y, z );
+}
+
 float Earth::getRadius()
 {
     return radius;
+}
+
+void Earth::setXRotationAxis( Vector v )
+{
+    xRotationAxis = v;
 }
