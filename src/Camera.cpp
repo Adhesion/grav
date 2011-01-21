@@ -10,6 +10,7 @@
 #include "Camera.h"
 #include "Point.h"
 #include "Vector.h"
+#include "Earth.h"
 
 Camera::Camera( Point c, Point l )
     : center( c ), lookat( l )
@@ -42,7 +43,27 @@ Vector Camera::getLookatDir()
     return lookat - center;
 }
 
+void setCenter( float x, float y, float z )
+{
+    center( x, y, z );
+    destCenter( x, y, z );
+}
+
+void moveCenter( float x, float y, float z )
+{
+    destCenter( x, y, z );
+    if ( !animated )
+        center( x, y, z );
+}
+
 void Camera::setEarth( Earth* e )
 {
     earth = e;
+}
+
+void Camera::animateValues()
+{
+    center = center + ( ( destCenter - center ) / 5.0f );
+    lookat = lookat + ( ( destLookat - lookat ) / 5.0f );
+    // not doing anim for up vector yet, might have to be different?
 }

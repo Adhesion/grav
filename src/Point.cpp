@@ -60,6 +60,11 @@ Vector Point::operator-( const Point& other )
     return Vector( x - other.x, y - other.y, z - other.z );
 }
 
+Point Point::operator+( const Vector& v )
+{
+    return Point( x + v.getX(), y + v.getY(), z + v.getZ() );
+}
+
 Vector Point::toVector()
 {
     return Vector( x, y, z );

@@ -25,6 +25,8 @@ public:
     void normalize();
     float getLength();
 
+    Vector operator/( const float& factor );
+
 private:
     float x, y, z;
 

@@ -27,6 +27,7 @@ public:
 
     /*
      * Set always snaps, move may animate. Similar to RectangleBase.
+     * x/y/z is destination point.
      * TODO abstract that to 'movable' or similar to avoid duplicate code
      */
     void setCenter( float x, float y, float z );
@@ -36,8 +37,11 @@ public:
 
 private:
     Point center;
+    Point destCenter;
     Point lookat;
+    Point destLookat;
     Vector up;
+    Vector destUp;
 
     // cam has a reference to earth so it can update its up-down rotation axis
     // based on the cam position
