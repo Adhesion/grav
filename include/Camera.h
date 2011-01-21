@@ -57,6 +57,8 @@ private:
     Earth* earth;
 
     bool animated;
+    bool centerMoving;
+    bool lookatMoving;
 
 };
 

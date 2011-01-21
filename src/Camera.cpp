@@ -13,11 +13,14 @@
 Camera::Camera( Point c, Point l )
     : center( c ), lookat( l )
 {
+    earth = NULL;
+    animated = true;
+    centerMoving = false;
+    lookatMoving = false;
+
     up = Vector( 0.0f, 1.0f, 0.0f );
     destCenter = center;
     destLookat = lookat;
-    earth = NULL;
-    animated = true;
 }
 
 void Camera::doGLLookat()
@@ -60,6 +63,8 @@ void Camera::moveCenter( float x, float y, float z )
     destCenter = Point( x, y, z );
     if ( !animated )
         center = Point( x, y, z );
+    else
+        centerMoving = true;
 }
 
 void Camera::moveCenter( Point p )
@@ -67,6 +72,8 @@ void Camera::moveCenter( Point p )
     destCenter = p;
     if ( !animated )
         center = p;
+    else
+        centerMoving = true;
 }
 
 void Camera::setLookat( float x, float y, float z )
@@ -86,6 +93,8 @@ void Camera::moveLookat( float x, float y, float z )
     destLookat = Point( x, y, z );
     if ( !animated )
         lookat = Point( x, y, z );
+    else
+        lookatMoving = true;
 }
 
 void Camera::moveLookat( Point p )
@@ -102,12 +111,27 @@ void Camera::setEarth( Earth* e )
 
 void Camera::animateValues()
 {
-    center = center + ( ( destCenter - center ) / 5.0f );
-    lookat = lookat + ( ( destLookat - lookat ) / 5.0f );
-    // not doing anim for up vector yet, might have to be different?
+    if ( centerMoving )
+    {
+        center = center + ( ( destCenter - center ) / 5.0f );
 
-    if ( center.findDistance( destCenter ) < 0.01f )
-        center = destCenter;
-    if ( lookat.findDistance( destLookat ) < 0.01f )
-        lookat = destLookat;
+        if ( center.findDistance( destCenter ) < 0.01f )
+        {
+            center = destCenter;
+            centerMoving = false;
+        }
+    }
+
+    if ( lookatMoving )
+    {
+        lookat = lookat + ( ( destLookat - lookat ) / 5.0f );
+
+        if ( lookat.findDistance( destLookat ) < 0.01f )
+        {
+            lookat = destLookat;
+            lookatMoving = false;
+        }
+    }
+
+    // not doing anim for up vector yet, might have to be different?
 }
