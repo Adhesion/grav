@@ -57,6 +57,7 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     borderScale = other.borderScale;
     titleStyle = other.titleStyle;
     coloredText = other.coloredText;
+    nameSizeDirty = other.nameSizeDirty;
 
     borderTex = other.borderTex;
     twidth = other.twidth; theight = other.theight;
@@ -106,6 +107,7 @@ void RectangleBase::setDefaults()
     relativeTextScale = 0.0009;
     titleStyle = TOPTEXT;
     coloredText = true;
+    nameSizeDirty = false;
 
     borderScale = 0.04;
 
@@ -594,30 +596,7 @@ void RectangleBase::updateTextBounds()
 {
     if ( font )
     {
-        cutoffPos = -1;
-        textBounds = font->BBox( getSubName().c_str() );
-        // only do cutoff if title is at top - so if centered (or other?)
-        // display whole name even if it goes out of bounds
-        while ( titleStyle == TOPTEXT && getTextWidth() > getWidth() )
-        {
-            //relativeTextScale = 0.0009 * ( getWidth() / getTextWidth() );
-            if ( nameStart == -1 || nameEnd == -1 )
-            {
-                nameStart = 0;
-                nameEnd = getName().length();
-            }
-
-            int curEnd;
-            if ( cutoffPos == -1 )
-                curEnd = nameEnd;
-            else
-                curEnd = cutoffPos;
-            int numChars = curEnd - nameStart;
-
-            cutoffPos = curEnd - ceil( ( 1.0f -
-                  ( getWidth() / getTextWidth() ) ) * numChars ) - 1;
-            textBounds = font->BBox( getSubName().c_str() );
-        }
+        nameSizeDirty = true;
     }
 }
 
@@ -668,6 +647,38 @@ bool RectangleBase::getRendering()
 
 void RectangleBase::draw()
 {
+    // update the text bounds if that function was called - it's here because
+    // BBox() may do a GL call which needs to be on the main thread
+    if ( nameSizeDirty )
+    {
+        cutoffPos = -1;
+        textBounds = font->BBox( getSubName().c_str() );
+        // only do cutoff if title is at top - so if centered (or other?)
+        // display whole name even if it goes out of bounds
+        while ( titleStyle == TOPTEXT && getTextWidth() > getWidth() )
+        {
+            //relativeTextScale = 0.0009 * ( getWidth() / getTextWidth() );
+            if ( nameStart == -1 || nameEnd == -1 )
+            {
+                nameStart = 0;
+                nameEnd = getName().length();
+            }
+
+            int curEnd;
+            if ( cutoffPos == -1 )
+                curEnd = nameEnd;
+            else
+                curEnd = cutoffPos;
+            int numChars = curEnd - nameStart;
+
+            cutoffPos = curEnd - ceil( ( 1.0f -
+                  ( getWidth() / getTextWidth() ) ) * numChars ) - 1;
+            textBounds = font->BBox( getSubName().c_str() );
+        }
+
+        nameSizeDirty = false;
+    }
+
     animateValues();
 
     // set up our position

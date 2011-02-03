@@ -54,8 +54,19 @@ bool GLUtil::initGL()
 
     // TODO: check whether we can redistribute a font instead of looking in
     //       a system spot, which would have to be different per-platform
-    mainFont = new FTBufferFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
-    mainFont->FaceSize(100);
+    mainFont = new FTTextureFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
+    if ( mainFont->Error() )
+    {
+        printf( "GLUtil::initGL(): ERROR: font failed to load\n" );
+        delete mainFont;
+        mainFont = NULL;
+        return false;
+    }
+    else
+    {
+        printf( "GLUtil::initGL(): font created\n" );
+        mainFont->FaceSize(100);
+    }
 
     // TODO this is platform-specific, see the glxew include in glutil.h
     // disabled for now, doesn't seem to work

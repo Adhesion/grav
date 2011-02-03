@@ -26,6 +26,8 @@
 
 #include "gravManager.h"
 
+#include <VPMedia/random_helper.h>
+
 gravManager::gravManager()
 {
     windowWidth = 0; windowHeight = 0; // this should be set immediately
@@ -466,8 +468,22 @@ void gravManager::addTestObject()
 {
     RectangleBase* obj = new RectangleBase( 0.0f, 0.0f );
     drawnObjects->push_back( obj );
-    obj->setName( "TEST" );
-    //runway->add( obj );
+    bool useRandName = true;
+    if ( useRandName )
+    {
+        int nameLength = 10;
+        std::string randName;
+        for( int i = 0; i < nameLength; i++ )
+        {
+            int rand = ((float)random32() / (float)random32_max() * 95) + 32;
+            randName += (char)rand;
+        }
+        obj->setName( randName );
+    }
+    else
+    {
+        obj->setName( "TEST" );
+    }
     obj->setTexture( borderTex, borderWidth, borderHeight );
     obj->setUserDeletable( true );
 }
@@ -1214,6 +1230,8 @@ void gravManager::setHeaderString( std::string h )
     headerString = h;
     useHeader = headerString.compare( "" ) != 0;
 
+    // since BBox may do some GL calls, any calls to this function must be on
+    // the main thread
     if ( GLUtil::getInstance()->getMainFont() )
         headerTextBox = GLUtil::getInstance()->getMainFont()->BBox(
                             headerString.c_str() );
