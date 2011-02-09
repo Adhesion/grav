@@ -34,6 +34,8 @@ include_directories(
 	${wxWidgets_INCLUDE_DIRS}
 	${VPMEDIA_INCLUDE_DIRS}
 	${PYTHON_INCLUDE_DIRS}
+	# stupid compatibility thing for cmake 2.6 :(
+	${PYTHON_INCLUDE_PATH}
 	include/
 	)
 
