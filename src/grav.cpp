@@ -107,7 +107,13 @@ bool gravApp::OnInit()
 
     // initialize GL stuff (+ shaders) needs to be done AFTER attriblist is
     // used in making the canvas
-    GLUtil::getInstance()->initGL();
+    if ( !GLUtil::getInstance()->initGL() )
+    {
+        // bail out if something failed
+        printf( "grav::OnInit(): ERROR: initGL() failed, exiting\n" );
+        delete grav;
+        return false;
+    }
 
     if ( headerSet )
         grav->setHeaderString( header );

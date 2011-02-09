@@ -52,9 +52,8 @@ bool GLUtil::initGL()
         printf( "GLUtil::initGL(): shaders NOT available (GL v%s)\n", glVer );
     }
 
-    // TODO: check whether we can redistribute a font instead of looking in
-    //       a system spot, which would have to be different per-platform
-    mainFont = new FTTextureFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
+    // TODO: could use a good way to find system-specific font dirs
+    mainFont = new FTTextureFont( "FreeSans.ttf" );
     if ( mainFont->Error() )
     {
         printf( "GLUtil::initGL(): ERROR: font failed to load\n" );
@@ -65,7 +64,7 @@ bool GLUtil::initGL()
     else
     {
         printf( "GLUtil::initGL(): font created\n" );
-        mainFont->FaceSize(100);
+        mainFont->FaceSize( 100 );
     }
 
     // TODO this is platform-specific, see the glxew include in glutil.h
