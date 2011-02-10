@@ -417,7 +417,7 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
     return true;
 }
 
-bool LayoutManager::focus( RectangleBase innerRect, RectangleBase outerRect,
+bool LayoutManager::focus( RectangleBase outerRect, RectangleBase innerRect,
                           std::map<std::string, std::vector<RectangleBase*> > data,
                           std::map<std::string, std::string> opts)
 {
@@ -431,15 +431,15 @@ bool LayoutManager::focus( RectangleBase innerRect, RectangleBase outerRect,
     float outerU = outerRect.getUBound();
     float outerD = outerRect.getDBound();
 
-    return focus( innerL, innerR, innerU, innerD,
-                  outerL, outerR, outerU, outerD,
+    return focus( outerL, outerR, outerU, outerD,
+                  innerL, innerR, innerU, innerD,
                   data, opts );
 }
 
-bool LayoutManager::focus( float innerL, float innerR,
-                           float innerU, float innerD,
-                           float outerL, float outerR,
+bool LayoutManager::focus( float outerL, float outerR,
                            float outerU, float outerD,
+                           float innerL, float innerR,
+                           float innerU, float innerD,
                            std::map<std::string, std::vector<RectangleBase*> > data,
                            std::map<std::string, std::string> opts)
 {
@@ -474,10 +474,10 @@ bool LayoutManager::focus( float innerL, float innerR,
     float scaleX = str2fl(opts["scaleX"]);
     float scaleY = str2fl(opts["scaleY"]);
 
-    float centerX = ( innerL + innerR ) / 2.0f;
-    float centerY = ( innerD + innerU ) / 2.0f;
-    float Xdist = ( innerR - innerL ) * scaleX / 2.0f;
-    float Ydist = ( innerU - innerD ) * scaleY / 2.0f;
+    float centerX = ( outerL + outerR ) / 2.0f;
+    float centerY = ( outerD + outerU ) / 2.0f;
+    float Xdist = ( outerR - outerL ) * scaleX / 2.0f;
+    float Ydist = ( outerU - outerD ) * scaleY / 2.0f;
     // .95f to give some extra room
     // TODO make this an argument?
     // could be easier now with the opts map?
@@ -498,7 +498,7 @@ bool LayoutManager::focus( float innerL, float innerR,
                                  true, false, true,
                                  a_data );
     a_data["objects"] = outers;
-    perimeterArrange( innerL, innerR, innerU, innerD,
+    perimeterArrange( outerL, outerR, outerU, outerD,
                         perimeterInnerL, perimeterInnerR,
                         perimeterInnerU, perimeterInnerD,
                         a_data );

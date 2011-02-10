@@ -34,12 +34,11 @@ public:
                   std::map<std::string, std::string> options=std::map<std::string, std::string>());
 
 private:
-    // TODO -- Need another fake rect here
-    bool focus( RectangleBase innerRect, RectangleBase outerRect,
+    bool focus( RectangleBase outerRect, RectangleBase innerRect,
                     std::map<std::string, std::vector<RectangleBase*> > data,
                     std::map<std::string, std::string> options=std::map<std::string, std::string>());
-    bool focus( float innerL, float innerR, float innerU, float innerD,
-                float outerL, float outerR, float outerU, float outerD,
+    bool focus( float outerL, float outerR, float outerU, float outerD,
+                float innerL, float innerR, float innerU, float innerD,
                 std::map<std::string, std::vector<RectangleBase*> > data,
                 std::map<std::string, std::string> options=std::map<std::string, std::string>());
     bool perimeterArrange( RectangleBase outerRect, RectangleBase innerRect,
