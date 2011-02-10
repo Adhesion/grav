@@ -14,7 +14,7 @@
 #ifndef __PYTHONTOOLS_H_
 #define __PYTHONTOOLS_H_
 
-#include <python2.6/Python.h>
+#include <Python.h>
 #include <string>
 #include <vector>
 #include <map>

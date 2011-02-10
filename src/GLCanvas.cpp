@@ -35,6 +35,7 @@ GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
     fpsResult = 0;
 
     useDebugTimers = false;
+    renderTimer = NULL;
 }
 
 GLCanvas::~GLCanvas()
@@ -136,12 +137,16 @@ void GLCanvas::GLreshape( int w, int h )
 
 void GLCanvas::stopTimer()
 {
-    renderTimer->Stop();
+    if ( renderTimer != NULL )
+    {
+        renderTimer->Stop();
+    }
 }
 
 void GLCanvas::setTimer( RenderTimer* t )
 {
-    renderTimer = t;
+    if ( renderTimer != NULL )
+        renderTimer = t;
 }
 
 long GLCanvas::getDrawTime()

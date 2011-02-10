@@ -27,6 +27,10 @@ public:
      * Returns the vector distance between two points.
      */
     Vector operator-( const Point& other );
+    /*
+     * Returns a new point: result of adding vector v to this point.
+     */
+    Point operator+( const Vector& v );
 
     Vector toVector();
 

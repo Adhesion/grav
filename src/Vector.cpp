@@ -58,3 +58,10 @@ float Vector::getLength()
 {
     return sqrt( ( x * x ) + ( y * y ) + ( z * z ) );
 }
+
+Vector Vector::operator/( const float& factor )
+{
+    if ( factor < 0.0001f && factor > -0.0001f )
+        return Vector( x, y, z );
+    return Vector( x / factor, y / factor, z / factor );
+}

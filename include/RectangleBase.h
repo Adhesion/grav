@@ -274,6 +274,10 @@ protected:
     // temp thing for calculating size - possible change to an enum
     TextStyle titleStyle;
     bool coloredText;
+    // this is a bool flag for updating the text bounding box the next time the
+    // object is drawn - this is because it may do a GL call, which can only be
+    // on the main thread
+    bool nameSizeDirty;
 
     // size of the border relative to total size
     float borderScale;
