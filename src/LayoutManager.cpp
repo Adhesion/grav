@@ -103,7 +103,6 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
     }
     std::vector<RectangleBase*> objects = data["objects"];
 
-
     float topRatio = (innerR-innerL) / ((outerU-outerD)+(innerR-innerL));
     float sideRatio = (outerU-outerD) / ((outerU-outerD)+(innerR-innerL));
     int topNum, sideNum, bottomNum;
@@ -458,7 +457,7 @@ bool LayoutManager::focus( float outerL, float outerR,
     std::vector<RectangleBase*> inners = data["inners"];
 
     // Setup opts defaults
-    std::map<std::string, std::string> dflt = \
+    std::map<std::string, std::string> dflt =
         std::map<std::string, std::string>();
     dflt["scaleX"] = "0.65";   dflt["scaleY"] = "0.6";
 
@@ -471,37 +470,63 @@ bool LayoutManager::focus( float outerL, float outerR,
             opts[i->first] = i->second;
     }
 
-    float scaleX = str2fl(opts["scaleX"]);
-    float scaleY = str2fl(opts["scaleY"]);
+    float gridInnerL;
+    float gridInnerR;
+    float gridInnerU;
+    float gridInnerD;
+    float perimeterInnerL;
+    float perimeterInnerR;
+    float perimeterInnerU;
+    float perimeterInnerD;
 
-    float centerX = ( outerL + outerR ) / 2.0f;
-    float centerY = ( outerD + outerU ) / 2.0f;
-    float Xdist = ( outerR - outerL ) * scaleX / 2.0f;
-    float Ydist = ( outerU - outerD ) * scaleY / 2.0f;
-    // .95f to give some extra room
-    // TODO make this an argument?
-    // could be easier now with the opts map?
-    float gridInnerL = centerX - (Xdist*0.95f);
-    float gridInnerR = centerX + (Xdist*0.95f);
-    float gridInnerU = centerY + (Ydist*0.95f);
-    float gridInnerD = centerY - (Ydist*0.95f);
-    float perimeterInnerL = centerX - Xdist;
-    float perimeterInnerR = centerX + Xdist;
-    float perimeterInnerU = centerY + Ydist;
-    float perimeterInnerD = centerY - Ydist;
+    // if there aren't any objects in the outside, just size the inner objects
+    // fully to the center as a grid
+    if ( outers.empty() )
+    {
+        gridInnerL = outerL;
+        gridInnerR = outerR;
+        gridInnerU = outerU;
+        gridInnerD = outerD;
+    }
+    else
+    {
+        float scaleX = str2fl(opts["scaleX"]);
+        float scaleY = str2fl(opts["scaleY"]);
+
+        float centerX = ( outerL + outerR ) / 2.0f;
+        float centerY = ( outerD + outerU ) / 2.0f;
+        float Xdist = ( outerR - outerL ) * scaleX / 2.0f;
+        float Ydist = ( outerU - outerD ) * scaleY / 2.0f;
+        // .95f to give some extra room
+        // TODO make this an argument?
+        // could be easier now with the opts map?
+        gridInnerL = centerX - (Xdist*0.95f);
+        gridInnerR = centerX + (Xdist*0.95f);
+        gridInnerU = centerY + (Ydist*0.95f);
+        gridInnerD = centerY - (Ydist*0.95f);
+        perimeterInnerL = centerX - Xdist;
+        perimeterInnerR = centerX + Xdist;
+        perimeterInnerU = centerY + Ydist;
+        perimeterInnerD = centerY - Ydist;
+    }
 
     std::map<std::string, std::vector<RectangleBase*> > a_data =
         std::map<std::string, std::vector<RectangleBase*> >();
     a_data["objects"] = inners;
 
-    bool grid = gridArrange( gridInnerL, gridInnerR, gridInnerU, gridInnerD,
+    bool gridRes = gridArrange( gridInnerL, gridInnerR, gridInnerU, gridInnerD,
                                  true, false, true,
                                  a_data );
-    a_data["objects"] = outers;
-    perimeterArrange( outerL, outerR, outerU, outerD,
-                        perimeterInnerL, perimeterInnerR,
-                        perimeterInnerU, perimeterInnerD,
-                        a_data );
 
-    return grid;
+    bool perimRes = true;
+    if ( !outers.empty() )
+    {
+        a_data["objects"] = outers;
+        perimRes = perimeterArrange( outerL, outerR, outerU, outerD,
+                            perimeterInnerL, perimeterInnerR,
+                            perimeterInnerU, perimeterInnerD,
+                            a_data );
+    }
+
+    return gridRes && perimRes;
 }
