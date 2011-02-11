@@ -470,10 +470,10 @@ bool LayoutManager::focus( float outerL, float outerR,
             opts[i->first] = i->second;
     }
 
-    float gridInnerL;
-    float gridInnerR;
-    float gridInnerU;
-    float gridInnerD;
+    float gridBoundL;
+    float gridBoundR;
+    float gridBoundU;
+    float gridBoundD;
     float perimeterInnerL;
     float perimeterInnerR;
     float perimeterInnerU;
@@ -483,10 +483,10 @@ bool LayoutManager::focus( float outerL, float outerR,
     // fully to the center as a grid
     if ( outers.empty() )
     {
-        gridInnerL = outerL;
-        gridInnerR = outerR;
-        gridInnerU = outerU;
-        gridInnerD = outerD;
+        gridBoundL = outerL;
+        gridBoundR = outerR;
+        gridBoundU = outerU;
+        gridBoundD = outerD;
     }
     else
     {
@@ -500,10 +500,10 @@ bool LayoutManager::focus( float outerL, float outerR,
         // .95f to give some extra room
         // TODO make this an argument?
         // could be easier now with the opts map?
-        gridInnerL = centerX - (Xdist*0.95f);
-        gridInnerR = centerX + (Xdist*0.95f);
-        gridInnerU = centerY + (Ydist*0.95f);
-        gridInnerD = centerY - (Ydist*0.95f);
+        gridBoundL = centerX - (Xdist*0.95f);
+        gridBoundR = centerX + (Xdist*0.95f);
+        gridBoundU = centerY + (Ydist*0.95f);
+        gridBoundD = centerY - (Ydist*0.95f);
         perimeterInnerL = centerX - Xdist;
         perimeterInnerR = centerX + Xdist;
         perimeterInnerU = centerY + Ydist;
@@ -514,7 +514,7 @@ bool LayoutManager::focus( float outerL, float outerR,
         std::map<std::string, std::vector<RectangleBase*> >();
     a_data["objects"] = inners;
 
-    bool gridRes = gridArrange( gridInnerL, gridInnerR, gridInnerU, gridInnerD,
+    bool gridRes = gridArrange( gridBoundL, gridBoundR, gridBoundU, gridBoundD,
                                  true, false, true,
                                  a_data );
 
