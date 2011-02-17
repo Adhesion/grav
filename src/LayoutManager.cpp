@@ -490,13 +490,31 @@ bool LayoutManager::focus( float outerL, float outerR,
     }
     else
     {
-        float scaleX = str2fl(opts["scaleX"]);
+        /*float scaleX = str2fl(opts["scaleX"]);
         float scaleY = str2fl(opts["scaleY"]);
 
         float centerX = ( outerL + outerR ) / 2.0f;
         float centerY = ( outerD + outerU ) / 2.0f;
         float Xdist = ( outerR - outerL ) * scaleX / 2.0f;
         float Ydist = ( outerU - outerD ) * scaleY / 2.0f;
+        // .95f to give some extra room
+        // TODO make this an argument?
+        // could be easier now with the opts map?
+        gridBoundL = centerX - (Xdist*0.95f);
+        gridBoundR = centerX + (Xdist*0.95f);
+        gridBoundU = centerY + (Ydist*0.95f);
+        gridBoundD = centerY - (Ydist*0.95f);
+        perimeterInnerL = centerX - Xdist;
+        perimeterInnerR = centerX + Xdist;
+        perimeterInnerU = centerY + Ydist;
+        perimeterInnerD = centerY - Ydist;*/
+
+        printf( "Layouts::focus: have inners, innerrect %f %f %f %f\n",
+                    innerL, innerR, innerU, innerD );
+        float centerX = ( innerL + innerR ) / 2.0f;
+        float centerY = ( innerD + innerU ) / 2.0f;
+        float Xdist = ( innerR - innerL ) / 2.0f;
+        float Ydist = ( innerU - innerD ) / 2.0f;
         // .95f to give some extra room
         // TODO make this an argument?
         // could be easier now with the opts map?

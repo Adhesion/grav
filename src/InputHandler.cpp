@@ -274,8 +274,12 @@ void InputHandler::handleFocusArrange()
         std::map<std::string, std::vector<RectangleBase*> > data;
         data["outers"] = grav->getUnselectedObjects();
         data["inners"] = *(grav->getSelectedObjects());
-        layouts.arrange( "focus", grav->getScreenRect(),
-                          RectangleBase(), data );
+        RectangleBase inner = grav->getScreenRect();
+        // these vals size it such that the inner rect size is 60% of the screen
+        // height and its aspect ratio is 14:9
+        inner.setScale( inner.getDestHeight() * 0.93333,
+                        inner.getDestHeight() * 0.6f );
+        layouts.arrange( "focus", grav->getScreenRect(), inner, data );
     }
 }
 
