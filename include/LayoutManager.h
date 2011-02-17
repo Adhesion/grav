@@ -18,7 +18,7 @@ class RectangleBase;
 
 class LayoutManager
 {
-    
+
 public:
     LayoutManager();
 
@@ -41,6 +41,19 @@ private:
                 float innerL, float innerR, float innerU, float innerD,
                 std::map<std::string, std::vector<RectangleBase*> > data,
                 std::map<std::string, std::string> options=std::map<std::string, std::string>());
+
+    // helper function to make an inner rect based on "aspect" and "scale"
+    // options.
+    // inner rect supplied is ignored.
+    // like focus, must be passed data["outers"] and data["inners"]
+    bool aspectFocus( RectangleBase outerRect, RectangleBase innerRect,
+                    std::map<std::string, std::vector<RectangleBase*> > data,
+                    std::map<std::string, std::string> options=std::map<std::string, std::string>());
+    bool aspectFocus( float outerL, float outerR, float outerU, float outerD,
+                float innerL, float innerR, float innerU, float innerD,
+                std::map<std::string, std::vector<RectangleBase*> > data,
+                std::map<std::string, std::string> options=std::map<std::string, std::string>());
+
     bool perimeterArrange( RectangleBase outerRect, RectangleBase innerRect,
                             std::map<std::string, std::vector<RectangleBase*> > data,
                             std::map<std::string, std::string> options=std::map<std::string, std::string>());
@@ -49,6 +62,7 @@ private:
                             float innerU, float innerD,
                             std::map<std::string, std::vector<RectangleBase*> > data,
                             std::map<std::string, std::string> options=std::map<std::string, std::string>());
+
     bool gridArrange( RectangleBase innerRect,
                         bool horiz, bool edge, bool resize,
                         std::map<std::string, std::vector<RectangleBase*> > data,

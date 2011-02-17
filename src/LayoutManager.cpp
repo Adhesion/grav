@@ -15,7 +15,6 @@
 LayoutManager::LayoutManager()
 { }
 
-
 bool LayoutManager::arrange( std::string method,
                              RectangleBase outerRect,
                              RectangleBase innerRect,
@@ -56,6 +55,7 @@ bool LayoutManager::arrange( std::string method,
     lookup["perimeter"] = &LayoutManager::perimeterArrange;
     lookup["grid"]      = &LayoutManager::gridArrange;
     lookup["focus"]     = &LayoutManager::focus;
+    lookup["aspectFocus"] = &LayoutManager::aspectFocus;
 
     if ( lookup.find(method) == lookup.end() )
     {
@@ -66,7 +66,6 @@ bool LayoutManager::arrange( std::string method,
                                     innerL, innerR, innerU, innerD,
                                     data, options );
 }
-
 
 bool LayoutManager::perimeterArrange( RectangleBase outerRect,
                                         RectangleBase innerRect,
@@ -233,6 +232,7 @@ bool LayoutManager::gridArrange(float outerL, float outerR,
                        str2int(opts["numX"]),
                        str2int(opts["numY"]));
 }
+
 bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
                                     float outerD,
                                     bool horiz, bool edge, bool resize,
@@ -445,12 +445,12 @@ bool LayoutManager::focus( float outerL, float outerR,
     // Extract object data
     if ( data.find("outers") == data.end() )
     {
-        printf( "ZOMG:::: gridArrange was not passed an 'outers'\n" );
+        printf( "ZOMG:::: focus was not passed an 'outers'\n" );
         return false;
     }
     if ( data.find("inners") == data.end() )
     {
-        printf( "ZOMG:::: gridArrange was not passed an 'inners'\n" );
+        printf( "ZOMG:::: focus was not passed an 'inners'\n" );
         return false;
     }
     std::vector<RectangleBase*> outers = data["outers"];
@@ -547,4 +547,88 @@ bool LayoutManager::focus( float outerL, float outerR,
     }
 
     return gridRes && perimRes;
+}
+
+bool LayoutManager::aspectFocus( RectangleBase outerRect, RectangleBase innerRect,
+                std::map<std::string, std::vector<RectangleBase*> > data,
+                std::map<std::string, std::string> opts )
+{
+    float innerL = innerRect.getLBound();
+    float innerR = innerRect.getRBound();
+    float innerU = innerRect.getUBound();
+    float innerD = innerRect.getDBound();
+
+    float outerL = outerRect.getLBound();
+    float outerR = outerRect.getRBound();
+    float outerU = outerRect.getUBound();
+    float outerD = outerRect.getDBound();
+
+    return aspectFocus( outerL, outerR, outerU, outerD,
+                  innerL, innerR, innerU, innerD,
+                  data, opts );
+}
+
+bool LayoutManager::aspectFocus( float outerL, float outerR, float outerU, float outerD,
+            float innerL, float innerR, float innerU, float innerD,
+            std::map<std::string, std::vector<RectangleBase*> > data,
+            std::map<std::string, std::string> opts )
+{
+    // Extract object data
+    if ( data.find("outers") == data.end() )
+    {
+        printf( "ZOMG:::: aspectfocus was not passed an 'outers'\n" );
+        return false;
+    }
+    if ( data.find("inners") == data.end() )
+    {
+        printf( "ZOMG:::: aspectfocus was not passed an 'inners'\n" );
+        return false;
+    }
+    std::vector<RectangleBase*> outers = data["outers"];
+    std::vector<RectangleBase*> inners = data["inners"];
+
+    // Setup opts defaults
+    std::map<std::string, std::string> dflt =
+        std::map<std::string, std::string>();
+    dflt["aspect"] = "1.5555";
+    dflt["scale"] = "0.65";
+
+    // Apply the opts defaults to opts
+    for (std::map<std::string,std::string>::iterator i = dflt.begin();
+         i != dflt.end(); i++)
+    {
+        // If the value wasn't specified by our caller, then load the default
+        if ( opts.find(i->first) == opts.end() )
+            opts[i->first] = i->second;
+    }
+
+    float outerAspect = ( outerR - outerL ) / ( outerU - outerD );
+    float aspect = str2fl( opts["aspect"] );
+    float scale = str2fl( opts["scale"] );
+    float centerX = ( outerL + outerR ) / 2.0f;
+    float centerY = ( outerD + outerU ) / 2.0f;
+    float width = outerR - outerL;
+    float height = outerU - outerD;
+    float xScale = 1.0f;
+    float yScale = 1.0f;
+
+    if ( aspect >= outerAspect )
+    {
+        xScale = scale * width / 2.0f;
+        yScale = xScale / aspect;
+    }
+    else
+    {
+        yScale = scale * height / 2.0f;
+        xScale = yScale * aspect;
+    }
+
+    innerL = centerX - xScale;
+    innerR = centerX + xScale;
+    innerU = centerY + yScale;
+    innerD = centerY - yScale;
+
+    return focus( outerL, outerR, outerU, outerD,
+                  innerL, innerR, innerU, innerD,
+                  data, opts );
 }
