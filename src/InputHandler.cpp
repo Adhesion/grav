@@ -94,7 +94,12 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     docstr[ktoh('=')] = "Upscale selected objects.";
     lookup[ktoh('F', wxMOD_SHIFT)] =
                         &InputHandler::handleFullscreenSelectedSingle;
-    docstr[ktoh('F', wxMOD_SHIFT)] = "Fullscreen selected object(s).";
+    docstr[ktoh('F', wxMOD_SHIFT)] =
+                "Fullscreen selected object (includes border and text).";
+    lookup[ktoh('F', wxMOD_SHIFT | wxMOD_CMD)] =
+                        &InputHandler::handleFullerFullscreenSelectedSingle;
+    docstr[ktoh('F', wxMOD_SHIFT | wxMOD_CMD)] =
+                "Fullscreen selected object (video/inner contents of object).";
     lookup[ktoh('M')] = &InputHandler::handleMuteSelected;
     docstr[ktoh('M')] = "Mute selected objects.";
     lookup[ktoh('N')] = &InputHandler::handleNativeScaleSelected;
@@ -284,6 +289,15 @@ void InputHandler::handleFullscreenSelectedSingle()
     if ( grav->getSelectedObjects()->size() == 1 )
     {
         (*grav->getSelectedObjects())[0]->fillToRect(grav->getScreenRect());
+    }
+}
+
+void InputHandler::handleFullerFullscreenSelectedSingle()
+{
+    if ( grav->getSelectedObjects()->size() == 1 )
+    {
+        (*grav->getSelectedObjects())[0]->fillToRect(
+                grav->getScreenRect( true ), true );
     }
 }
 

@@ -122,8 +122,9 @@ public:
     /*
      * Fill to another rectangle.
      */
-    void fillToRect( RectangleBase rect );
-    void fillToRect( float left, float right, float up, float down );
+    void fillToRect( RectangleBase rect, bool full = false );
+    void fillToRect( float left, float right, float up, float down,
+                        bool full = false );
 
     /*
      * Set the background texture for this object.

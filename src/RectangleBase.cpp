@@ -337,24 +337,44 @@ void RectangleBase::setBorderScale( float b )
     borderScale = b;
 }
 
-void RectangleBase::fillToRect( RectangleBase r )
+void RectangleBase::fillToRect( RectangleBase r, bool full )
 {
-    fillToRect(r.getLBound(), r.getRBound(), r.getUBound(), r.getDBound());
+    fillToRect( r.getLBound(), r.getRBound(), r.getUBound(), r.getDBound(),
+                    full );
 }
+
 void RectangleBase::fillToRect( float innerL, float innerR,
-                                float innerU, float innerD )
+                                float innerU, float innerD, bool full )
 {
     float spaceAspect = fabs( ( innerR - innerL ) / ( innerU - innerD ) );
-    float objectAspect = getTotalWidth() / getTotalHeight();
 
-    if ( ( spaceAspect - objectAspect ) > 0.01f )
-        setTotalHeight( innerU - innerD );
+    // full sizes the object such that the inner part of the rect will match
+    // the argument rect, full = false sizes it such that the border and text
+    // fit in the argument rect (hence using total width/height)
+    if ( full )
+    {
+        float objectAspect = getWidth() / getHeight();
+
+        if ( ( spaceAspect - objectAspect ) > 0.01f )
+            setHeight( innerU - innerD );
+        else
+            setWidth( innerR - innerL );
+
+        move( ( innerR + innerL ) / 2.0f, ( innerU + innerD ) / 2.0f );
+    }
     else
-        setTotalWidth( innerR - innerL );
+    {
+        float objectAspect = getTotalWidth() / getTotalHeight();
 
-    // TODO need to change this if getCenterOffsetX() is ever meaningful
-    move( ( innerR + innerL ) / 2.0f,
-          ( ( innerU + innerD ) / 2.0f ) - getCenterOffsetY() );
+        if ( ( spaceAspect - objectAspect ) > 0.01f )
+            setTotalHeight( innerU - innerD );
+        else
+            setTotalWidth( innerR - innerL );
+        // TODO need to change this if getCenterOffsetX() is ever meaningful
+        // and maybe the above one as well
+        move( ( innerR + innerL ) / 2.0f,
+              ( ( innerU + innerD ) / 2.0f ) - getCenterOffsetY() );
+    }
 }
 
 void RectangleBase::setTexture( GLuint tex, int width, int height )
