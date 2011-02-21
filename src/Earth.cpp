@@ -183,7 +183,6 @@ void Earth::rotate( float x, float y, float z )
     xRot += x;
     yRot += y;
     zRot += z;
-    printf( "Earth::rotate: rotation vals now %f,%f,%f\n", xRot, yRot, zRot );
 }
 
 float Earth::getX()

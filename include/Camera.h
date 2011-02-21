@@ -22,8 +22,11 @@ public:
     void doGLLookat();
 
     Point getCenter();
+    Point getDestCenter();
     Point getLookat();
+    Point getDestLookat();
     Vector getLookatDir();
+    Vector getDestLookatDir();
 
     /*
      * Set always snaps, move may animate. Similar to RectangleBase.

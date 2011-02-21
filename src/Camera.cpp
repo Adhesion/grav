@@ -36,14 +36,29 @@ Point Camera::getCenter()
     return center;
 }
 
+Point Camera::getDestCenter()
+{
+    return destCenter;
+}
+
 Point Camera::getLookat()
 {
     return lookat;
 }
 
+Point Camera::getDestLookat()
+{
+    return destLookat;
+}
+
 Vector Camera::getLookatDir()
 {
     return lookat - center;
+}
+
+Vector Camera::getDestLookatDir()
+{
+    return destLookat - destCenter;
 }
 
 void Camera::setCenter( float x, float y, float z )

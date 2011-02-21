@@ -1130,38 +1130,45 @@ Group* gravManager::createSiteIDGroup( std::string data )
     return g;
 }
 
+/*
+ * These use the destination center for the camera so that if you move the
+ * camera while it is being moved, the new point is relative to the destination
+ * point rather than the actual current point, which is in between the old point
+ * and the current destination, and moving based on that can cause new points
+ * to be off from what you might expect.
+ */
 float gravManager::getCamX()
 {
-    return cam->getCenter().getX();
+    return cam->getDestCenter().getX();
 }
 
 float gravManager::getCamY()
 {
-    return cam->getCenter().getY();
+    return cam->getDestCenter().getY();
 }
 
 float gravManager::getCamZ()
 {
-    return cam->getCenter().getZ();
+    return cam->getDestCenter().getZ();
 }
 
 void gravManager::setCamX( float x )
 {
-    Point p = cam->getCenter();
+    Point p = cam->getDestCenter();
     p.setX( x );
     cam->moveCenter( p );
 }
 
 void gravManager::setCamY( float y )
 {
-    Point p = cam->getCenter();
+    Point p = cam->getDestCenter();
     p.setY( y );
     cam->moveCenter( p );
 }
 
 void gravManager::setCamZ( float z )
 {
-    Point p = cam->getCenter();
+    Point p = cam->getDestCenter();
     p.setZ( z );
     cam->moveCenter( p );
 }
