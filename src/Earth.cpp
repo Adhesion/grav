@@ -17,8 +17,12 @@ Earth::Earth()
     x = 0.0f; y = 0.0f, z = -25.0f;
     radius = 15.0f;
     xRot = 0.0f; yRot = 0.0f; zRot = 0.0f;
+    destXRot = xRot; destYRot = yRot; destZRot = zRot;
     moveAmt = 1.0f;
     earthTex = PNGLoader::loadPNG( "earth.png", texWidth, texHeight );
+
+    animated = true;
+    rotating = false;
 
     sphereQuad = gluNewQuadric();
     gluQuadricTexture( sphereQuad, GL_TRUE );
@@ -56,6 +60,8 @@ Earth::~Earth()
 
 void Earth::draw()
 {
+    animateValues();
+
     glPushMatrix();
 
     glTranslatef( x, y, z );
@@ -180,9 +186,18 @@ void Earth::convertLatLong( float lat, float lon, float &ex, float &ey,
 
 void Earth::rotate( float x, float y, float z )
 {
-    xRot += x;
-    yRot += y;
-    zRot += z;
+    destXRot += x;
+    destYRot += y;
+    destZRot += z;
+
+    if ( !animated )
+    {
+        xRot += x;
+        yRot += y;
+        zRot += z;
+    }
+    else
+        rotating = true;
 }
 
 float Earth::getX()
@@ -203,4 +218,25 @@ float Earth::getZ()
 float Earth::getRadius()
 {
     return radius;
+}
+
+void Earth::animateValues()
+{
+    // this could be a bit better (individual bools for each axis) but this
+    // should be fine for now
+    if ( rotating )
+    {
+        xRot = xRot + ( ( destXRot - xRot ) / 5.0f );
+        yRot = yRot + ( ( destYRot - yRot ) / 5.0f );
+        zRot = zRot + ( ( destZRot - zRot ) / 5.0f );
+
+        if ( fabs( xRot - destXRot ) < 0.01f && fabs( yRot - destYRot ) < 0.01f
+                && fabs( zRot - destZRot ) < 0.01f )
+        {
+            xRot = destXRot;
+            yRot = destYRot;
+            zRot = destZRot;
+            rotating = false;
+        }
+    }
 }

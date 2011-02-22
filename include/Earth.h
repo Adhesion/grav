@@ -12,7 +12,7 @@
 
 class Earth
 {
-    
+
 public:
     Earth();
     ~Earth();
@@ -22,25 +22,32 @@ public:
     void rotate( float x, float y, float z );
     float getX(); float getY(); float getZ();
     float getRadius();
-    
+
 private:
     // texture ID & info
     GLuint earthTex;
     int texWidth, texHeight;
-    
+
     GLUquadric* sphereQuad;
     GLuint sphereIndex;
-    
+
+    // note, only doing animation for rotation for now
+    bool animated;
+    // indicator of whether the object is in motion
+    bool rotating;
+    void animateValues();
+
     float x, y, z;
     float radius;
     float xRot, yRot, zRot;
+    float destXRot, destYRot, destZRot;
     float testLat;
-    
+
     float moveAmt;
 
     // keep track of the transformation matrix to use with lat/long conversion
     GLdouble* matrix;
-    
+
 };
 
 #endif /*EARTH_H_*/

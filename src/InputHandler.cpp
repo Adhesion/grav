@@ -663,8 +663,6 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     case WXK_RIGHT:
         earth->rotate( 0.0f, 0.0f, 2.0f );
         break;
-
-
     }
 }
 
