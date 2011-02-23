@@ -319,7 +319,6 @@ protected:
              std::vector<float>::iterator points_last,
              float t);
     void finalizeAnimation();
-    void animateLinearBezier();
     void animateValues();
 
 };
