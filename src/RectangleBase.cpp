@@ -1005,6 +1005,15 @@ std::vector<float> RectangleBase::bezierSpecification(
         points.push_back(a + (z-a) * 0.99);
     } else if ( name == "snap" ) {
         points.push_back(a + (z-a) * 0.01);
+    } else if ( name == "wiggle" ) {
+        points.push_back(a + (z-a) * 2.5);
+        points.push_back(a + (z-a) * 0.0);
+        points.push_back(a + (z-a) * 1.5);
+        points.push_back(a + (z-a) * 0.9);
+    } else if ( name == "none" ) {
+        // pass
+    } else {
+        printf("Got unexpected animation name %s\n", name.c_str());
     }
 
     points.push_back(z);
