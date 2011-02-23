@@ -11,6 +11,7 @@
 #include "Point.h"
 
 #include <cmath>
+#include <sys/time.h>
 
 RectangleBase::RectangleBase()
 {
@@ -22,12 +23,21 @@ RectangleBase::RectangleBase( float _x, float _y )
     setDefaults();
     x = -15.0f; y = 15.0f; z = 0.0f;
     destX = _x; destY = _y;
+    origX = _x; origY = _y;
+
+    positionDuration = 2000;
+    scaleDuration = 2000;
+    colorDuration = 250;
+
+    anim_start = currentTime();
+
 }
 
 RectangleBase::RectangleBase( const RectangleBase& other )
 {
     x = other.x; y = other.y; z = other.z;
     destX = other.destX; destY = other.destY;
+    origX = other.origX; origY = other.origY;
     scaleX = other.scaleX; scaleY = other.scaleY;
     destScaleX = other.destScaleX; destScaleY = other.destScaleY;
     xAngle = other.xAngle; yAngle = other.yAngle; zAngle = other.zAngle;
@@ -90,6 +100,7 @@ void RectangleBase::setDefaults()
     xAngle = 0.0f; yAngle = 0.0f; zAngle = 0.0f;
     x = 0.0f; y = 0.0f; z = 0.0f;
     destX = x; destY = y;
+    origX = x; origY = y;
     destScaleX = scaleX; destScaleY = scaleY;
     // TODO make this actually based on the rotation
     normal = Vector( 0.0f, 0.0f, 1.0f );
@@ -284,21 +295,27 @@ float RectangleBase::getCenterOffsetY()
 void RectangleBase::move( float _x, float _y )
 {
     destX = _x;
+    origX = x;
     if ( !animated ) x = _x;
     destY = _y;
+    origY = y;
     if ( !animated ) y = _y;
+    anim_start = currentTime();
 }
 
 void RectangleBase::setPos( float _x, float _y )
 {
-    destX = _x; x = _x;
-    destY = _y; y = _y;
+    destX = _x; origX = _x; x = _x;
+    destY = _y; origY = _y; y = _y;
 }
 
 void RectangleBase::setScale( float xs, float ys )
 {
     destScaleX = xs; destScaleY = ys;
+    origScaleX = scaleX; origScaleY = scaleY;
+
     if ( !animated ) { scaleX = xs; scaleY = ys; }
+    anim_start = currentTime();
 }
 
 void RectangleBase::setScale( float xs, float ys, bool resizeMembers )
@@ -388,6 +405,11 @@ float RectangleBase::getX()
     return x;
 }
 
+float RectangleBase::getOrigX()
+{
+    return origX;
+}
+
 float RectangleBase::getDestX()
 {
     return destX;
@@ -396,6 +418,11 @@ float RectangleBase::getDestX()
 float RectangleBase::getY()
 {
     return y;
+}
+
+float RectangleBase::getOrigY()
+{
+    return origY;
 }
 
 float RectangleBase::getDestY()
@@ -565,17 +592,21 @@ RGBAColor RectangleBase::getSecondaryColor()
 void RectangleBase::setColor( RGBAColor c )
 {
     destBColor = c;
+    origBColor = borderColor;
 
     if ( !animated )
         borderColor = destBColor;
+    anim_start = currentTime();
 }
 
 void RectangleBase::setSecondaryColor( RGBAColor c )
 {
     destSecondaryColor = c;
+    origSecondaryColor = secondaryColor;
 
     if ( !animated )
         secondaryColor = destSecondaryColor;
+    anim_start = currentTime();
 }
 
 void RectangleBase::resetColor()
@@ -903,8 +934,74 @@ void RectangleBase::drawBorder( float Xdist, float Ydist, float s, float t )
     glDisable( GL_TEXTURE_2D );
 }
 
+// Get the current time in miliseconds
+uint32_t RectangleBase::currentTime()
+{
+    struct timeval  tv;
+    struct timezone tz;
+    gettimeofday(&tv, &tz);
+    return tv.tv_sec * 1000 + tv.tv_usec / 1000.0;
+}
+
+// simple linear interpolation between two points
+float RectangleBase::lerp(float x1, float x2, float t)
+{
+    return x1 + (x2 - x1)*t;
+}
+
+void RectangleBase::finalizeAnimation()
+{
+   origScaleX = destScaleX;
+   origScaleY = destScaleY;
+   origBColor = destBColor;
+   origSecondaryColor = destSecondaryColor;
+}
+
+// evaluate a point on a bezier-curve. t goes from 0 to 1.0
+void RectangleBase::animateLinearBezier()
+{
+    uint32_t current = currentTime();
+
+    float pt = (float)(current - anim_start)/positionDuration;
+    if ( pt > 0.0 && pt < 1.0 ) {
+        x = lerp(origX, destX, pt);
+        y = lerp(origY, destY, pt);
+    } else {
+        x = origX = destX;
+        y = origY = destY;
+    }
+
+    float st = (float)(current - anim_start)/scaleDuration;
+    if ( st > 0.0 && st < 1.0 ) {
+        scaleX = lerp(origScaleX, destScaleX, st);
+        scaleY = lerp(origScaleY, destScaleY, st);
+    } else {
+        scaleX = origScaleX = destScaleX;
+        scaleY = origScaleY = destScaleY;
+    }
+
+    float ct = (float)(current - anim_start)/colorDuration;
+    if ( ct > 0.0 && ct < 1.0 ) {
+        borderColor.R = lerp(origBColor.R, destBColor.R, ct);
+        borderColor.G = lerp(origBColor.G, destBColor.G, ct);
+        borderColor.B = lerp(origBColor.B, destBColor.B, ct);
+        borderColor.A = lerp(origBColor.A, destBColor.A, ct);
+        secondaryColor.R = lerp(origSecondaryColor.R, destSecondaryColor.R, ct);
+        secondaryColor.G = lerp(origSecondaryColor.G, destSecondaryColor.G, ct);
+        secondaryColor.B = lerp(origSecondaryColor.B, destSecondaryColor.B, ct);
+        secondaryColor.A = lerp(origSecondaryColor.A, destSecondaryColor.A, ct);
+    } else {
+        borderColor = origBColor = destBColor;
+        secondaryColor = origSecondaryColor = destSecondaryColor;
+    }
+
+}
+
 void RectangleBase::animateValues()
 {
+    animateLinearBezier();
+    return;
+
     // movement animation
     x += (destX-x)/7.5f;
     y += (destY-y)/7.5f;

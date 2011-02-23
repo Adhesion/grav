@@ -133,6 +133,7 @@ public:
 
     float getX(); float getY(); float getZ();
     float getDestX(); float getDestY();
+    float getOrigX(); float getOrigY();
     float getScaleX(); float getScaleY();
     float getLat(); float getLon();
 
@@ -241,9 +242,11 @@ protected:
     // position in world space (center of the object)
     float x,y,z;
     // x/y destinations for movement/animation
+    float origX, origY;
     float destX, destY;
     float xAngle, yAngle, zAngle;
     float scaleX, scaleY;
+    float origScaleX, origScaleY;
     float destScaleX, destScaleY;
     Vector normal;
 
@@ -254,9 +257,11 @@ protected:
     float lat, lon;
 
     RGBAColor borderColor;
+    RGBAColor origBColor;
     RGBAColor destBColor;
     RGBAColor baseBColor;
     RGBAColor secondaryColor;
+    RGBAColor origSecondaryColor;
     RGBAColor destSecondaryColor;
 
     std::string name;
@@ -300,6 +305,14 @@ protected:
     bool debugDraw;
 
     bool animated;
+    float positionDuration;
+    float scaleDuration;
+    float colorDuration;
+    uint32_t anim_start;
+    uint32_t currentTime();
+    float lerp(float x1, float x2, float t);
+    void finalizeAnimation();
+    void animateLinearBezier();
     void animateValues();
 
 };
