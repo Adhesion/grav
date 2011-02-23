@@ -957,6 +957,29 @@ void RectangleBase::finalizeAnimation()
    origSecondaryColor = destSecondaryColor;
 }
 
+float RectangleBase::bezier(
+                std::vector<float>::iterator points_first,
+                std::vector<float>::iterator points_last,
+                float t)
+{
+    if ( points_last - points_first == 2 )
+    {
+        return lerp(*points_first, *(points_last-1), t);
+    }
+
+    std::vector<float>::iterator left_first, left_last, right_first, right_last;
+    float left, right;
+
+    left_first = points_first;
+    left_last = points_last - 1;
+    left = bezier(left_first, left_last, t);
+
+    right_first = points_first + 1;
+    right_last = points_last;
+    right = bezier(right_first, right_last, t);
+
+    return lerp(left, right, t);
+}
 // evaluate a point on a bezier-curve. t goes from 0 to 1.0
 void RectangleBase::animateLinearBezier()
 {
@@ -964,7 +987,11 @@ void RectangleBase::animateLinearBezier()
 
     float pt = (float)(current - anim_start)/positionDuration;
     if ( pt > 0.0 && pt < 1.0 ) {
-        x = lerp(origX, destX, pt);
+        std::vector<float> points;
+        points.push_back(origX);
+        points.push_back(destX);
+        x = bezier(points.begin(), points.end(), pt);
+        //x = lerp(origX, destX, pt);
         y = lerp(origY, destY, pt);
     } else {
         x = origX = destX;

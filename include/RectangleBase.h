@@ -10,6 +10,7 @@
  */
 
 #include <string>
+#include <vector>
 
 #include "GLUtil.h"
 #include "Vector.h"
@@ -311,6 +312,10 @@ protected:
     uint32_t anim_start;
     uint32_t currentTime();
     float lerp(float x1, float x2, float t);
+    float bezier(
+             std::vector<float>::iterator points_first,
+             std::vector<float>::iterator points_last,
+             float t);
     void finalizeAnimation();
     void animateLinearBezier();
     void animateValues();
