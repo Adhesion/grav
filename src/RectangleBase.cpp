@@ -25,8 +25,9 @@ RectangleBase::RectangleBase( float _x, float _y )
     destX = _x; destY = _y;
     origX = _x; origY = _y;
 
-    positionDuration = 2000;
-    scaleDuration = 2000;
+    // This is time in milliseconds
+    positionDuration = 600;
+    scaleDuration = 600;
     colorDuration = 250;
 
     anim_start = currentTime();
@@ -981,31 +982,40 @@ float RectangleBase::bezier(
     return lerp(left, right, t);
 }
 
-std::vector<float> RectangleBase::bezierSpecification(float a, float z)
+// returns a list of points that specify a bezier curve.  has some named ones.
+std::vector<float> RectangleBase::bezierSpecification(
+                float a, float z, std::string name)
 {
     std::vector<float> points;
     points.push_back(a);
 
     // TODO -- play with introducing fancy points here.
-    points.push_back(a + (z-a) * -0.5);
-    points.push_back(a + (z-a) *  1.5);
+    if ( name == "aggressive" ) {
+        points.push_back(a + (z-a) * -0.25);
+        points.push_back(a + (z-a) *  1.25);
+    } else if ( name == "easy" ) {
+        points.push_back(a + (z-a) * 0.01);
+        points.push_back(a + (z-a) * 0.99);
+    }
 
     points.push_back(z);
     return points;
 }
 
 // evaluate a point on a bezier-curve. t goes from 0 to 1.0
-void RectangleBase::animateLinearBezier()
+void RectangleBase::animateValues()
 {
+    // TODO -- introduce booleans here that avoid computing anything unneeded
+    // TODO -- introduce bezier of the time variable 't' itself.
     uint32_t current = currentTime();
 
     std::vector<float> points;
     float pt = (float)(current - anim_start)/positionDuration;
     if ( pt > 0.0 && pt < 1.0 ) {
-        points = bezierSpecification(origX, destX);
+        points = bezierSpecification(origX, destX, "easy");
         x = bezier(points.begin(), points.end(), pt);
 
-        points = bezierSpecification(origY, destY);
+        points = bezierSpecification(origY, destY, "aggressive");
         y = bezier(points.begin(), points.end(), pt);
     } else {
         x = origX = destX;
