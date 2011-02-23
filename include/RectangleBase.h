@@ -306,10 +306,15 @@ protected:
     bool debugDraw;
 
     bool animated;
+
     float positionDuration;
     float scaleDuration;
     float colorDuration;
-    uint32_t anim_start;
+
+    uint32_t positionAnimStart;
+    uint32_t scaleAnimStart;
+    uint32_t colorAnimStart;
+
     uint32_t currentTime();
     float lerp(float x1, float x2, float t);
     std::vector<float> bezierSpecification(

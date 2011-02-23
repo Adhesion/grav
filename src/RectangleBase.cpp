@@ -30,7 +30,9 @@ RectangleBase::RectangleBase( float _x, float _y )
     scaleDuration = 600;
     colorDuration = 250;
 
-    anim_start = currentTime();
+    positionAnimStart = currentTime();
+    scaleAnimStart = currentTime();
+    colorAnimStart = currentTime();
 
 }
 
@@ -301,7 +303,7 @@ void RectangleBase::move( float _x, float _y )
     destY = _y;
     origY = y;
     if ( !animated ) y = _y;
-    anim_start = currentTime();
+    positionAnimStart = currentTime();
 }
 
 void RectangleBase::setPos( float _x, float _y )
@@ -316,7 +318,7 @@ void RectangleBase::setScale( float xs, float ys )
     origScaleX = scaleX; origScaleY = scaleY;
 
     if ( !animated ) { scaleX = xs; scaleY = ys; }
-    anim_start = currentTime();
+    scaleAnimStart = currentTime();
 }
 
 void RectangleBase::setScale( float xs, float ys, bool resizeMembers )
@@ -597,7 +599,7 @@ void RectangleBase::setColor( RGBAColor c )
 
     if ( !animated )
         borderColor = destBColor;
-    anim_start = currentTime();
+    colorAnimStart = currentTime();
 }
 
 void RectangleBase::setSecondaryColor( RGBAColor c )
@@ -607,7 +609,7 @@ void RectangleBase::setSecondaryColor( RGBAColor c )
 
     if ( !animated )
         secondaryColor = destSecondaryColor;
-    anim_start = currentTime();
+    colorAnimStart = currentTime();
 }
 
 void RectangleBase::resetColor()
@@ -1008,12 +1010,11 @@ std::vector<float> RectangleBase::bezierSpecification(
 void RectangleBase::animateValues()
 {
     // TODO -- introduce booleans here that avoid computing anything unneeded
-    // TODO -- keep three anim_start variables to kill the 'click bug'
     uint32_t current = currentTime();
 
     std::vector<float> points;
     std::vector<float> snap = bezierSpecification(0, 1, "snap");
-    float pt = (float)(current - anim_start)/positionDuration;
+    float pt = (float)(current - positionAnimStart)/positionDuration;
     if ( pt > 0.0 && pt < 1.0 ) {
         pt = bezier(snap.begin(), snap.end(), pt);
 
@@ -1027,7 +1028,7 @@ void RectangleBase::animateValues()
         y = origY = destY;
     }
 
-    float st = (float)(current - anim_start)/scaleDuration;
+    float st = (float)(current - scaleAnimStart)/scaleDuration;
     if ( st > 0.0 && st < 1.0 ) {
         st = bezier(snap.begin(), snap.end(), st);
 
@@ -1041,7 +1042,7 @@ void RectangleBase::animateValues()
         scaleY = origScaleY = destScaleY;
     }
 
-    float ct = (float)(current - anim_start)/colorDuration;
+    float ct = (float)(current - colorAnimStart)/colorDuration;
     if ( ct > 0.0 && ct < 1.0 ) {
         points = bezierSpecification(origBColor.R, destBColor.R);
         borderColor.R = bezier(points.begin(), points.end(), ct);
