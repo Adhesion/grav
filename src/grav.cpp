@@ -39,8 +39,11 @@ int gravApp::threadCounter = 0;
 bool gravApp::OnInit()
 {
     grav = new gravManager();
-    windowWidth = 900; windowHeight = 550; // defaults - should be command line
-    // grav's windowwidth/height will be set by the glcanvas's resize callback
+    // defaults - can be changed by command line
+    windowWidth = 900; windowHeight = 550;
+    startX = 10; startY = 50;
+    // gravManager's windowwidth/height will be set by the glcanvas's resize
+    // callback
 
     parser.SetCmdLine( argc, argv );
 
@@ -57,7 +60,8 @@ bool gravApp::OnInit()
     }
 
     // GUI setup
-    mainFrame = new Frame( (wxFrame*)NULL, -1, _("grav"), wxPoint( 10, 50 ),
+    mainFrame = new Frame( (wxFrame*)NULL, -1, _("grav"),
+                        wxPoint( startX, startY ),
                         wxSize( windowWidth, windowHeight ) );
     mainFrame->Show( true );
     mainFrame->SetName( _("main grav frame") );
@@ -359,6 +363,24 @@ bool gravApp::handleArgs()
     if ( haveAudioKey )
     {
         initialAudioKey = std::string( (char*)audioKeyWX.char_str() );
+    }
+
+    long int startXTemp, startYTemp, widthTemp, heightTemp;
+    if ( parser.Found( _("start-x"), &startXTemp ) )
+    {
+        startX = startXTemp;
+    }
+    if ( parser.Found( _("start-y"), &startYTemp ) )
+    {
+        startY = startYTemp;
+    }
+    if ( parser.Found( _("start-width"), &widthTemp ) )
+    {
+        windowWidth = widthTemp;
+    }
+    if ( parser.Found( _("start-height"), &heightTemp ) )
+    {
+        windowHeight = heightTemp;
     }
 
     return true;
