@@ -68,14 +68,13 @@ bool GLUtil::initGL()
     }
 
     // TODO this is platform-specific, see the glxew include in glutil.h
-    // disabled for now, doesn't seem to work
-    /*if ( GLX_SGI_swap_control )
+    if ( GLX_SGI_swap_control )
     {
         printf( "GLUtil::have glx sgi swap control\n" );
         glXSwapIntervalSGI( 1 );
     }
     else
-        printf( "GLUtil::no swap control\n" );*/
+        printf( "GLUtil::no swap control\n" );
 
     glEnable( GL_DEPTH_TEST );
 

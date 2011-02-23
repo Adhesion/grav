@@ -8,9 +8,11 @@
  * @author Andrew Ford
  */
 
+#include <GL/glew.h>
+
 // TODO glxew is platform specific, add some #defs to only include it on
 // supported platforms (just linux?)
-#include <GL/glew.h>
+#include <GL/glxew.h>
 
 #include <FTGL/ftgl.h>
 
