@@ -130,6 +130,8 @@ private:
 
     int windowWidth, windowHeight;
 
+    int startX, startY;
+
 };
 
 static const wxCmdLineEntryDesc cmdLineDesc[] =
@@ -208,6 +210,30 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
         wxCMD_LINE_OPTION, _("ak"), _("audio-key"),
             _("encryption key for initial audio sessions"),
             wxCMD_LINE_VAL_STRING
+    },
+
+    {
+        wxCMD_LINE_OPTION, _("sx"), _("start-x"),
+            _("Initial X position for main window"),
+            wxCMD_LINE_VAL_NUMBER
+    },
+
+    {
+        wxCMD_LINE_OPTION, _("sy"), _("start-y"),
+            _("Initial Y position for main window"),
+            wxCMD_LINE_VAL_NUMBER
+    },
+
+    {
+        wxCMD_LINE_OPTION, _("sw"), _("start-width"),
+            _("Initial width for main window"),
+            wxCMD_LINE_VAL_NUMBER
+    },
+
+    {
+        wxCMD_LINE_OPTION, _("sh"), _("start-height"),
+            _("Initial height for main window"),
+            wxCMD_LINE_VAL_NUMBER
     },
 
     {
