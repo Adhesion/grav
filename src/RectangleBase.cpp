@@ -23,7 +23,7 @@ RectangleBase::RectangleBase( float _x, float _y )
     setDefaults();
     x = -15.0f; y = 15.0f; z = 0.0f;
     destX = _x; destY = _y;
-    origX = _x; origY = _y;
+    origX = x; origY = y;
 
     // This is time in milliseconds
     positionDuration = 600;
