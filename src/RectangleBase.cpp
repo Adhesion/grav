@@ -985,14 +985,18 @@ void RectangleBase::animateLinearBezier()
 {
     uint32_t current = currentTime();
 
+    std::vector<float> points;
     float pt = (float)(current - anim_start)/positionDuration;
     if ( pt > 0.0 && pt < 1.0 ) {
-        std::vector<float> points;
         points.push_back(origX);
         points.push_back(destX);
         x = bezier(points.begin(), points.end(), pt);
-        //x = lerp(origX, destX, pt);
-        y = lerp(origY, destY, pt);
+        points.clear();
+
+        points.push_back(origY);
+        points.push_back(destY);
+        y = bezier(points.begin(), points.end(), pt);
+        points.clear();
     } else {
         x = origX = destX;
         y = origY = destY;
@@ -1000,8 +1004,15 @@ void RectangleBase::animateLinearBezier()
 
     float st = (float)(current - anim_start)/scaleDuration;
     if ( st > 0.0 && st < 1.0 ) {
-        scaleX = lerp(origScaleX, destScaleX, st);
-        scaleY = lerp(origScaleY, destScaleY, st);
+        points.push_back(origScaleX);
+        points.push_back(destScaleX);
+        scaleX = bezier(points.begin(), points.end(), st);
+        points.clear();
+
+        points.push_back(origScaleY);
+        points.push_back(destScaleY);
+        scaleY = bezier(points.begin(), points.end(), st);
+        points.clear();
     } else {
         scaleX = origScaleX = destScaleX;
         scaleY = origScaleY = destScaleY;
@@ -1009,14 +1020,40 @@ void RectangleBase::animateLinearBezier()
 
     float ct = (float)(current - anim_start)/colorDuration;
     if ( ct > 0.0 && ct < 1.0 ) {
-        borderColor.R = lerp(origBColor.R, destBColor.R, ct);
-        borderColor.G = lerp(origBColor.G, destBColor.G, ct);
-        borderColor.B = lerp(origBColor.B, destBColor.B, ct);
-        borderColor.A = lerp(origBColor.A, destBColor.A, ct);
-        secondaryColor.R = lerp(origSecondaryColor.R, destSecondaryColor.R, ct);
-        secondaryColor.G = lerp(origSecondaryColor.G, destSecondaryColor.G, ct);
-        secondaryColor.B = lerp(origSecondaryColor.B, destSecondaryColor.B, ct);
-        secondaryColor.A = lerp(origSecondaryColor.A, destSecondaryColor.A, ct);
+        points.push_back(origBColor.R);
+        points.push_back(destBColor.R);
+        borderColor.R = bezier(points.begin(), points.end(), ct);
+        points.clear();
+        points.push_back(origBColor.G);
+        points.push_back(destBColor.G);
+        borderColor.G = bezier(points.begin(), points.end(), ct);
+        points.clear();
+        points.push_back(origBColor.B);
+        points.push_back(destBColor.B);
+        borderColor.B = bezier(points.begin(), points.end(), ct);
+        points.clear();
+        points.push_back(origBColor.A);
+        points.push_back(destBColor.A);
+        borderColor.A = bezier(points.begin(), points.end(), ct);
+        points.clear();
+
+        points.push_back(origSecondaryColor.R);
+        points.push_back(destSecondaryColor.R);
+        secondaryColor.R = bezier(points.begin(), points.end(), ct);
+        points.clear();
+        points.push_back(origSecondaryColor.G);
+        points.push_back(destSecondaryColor.G);
+        secondaryColor.G = bezier(points.begin(), points.end(), ct);
+        points.clear();
+        points.push_back(origSecondaryColor.B);
+        points.push_back(destSecondaryColor.B);
+        secondaryColor.B = bezier(points.begin(), points.end(), ct);
+        points.clear();
+        points.push_back(origSecondaryColor.A);
+        points.push_back(destSecondaryColor.A);
+        secondaryColor.A = bezier(points.begin(), points.end(), ct);
+        points.clear();
+
     } else {
         borderColor = origBColor = destBColor;
         secondaryColor = origSecondaryColor = destSecondaryColor;
