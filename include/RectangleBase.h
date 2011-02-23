@@ -312,6 +312,7 @@ protected:
     uint32_t anim_start;
     uint32_t currentTime();
     float lerp(float x1, float x2, float t);
+    std::vector<float> bezierSpecification(float a, float z);
     float bezier(
              std::vector<float>::iterator points_first,
              std::vector<float>::iterator points_last,

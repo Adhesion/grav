@@ -980,6 +980,16 @@ float RectangleBase::bezier(
 
     return lerp(left, right, t);
 }
+
+std::vector<float> RectangleBase::bezierSpecification(float a, float z)
+{
+    std::vector<float> points;
+    points.push_back(a);
+    // TODO -- compute and insert fancy bezier points here
+    points.push_back(z);
+    return points;
+}
+
 // evaluate a point on a bezier-curve. t goes from 0 to 1.0
 void RectangleBase::animateLinearBezier()
 {
@@ -988,15 +998,11 @@ void RectangleBase::animateLinearBezier()
     std::vector<float> points;
     float pt = (float)(current - anim_start)/positionDuration;
     if ( pt > 0.0 && pt < 1.0 ) {
-        points.push_back(origX);
-        points.push_back(destX);
+        points = bezierSpecification(origX, destX);
         x = bezier(points.begin(), points.end(), pt);
-        points.clear();
 
-        points.push_back(origY);
-        points.push_back(destY);
+        points = bezierSpecification(origY, destY);
         y = bezier(points.begin(), points.end(), pt);
-        points.clear();
     } else {
         x = origX = destX;
         y = origY = destY;
@@ -1004,15 +1010,11 @@ void RectangleBase::animateLinearBezier()
 
     float st = (float)(current - anim_start)/scaleDuration;
     if ( st > 0.0 && st < 1.0 ) {
-        points.push_back(origScaleX);
-        points.push_back(destScaleX);
+        points = bezierSpecification(origScaleX, destScaleX);
         scaleX = bezier(points.begin(), points.end(), st);
-        points.clear();
 
-        points.push_back(origScaleY);
-        points.push_back(destScaleY);
+        points = bezierSpecification(origScaleY, destScaleY);
         scaleY = bezier(points.begin(), points.end(), st);
-        points.clear();
     } else {
         scaleX = origScaleX = destScaleX;
         scaleY = origScaleY = destScaleY;
@@ -1020,45 +1022,27 @@ void RectangleBase::animateLinearBezier()
 
     float ct = (float)(current - anim_start)/colorDuration;
     if ( ct > 0.0 && ct < 1.0 ) {
-        points.push_back(origBColor.R);
-        points.push_back(destBColor.R);
+        points = bezierSpecification(origBColor.R, destBColor.R);
         borderColor.R = bezier(points.begin(), points.end(), ct);
-        points.clear();
-        points.push_back(origBColor.G);
-        points.push_back(destBColor.G);
+        points = bezierSpecification(origBColor.G, destBColor.G);
         borderColor.G = bezier(points.begin(), points.end(), ct);
-        points.clear();
-        points.push_back(origBColor.B);
-        points.push_back(destBColor.B);
+        points = bezierSpecification(origBColor.B, destBColor.B);
         borderColor.B = bezier(points.begin(), points.end(), ct);
-        points.clear();
-        points.push_back(origBColor.A);
-        points.push_back(destBColor.A);
+        points = bezierSpecification(origBColor.A, destBColor.A);
         borderColor.A = bezier(points.begin(), points.end(), ct);
-        points.clear();
 
-        points.push_back(origSecondaryColor.R);
-        points.push_back(destSecondaryColor.R);
+        points = bezierSpecification(origSecondaryColor.R,destSecondaryColor.R);
         secondaryColor.R = bezier(points.begin(), points.end(), ct);
-        points.clear();
-        points.push_back(origSecondaryColor.G);
-        points.push_back(destSecondaryColor.G);
+        points = bezierSpecification(origSecondaryColor.G,destSecondaryColor.G);
         secondaryColor.G = bezier(points.begin(), points.end(), ct);
-        points.clear();
-        points.push_back(origSecondaryColor.B);
-        points.push_back(destSecondaryColor.B);
+        points = bezierSpecification(origSecondaryColor.B,destSecondaryColor.B);
         secondaryColor.B = bezier(points.begin(), points.end(), ct);
-        points.clear();
-        points.push_back(origSecondaryColor.A);
-        points.push_back(destSecondaryColor.A);
+        points = bezierSpecification(origSecondaryColor.A,destSecondaryColor.A);
         secondaryColor.A = bezier(points.begin(), points.end(), ct);
-        points.clear();
-
     } else {
         borderColor = origBColor = destBColor;
         secondaryColor = origSecondaryColor = destSecondaryColor;
     }
-
 }
 
 void RectangleBase::animateValues()
