@@ -985,7 +985,11 @@ std::vector<float> RectangleBase::bezierSpecification(float a, float z)
 {
     std::vector<float> points;
     points.push_back(a);
-    // TODO -- compute and insert fancy bezier points here
+
+    // TODO -- play with introducing fancy points here.
+    points.push_back(a + (z-a) * -0.5);
+    points.push_back(a + (z-a) *  1.5);
+
     points.push_back(z);
     return points;
 }
