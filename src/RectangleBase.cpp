@@ -996,6 +996,8 @@ std::vector<float> RectangleBase::bezierSpecification(
     } else if ( name == "easy" ) {
         points.push_back(a + (z-a) * 0.01);
         points.push_back(a + (z-a) * 0.99);
+    } else if ( name == "snap" ) {
+        points.push_back(a + (z-a) * 0.01);
     }
 
     points.push_back(z);
@@ -1006,16 +1008,19 @@ std::vector<float> RectangleBase::bezierSpecification(
 void RectangleBase::animateValues()
 {
     // TODO -- introduce booleans here that avoid computing anything unneeded
-    // TODO -- introduce bezier of the time variable 't' itself.
+    // TODO -- keep three anim_start variables to kill the 'click bug'
     uint32_t current = currentTime();
 
     std::vector<float> points;
+    std::vector<float> snap = bezierSpecification(0, 1, "snap");
     float pt = (float)(current - anim_start)/positionDuration;
     if ( pt > 0.0 && pt < 1.0 ) {
-        points = bezierSpecification(origX, destX, "easy");
+        pt = bezier(snap.begin(), snap.end(), pt);
+
+        points = bezierSpecification(origX, destX, "aggressive");
         x = bezier(points.begin(), points.end(), pt);
 
-        points = bezierSpecification(origY, destY, "aggressive");
+        points = bezierSpecification(origY, destY, "easy");
         y = bezier(points.begin(), points.end(), pt);
     } else {
         x = origX = destX;
@@ -1024,6 +1029,8 @@ void RectangleBase::animateValues()
 
     float st = (float)(current - anim_start)/scaleDuration;
     if ( st > 0.0 && st < 1.0 ) {
+        st = bezier(snap.begin(), snap.end(), st);
+
         points = bezierSpecification(origScaleX, destScaleX);
         scaleX = bezier(points.begin(), points.end(), st);
 
