@@ -315,6 +315,10 @@ protected:
     uint32_t scaleAnimStart;
     uint32_t colorAnimStart;
 
+    bool positionAnimating;
+    bool scaleAnimating;
+    bool colorAnimating;
+
     uint32_t currentTime();
     float lerp(float x1, float x2, float t);
     std::vector<float> bezierSpecification(

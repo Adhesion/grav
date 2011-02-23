@@ -33,6 +33,7 @@ RectangleBase::RectangleBase( float _x, float _y )
     positionAnimStart = currentTime();
     scaleAnimStart = currentTime();
     colorAnimStart = currentTime();
+    positionAnimating = scaleAnimating = colorAnimating = true;
 
 }
 
@@ -304,6 +305,7 @@ void RectangleBase::move( float _x, float _y )
     origY = y;
     if ( !animated ) y = _y;
     positionAnimStart = currentTime();
+    positionAnimating = true;
 }
 
 void RectangleBase::setPos( float _x, float _y )
@@ -319,6 +321,7 @@ void RectangleBase::setScale( float xs, float ys )
 
     if ( !animated ) { scaleX = xs; scaleY = ys; }
     scaleAnimStart = currentTime();
+    scaleAnimating = true;
 }
 
 void RectangleBase::setScale( float xs, float ys, bool resizeMembers )
@@ -600,6 +603,7 @@ void RectangleBase::setColor( RGBAColor c )
     if ( !animated )
         borderColor = destBColor;
     colorAnimStart = currentTime();
+    colorAnimating = true;
 }
 
 void RectangleBase::setSecondaryColor( RGBAColor c )
@@ -610,6 +614,7 @@ void RectangleBase::setSecondaryColor( RGBAColor c )
     if ( !animated )
         secondaryColor = destSecondaryColor;
     colorAnimStart = currentTime();
+    colorAnimating = true;
 }
 
 void RectangleBase::resetColor()
@@ -1009,60 +1014,74 @@ std::vector<float> RectangleBase::bezierSpecification(
 // evaluate a point on a bezier-curve. t goes from 0 to 1.0
 void RectangleBase::animateValues()
 {
-    // TODO -- introduce booleans here that avoid computing anything unneeded
-    uint32_t current = currentTime();
+    if ( ! positionAnimating && ! scaleAnimating && ! colorAnimating ) return;
 
+    uint32_t current = currentTime();
     std::vector<float> points;
     std::vector<float> snap = bezierSpecification(0, 1, "snap");
-    float pt = (float)(current - positionAnimStart)/positionDuration;
-    if ( pt > 0.0 && pt < 1.0 ) {
-        pt = bezier(snap.begin(), snap.end(), pt);
 
-        points = bezierSpecification(origX, destX, "aggressive");
-        x = bezier(points.begin(), points.end(), pt);
+    if ( positionAnimating ) {
+        float pt = (float)(current - positionAnimStart)/positionDuration;
+        if ( pt > 0.0 && pt < 1.0 ) {
+            pt = bezier(snap.begin(), snap.end(), pt);
 
-        points = bezierSpecification(origY, destY, "easy");
-        y = bezier(points.begin(), points.end(), pt);
-    } else {
-        x = origX = destX;
-        y = origY = destY;
+            points = bezierSpecification(origX, destX, "aggressive");
+            x = bezier(points.begin(), points.end(), pt);
+
+            points = bezierSpecification(origY, destY, "easy");
+            y = bezier(points.begin(), points.end(), pt);
+        } else {
+            x = origX = destX;
+            y = origY = destY;
+            positionAnimating = false;
+        }
     }
 
-    float st = (float)(current - scaleAnimStart)/scaleDuration;
-    if ( st > 0.0 && st < 1.0 ) {
-        st = bezier(snap.begin(), snap.end(), st);
+    if ( scaleAnimating ) {
+        float st = (float)(current - scaleAnimStart)/scaleDuration;
+        if ( st > 0.0 && st < 1.0 ) {
+            st = bezier(snap.begin(), snap.end(), st);
 
-        points = bezierSpecification(origScaleX, destScaleX);
-        scaleX = bezier(points.begin(), points.end(), st);
+            points = bezierSpecification(origScaleX, destScaleX);
+            scaleX = bezier(points.begin(), points.end(), st);
 
-        points = bezierSpecification(origScaleY, destScaleY);
-        scaleY = bezier(points.begin(), points.end(), st);
-    } else {
-        scaleX = origScaleX = destScaleX;
-        scaleY = origScaleY = destScaleY;
+            points = bezierSpecification(origScaleY, destScaleY);
+            scaleY = bezier(points.begin(), points.end(), st);
+        } else {
+            scaleX = origScaleX = destScaleX;
+            scaleY = origScaleY = destScaleY;
+            scaleAnimating = false;
+        }
     }
 
-    float ct = (float)(current - colorAnimStart)/colorDuration;
-    if ( ct > 0.0 && ct < 1.0 ) {
-        points = bezierSpecification(origBColor.R, destBColor.R);
-        borderColor.R = bezier(points.begin(), points.end(), ct);
-        points = bezierSpecification(origBColor.G, destBColor.G);
-        borderColor.G = bezier(points.begin(), points.end(), ct);
-        points = bezierSpecification(origBColor.B, destBColor.B);
-        borderColor.B = bezier(points.begin(), points.end(), ct);
-        points = bezierSpecification(origBColor.A, destBColor.A);
-        borderColor.A = bezier(points.begin(), points.end(), ct);
+    if ( colorAnimating ) {
+        float ct = (float)(current - colorAnimStart)/colorDuration;
+        if ( ct > 0.0 && ct < 1.0 ) {
+            points = bezierSpecification(origBColor.R, destBColor.R);
+            borderColor.R = bezier(points.begin(), points.end(), ct);
+            points = bezierSpecification(origBColor.G, destBColor.G);
+            borderColor.G = bezier(points.begin(), points.end(), ct);
+            points = bezierSpecification(origBColor.B, destBColor.B);
+            borderColor.B = bezier(points.begin(), points.end(), ct);
+            points = bezierSpecification(origBColor.A, destBColor.A);
+            borderColor.A = bezier(points.begin(), points.end(), ct);
 
-        points = bezierSpecification(origSecondaryColor.R,destSecondaryColor.R);
-        secondaryColor.R = bezier(points.begin(), points.end(), ct);
-        points = bezierSpecification(origSecondaryColor.G,destSecondaryColor.G);
-        secondaryColor.G = bezier(points.begin(), points.end(), ct);
-        points = bezierSpecification(origSecondaryColor.B,destSecondaryColor.B);
-        secondaryColor.B = bezier(points.begin(), points.end(), ct);
-        points = bezierSpecification(origSecondaryColor.A,destSecondaryColor.A);
-        secondaryColor.A = bezier(points.begin(), points.end(), ct);
-    } else {
-        borderColor = origBColor = destBColor;
-        secondaryColor = origSecondaryColor = destSecondaryColor;
+            points = bezierSpecification(
+                            origSecondaryColor.R, destSecondaryColor.R);
+            secondaryColor.R = bezier(points.begin(), points.end(), ct);
+            points = bezierSpecification(
+                            origSecondaryColor.G, destSecondaryColor.G);
+            secondaryColor.G = bezier(points.begin(), points.end(), ct);
+            points = bezierSpecification(
+                            origSecondaryColor.B, destSecondaryColor.B);
+            secondaryColor.B = bezier(points.begin(), points.end(), ct);
+            points = bezierSpecification(
+                            origSecondaryColor.A, destSecondaryColor.A);
+            secondaryColor.A = bezier(points.begin(), points.end(), ct);
+        } else {
+            borderColor = origBColor = destBColor;
+            secondaryColor = origSecondaryColor = destSecondaryColor;
+            colorAnimating = true;
+        }
     }
 }
