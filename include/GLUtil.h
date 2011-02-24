@@ -102,6 +102,8 @@ public:
 
     void setShaderEnable( bool es );
 
+    void setBufferFontUsage( bool buf );
+
 protected:
     GLUtil();
     ~GLUtil();
@@ -126,6 +128,8 @@ private:
     GLuint YUV420alphaID;
 
     FTFont* mainFont;
+    // switch to change to use buffer font - texture font is default
+    bool useBufferFont;
 
 };
 

@@ -106,8 +106,9 @@ bool gravApp::OnInit()
     // put the main frame on top
     mainFrame->Raise();
 
-    // since that bool is used in init, set it before init
+    // since these bools are used in init, set them before init
     GLUtil::getInstance()->setShaderEnable( enableShaders );
+    GLUtil::getInstance()->setBufferFontUsage( bufferFont );
 
     // initialize GL stuff (+ shaders) needs to be done AFTER attriblist is
     // used in making the canvas
@@ -305,6 +306,8 @@ bool gravApp::handleArgs()
     usingThreads = parser.Found( _("threads") );
 
     enableShaders = parser.Found( _("enable-shaders") );
+
+    bufferFont = parser.Found( _("use-buffer-font") );
 
     startFullscreen = parser.Found( _("fullscreen") );
 

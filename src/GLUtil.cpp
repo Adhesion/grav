@@ -53,7 +53,10 @@ bool GLUtil::initGL()
     }
 
     // TODO: could use a good way to find system-specific font dirs
-    mainFont = new FTTextureFont( "FreeSans.ttf" );
+    if ( useBufferFont )
+        mainFont = new FTBufferFont( "FreeSans.ttf" );
+    else
+        mainFont = new FTTextureFont( "FreeSans.ttf" );
     if ( mainFont->Error() )
     {
         printf( "GLUtil::initGL(): ERROR: font failed to load\n" );
@@ -315,9 +318,15 @@ void GLUtil::setShaderEnable( bool es )
     enableShaders = es;
 }
 
+void GLUtil::setBufferFontUsage( bool buf )
+{
+    useBufferFont = buf;
+}
+
 GLUtil::GLUtil()
 {
     enableShaders = false;
+    useBufferFont = false;
 
     frag420 =
     "uniform sampler2D texture;\n"

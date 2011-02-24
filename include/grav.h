@@ -121,6 +121,7 @@ private:
     bool headerSet;
 
     bool enableShaders;
+    bool bufferFont;
 
     bool startFullscreen;
 
@@ -156,6 +157,13 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
             _("enable GLSL shader-based colorspace conversion if it would be "
                 "available (experimental, may not look as good, adds CPU usage "
                 "to rendering thread)")
+    },
+
+    {
+        wxCMD_LINE_SWITCH, _("bf"), _("use-buffer-font"),
+            _("enable buffer font rendering method - may save memory and be "
+              "better for slower machines, but doesn't scale as well CPU-wise "
+              "for many objects")
     },
 
     {
