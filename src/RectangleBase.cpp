@@ -1031,7 +1031,7 @@ void RectangleBase::animateValues()
 
     if ( positionAnimating ) {
         float pt = (float)(current - positionAnimStart)/positionDuration;
-        if ( pt > 0.0 && pt < 1.0 ) {
+        if ( pt >= 0.0 && pt < 1.0 ) {
             pt = bezier(snap.begin(), snap.end(), pt);
 
             points = bezierSpecification(origX, destX, "aggressive");
@@ -1048,7 +1048,7 @@ void RectangleBase::animateValues()
 
     if ( scaleAnimating ) {
         float st = (float)(current - scaleAnimStart)/scaleDuration;
-        if ( st > 0.0 && st < 1.0 ) {
+        if ( st >= 0.0 && st < 1.0 ) {
             st = bezier(snap.begin(), snap.end(), st);
 
             points = bezierSpecification(origScaleX, destScaleX);
@@ -1065,7 +1065,7 @@ void RectangleBase::animateValues()
 
     if ( colorAnimating ) {
         float ct = (float)(current - colorAnimStart)/colorDuration;
-        if ( ct > 0.0 && ct < 1.0 ) {
+        if ( ct >= 0.0 && ct < 1.0 ) {
             points = bezierSpecification(origBColor.R, destBColor.R);
             borderColor.R = bezier(points.begin(), points.end(), ct);
             points = bezierSpecification(origBColor.G, destBColor.G);
