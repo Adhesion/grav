@@ -365,18 +365,22 @@ void Group::setRendering( bool r )
 
     if ( allowHiding )
     {
+        float newalpha = baseBColor.A;
         if ( !r )
         {
-            destBColor.A = 0.0f;
-            // set children to unselected just in case they're selected - user will
-            // probably end up moving them accidentally
+            newalpha = 0.0f;
+            // set children to unselected just in case they're selected
+            // user will probably end up moving them accidentally
             for ( unsigned int i = 0; i < objects.size(); i++ )
             {
                 objects[i]->setSelect( false );
             }
         }
-        else
-            destBColor.A = baseBColor.A;
+
+        // If you want to change colors, always use setColor (it animates!)
+        RGBAColor newcolor = getColor();
+        newcolor.A = newalpha;
+        setColor( newcolor );
 
         for ( unsigned int i = 0; i < objects.size(); i++ )
         {
@@ -387,8 +391,9 @@ void Group::setRendering( bool r )
                 col.A = 0.0f;
                 col2.A = 0.0f;
             }
-            // note secondary color is going to lose its previous alpha here,
-            // TODO fix this somehow? adding a base-secondary-color seems excessive
+            // NOTE: secondary color is going to lose its previous alpha here,
+            // TODO: fix this somehow?
+            //      adding a base-secondary-color seems excessive
             else
                 col2.A = 1.0f;
             objects[i]->setColor( col );
