@@ -44,6 +44,7 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     origX = other.origX; origY = other.origY;
     scaleX = other.scaleX; scaleY = other.scaleY;
     destScaleX = other.destScaleX; destScaleY = other.destScaleY;
+    origScaleX = other.origScaleX; origScaleY = other.origScaleY;
     xAngle = other.xAngle; yAngle = other.yAngle; zAngle = other.zAngle;
     normal = other.normal;
 
@@ -106,6 +107,7 @@ void RectangleBase::setDefaults()
     destX = x; destY = y;
     origX = x; origY = y;
     destScaleX = scaleX; destScaleY = scaleY;
+    origScaleX = scaleX; origScaleY = scaleY;
     // TODO make this actually based on the rotation
     normal = Vector( 0.0f, 0.0f, 1.0f );
 
