@@ -1090,7 +1090,7 @@ void RectangleBase::animateValues()
         } else {
             borderColor = origBColor = destBColor;
             secondaryColor = origSecondaryColor = destSecondaryColor;
-            colorAnimating = true;
+            colorAnimating = false;
         }
     }
 }
