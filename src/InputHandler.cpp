@@ -126,6 +126,8 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     docstr[ktoh('F')] = "Rearrange objects to focus on selected objects.";
     lookup[ktoh('A', wxMOD_ALT)] = &InputHandler::handleToggleAutoFocusRotate;
     docstr[ktoh('A', wxMOD_ALT)] = "Toggle 'automatic' mode.";
+    lookup[ktoh('O')] = &InputHandler::handleTilingArrange;
+    docstr[ktoh('O')] = "Rearrange objects tiling them to preserve aspect ratio.";
 
     if ( debug ) {
         /* Debug keys */
@@ -138,8 +140,6 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
         unprintables[ktoh((unsigned char)127)] = "(delete)";
         lookup[ktoh('K')] = &InputHandler::handlePrintSelected;
         docstr[ktoh('K')] = "[debug] Print information about selected windows.";
-        lookup[ktoh('O')] = &InputHandler::handleRandomTest;
-        docstr[ktoh('O')] = "[debug] Print out randomly generated numbers.";
         lookup[ktoh('0')] = &InputHandler::handleMoveAllToCenter;
         docstr[ktoh('0')] = "[debug] Move all objects to the center.";
         lookup[ktoh('I')] = &InputHandler::handleInformation;
@@ -282,6 +282,12 @@ void InputHandler::handleFocusArrange()
         layouts.arrange( "aspectFocus", grav->getScreenRect(), RectangleBase(),
                             data );
     }
+}
+void InputHandler::handleTilingArrange()
+{
+    std::map<std::string, std::vector<RectangleBase*> > data;
+    data["objects"] = grav->getMovableObjects();
+    layouts.arrange( "tiling", grav->getScreenRect(), RectangleBase(), data );
 }
 
 void InputHandler::handleFullscreenSelectedSingle()
@@ -428,12 +434,6 @@ void InputHandler::handleMuteSelected()
         }
     }
     grav->clearSelected();
-}
-
-void InputHandler::handleRandomTest()
-{
-    printf( "random32: %i\n", random32() );
-    printf( "random32max: %i\n", random32_max() );
 }
 
 void InputHandler::handleNativeScaleAll()

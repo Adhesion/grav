@@ -50,6 +50,7 @@ public:
     void handlePerimeterArrange();
     void handleGridArrange();
     void handleFocusArrange();
+    void handleTilingArrange();
     void handleFullscreenSelectedSingle();
     void handleFullerFullscreenSelectedSingle();
     void handleRunwayToggle();
@@ -57,7 +58,6 @@ public:
     void handleInformation();
     void handleToggleGroupLocks();
     void handleMuteSelected();
-    void handleRandomTest();
     void handleNativeScaleAll();
     void handleNativeScaleSelected();
     void handleMoveAllToCenter();
