@@ -50,7 +50,7 @@ public:
      * ratio in addition to how much it's being scaled. In objects without
      * aspect ratio, these will most likely be equal to the scale factors.
      */
-    virtual float getWidth(); virtual float getHeight() const;
+    virtual float getWidth() const; virtual float getHeight() const;
     float getTotalWidth(); float getTotalHeight();
     virtual float getDestWidth(); virtual float getDestHeight();
     float getBorderSize(); float getDestBorderSize();
@@ -131,7 +131,8 @@ public:
      */
     void setTexture( GLuint tex, int width, int height );
 
-    float getX(); float getY(); float getZ();
+    float getX() const; float getY() const; float getZ() const;
+    void setX(float _x); void setY(float _y); void setZ(float _z);
     float getDestX(); float getDestY();
     float getScaleX(); float getScaleY();
     float getLat(); float getLon();

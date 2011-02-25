@@ -137,7 +137,7 @@ void RectangleBase::setDefaults()
     //                                twidth, theight );
 }
 
-float RectangleBase::getWidth()
+float RectangleBase::getWidth() const
 {
     return scaleX;
 }
@@ -383,7 +383,22 @@ void RectangleBase::setTexture( GLuint tex, int width, int height )
     twidth = width; theight = height;
 }
 
-float RectangleBase::getX()
+void RectangleBase::setX(float _x)
+{
+    x = _x;
+}
+
+void RectangleBase::setY(float _y)
+{
+    y = _y;
+}
+
+void RectangleBase::setZ(float _z)
+{
+    z = _z;
+}
+
+float RectangleBase::getX() const
 {
     return x;
 }
@@ -393,7 +408,7 @@ float RectangleBase::getDestX()
     return destX;
 }
 
-float RectangleBase::getY()
+float RectangleBase::getY() const
 {
     return y;
 }
@@ -403,7 +418,7 @@ float RectangleBase::getDestY()
     return destY;
 }
 
-float RectangleBase::getZ()
+float RectangleBase::getZ() const
 {
     return z;
 }
