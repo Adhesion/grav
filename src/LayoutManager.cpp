@@ -228,10 +228,118 @@ bool LayoutManager::tilingArrange(float outerL, float outerR,
     return tilingArrange( outerL, outerR, outerU, outerD, data );
 }
 
-bool LayoutManager::tilingArrange( float outerL, float outerR,
-                                   float outerU, float outerD,
-                                   std::map<std::string, std::vector<RectangleBase*> > data )
+float maximum_y(std::vector<RectangleBase*> rects, std::vector<bool> is_positioned)
 {
+    float max = 0;
+    for ( int i = 0; i < rects.size(); i++ )
+    {
+        if ( is_positioned[i] )
+        {
+            float y = (rects[i])->getHeight() + (rects[i])->getY();
+            if ( y > max ) max = y;
+        }
+    }
+    return max;
+}
+
+void fillBoundedArea(
+                float xmin, float xmax, float ymin, float ymax,
+                int num_unpositioned,
+                std::vector<RectangleBase*> & rects,
+                std::vector<bool> & is_positioned)
+{
+
+}
+
+
+void fillUnboundedArea(
+                float xmin, float xmax, float ymin,
+                int num_unpositioned,
+                std::vector<RectangleBase*> & rects,
+                std::vector<bool> & is_positioned)
+{
+    if ( num_unpositioned <= 0 ) return;
+
+    int best_num_unpositioned = num_unpositioned;
+    std::vector<RectangleBase*> best_rects = rects;
+    std::vector<bool> best_is_positioned = is_positioned;
+
+    int best_max_y = 10000000; // infinity
+
+    for ( int i = 0; i < rects.size(); i++ )
+    {
+            printf("Looking at rectangle %i\n", i);
+            printf("%f .. %f\n", (rects[i])->getWidth(), xmax - xmin );
+        if ( ! is_positioned[i] && (rects[i])->getWidth() <= xmax - xmin )
+        {
+            // It will fit.  Try it.
+            int test1_num_unpositioned = num_unpositioned;
+            std::vector<RectangleBase*> test1_rects = rects;
+            std::vector<bool> test1_is_positioned = is_positioned;
+
+            (test1_rects[i])->setX( xmin );
+            (test1_rects[i])->setY( ymin );
+            test1_is_positioned[i] = true;
+
+            // Fill the area on the right
+            fillUnboundedArea(xmin + rects[i]->getWidth(), xmax, //Bounded?
+                            ymin,// ymin + rects[i]->getHeight(),//Bounded?
+                            test1_num_unpositioned, test1_rects, test1_is_positioned );
+            // Fill the area on the bottom
+            fillUnboundedArea(xmin, xmax, ymin + rects[i]->getHeight(),
+                            test1_num_unpositioned, test1_rects, test1_is_positioned);
+
+            float test1_max_y = maximum_y(test1_rects, test1_is_positioned);
+
+            if ((test1_num_unpositioned == 0) && (test1_max_y < best_max_y))
+            {
+                best_max_y = test1_max_y;
+                best_rects = test1_rects;
+                best_is_positioned = test1_is_positioned;
+                best_num_unpositioned = test1_num_unpositioned;
+            }
+
+            // Divide the remaining area vertically.
+            int test2_num_unpositioned = num_unpositioned;
+            std::vector<RectangleBase*> test2_rects = rects;
+            std::vector<bool> test2_is_positioned = is_positioned;
+
+            // TODO -- to fix all this, change all the setX calls to setDestX
+            //         and all the getX calls to getDestX
+            (test2_rects[i])->setX( xmin );
+            (test2_rects[i])->setY( ymin );
+            test2_is_positioned[i] = true;
+
+            fillUnboundedArea(xmin + rects[i]->getWidth(), xmax, ymin,
+                            test2_num_unpositioned, test2_rects, test2_is_positioned);
+            fillUnboundedArea(xmin, xmin + rects[i]->getWidth(),
+                            ymin + rects[i]->getHeight(),
+                            test2_num_unpositioned, test2_rects, test2_is_positioned);
+
+            float test2_max_y = maximum_y(test2_rects, test2_is_positioned);
+
+            if ((test2_num_unpositioned == 0) && (test2_max_y < best_max_y))
+            {
+                // This test is better than the other one.  save it.
+                best_max_y = test2_max_y;
+                best_rects = test2_rects;
+                best_is_positioned = test2_is_positioned;
+                best_num_unpositioned = test2_num_unpositioned;
+            }
+        } // end trying this rectangle.
+    } // end looping through the rectangles.
+
+    // return the best we found
+    is_positioned = best_is_positioned;
+    num_unpositioned = best_num_unpositioned;
+    rects = best_rects;
+}
+
+bool LayoutManager::tilingArrange(
+                float outerL, float outerR, float outerU, float outerD,
+                std::map<std::string, std::vector<RectangleBase*> > data )
+{
+    printf( "Trying to do tiling\n");
     // Extract object data
     if ( data.find("objects") == data.end() )
     {
@@ -251,6 +359,20 @@ bool LayoutManager::tilingArrange( float outerL, float outerR,
     }
 
     sort(objects.begin(), objects.end(), RectangleHeightComparator);
+
+    // TODO -- to do focus, we can scale up selected rects here before we binpack
+
+    std::vector<bool> is_positioned;
+    for ( int i = 0; i < objects.size(); i++ ) is_positioned.push_back(false);
+
+    float xmin = -10;
+    float xmax = 10;
+    float ymin = 0;
+
+    fillUnboundedArea( xmin, xmax, ymin, is_positioned.size(), objects, is_positioned);
+    printf("Outties from tiling arrange.\n");
+
+    return true;
 
 }
 
