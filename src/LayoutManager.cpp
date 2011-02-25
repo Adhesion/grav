@@ -250,21 +250,7 @@ bool LayoutManager::tilingArrange( float outerL, float outerR,
         return true;
     }
 
-    printf("Before:\n");
-    for ( int i = 0; i < objects.size(); i++ )
-    {
-        printf("  %i %s %f %f\n", i, objects[i]->getName().c_str(),
-                        objects[i]->getWidth(), objects[i]->getHeight());
-    }
-
     sort(objects.begin(), objects.end(), RectangleHeightComparator);
-
-    printf("After:\n");
-    for ( int i = 0; i < objects.size(); i++ )
-    {
-        printf("  %i %s %f %f\n", i, objects[i]->getName().c_str(),
-                        objects[i]->getWidth(), objects[i]->getHeight());
-    }
 
 }
 
