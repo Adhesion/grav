@@ -106,6 +106,8 @@ VideoListener::vpmsession_source_deleted(VPMSession &session,
         if ( (*si)->getssrc() == ssrc )
         {
             sourceCount--;
+            updatePixelCount( -( (*si)->getVideoWidth() *
+                                 (*si)->getVideoHeight() ) );
             grav->deleteSource( si );
             return;
         }
