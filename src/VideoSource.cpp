@@ -211,7 +211,7 @@ void VideoSource::draw()
 
     glEnd();
 
-    glDisable(GL_TEXTURE_2D);
+    glDisable( GL_TEXTURE_2D );
 
     if ( GLUtil::getInstance()->areShadersAvailable() )
         glUseProgram( 0 );
