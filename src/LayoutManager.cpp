@@ -59,7 +59,7 @@ bool LayoutManager::arrange( std::string method,
 
     if ( lookup.find(method) == lookup.end() )
     {
-        printf( "ZOMG:::: a huge error should be thrown here!!!\n" );
+        printf( "error: No such layout method '%s'.\n", method.c_str() );
         return false; // double false !!!
     }
     return (this->*lookup[method])( outerL, outerR, outerU, outerD,
