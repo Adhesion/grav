@@ -190,17 +190,14 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
 }
 
 bool LayoutManager::tilingArrange( RectangleBase outerRect,
-                                    bool horiz, bool edge, bool resize,
-                                    std::map<std::string, std::vector<RectangleBase*> > data,
-                                    int numX, int numY )
+                                   std::map<std::string, std::vector<RectangleBase*> > data)
 {
     float outerL = outerRect.getLBound();
     float outerR = outerRect.getRBound();
     float outerU = outerRect.getUBound();
     float outerD = outerRect.getDBound();
 
-    return tilingArrange( outerL, outerR, outerU, outerD, horiz, edge,
-                            resize, data, numX, numY );
+    return tilingArrange( outerL, outerR, outerU, outerD, data );
 }
 
 bool LayoutManager::tilingArrange(float outerL, float outerR,
@@ -213,8 +210,10 @@ bool LayoutManager::tilingArrange(float outerL, float outerR,
     // Setup opts defaults
     std::map<std::string, std::string> dflt = \
         std::map<std::string, std::string>();
-    dflt["horiz"] = "True"; dflt["edge"] = "False"; dflt["resize"] = "True";
-    dflt["numX"] = "0";     dflt["numY"] = "0";
+
+    // NOTE: no defaults are really added here (none are specified).
+    //       this code is left here from being copied from gridArrange to make
+    //       it simple to add options and their defaults in the future.
 
     // Apply the opts defaults to opts
     for (std::map<std::string,std::string>::iterator i = dflt.begin();
@@ -225,22 +224,13 @@ bool LayoutManager::tilingArrange(float outerL, float outerR,
             opts[i->first] = i->second;
     }
 
-    return tilingArrange(outerL, outerR, outerU, outerD,
-                       str2bool(opts["horiz"]),
-                       str2bool(opts["edge"]),
-                       str2bool(opts["resize"]),
-                       data,
-                       str2int(opts["numX"]),
-                       str2int(opts["numY"]));
+    return tilingArrange( outerL, outerR, outerU, outerD, data );
 }
 
-bool LayoutManager::tilingArrange( float outerL, float outerR, float outerU,
-                                    float outerD,
-                                    bool horiz, bool edge, bool resize,
-                                    std::map<std::string, std::vector<RectangleBase*> > data,
-                                    int numX, int numY )
+bool LayoutManager::tilingArrange( float outerL, float outerR,
+                                   float outerU, float outerD,
+                                   std::map<std::string, std::vector<RectangleBase*> > data )
 {
-    printf("Stub here for tiling arrange\n");
     return true;
 }
 
