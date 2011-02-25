@@ -162,12 +162,12 @@ float RectangleBase::getTotalHeight()
     return h;
 }
 
-float RectangleBase::getDestWidth()
+float RectangleBase::getDestWidth() const
 {
     return destScaleX;
 }
 
-float RectangleBase::getDestHeight()
+float RectangleBase::getDestHeight() const
 {
     return destScaleY;
 }
@@ -403,7 +403,12 @@ float RectangleBase::getX() const
     return x;
 }
 
-float RectangleBase::getDestX()
+void RectangleBase::setDestX(float _x)
+{
+    destX = _x;
+}
+
+float RectangleBase::getDestX() const
 {
     return destX;
 }
@@ -413,7 +418,12 @@ float RectangleBase::getY() const
     return y;
 }
 
-float RectangleBase::getDestY()
+void RectangleBase::setDestY(float _y)
+{
+    destY = _y;
+}
+
+float RectangleBase::getDestY() const
 {
     return destY;
 }
@@ -423,12 +433,12 @@ float RectangleBase::getZ() const
     return z;
 }
 
-float RectangleBase::getScaleX()
+float RectangleBase::getScaleX() const
 {
     return scaleX;
 }
 
-float RectangleBase::getScaleY()
+float RectangleBase::getScaleY() const
 {
     return scaleY;
 }

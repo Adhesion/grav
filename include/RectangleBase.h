@@ -52,7 +52,7 @@ public:
      */
     virtual float getWidth() const; virtual float getHeight() const;
     float getTotalWidth(); float getTotalHeight();
-    virtual float getDestWidth(); virtual float getDestHeight();
+    virtual float getDestWidth() const; virtual float getDestHeight() const;
     float getBorderSize(); float getDestBorderSize();
     float getBorderScale();
     float getLBound(); float getRBound(); float getUBound(); float getDBound();
@@ -133,8 +133,9 @@ public:
 
     float getX() const; float getY() const; float getZ() const;
     void setX(float _x); void setY(float _y); void setZ(float _z);
-    float getDestX(); float getDestY();
-    float getScaleX(); float getScaleY();
+    float getDestX() const; float getDestY() const;
+    void setDestX(float _x); void setDestY(float _y);
+    float getScaleX() const; float getScaleY() const;
     float getLat(); float getLon();
 
     void setName( std::string s );
