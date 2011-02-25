@@ -12,6 +12,11 @@
 #include "LayoutManager.h"
 #include "RectangleBase.h"
 
+// Little utilities... should be phased out with a better usage of std::map
+bool str2bool(std::string str) { return str.compare( "True" ) == 0; }
+int str2int(std::string str) { return atoi(str.c_str()); }
+float str2fl(std::string str) { return atof(str.c_str()); }
+
 LayoutManager::LayoutManager()
 { }
 
@@ -196,11 +201,6 @@ bool LayoutManager::gridArrange( RectangleBase outerRect,
     return gridArrange( outerL, outerR, outerU, outerD, horiz, edge,
                             resize, data, numX, numY );
 }
-
-// Little utility... should be phased out with a better usage of std::map
-bool str2bool(std::string str) { return str.compare( "True" ) == 0; }
-int str2int(std::string str) { return atoi(str.c_str()); }
-float str2fl(std::string str) { return atof(str.c_str()); }
 
 bool LayoutManager::gridArrange(float outerL, float outerR,
                                 float outerU, float outerD,
