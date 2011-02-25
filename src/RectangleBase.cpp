@@ -142,7 +142,7 @@ float RectangleBase::getWidth()
     return scaleX;
 }
 
-float RectangleBase::getHeight()
+float RectangleBase::getHeight() const
 {
     return scaleY;
 }
@@ -945,4 +945,9 @@ void RectangleBase::animateValues()
         secondaryColor.B = destSecondaryColor.B;
     if ( fabs( destSecondaryColor.A - secondaryColor.A ) < 0.01f )
         secondaryColor.A = destSecondaryColor.A;
+}
+
+bool RectangleHeightComparator( const RectangleBase * const r1, const RectangleBase * const r2 )
+{
+    return r1->getHeight() > r2->getHeight();
 }

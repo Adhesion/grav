@@ -50,7 +50,7 @@ public:
      * ratio in addition to how much it's being scaled. In objects without
      * aspect ratio, these will most likely be equal to the scale factors.
      */
-    virtual float getWidth(); virtual float getHeight();
+    virtual float getWidth(); virtual float getHeight() const;
     float getTotalWidth(); float getTotalHeight();
     virtual float getDestWidth(); virtual float getDestHeight();
     float getBorderSize(); float getDestBorderSize();
@@ -303,5 +303,7 @@ protected:
     void animateValues();
 
 };
+
+bool RectangleHeightComparator( const RectangleBase * const r1, const RectangleBase * const r2 );
 
 #endif /*RECTANGLEBASE_H_*/

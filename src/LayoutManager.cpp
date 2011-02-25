@@ -8,6 +8,7 @@
 
 #include <cstdio>
 #include <cmath>
+#include <algorithm>
 
 #include "LayoutManager.h"
 #include "RectangleBase.h"
@@ -231,7 +232,40 @@ bool LayoutManager::tilingArrange( float outerL, float outerR,
                                    float outerU, float outerD,
                                    std::map<std::string, std::vector<RectangleBase*> > data )
 {
-    return true;
+    // Extract object data
+    if ( data.find("objects") == data.end() )
+    {
+        printf( "ZOMG:::: tilingArrange was not passed an 'objects'\n" );
+        return false;
+    }
+    std::vector<RectangleBase*> objects = data["objects"];
+
+    if ( objects.size() == 0 )
+        return false;
+
+    // if we only have one object, just fullscreen it to the area
+    if ( objects.size() == 1 )
+    {
+        objects[0]->fillToRect( outerL, outerR, outerU, outerD );
+        return true;
+    }
+
+    printf("Before:\n");
+    for ( int i = 0; i < objects.size(); i++ )
+    {
+        printf("  %i %s %f %f\n", i, objects[i]->getName().c_str(),
+                        objects[i]->getWidth(), objects[i]->getHeight());
+    }
+
+    sort(objects.begin(), objects.end(), RectangleHeightComparator);
+
+    printf("After:\n");
+    for ( int i = 0; i < objects.size(); i++ )
+    {
+        printf("  %i %s %f %f\n", i, objects[i]->getName().c_str(),
+                        objects[i]->getWidth(), objects[i]->getHeight());
+    }
+
 }
 
 bool LayoutManager::gridArrange( RectangleBase outerRect,
