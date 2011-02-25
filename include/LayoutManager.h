@@ -75,6 +75,19 @@ private:
                         bool horiz, bool edge, bool resize,
                         std::map<std::string, std::vector<RectangleBase*> > data,
                         int numX = 0, int numY = 0 );
+
+    bool tilingArrange( RectangleBase innerRect,
+                      bool horiz, bool edge, bool resize,
+                      std::map<std::string, std::vector<RectangleBase*> > data,
+                      int numX = 0, int numY = 0 );
+    bool tilingArrange( float outerL, float outerR, float outerU, float outerD,
+                      float innerL, float innerR, float innerU, float innerD,
+                      std::map<std::string, std::vector<RectangleBase*> > data,
+                      std::map<std::string, std::string> options);
+    bool tilingArrange( float innerL, float innerR, float innerU, float innerD,
+                      bool horiz, bool edge, bool resize,
+                      std::map<std::string, std::vector<RectangleBase*> > data,
+                      int numX = 0, int numY = 0 );
 };
 
 #endif /*LAYOUTMANAGER_H_*/

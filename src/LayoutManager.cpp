@@ -59,6 +59,7 @@ bool LayoutManager::arrange( std::string method,
     std::map<std::string, fn_ptr> lookup;
     lookup["perimeter"] = &LayoutManager::perimeterArrange;
     lookup["grid"]      = &LayoutManager::gridArrange;
+    lookup["tiling"]    = &LayoutManager::tilingArrange;
     lookup["focus"]     = &LayoutManager::focus;
     lookup["aspectFocus"] = &LayoutManager::aspectFocus;
 
@@ -185,6 +186,61 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
                      data, 1, sideNum );
     }
     // TODO - return the conjunction of the above gridArrange return values
+    return true;
+}
+
+bool LayoutManager::tilingArrange( RectangleBase outerRect,
+                                    bool horiz, bool edge, bool resize,
+                                    std::map<std::string, std::vector<RectangleBase*> > data,
+                                    int numX, int numY )
+{
+    float outerL = outerRect.getLBound();
+    float outerR = outerRect.getRBound();
+    float outerU = outerRect.getUBound();
+    float outerD = outerRect.getDBound();
+
+    return tilingArrange( outerL, outerR, outerU, outerD, horiz, edge,
+                            resize, data, numX, numY );
+}
+
+bool LayoutManager::tilingArrange(float outerL, float outerR,
+                                float outerU, float outerD,
+                                float innerL, float innerR,
+                                float innerU, float innerD,
+                                std::map<std::string, std::vector<RectangleBase*> > data,
+                                std::map<std::string, std::string> opts )
+{
+    // Setup opts defaults
+    std::map<std::string, std::string> dflt = \
+        std::map<std::string, std::string>();
+    dflt["horiz"] = "True"; dflt["edge"] = "False"; dflt["resize"] = "True";
+    dflt["numX"] = "0";     dflt["numY"] = "0";
+
+    // Apply the opts defaults to opts
+    for (std::map<std::string,std::string>::iterator i = dflt.begin();
+         i != dflt.end(); i++)
+    {
+        // If the value wasn't specified by our caller, then load the default
+        if ( opts.find(i->first) == opts.end() )
+            opts[i->first] = i->second;
+    }
+
+    return tilingArrange(outerL, outerR, outerU, outerD,
+                       str2bool(opts["horiz"]),
+                       str2bool(opts["edge"]),
+                       str2bool(opts["resize"]),
+                       data,
+                       str2int(opts["numX"]),
+                       str2int(opts["numY"]));
+}
+
+bool LayoutManager::tilingArrange( float outerL, float outerR, float outerU,
+                                    float outerD,
+                                    bool horiz, bool edge, bool resize,
+                                    std::map<std::string, std::vector<RectangleBase*> > data,
+                                    int numX, int numY )
+{
+    printf("Stub here for tiling arrange\n");
     return true;
 }
 
