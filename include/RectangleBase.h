@@ -131,11 +131,21 @@ public:
      */
     void setTexture( GLuint tex, int width, int height );
 
+    /*
+     * True if this rectangle intersects the specified one
+     */
+    bool intersectsX(RectangleBase * other);
+    bool intersectsY(RectangleBase * other);
+    bool outOfBoundsX(float xmin, float xmax);
+    bool outOfBoundsY(float ymin, float ymax);
+
     float getX() const; float getY() const; float getZ() const;
     void setX(float _x); void setY(float _y); void setZ(float _z);
     float getDestX() const; float getDestY() const;
     void setDestX(float _x); void setDestY(float _y);
     float getScaleX() const; float getScaleY() const;
+    float getDestScaleX() const; float getDestScaleY() const;
+    void setScaleX(float _x); void setScaleY(float _y);
     float getLat(); float getLon();
 
     void setName( std::string s );

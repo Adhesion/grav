@@ -383,6 +383,39 @@ void RectangleBase::setTexture( GLuint tex, int width, int height )
     twidth = width; theight = height;
 }
 
+bool RectangleBase::intersectsY(RectangleBase* o)
+{
+    float r1top = getDestY() + getDestScaleY() / 2.0;
+    float r1bot = getDestY() - getDestScaleY() / 2.0;
+    float r2top = o->getDestY() + o->getDestScaleY() / 2.0;
+    float r2bot = o->getDestY() - o->getDestScaleY() / 2.0;
+
+    return r2top < r1bot && r1top < r2bot;
+}
+bool RectangleBase::intersectsX(RectangleBase* o)
+{
+    float r1right = getDestX() + getDestScaleX() / 2.0;
+    float r1left  = getDestX() - getDestScaleX() / 2.0;
+    float r2right = o->getDestX() + o->getDestScaleX() / 2.0;
+    float r2left  = o->getDestX() - o->getDestScaleX() / 2.0;
+
+    return r2left < r1right && r1left < r2right;
+}
+
+bool RectangleBase::outOfBoundsX(float xmin, float xmax)
+{
+    float right = getDestX() + getDestScaleX() / 2.0;
+    float left  = getDestX() - getDestScaleX() / 2.0;
+    return right > xmax || left < xmin;
+}
+
+bool RectangleBase::outOfBoundsY(float ymin, float ymax)
+{
+    float top = getDestY() - getDestScaleY() / 2.0;
+    float bot = getDestY() + getDestScaleY() / 2.0;
+    return top < ymin || bot > ymax;
+}
+
 void RectangleBase::setX(float _x)
 {
     x = _x;
@@ -441,6 +474,16 @@ float RectangleBase::getScaleX() const
 float RectangleBase::getScaleY() const
 {
     return scaleY;
+}
+
+float RectangleBase::getDestScaleX() const
+{
+    return destScaleX;
+}
+
+float RectangleBase::getDestScaleY() const
+{
+    return destScaleY;
 }
 
 float RectangleBase::getLat()
