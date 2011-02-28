@@ -305,7 +305,7 @@ std::vector<RectangleBase*>::iterator
 
     RectangleBase* o = (*start);
     // If it doesn't fit.. we're screwed.
-    if ( !(o->getScaleX() < xmax-xmin && o->getScaleY() < ymax-ymin) )
+    if ( !(o->getDestScaleX() < xmax-xmin && o->getDestScaleY() < ymax-ymin) )
     {
         for ( int i = 0; i < level ; i++ ) printf("*  ");
         printf("Does not fit!\n");
