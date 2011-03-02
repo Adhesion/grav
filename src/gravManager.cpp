@@ -28,6 +28,8 @@
 
 #include <VPMedia/random_helper.h>
 
+static float overalllevel;
+
 gravManager::gravManager()
 {
     windowWidth = 0; windowHeight = 0; // this should be set immediately
@@ -134,13 +136,18 @@ void gravManager::draw()
     cam->doGLLookat();
 
     // audio test drawing
-    /*if ( audioEnabled )
+    if ( audioEnabled )
     {
         GLUquadric* sphereQuad = gluNewQuadric();
-        float level = audio->getLevelAvg();
-        printf( "level: %f\n", level );
-        gluSphere( sphereQuad, level * 50.0f, 200, 200 );
-    }*/
+        if ( true ) //drawCounter % 2 == 0 )
+        {
+            float avg = audio->getLevelAvg();
+            if ( avg > 0.0001f )
+                overalllevel = avg;
+            //printf( "level: %f\n", level );
+        }
+        gluSphere( sphereQuad, overalllevel * 30.0f, 50, 50 );
+    }
 
     // set it to update names only every 30 frames
     bool updateNames = false;
@@ -148,6 +155,8 @@ void gravManager::draw()
     {
         updateNames = true;
         drawCounter = 0;
+        if ( audioEnabled )
+            audio->updateNames();
     }
 
     // polygon offset to fix z-fighting of coplanar polygons (videos)
@@ -272,23 +281,24 @@ void gravManager::draw()
             if ( audioEnabled && drawCounter == 0 && (*si)->isSelectable() &&
                     audio->getSourceCount() > 0 )
             {
-                // TODO: do a lookup with CNAME if siteIDs aren't enabled
+                // had a really bizarre bug here - if uninitialized, would hit
+                // > 0.01f check and succeed later if object was selected. what?
+                float level = 0.0f;
+                // if source has siteID, send that (and tell audiomanager to
+                // only check siteIDs), if not, use cname if available
                 if ( (*si)->getSiteID().compare("") != 0 )
                 {
-                    float level;
-                    level = audio->getLevelAvg( (*si)->getSiteID() );
-                    //printf( "siteID %s level: %f\n", (*si)->getSiteID().c_str(),
-                    //        level );
-                    // -2.0f is our default value for not finding the level
-                    if ( level > 0.01f )
-                    {
-                        innerObjs.push_back( (*si) );
-                        audioFocusTrigger = true;
-                    }
-                    else
-                    {
-                        outerObjs.push_back( (*si) );
-                    }
+                    level = audio->getLevel( (*si)->getSiteID(), true, false );
+                }
+                else if ( (*si)->getAltName().compare("") != 0 )
+                {
+                    level = audio->getLevel( (*si)->getAltName(), true, true );
+                }
+
+                if ( level > 0.01f )
+                {
+                    innerObjs.push_back( (*si) );
+                    audioFocusTrigger = true;
                 }
                 else
                 {

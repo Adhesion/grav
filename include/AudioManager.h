@@ -8,10 +8,11 @@
  * other objects.
  * @author Andrew Ford
  */
- 
+
 class VPMSession;
 class VPMPayloadDecoder;
 class VPMAudioMeter;
+
 #include <VPMedia/VPMSessionListener.h>
 #include <VPMedia/VPMPayload.h>
 #include <VPMedia/VPMTypes.h>
@@ -22,7 +23,9 @@ typedef struct AudioSource
 {
     uint32_t ssrc;
     std::string siteID;
+    std::string cName;
     VPMAudioMeter* meter;
+    VPMSession* session;
 } AudioSource;
 
 class AudioManager : public VPMSessionListener
@@ -31,10 +34,19 @@ class AudioManager : public VPMSessionListener
 public:
     AudioManager();
     ~AudioManager();
-    float getLevel( std::string name = "", bool avg = false );
+
+    // avg: get running level average for single source
+    // cnames: check cname instead of siteID
+    // if name is blank, average all sources
+    float getLevel( std::string name = "", bool avg = false,
+                        bool cnames = false );
     float getLevelAvg( std::string name = "" );
     void printLevels();
+
     unsigned int getSourceCount();
+
+    void updateNames();
+
     virtual void vpmsession_source_created( VPMSession &session,
                                           uint32_t ssrc,
                                           uint32_t pt,
@@ -45,12 +57,12 @@ public:
                                           const char *reason );
     virtual void vpmsession_source_description( VPMSession &session,
                                               uint32_t ssrc );
-    virtual void vpmsession_source_app(VPMSession &session, 
-                                     uint32_t ssrc, 
-                                     const char *app, 
-                                     const char *data, 
+    virtual void vpmsession_source_app(VPMSession &session,
+                                     uint32_t ssrc,
+                                     const char *app,
+                                     const char *data,
                                      uint32_t data_len);
-    
+
 private:
     std::vector<AudioSource*> sources;
 

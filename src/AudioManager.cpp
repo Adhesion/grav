@@ -10,19 +10,20 @@
 #include <VPMedia/VPMPayloadDecoder.h>
 #include <VPMedia/audio/linear/VPMLinear16Decoder.h>
 #include <VPMedia/audio/VPMAudioMeter.h>
+#include <VPMedia/VPMSession.h>
 #include <cstdio>
 
 AudioManager::AudioManager()
 {
-    
+
 }
 
 AudioManager::~AudioManager()
 {
-    
+
 }
 
-float AudioManager::getLevel( std::string name, bool avg )
+float AudioManager::getLevel( std::string name, bool avg, bool cnames )
 {
     // Since there might be multiple sources with the same label (ie, one
     // site sending multiple audio streams) we'll average the values of the
@@ -34,8 +35,9 @@ float AudioManager::getLevel( std::string name, bool avg )
 
     for ( unsigned int i = 0; i < sources.size(); i++ )
     {
-        if ( sources[i]->siteID.compare( name ) == 0 ||
-                name.compare( "" ) == 0 )
+        if ( ( !cnames && sources[i]->siteID.compare( name ) == 0 ) ||
+             ( cnames && sources[i]->cName.compare( name ) == 0 ) ||
+             name.compare( "" ) == 0 )
         {
             //printf( "AudioManager::getLevel: found %s\n", name.c_str() );
             if ( avg )
@@ -46,6 +48,7 @@ float AudioManager::getLevel( std::string name, bool avg )
             else
                 temp += sources[i]->meter->level();
             count++;
+            //printf( "audioman returning %f\n", temp );
         }
         //else
             //printf( "AudioManager::getLevel: DID NOT find %s\n", name.c_str() );
@@ -78,6 +81,22 @@ unsigned int AudioManager::getSourceCount()
     return sources.size();
 }
 
+void AudioManager::updateNames()
+{
+    for ( unsigned int i = 0; i < sources.size(); i++ )
+    {
+        char buffer[256];
+        uint32_t bufferLen = sizeof( buffer );
+
+        if ( sources[i]->session->getRemoteSDES( sources[i]->ssrc,
+                        VPMSession::VPMSESSION_SDES_CNAME, buffer, bufferLen ) )
+        {
+            sources[i]->cName = std::string( buffer );
+            //printf( "audioman::updatenames got %s for source 0x%08x\n", sources[i]->cName.c_str(), sources[i]->ssrc );
+        }
+    }
+}
+
 void AudioManager::vpmsession_source_created( VPMSession &session,
                                           uint32_t ssrc,
                                           uint32_t pt,
@@ -93,9 +112,10 @@ void AudioManager::vpmsession_source_created( VPMSession &session,
         VPMAudioMeter* m = new VPMAudioMeter();
         a->ssrc = ssrc;
         a->meter = m;
-        
+        a->session = &session;
+
         dec->connectAudioProcessor( m );
-        
+
         sources.push_back( a );
         printf( "AudioManager::vpmsession_source_created: source added\n" );
     }
@@ -124,13 +144,13 @@ void AudioManager::vpmsession_source_deleted( VPMSession &session,
 void AudioManager::vpmsession_source_description( VPMSession &session,
                                               uint32_t ssrc )
 {
-    
+
 }
 
-void AudioManager::vpmsession_source_app(VPMSession &session, 
-                                     uint32_t ssrc, 
-                                     const char *app, 
-                                     const char *data, 
+void AudioManager::vpmsession_source_app(VPMSession &session,
+                                     uint32_t ssrc,
+                                     const char *app,
+                                     const char *data,
                                      uint32_t data_len)
 {
     std::string appS( app, 4 );
@@ -138,7 +158,7 @@ void AudioManager::vpmsession_source_app(VPMSession &session,
     printf( "AudioManager::RTCP_APP: ssrc: 0x%08x\n", ssrc );
     printf( "AudioManager::RTCP_APP: %s,%s\n", appS.c_str(), dataS.c_str() );
     printf( "AudioManager::RTCP_APP: data length is %i\n", data_len );
-    
+
     if ( appS.compare( "site" ) == 0 )
     {
         for ( unsigned int i = 0; i < sources.size(); i++ )
