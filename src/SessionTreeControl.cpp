@@ -96,7 +96,8 @@ void SessionTreeControl::removeSession( std::string address )
     }
 
     // figure out whether it's a rotated session or not here
-    if ( GetItemParent( item ) == videoNodeID )
+    if ( GetItemParent( item ) == videoNodeID ||
+         GetItemParent( item ) == audioNodeID )
     {
         if ( sessionManager->removeSession( address ) )
             Delete( item );
