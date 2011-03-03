@@ -84,6 +84,8 @@ bool SessionManager::initSession( std::string address, bool audio )
     (*counter)++;
     entry.sessionTS = random32();
     entry.address = address;
+    entry.encryptionKey = "";
+    entry.encryptionEnabled = false;
     entry.audio = audio;
     entry.enabled = true;
     entry.session = session;
