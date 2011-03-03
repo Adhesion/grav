@@ -149,6 +149,7 @@ bool gravApp::OnInit()
     grav->setVideoListener( videoSessionListener );
     grav->setCanvas( canvas );
     grav->setVenueClientController( venueClientController );
+    grav->setAudio( audioSessionListener ); // may not necessarily be used
 
     venueClientController->setSessionControl( sessionTree );
 
@@ -293,7 +294,6 @@ bool gravApp::handleArgs()
     {
         initialAudioAddresses.push_back(
                                 std::string((char*)audioAddress.char_str()) );
-        grav->setAudio( audioSessionListener );
     }
 
     wxString headerWX;

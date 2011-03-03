@@ -223,9 +223,14 @@ private:
     float textScale;
     float textOffset;
 
-    bool audioEnabled;
     AudioManager* audio;
     bool audioFocusTrigger;
+    // "audioEnabled" only means that the AudioManager object is available, not
+    // that there actually is any audio being used in the session.
+    // audioAvailable() accomplishes this by checking number of sources in
+    // AudioManager
+    bool audioEnabled;
+    bool audioAvailable();
 
     bool drawSelectionBox;
 

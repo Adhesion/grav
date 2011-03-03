@@ -136,7 +136,7 @@ void gravManager::draw()
     cam->doGLLookat();
 
     // audio test drawing
-    if ( audioEnabled )
+    /*if ( audioAvailable() )
     {
         GLUquadric* sphereQuad = gluNewQuadric();
         if ( true ) //drawCounter % 2 == 0 )
@@ -146,8 +146,8 @@ void gravManager::draw()
                 overalllevel = avg;
             //printf( "level: %f\n", level );
         }
-        gluSphere( sphereQuad, overalllevel * 30.0f, 50, 50 );
-    }
+        gluSphere( sphereQuad, overalllevel * 30.0f + 0.5f, 50, 50 );
+    }*/
 
     // set it to update names only every 30 frames
     bool updateNames = false;
@@ -155,7 +155,7 @@ void gravManager::draw()
     {
         updateNames = true;
         drawCounter = 0;
-        if ( audioEnabled )
+        if ( audioAvailable() )
             audio->updateNames();
     }
 
@@ -278,8 +278,7 @@ void gravManager::draw()
             // set the audio effect level on the drawcounter, if audio is
             // enabled, and if it's selectable (excludes runway)
             // TODO maybe change this if meaning of selectable changes
-            if ( audioEnabled && drawCounter == 0 && (*si)->isSelectable() &&
-                    audio->getSourceCount() > 0 )
+            if ( audioAvailable() && drawCounter == 0 && (*si)->isSelectable() )
             {
                 // had a really bizarre bug here - if uninitialized, would hit
                 // > 0.01f check and succeed later if object was selected. what?
@@ -319,7 +318,7 @@ void gravManager::draw()
     }
 
     // do the audio focus if it triggered
-    if ( audioEnabled && audio->getSourceCount() > 0 )
+    if ( audioAvailable() )
     {
         if ( audioFocusTrigger )
         {
@@ -1352,4 +1351,9 @@ void gravManager::toggleShowVenueClientController()
         venueClientController->setRendering(
                                     !venueClientController->getRendering() );
     }
+}
+
+bool gravManager::audioAvailable()
+{
+    return audioEnabled && audio->getSourceCount() > 0;
 }
