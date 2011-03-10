@@ -26,7 +26,18 @@ public:
     void spawnPropertyWindow( wxCommandEvent& evt );
 
 private:
+    // different event types for these, so we need these separate functions even
+    // though they do the same thing
     void OnCloseWindow( wxCloseEvent& evt );
+    void OnExit( wxCommandEvent& evt );
+
+    void OnAbout( wxCommandEvent& evt );
+
+    void setupMenuBar();
+
+    // common close functionality to be accessed by the different entry points
+    void cleanup();
+
     gravManager* grav;
 
     DECLARE_EVENT_TABLE()

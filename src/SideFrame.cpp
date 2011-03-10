@@ -39,7 +39,7 @@ void SideFrame::setupMenuBar()
                             _("Rotate video sessions") );
 
     // add menubar to parent frame here - kind of clunky
-    wxMenuBar* menubar = new wxMenuBar;
+    wxMenuBar* menubar = new wxMenuBar();
     menubar->Append( sessionMenu, _("Sessions") );
 
     SetMenuBar( menubar );

@@ -19,26 +19,21 @@ BEGIN_EVENT_TABLE(Frame, wxFrame)
 EVT_CLOSE(Frame::OnCloseWindow)
 // for right click -> properties in main window
 EVT_MENU(InputHandler::propertyID, Frame::spawnPropertyWindow)
-// for menubar on side window, temporarily disabled
-/*EVT_MENU(SessionTreeControl::addVideoID,
-         SessionTreeControl::addVideoSessionEvent)
-EVT_MENU(SessionTreeControl::addAudioID,
-         SessionTreeControl::addAudioSessionEvent)
-EVT_MENU(SessionTreeControl::rotateID,
-         SessionTreeControl::rotateEvent)*/
+EVT_MENU(wxID_EXIT, Frame::OnExit)
+EVT_MENU(wxID_ABOUT, Frame::OnAbout)
 END_EVENT_TABLE()
 
 Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title ) :
                 wxFrame( parent, id, title, wxDefaultPosition, wxDefaultSize )
 {
-
+    setupMenuBar();
 }
 
 Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title,
                 const wxPoint& pos, const wxSize& size ) :
                 wxFrame( parent, id, title, pos, size )
 {
-
+    setupMenuBar();
 }
 
 void Frame::setSourceManager( gravManager* g )
@@ -57,6 +52,38 @@ void Frame::spawnPropertyWindow( wxCommandEvent& evt )
 }
 
 void Frame::OnCloseWindow( wxCloseEvent& evt )
+{
+    cleanup();
+}
+
+void Frame::OnExit( wxCommandEvent& evt )
+{
+    cleanup();
+}
+
+void Frame::OnAbout( wxCommandEvent& evt )
+{
+
+}
+
+void Frame::setupMenuBar()
+{
+    wxMenu *fileMenu = new wxMenu();
+    fileMenu->AppendSeparator();
+    fileMenu->Append( wxID_EXIT, _("Exit") );
+
+    wxMenu *helpMenu = new wxMenu();
+    helpMenu->Append( wxID_HELP_COMMANDS, _("Keyboard shortcuts...") );
+    helpMenu->AppendSeparator();
+    helpMenu->Append( wxID_ABOUT, _("About...") );
+
+    wxMenuBar *menuBar = new wxMenuBar();
+    menuBar->Append( fileMenu, _("File") );
+    menuBar->Append( helpMenu, _("Help") );
+    SetMenuBar( menuBar ) ;
+}
+
+void Frame::cleanup()
 {
     // can potentially add a "really quit?" dialog here
     //printf( "Frame::OnCloseWindow (%s)\n", (char*)(GetName().char_str()) );
