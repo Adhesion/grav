@@ -16,11 +16,11 @@ EVT_SIZE(GLCanvas::resize)
 END_EVENT_TABLE()
 
 GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
-                        int width, int height ) :
+                        wxSize size ) :
     wxGLCanvas( parent, wxID_ANY, attributes, wxDefaultPosition,
                 wxDefaultSize, 0, wxT("grav GLCanvas")), grav( g )
 {
-    SetSize( wxSize( width, height ) );
+    SetSize( size );
     glContext = new wxGLContext( this );
     SetCurrent( *glContext );
 

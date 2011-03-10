@@ -21,8 +21,7 @@ class GLCanvas : public wxGLCanvas
 {
 
 public:
-    GLCanvas( wxWindow* parent, gravManager* g, int* attributes, int width,
-                int height );
+    GLCanvas( wxWindow* parent, gravManager* g, int* attributes, wxSize size );
     ~GLCanvas();
 
     void handlePaintEvent( wxPaintEvent& evt );

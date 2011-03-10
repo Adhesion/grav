@@ -88,8 +88,8 @@ bool gravApp::OnInit()
     int attribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24,
                             0 };
 
-    canvas = new GLCanvas( mainFrame, grav, attribList, windowWidth,
-                            windowHeight );
+    canvas = new GLCanvas( mainFrame, grav, attribList,
+                            mainFrame->GetClientSize() );
     sourceTree = new TreeControl( treeNotebook );
     sourceTree->setSourceManager( grav );
     sessionTree = new SessionTreeControl( treeNotebook );
