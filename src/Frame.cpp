@@ -63,7 +63,10 @@ void Frame::OnExit( wxCommandEvent& evt )
 
 void Frame::OnAbout( wxCommandEvent& evt )
 {
-
+    wxMessageBox(
+            _("grav (C) 2011 Rochester Institute of Technology\n"
+              "grav is free software, released under the GNU GPL. "
+              "See COPYING for details.") );
 }
 
 void Frame::setupMenuBar()
