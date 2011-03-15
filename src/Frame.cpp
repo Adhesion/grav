@@ -66,7 +66,9 @@ void Frame::OnAbout( wxCommandEvent& evt )
     wxMessageBox(
             _("grav (C) 2011 Rochester Institute of Technology\n"
               "grav is free software, released under the GNU GPL. "
-              "See COPYING for details.") );
+              "See COPYING for details.\n\n"
+              "This software uses libraries from the FFmpeg project under the "
+              "GPLv3.") );
 }
 
 void Frame::setupMenuBar()
