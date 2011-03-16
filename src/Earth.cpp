@@ -6,6 +6,7 @@
  */
 
 #include "Earth.h"
+#include "gravUtil.h"
 #include "PNGLoader.h"
 
 #include <cmath>
@@ -19,7 +20,18 @@ Earth::Earth()
     xRot = 0.0f; yRot = 0.0f; zRot = 0.0f;
     destXRot = xRot; destYRot = yRot; destZRot = zRot;
     moveAmt = 1.0f;
-    earthTex = PNGLoader::loadPNG( "earth.png", texWidth, texHeight );
+
+    earthTex = 0;
+    gravUtil* util = gravUtil::getInstance();
+    std::string earthTexLoc = util->findFile( "earth.png" );
+    if ( earthTexLoc.compare( "" ) != 0 )
+    {
+        earthTex = PNGLoader::loadPNG( earthTexLoc, texWidth, texHeight );
+    }
+    else
+    {
+        printf( "Earth::warning: earth texture not found\n" );
+    }
 
     animated = true;
     rotating = false;

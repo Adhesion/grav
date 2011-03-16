@@ -12,6 +12,7 @@
  */
 
 #include "PythonTools.h"
+#include "gravUtil.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -24,17 +25,25 @@ PythonTools::PythonTools()
     main_m = PyImport_AddModule( "__main__" );
     main_d = PyModule_GetDict( main_m );
 
-    entryModule = "py/entry.py";
+    gravUtil* util = gravUtil::getInstance();
+    entryModule = util->findFile( "entry.py" );
     entryFunc = "entryFunc";
 
-    FILE* file_1 = fopen( entryModule.c_str(), "r" );
-    if ( file_1 != NULL )
+    bool found = false;
+    if ( entryModule.compare( "" ) != 0 )
     {
-        PyRun_File( file_1, entryModule.c_str(), Py_file_input, main_d, main_d );
-        fclose( file_1 );
-        init = true;
+        FILE* file_1 = fopen( entryModule.c_str(), "r" );
+        found = file_1 != NULL;
+        if ( found )
+        {
+            PyRun_File( file_1, entryModule.c_str(), Py_file_input, main_d,
+                            main_d );
+            fclose( file_1 );
+            init = true;
+        }
     }
-    else
+
+    if ( !found )
     {
         printf( "PythonTools::ERROR: entry script not found - python "
                 "integration not available\n" );

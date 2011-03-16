@@ -12,6 +12,7 @@
 #include "SessionTreeControl.h"
 #include "VenueNode.h"
 #include "PNGLoader.h"
+#include "gravUtil.h"
 
 VenueClientController::VenueClientController( float _x, float _y,
                                                 gravManager* g )
@@ -34,11 +35,29 @@ VenueClientController::VenueClientController( float _x, float _y,
 
     setScale( 13.0f, 13.0f );
 
+    gravUtil* util = gravUtil::getInstance();
+
     // this should be safe since this constructor normally gets called after
     // GL stuff gets set up
     circleWidth = 256;
     circleHeight = 256;
-    circleTex = PNGLoader::loadPNG( "circle.png", circleWidth, circleHeight );
+    circleTex = 0;
+    std::string circleLoc = util->findFile( "circle.png" );
+    if ( AGToolsScript.compare( "" ) == 0 )
+    {
+        printf( "VenueClientController::warning: "
+                "texture circle.png not found\n" );
+    }
+    else
+    {
+        circleTex = PNGLoader::loadPNG( circleLoc, circleWidth, circleHeight );
+    }
+
+    AGToolsScript = util->findFile( "AGTools.py" );
+    if ( AGToolsScript.compare( "" ) == 0 )
+    {
+        printf( "VenueClientController::warning: AGTools.py not found\n" );
+    }
 
     updateVenueName();
     updateExitMap();
@@ -98,7 +117,7 @@ std::vector<RectangleBase*>::iterator VenueClientController::remove(
 
 void VenueClientController::getVenueClient()
 {
-    PyObject* pRes = pyTools.call( "AGTools", "GetVenueClients" );
+    PyObject* pRes = pyTools.call( AGToolsScript, "GetVenueClients" );
     std::vector<std::string> venueClients = pyTools.ltov( pRes );
     if ( venueClients.size() == 0 )
     {
@@ -125,7 +144,7 @@ void VenueClientController::updateExitMap()
         return;
     }
 
-    PyObject* pRes = pyTools.call( "AGTools", "GetExits",
+    PyObject* pRes = pyTools.call( AGToolsScript, "GetExits",
                                     venueClientUrl );
     exitMap = pyTools.dtom( pRes );
     Py_XDECREF( pRes );
@@ -185,7 +204,7 @@ void VenueClientController::enterVenue( std::string venueName )
     printf( "VCC::calling entervenue on %s to %s\n", venueClientUrl.c_str(),
                 it->second.c_str() );
 
-    pyTools.call( "AGTools", "EnterVenue", args );
+    pyTools.call( AGToolsScript, "EnterVenue", args );
 
     updateExitMap();
 
@@ -203,14 +222,15 @@ void VenueClientController::updateVenueStreams()
     PyTuple_SetItem( args, 0, PyString_FromString( venueClientUrl.c_str() ) );
     PyTuple_SetItem( args, 1, PyString_FromString( type.c_str() ) );
 
-    PyObject* res = pyTools.call( "AGTools", "GetFormattedVenueStreams", args );
+    PyObject* res = pyTools.call( AGToolsScript, "GetFormattedVenueStreams",
+                                    args );
     currentVenueStreams = pyTools.dtom( res );
     Py_XDECREF( res );
 }
 
 void VenueClientController::updateVenueName()
 {
-    PyObject* res = pyTools.call( "AGTools", "GetCurrentVenueName",
+    PyObject* res = pyTools.call( AGToolsScript, "GetCurrentVenueName",
                                     venueClientUrl.c_str() );
     if ( res != NULL && res != Py_None )
         currentVenue = PyString_AsString( res );

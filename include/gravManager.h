@@ -132,6 +132,7 @@ public:
      * This would be done in the constructor, but it has to be done after
      * the GL context is set up (and in the WX case, the constructor for this
      * class has to be done before that).
+     * Input is just a filename, this function will calculate full path.
      */
     void setBorderTex( std::string border );
 

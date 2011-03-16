@@ -11,6 +11,7 @@
 #include "VideoSource.h"
 #include "AudioManager.h"
 #include "GLUtil.h"
+#include "gravUtil.h"
 #include "RectangleBase.h"
 #include "Group.h"
 #include "Runway.h"
@@ -98,6 +99,8 @@ gravManager::gravManager()
 
     graphicsDebugView = false;
     pixelCount = 0;
+
+    borderTex = 0;
 
     venueClientController = NULL; // just for before it gets set
 }
@@ -1107,8 +1110,18 @@ void gravManager::removeFromLists( RectangleBase* obj, bool treeRemove )
 
 void gravManager::setBorderTex( std::string border )
 {
-    borderTex = PNGLoader::loadPNG( "border.png",
-                                    borderWidth, borderHeight );
+    gravUtil* util = gravUtil::getInstance();
+    std::string borderTexLoc = util->findFile( border );
+    if ( borderTexLoc.compare( "" ) != 0 )
+    {
+        borderTex = PNGLoader::loadPNG( borderTexLoc, borderWidth,
+                                            borderHeight );
+    }
+    else
+    {
+        printf( "gravManager::setBorderTex: warning: border texture %s "
+                "not found", border.c_str() );
+    }
 }
 
 Group* gravManager::createSiteIDGroup( std::string data )

@@ -5,6 +5,7 @@
  */
 
 #include "GLUtil.h"
+#include "gravUtil.h"
 #include "VideoSource.h"
 #include <string>
 
@@ -52,12 +53,20 @@ bool GLUtil::initGL()
         printf( "GLUtil::initGL(): shaders NOT available (GL v%s)\n", glVer );
     }
 
-    // TODO: could use a good way to find system-specific font dirs
-    if ( useBufferFont )
-        mainFont = new FTBufferFont( "FreeSans.ttf" );
-    else
-        mainFont = new FTTextureFont( "FreeSans.ttf" );
-    if ( mainFont->Error() )
+    gravUtil* util = gravUtil::getInstance();
+    std::string fontLoc = util->findFile( "FreeSans.ttf" );
+    bool found = fontLoc.compare( "" ) != 0;
+
+    if ( found )
+    {
+        // TODO: could use a good way to find system-specific font dirs
+        if ( useBufferFont )
+            mainFont = new FTBufferFont( fontLoc.c_str() );
+        else
+            mainFont = new FTTextureFont( fontLoc.c_str() );
+    }
+
+    if ( !found || mainFont->Error() )
     {
         printf( "GLUtil::initGL(): ERROR: font failed to load\n" );
         delete mainFont;

@@ -63,6 +63,7 @@ private:
     std::string venueClientUrl;
 
     PythonTools pyTools;
+    std::string AGToolsScript;
 
     gravManager* grav;
 

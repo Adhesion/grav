@@ -53,6 +53,11 @@ link_directories(
 # for ffmpeg
 add_definitions(-D__STDC_CONSTANT_MACROS)
 
+# setup paths for install
+set(GRAV_RESOURCE_DIR \"${CMAKE_INSTALL_PREFIX}/share/grav/\")
+message(${GRAV_RESOURCE_DIR})
+add_definitions(-DGRAV_RESOURCE_DIR=${GRAV_RESOURCE_DIR})
+
 set(SOURCES
 	src/AudioManager.cpp
 	src/Camera.cpp
@@ -62,6 +67,7 @@ set(SOURCES
 	src/GLUtil.cpp
 	src/grav.cpp
 	src/gravManager.cpp
+	src/gravUtil.cpp
 	src/Group.cpp
 	src/InputHandler.cpp
 	src/LayoutManager.cpp
@@ -95,5 +101,18 @@ target_link_libraries(grav
 	${wxWidgets_LIBRARIES}
 	${VPMEDIA_LIBRARIES}
 	${PYTHON_LIBRARIES}
+	)
+
+install(TARGETS grav
+	RUNTIME DESTINATION bin
+	)
+
+install(FILES circle.png border.png earth.png FreeSans.ttf
+	DESTINATION share/grav
+	)
+
+install(DIRECTORY py/
+	DESTINATION share/grav/py
+	FILES_MATCHING PATTERN "*.py"
 	)
 
