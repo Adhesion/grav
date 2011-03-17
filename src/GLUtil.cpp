@@ -65,8 +65,14 @@ bool GLUtil::initGL()
         else
             mainFont = new FTTextureFont( fontLoc.c_str() );
     }
+    else
+    {
+        printf( "GLUtil::initGL(): ERROR: font not found\n" );
+        mainFont = NULL;
+        return false;
+    }
 
-    if ( !found || mainFont->Error() )
+    if ( mainFont->Error() )
     {
         printf( "GLUtil::initGL(): ERROR: font failed to load\n" );
         delete mainFont;
