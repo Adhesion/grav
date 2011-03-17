@@ -34,7 +34,12 @@ protected:
 
 private:
     static gravUtil* instance;
+    /*
+     * All paths in this list should have the separator at the end. addPath will
+     * ensure this is the case.
+     */
     std::vector<std::string> resourceDirList;
+    std::string sep;
 
 };
 

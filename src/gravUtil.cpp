@@ -27,7 +27,7 @@ gravUtil::gravUtil()
     // TODO make this akin to os.path.sep in python - we can't necessarily just
     // grab it from python since pythontools needs to call this to find the
     // python script locations itself
-    std::string sep = "/";
+    sep = "/";
     std::string subdir = "py";
     resourceDirList.push_back( "." + sep );
     resourceDirList.push_back( "." + sep + subdir + sep );
@@ -61,5 +61,10 @@ std::string gravUtil::findFile( std::string file )
 void gravUtil::addPath( std::string path )
 {
     std::vector<std::string>::iterator start = resourceDirList.begin();
+    // check if path separator is at end of input, if not, add it
+    if ( *(path.rbegin()) != *(sep.begin()) )
+    {
+        path += sep;
+    }
     resourceDirList.insert( start, path );
 }
