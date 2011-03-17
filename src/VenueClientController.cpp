@@ -43,7 +43,7 @@ VenueClientController::VenueClientController( float _x, float _y,
     circleHeight = 256;
     circleTex = 0;
     std::string circleLoc = util->findFile( "circle.png" );
-    if ( AGToolsScript.compare( "" ) == 0 )
+    if ( circleLoc.compare( "" ) == 0 )
     {
         printf( "VenueClientController::warning: "
                 "texture circle.png not found\n" );
