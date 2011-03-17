@@ -162,23 +162,24 @@ void PythonTools::inspect_dictionary( PyObject *dict )
 
     Py_ssize_t pos = 0;
 
-    fprintf( stdout, "Inspecting Dictionary\n");
-    while (PyDict_Next(dict, &pos, &key, &value)) {
-        kstr = PyObject_Str(key);
-        stl_kstr = PyString_AsString(kstr);
+    fprintf( stdout, "Inspecting Dictionary\n" );
+    while ( PyDict_Next( dict, &pos, &key, &value ) )
+    {
+        kstr = PyObject_Str( key );
+        stl_kstr = PyString_AsString( kstr );
 
         fprintf( stdout, "(d)%s -> ", stl_kstr.c_str() );
         std::cout.flush();
 
-        vstr = PyObject_Str(value);
-        stl_vstr = PyString_AsString(vstr);
+        vstr = PyObject_Str( value );
+        stl_vstr = PyString_AsString( vstr );
 
         fprintf( stdout, "%s\n", stl_vstr.c_str()  );
 
-        Py_DECREF(kstr);
-        Py_DECREF(vstr);
+        Py_DECREF( kstr );
+        Py_DECREF( vstr );
     }
-    fprintf( stdout, "*salutes* Done Inspecting Dictionary\n");
+    fprintf( stdout, "*salutes* Done Inspecting Dictionary\n" );
 }
 
 PyObject* PythonTools::call( std::string _script, std::string _func,
