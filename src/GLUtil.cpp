@@ -43,9 +43,15 @@ bool GLUtil::initGL()
         else
         {
             shadersAvailable = false;
-            printf( "GLUtil::initGL(): shaders NOT available (GL v%s)\n",
-                        glVer );
+            printf( "GLUtil::initGL(): attempted to load shaders but failed"
+                    " (GL v%s)\n", glVer );
         }
+    }
+    else if ( glMajorVer >= 2 && !enableShaders )
+    {
+        shadersAvailable = false;
+        printf( "GLUtil::initGL(): shaders may be available but are disabled"
+                " (GL v%s)\n", glVer );
     }
     else
     {
