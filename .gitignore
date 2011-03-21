@@ -13,3 +13,5 @@ Makefile
 CMakeFiles
 CMakeCache.txt
 install_manifest.txt
+basicep7build.sh
+cleanep7build.sh
