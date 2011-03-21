@@ -10,6 +10,7 @@
 #include "gravUtil.h"
 
 #include <wx/file.h>
+#include <wx/filename.h>
 
 gravUtil* gravUtil::instance = NULL;
 
@@ -24,10 +25,7 @@ gravUtil* gravUtil::getInstance()
 
 gravUtil::gravUtil()
 {
-    // TODO make this akin to os.path.sep in python - we can't necessarily just
-    // grab it from python since pythontools needs to call this to find the
-    // python script locations itself
-    sep = "/";
+    sep = wxFileName::GetPathSeparator();
     std::string subdir = "py";
     resourceDirList.push_back( "." + sep );
     resourceDirList.push_back( "." + sep + subdir + sep );
