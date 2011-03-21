@@ -26,7 +26,7 @@ PythonTools::PythonTools()
     main_d = PyModule_GetDict( main_m );
 
     gravUtil* util = gravUtil::getInstance();
-    entryModule = util->findFile( "entry.py" );
+    entryModule = util->findFile( "gravEntry.py" );
     entryFunc = "entryFunc";
 
     bool found = false;
