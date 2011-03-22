@@ -48,9 +48,7 @@ try:
             print "EnterVenue(): Error: getclient failed"
             return
 
-        print "EnterVenue calling clientIW enter function"
         client.EnterVenue(venueURL)
-        print "EnterVenue complete"
 
     def GetFormattedVenueStreams(clientURL, streamType):
         client = GetClient(clientURL)
@@ -75,8 +73,6 @@ try:
         # if encryptionKey is None - ie, stream is not encrypted - send a dummy
         # value to signal to grav to not use encryption
         d = dict([(format(s), key(s)) for s in streams if criteria(s)])
-        import pprint
-        pprint.pprint(d)
         return d
 
     def GetCurrentVenueName(clientURL):
