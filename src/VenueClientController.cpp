@@ -330,14 +330,11 @@ bool VenueClientController::updateName()
 
 void VenueClientController::setRendering( bool r )
 {
-    //printf( "VCC::setrendering called with val %i\n", r );
-    //printf( "VCC::current val %i\n", enableRendering );
     // check if venue has changed in the meantime, if so update stuff
     std::string oldName = currentVenue;
     updateVenueName();
     if ( oldName.compare( currentVenue ) != 0 )
     {
-        //printf( "VCC::setrendering: venues different (old %s, new %s), updating stuff\n", oldName.c_str(), currentVenue.c_str() );
         updateExitMap();
         updateVenueStreams();
     }
@@ -347,7 +344,6 @@ void VenueClientController::setRendering( bool r )
     // hit will "hide" nothing, opposite what is expected)
     if ( exitMap.size() == 0 )
     {
-        //printf( "VCC::no exit map, setrendering returning\n" );
         return;
     }
 
@@ -365,8 +361,6 @@ void VenueClientController::setRendering( bool r )
         rearrange();
         grav->moveToTop( this );
     }
-
-    //printf( "VCC::setrendering ending, val now %i\n", enableRendering );
 }
 
 void VenueClientController::setSessionControl( SessionTreeControl* s )
