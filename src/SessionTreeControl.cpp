@@ -180,8 +180,12 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
     wxTreeItemId parent = GetItemParent( item );
 
     // when right clicking on a session
-    if ( ( parent == videoNodeID || parent == audioNodeID ||
-            parent == rotatedVideoNodeID ) && item != rotatedVideoNodeID )
+    // checking parent prevents remove option from showing up on top-level
+    // group
+    if ( parent.IsOk() &&
+            ( parent == videoNodeID || parent == audioNodeID ||
+              parent == rotatedVideoNodeID ) &&
+            item != rotatedVideoNodeID )
     {
         // only add enable/disable if it's a real session, not a rotated one
         // also add encryption set
