@@ -141,6 +141,8 @@ void VenueClientController::updateExitMap()
     }
     if ( venueClientUrl.compare( "" ) == 0 )
     {
+        printf( "VenueClientController::updateExitMap(): error: no venue "
+                        "client found\n" );
         return;
     }
 
@@ -187,6 +189,18 @@ void VenueClientController::printExitMap()
 
 void VenueClientController::enterVenue( std::string venueName )
 {
+    // if no venue client, try to get; if not then fail
+    if ( venueClientUrl.compare( "" ) == 0 )
+    {
+        getVenueClient();
+    }
+    if ( venueClientUrl.compare( "" ) == 0 )
+    {
+        printf( "VenueClientController::enterVenue(): error: no venue "
+                        "client found\n" );
+        return;
+    }
+
     std::map<std::string, std::string>::iterator it = exitMap.find( venueName );
     if ( it == exitMap.end() )
     {
@@ -217,6 +231,18 @@ void VenueClientController::enterVenue( std::string venueName )
 
 void VenueClientController::updateVenueStreams()
 {
+    // if no venue client, try to get; if not then fail
+    if ( venueClientUrl.compare( "" ) == 0 )
+    {
+        getVenueClient();
+    }
+    if ( venueClientUrl.compare( "" ) == 0 )
+    {
+        printf( "VenueClientController::updateVenueStreams(): error: no venue "
+                        "client found\n" );
+        return;
+    }
+
     std::string type = "video";
     PyObject* args = PyTuple_New( 2 );
     PyTuple_SetItem( args, 0, PyString_FromString( venueClientUrl.c_str() ) );
@@ -230,6 +256,18 @@ void VenueClientController::updateVenueStreams()
 
 void VenueClientController::updateVenueName()
 {
+    // if no venue client, try to get; if not then fail
+    if ( venueClientUrl.compare( "" ) == 0 )
+    {
+        getVenueClient();
+    }
+    if ( venueClientUrl.compare( "" ) == 0 )
+    {
+        printf( "VenueClientController::updateVenueName(): error: no venue "
+                        "client found\n" );
+        return;
+    }
+
     PyObject* res = pyTools.call( AGToolsScript, "GetCurrentVenueName",
                                     venueClientUrl.c_str() );
     if ( res != NULL && res != Py_None )
