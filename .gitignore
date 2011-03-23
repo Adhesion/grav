@@ -15,3 +15,10 @@ CMakeCache.txt
 install_manifest.txt
 basicep7build.sh
 cleanep7build.sh
+.cdtbuild
+.cdtbuild_initial
+.cdtproject
+.cproject
+.project
+.project_initial
+.settings/
