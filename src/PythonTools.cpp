@@ -191,7 +191,6 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
     PyObject *func, *result;
 
     func = PyDict_GetItemString( main_d, entryFunc.c_str() );
-    Py_INCREF( func );
 
     if ( func == NULL )
     {
@@ -200,11 +199,13 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
                     entryFunc.c_str() );
         return NULL;
     }
+    Py_INCREF( func );
     if ( ! PyCallable_Check(func) )
     {
         PyErr_Print();
         fprintf( stderr, "Attribute \"%s\" is not callable.\n",
                     entryFunc.c_str() );
+        Py_DECREF( func );
         return NULL;
     }
 
@@ -244,6 +245,8 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
     {
         PyErr_Print();
         fprintf( stderr, "Call failed.\n" );
+        Py_DECREF( func );
+        Py_DECREF( entryArgs );
         return NULL;
     }
 
