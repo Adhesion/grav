@@ -98,7 +98,7 @@ void Frame::setupMenuBar()
 {
     wxMenu *fileMenu = new wxMenu();
     fileMenu->AppendSeparator();
-    fileMenu->Append( wxID_EXIT, _("&Quit") );
+    fileMenu->Append( wxID_EXIT, _("Quit") );
 
     wxMenu *helpMenu = new wxMenu();
     helpMenu->Append( wxID_HELP_COMMANDS, _("Keyboard shortcuts...") );
