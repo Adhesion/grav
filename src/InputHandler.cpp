@@ -60,8 +60,8 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     docstr[ktoh('G')] = "Toggle site grouping.";
     lookup[ktoh('X')] = &InputHandler::handleToggleRenderingSelected;
     docstr[ktoh('X')] = "Toggle rendering of selected objects.";
-    lookup[ktoh('Q')] = &InputHandler::handleQuit;
-    docstr[ktoh('Q')] = "Quit.";
+    lookup[ktoh('Q', wxMOD_ALT)] = &InputHandler::handleQuit;
+    docstr[ktoh('Q', wxMOD_ALT)] = "Quit.";
     lookup[ktoh('\e')] = &InputHandler::handleQuit;
     docstr[ktoh('\e')] = "Quit.";
     unprintables['\e'] = "(escape)";
