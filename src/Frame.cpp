@@ -53,12 +53,35 @@ void Frame::spawnPropertyWindow( wxCommandEvent& evt )
 
 void Frame::OnCloseWindow( wxCloseEvent& evt )
 {
-    cleanup();
+    // if the event can't be vetoed (ie, force close) then force close
+    if ( !evt.CanVeto() )
+    {
+        cleanup();
+        Destroy();
+    }
+
+    // otherwise show "really quit" dialog, close window if OK clicked
+    wxMessageDialog* exitDialog = new wxMessageDialog( this, _("Really quit?"),
+            _("grav"), wxOK | wxCANCEL );
+    int result = exitDialog->ShowModal();
+    exitDialog->Destroy();
+
+    switch( result )
+    {
+    case wxID_OK:
+        cleanup();
+        Destroy();
+        break;
+    case wxID_CANCEL:
+    default:
+        evt.Veto();
+        break;
+    }
 }
 
 void Frame::OnExit( wxCommandEvent& evt )
 {
-    cleanup();
+    Close();
 }
 
 void Frame::OnAbout( wxCommandEvent& evt )
