@@ -107,16 +107,6 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     lookup[ktoh('N', wxMOD_SHIFT)] = &InputHandler::handleNativeScaleAll;
     docstr[ktoh('N', wxMOD_SHIFT)] = "Scale all objects to native size.";
 
-    /* Navigation */
-    lookup[ktoh('A')] = &InputHandler::handleStrafeLeft;
-    docstr[ktoh('A')] = "Strafe left.";
-    lookup[ktoh('D')] = &InputHandler::handleStrafeRight;
-    docstr[ktoh('D')] = "Strafe right.";
-    lookup[ktoh('W')] = &InputHandler::handleZoomin;
-    docstr[ktoh('W')] = "Zoom in.";
-    lookup[ktoh('S')] = &InputHandler::handleZoomout;
-    docstr[ktoh('S')] = "Zoom out.";
-
     /* Different Layouts */
     lookup[ktoh('P')] = &InputHandler::handlePerimeterArrange;
     docstr[ktoh('P')] = "Arrange objects around the perimeter of the screen.";
@@ -148,6 +138,16 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
                             &InputHandler::handleToggleGraphicsDebug;
         docstr[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
                             "[debug] Toggle graphics debugging information.";
+
+        /* Navigation */
+        lookup[ktoh('A')] = &InputHandler::handleStrafeLeft;
+        docstr[ktoh('A')] = "Strafe left.";
+        lookup[ktoh('D')] = &InputHandler::handleStrafeRight;
+        docstr[ktoh('D')] = "Strafe right.";
+        lookup[ktoh('W')] = &InputHandler::handleZoomin;
+        docstr[ktoh('W')] = "Zoom in.";
+        lookup[ktoh('S')] = &InputHandler::handleZoomout;
+        docstr[ktoh('S')] = "Zoom out.";
     }
 }
 
