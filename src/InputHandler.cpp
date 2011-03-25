@@ -47,8 +47,6 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     debug = true;
 #endif
 
-    // TODO -- also below here, populate another map of keys to 'help strings'
-
     // Here we register which keys do what (declarative programming).
     /* Misc Management */
     lookup[ktoh('H')] = &InputHandler::handleHelp;
