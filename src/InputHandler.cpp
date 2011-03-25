@@ -42,7 +42,10 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     leftButtonHeld = false;
     ctrlHeld = false;
     modifiers = 0;
-    bool debug = true;
+    bool debug = false;
+#ifdef GRAV_DEBUG_MODE
+    debug = true;
+#endif
 
     // TODO -- also below here, populate another map of keys to 'help strings'
 
