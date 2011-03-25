@@ -141,13 +141,13 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
 
         /* Navigation */
         lookup[ktoh('A')] = &InputHandler::handleStrafeLeft;
-        docstr[ktoh('A')] = "Strafe left.";
+        docstr[ktoh('A')] = "[debug] Strafe left.";
         lookup[ktoh('D')] = &InputHandler::handleStrafeRight;
-        docstr[ktoh('D')] = "Strafe right.";
+        docstr[ktoh('D')] = "[debug] Strafe right.";
         lookup[ktoh('W')] = &InputHandler::handleZoomin;
-        docstr[ktoh('W')] = "Zoom in.";
+        docstr[ktoh('W')] = "[debug] Zoom in.";
         lookup[ktoh('S')] = &InputHandler::handleZoomout;
-        docstr[ktoh('S')] = "Zoom out.";
+        docstr[ktoh('S')] = "[debug] Zoom out.";
     }
 }
 
