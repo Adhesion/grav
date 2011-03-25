@@ -118,6 +118,11 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     lookup[ktoh('A', wxMOD_ALT)] = &InputHandler::handleToggleAutoFocusRotate;
     docstr[ktoh('A', wxMOD_ALT)] = "Toggle 'automatic' mode.";
 
+    lookup[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
+                        &InputHandler::handleToggleGraphicsDebug;
+    docstr[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
+                        "Toggle graphics debugging information.";
+
     if ( debug ) {
         /* Debug keys */
         lookup[ktoh(' ')] = &InputHandler::handleAddTestObject;
@@ -135,10 +140,6 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
         docstr[ktoh('0')] = "[debug] Move all objects to the center.";
         lookup[ktoh('I')] = &InputHandler::handleInformation;
         docstr[ktoh('I')] = "[debug] Print information about all objects.";
-        lookup[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
-                            &InputHandler::handleToggleGraphicsDebug;
-        docstr[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
-                            "[debug] Toggle graphics debugging information.";
 
         /* Navigation */
         lookup[ktoh('A')] = &InputHandler::handleStrafeLeft;
