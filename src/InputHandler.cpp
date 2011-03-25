@@ -332,10 +332,12 @@ void InputHandler::handleInvertSelection()
 
 void InputHandler::handleHelp()
 {
-    std::map<int, std::string>::const_iterator di;
-    printf("List of mapped keys:\n");
-    for ( di = docstr.begin(); di != docstr.end(); di++ ) {
-        printf( "%s\t%s\n", htos(di->first).c_str(), di->second.c_str());
+    std::vector<std::string>::const_iterator i;
+    std::vector<std::string> helpList = getShortcutHelpList();
+    printf( "List of mapped keys:\n" );
+    for ( i = helpList.begin(); i != helpList.end(); ++i )
+    {
+        printf( "%s\n", (*i).c_str() );
     }
 }
 
@@ -1008,4 +1010,16 @@ float InputHandler::getDragEndX()
 float InputHandler::getDragEndY()
 {
     return dragEndY;
+}
+
+std::vector<std::string> InputHandler::getShortcutHelpList()
+{
+    std::vector<std::string> output;
+    std::map<int, std::string>::const_iterator di;
+    for ( di = docstr.begin(); di != docstr.end(); di++ )
+    {
+        std::string line = htos( di->first ) + "\t" + di->second;
+        output.push_back( line );
+    }
+    return output;
 }

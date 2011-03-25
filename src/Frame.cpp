@@ -14,6 +14,7 @@
 #include "VideoInfoDialog.h"
 #include "SessionTreeControl.h"
 #include "gravManager.h"
+#include "InputHandler.h"
 
 BEGIN_EVENT_TABLE(Frame, wxFrame)
 EVT_CLOSE(Frame::OnCloseWindow)
@@ -21,6 +22,7 @@ EVT_CLOSE(Frame::OnCloseWindow)
 EVT_MENU(InputHandler::propertyID, Frame::spawnPropertyWindow)
 EVT_MENU(wxID_EXIT, Frame::OnExit)
 EVT_MENU(wxID_ABOUT, Frame::OnAbout)
+EVT_MENU(wxID_HELP_COMMANDS, Frame::OnKeyboardShortcuts)
 END_EVENT_TABLE()
 
 Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title ) :
@@ -39,6 +41,11 @@ Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title,
 void Frame::setSourceManager( gravManager* g )
 {
     grav = g;
+}
+
+void Frame::setInputHandler( InputHandler* i )
+{
+    input = i;
 }
 
 void Frame::spawnPropertyWindow( wxCommandEvent& evt )
@@ -92,6 +99,20 @@ void Frame::OnAbout( wxCommandEvent& evt )
               "See COPYING for details.\n\n"
               "This software uses libraries from the FFmpeg project under the "
               "GPLv3.") );
+}
+
+void Frame::OnKeyboardShortcuts( wxCommandEvent& evt )
+{
+    printf( "keyboardshortcut frame\n" );
+    wxDialog* helpDialog = new wxDialog( this, wxID_ANY,
+            _("Keyboard Shortcuts") );
+    helpDialog->SetSize( wxSize( 500, 500 ) );
+
+    wxStaticText* keyText = new wxStaticText( helpDialog, wxID_ANY, _("") );
+    wxStaticText* helpText = new wxStaticText( helpDialog, wxID_ANY, _("") );
+
+    helpDialog->ShowModal();
+    helpDialog->Destroy();
 }
 
 void Frame::setupMenuBar()

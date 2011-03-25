@@ -96,6 +96,13 @@ public:
     float getDragStartX(); float getDragStartY();
     float getDragEndX(); float getDragEndY();
 
+    /*
+     * From the docstr dict, generate a list of strings that acts as a help file
+     * for keyboard shortcuts.
+     * format: key\tdescription
+     */
+    std::vector<std::string> getShortcutHelpList();
+
 private:
     std::vector<RectangleBase*>* tempSelectedObjects;
     Earth* earth;

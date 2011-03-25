@@ -14,6 +14,7 @@
 #include <wx/wx.h>
 
 class gravManager;
+class InputHandler;
 
 class Frame : public wxFrame
 {
@@ -23,6 +24,7 @@ public:
     Frame( wxWindow* parent, wxWindowID id, const wxString& title,
                     const wxPoint& pos, const wxSize& size );
     void setSourceManager( gravManager* g );
+    void setInputHandler( InputHandler* i );
     void spawnPropertyWindow( wxCommandEvent& evt );
 
 private:
@@ -32,6 +34,7 @@ private:
     void OnExit( wxCommandEvent& evt );
 
     void OnAbout( wxCommandEvent& evt );
+    void OnKeyboardShortcuts( wxCommandEvent& evt );
 
     void setupMenuBar();
 
@@ -39,6 +42,8 @@ private:
     void cleanup();
 
     gravManager* grav;
+    // reference to input to grab keyboard shortcuts to generate help menu
+    InputHandler* input;
 
     DECLARE_EVENT_TABLE()
 
