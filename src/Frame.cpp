@@ -107,9 +107,37 @@ void Frame::OnKeyboardShortcuts( wxCommandEvent& evt )
     wxDialog* helpDialog = new wxDialog( this, wxID_ANY,
             _("Keyboard Shortcuts") );
     helpDialog->SetSize( wxSize( 500, 500 ) );
+    // note that size, i think, is only relevant as a minimum, since the sizer
+    // will resize the window to the proper size
 
     wxStaticText* keyText = new wxStaticText( helpDialog, wxID_ANY, _("") );
     wxStaticText* helpText = new wxStaticText( helpDialog, wxID_ANY, _("") );
+    std::string keyTextStd, helpTextStd;
+
+    std::map<std::string, std::string> keyMap = input->getShortcutHelpList();
+    std::map<std::string, std::string>::iterator i;
+    for ( i = keyMap.begin(); i != keyMap.end(); ++i )
+    {
+        keyTextStd += i->first;
+        helpTextStd += i->second;
+
+        std::map<std::string, std::string>::iterator check = i;
+        if ( ++check != keyMap.end() )
+        {
+            keyTextStd += "\n";
+            helpTextStd += "\n";
+        }
+    }
+
+    keyText->SetLabel( wxString( keyTextStd.c_str(), wxConvUTF8 ) );
+    helpText->SetLabel( wxString( helpTextStd.c_str(), wxConvUTF8 ) );
+
+    wxBoxSizer* textSizer = new wxBoxSizer( wxHORIZONTAL );
+    textSizer->Add( keyText, wxSizerFlags(0).Align(0).Border( wxALL, 10 ) );
+    textSizer->Add( helpText, wxSizerFlags(0).Align(0).Border( wxALL, 10 ) );
+
+    helpDialog->SetSizer( textSizer );
+    textSizer->SetSizeHints( helpDialog );
 
     helpDialog->ShowModal();
     helpDialog->Destroy();
