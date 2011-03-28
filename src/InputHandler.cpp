@@ -630,7 +630,7 @@ std::string InputHandler::htos( int hash, bool spaced )
     {
         _mods = sstr.str();
         sstr.str("");
-        sstr << std::setw(25) << _mods << " ";
+        sstr << std::setw(25) << _mods;
     }
 
     if ( upIter != unprintables.end() )
