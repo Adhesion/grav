@@ -135,6 +135,10 @@ bool gravApp::OnInit()
     InputHandler* input = new InputHandler( earth, grav, mainFrame );
     venueClientController = new VenueClientController( 0.0f, 0.0f, grav );
 
+    // frame needs reference to inputhandler to generate help window for
+    // shortcut hotkeys
+    mainFrame->setInputHandler( input );
+
     // add the input handler to the chain of things that can handle
     // events & give the canvas focus so we don't have to click on it to
     // start sending key events

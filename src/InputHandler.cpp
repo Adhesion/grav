@@ -332,12 +332,14 @@ void InputHandler::handleInvertSelection()
 
 void InputHandler::handleHelp()
 {
-    std::vector<std::string>::const_iterator i;
-    std::vector<std::string> helpList = getShortcutHelpList();
+    std::map<std::string, std::string>::const_iterator i;
+    std::map<std::string, std::string> helpList = getShortcutHelpList();
     printf( "List of mapped keys:\n" );
     for ( i = helpList.begin(); i != helpList.end(); ++i )
     {
-        printf( "%s\n", (*i).c_str() );
+        std::ostringstream sstr;
+        sstr << std::setw(25) << i->first;
+        printf( "%s\t%s\n", sstr.str().c_str(), i->second.c_str() );
     }
 }
 
@@ -613,12 +615,11 @@ unsigned char InputHandler::htok( int hash )
 }
 
 /* Hash to String representation */
-std::string InputHandler::htos( int hash, bool spaced )
+std::string InputHandler::htos( int hash )
 {
     char key = htok( hash );
     std::map<char, std::string>::iterator upIter = unprintables.find(key);
     std::ostringstream sstr;
-    std::string _mods;
 
     std::string shi = (hash & wxMOD_SHIFT) ? "shift + " : "";
     std::string alt = (hash & wxMOD_ALT) ? "alt + " : "";
@@ -626,24 +627,12 @@ std::string InputHandler::htos( int hash, bool spaced )
 
     sstr << shi << alt << cmd;
 
-    if ( spaced )
-    {
-        _mods = sstr.str();
-        sstr.str("");
-        sstr << std::setw(25) << _mods;
-    }
-
     if ( upIter != unprintables.end() )
         sstr << unprintables[key];
     else
         sstr << key;
 
     return sstr.str();
-}
-
-std::string InputHandler::htos( int hash )
-{
-    return htos( hash, true );
 }
 
 void InputHandler::processKeyboard( int keyCode, int x, int y )
@@ -1030,14 +1019,15 @@ float InputHandler::getDragEndY()
     return dragEndY;
 }
 
-std::vector<std::string> InputHandler::getShortcutHelpList()
+std::map<std::string, std::string> InputHandler::getShortcutHelpList()
 {
-    std::vector<std::string> output;
+    std::map<std::string, std::string> output;
     std::map<int, std::string>::const_iterator di;
     for ( di = docstr.begin(); di != docstr.end(); di++ )
     {
-        std::string line = htos( di->first ) + "\t" + di->second;
-        output.push_back( line );
+        std::string line = htos( di->first );
+        output.insert(
+                std::pair<std::string, std::string>( line, di->second ) );
     }
     return output;
 }

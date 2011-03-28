@@ -99,9 +99,8 @@ public:
     /*
      * From the docstr dict, generate a list of strings that acts as a help file
      * for keyboard shortcuts.
-     * format: key\tdescription
      */
-    std::vector<std::string> getShortcutHelpList();
+    std::map<std::string, std::string> getShortcutHelpList();
 
 private:
     std::vector<RectangleBase*>* tempSelectedObjects;
@@ -121,10 +120,7 @@ private:
     int ktoh( unsigned char key ); // key to hash
     int ktoh( unsigned char key, int modifiers ); // key to hash
     unsigned char htok( int keyHash ); // hash to key
-    // Hash to string representation. 'Spaced' bool argument determines whether
-    // the string is set to a constant 25-character width. Default is true.
-    std::string htos( int keyHash, bool spaced );
-    std::string htos( int keyHash );
+    std::string htos( int keyHash ); // Hash to string representation
 
     // special input modifiers like CTRL
     int special;
