@@ -121,8 +121,10 @@ private:
     int ktoh( unsigned char key ); // key to hash
     int ktoh( unsigned char key, int modifiers ); // key to hash
     unsigned char htok( int keyHash ); // hash to key
-    std::string htos( int keyHash ); // hash to string representation
-
+    // Hash to string representation. 'Spaced' bool argument determines whether
+    // the string is set to a constant 25-character width. Default is true.
+    std::string htos( int keyHash, bool spaced );
+    std::string htos( int keyHash );
 
     // special input modifiers like CTRL
     int special;

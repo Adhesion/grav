@@ -596,16 +596,25 @@ void InputHandler::handleTryDeleteObject()
 }
 
 /* Key To Hash */
-int InputHandler::ktoh( unsigned char key ) { return ktoh(key, 0); }
-int InputHandler::ktoh( unsigned char key, int _modifiers ) {
+int InputHandler::ktoh( unsigned char key )
+{
+    return ktoh( key, 0 );
+}
+
+int InputHandler::ktoh( unsigned char key, int _modifiers )
+{
     return ( ((int)key)  << 4 ) | _modifiers;
 }
+
 /* Hash To Key */
-unsigned char InputHandler::htok( int hash ) {
+unsigned char InputHandler::htok( int hash )
+{
     return (unsigned char)(hash >> 4);
 }
+
 /* Hash to String representation */
-std::string InputHandler::htos( int hash ) {
+std::string InputHandler::htos( int hash, bool spaced )
+{
     char key = htok( hash );
     std::map<char, std::string>::iterator upIter = unprintables.find(key);
     std::ostringstream sstr;
@@ -616,9 +625,13 @@ std::string InputHandler::htos( int hash ) {
     std::string cmd = (hash & wxMOD_CMD) ? "ctrl + " : "";
 
     sstr << shi << alt << cmd;
-    _mods = sstr.str();
-    sstr.str("");
-    sstr << std::setw(25) << _mods << " ";
+
+    if ( spaced )
+    {
+        _mods = sstr.str();
+        sstr.str("");
+        sstr << std::setw(25) << _mods << " ";
+    }
 
     if ( upIter != unprintables.end() )
         sstr << unprintables[key];
@@ -626,6 +639,11 @@ std::string InputHandler::htos( int hash ) {
         sstr << key;
 
     return sstr.str();
+}
+
+std::string InputHandler::htos( int hash )
+{
+    return htos( hash, true );
 }
 
 void InputHandler::processKeyboard( int keyCode, int x, int y )
