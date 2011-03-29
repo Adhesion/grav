@@ -144,7 +144,13 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 
     {
         wxCMD_LINE_SWITCH, _("t"), _("threads"),
-            _("enables threading separation of graphics and network/decoding")
+            _("threading separation of graphics and network/decoding "
+              "(this is the default, option left in for legacy purposes)")
+    },
+
+    {
+        wxCMD_LINE_SWITCH, _("nt"), _("no-threads"),
+            _("disables threading separation of graphics and network/decoding")
     },
 
     {

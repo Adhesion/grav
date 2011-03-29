@@ -307,7 +307,7 @@ bool gravApp::handleArgs()
         header = std::string((char*)headerWX.char_str());
     }
 
-    usingThreads = parser.Found( _("threads") );
+    usingThreads = !parser.Found( _("no-threads") );
 
     enableShaders = parser.Found( _("enable-shaders") );
 
