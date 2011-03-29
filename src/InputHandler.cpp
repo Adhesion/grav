@@ -131,7 +131,7 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
         lookup[ktoh((unsigned char)127)] = &InputHandler::handleTryDeleteObject;
         docstr[ktoh((unsigned char)127)] = "[debug] Delete selected deletable"
                                             " objects (test objects)";
-        unprintables[ktoh((unsigned char)127)] = "(delete)";
+        unprintables[(unsigned char)127] = "(delete)";
         lookup[ktoh('K')] = &InputHandler::handlePrintSelected;
         docstr[ktoh('K')] = "[debug] Print information about selected windows.";
         lookup[ktoh('O')] = &InputHandler::handleRandomTest;
