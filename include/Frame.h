@@ -36,6 +36,8 @@ private:
     void OnAbout( wxCommandEvent& evt );
     void OnKeyboardShortcuts( wxCommandEvent& evt );
 
+    void OnMenuOpen( wxMenuEvent& evt );
+
     void setupMenuBar();
 
     // common close functionality to be accessed by the different entry points

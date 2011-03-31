@@ -143,6 +143,17 @@ void Frame::OnKeyboardShortcuts( wxCommandEvent& evt )
     helpDialog->Destroy();
 }
 
+void Frame::OnMenuOpen( wxMenuEvent& evt )
+{
+    wxMenu* menu = evt.GetMenu();
+    wxMenuItemList list = menu->GetMenuItems();
+    wxMenuItemList::iterator i;
+    for ( i = list.begin(); i != list.end(); ++i )
+    {
+
+    }
+}
+
 void Frame::setupMenuBar()
 {
     wxMenu *fileMenu = new wxMenu();
@@ -153,6 +164,9 @@ void Frame::setupMenuBar()
     helpMenu->Append( wxID_HELP_COMMANDS, _("Keyboard shortcuts...") );
     helpMenu->AppendSeparator();
     helpMenu->Append( wxID_ABOUT, _("About...") );
+
+    //helpMenu->Connect( wxID_ANY, wxEVT_MENU_OPEN,
+    //        wxMenuEventHandler(Frame::OnMenuOpen) );
 
     wxMenuBar *menuBar = new wxMenuBar();
     menuBar->Append( fileMenu, _("File") );
