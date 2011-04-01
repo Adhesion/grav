@@ -60,9 +60,9 @@ bool gravApp::OnInit()
         return false;
     }
 
+    // some weirdness happens if this is called before arg handling, etc.
+    gravUtil::initLogging();
     // Set verbosity here, nothing should use gravUtil::logVerbose before this.
-    wxLog* logger = new wxLogStream();
-    delete wxLog::SetActiveTarget( logger );
     wxLog::SetVerbose( true );
     vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
 

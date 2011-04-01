@@ -68,6 +68,27 @@ void gravUtil::addPath( std::string path )
     resourceDirList.insert( start, path );
 }
 
+void gravUtil::initLogging()
+{
+    // note, here we're using a logstream instead of the logstderr - output from
+    // the latter wouldn't show up for some reason.
+    // also note logstream may not be available in some wx builds (needs
+    // wxUSE_STD_IOSTREAM / compiled with iostream support) but that's default
+    // in standard builds so leaving it for now
+    wxLog* logger = new wxLogStream();
+    delete wxLog::SetActiveTarget( logger );
+    // the delete is normal, setactivetarget returns a pointer to the old target
+    // so we can get rid of it
+
+    // set the timestamp format here
+    // note this SHOULD be dependent on the locale, but AccessGrid actually
+    // changes the locale itself which modifies the timestamp format.
+    // Changing the locale may have other ramifications.
+    // See https://grav.rc.rit.edu/wiki/KnownIssues
+    wxString timestampFormat( "%H:%M:%S", wxConvUTF8 );
+    wxLog::SetTimestamp( timestampFormat.c_str() );
+}
+
 void gravUtil::logVerbose( const char* str, ... )
 {
     va_list args;

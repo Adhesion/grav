@@ -40,12 +40,15 @@ public:
      * Currently, inputs printf format, sends final formatted string to wx log
      * functions.
      */
+    static void initLogging();
+
     static void logVerbose( const char* str, ... );
     static void logMessage( const char* str, ... );
     static void logStatus( const char* str, ... );
     static void logWarning( const char* str, ... );
     static void logError( const char* str, ... );
     static void logFatalError( const char* str, ... );
+
 
 protected:
     gravUtil();
