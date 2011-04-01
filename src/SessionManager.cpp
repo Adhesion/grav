@@ -74,7 +74,7 @@ bool SessionManager::initSession( std::string address, bool audio )
 
     if ( !session->initialise() )
     {
-        fprintf(stderr, "error: failed to initialise session\n");
+        printf( "error: failed to initialise session\n" );
         unlockSessions();
         return false;
     }

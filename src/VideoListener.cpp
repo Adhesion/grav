@@ -61,7 +61,7 @@ VideoListener::vpmsession_source_created(VPMSession &session,
 
         if ( !sink->initialise() )
         {
-            fprintf(stderr, "Failed to initialise video sink\n");
+            printf( "Failed to initialise video sink\n" );
             return;
         }
 

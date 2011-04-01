@@ -11,6 +11,7 @@
 
 #include <wx/file.h>
 #include <wx/filename.h>
+#include <wx/log.h>
 
 gravUtil* gravUtil::instance = NULL;
 
@@ -65,4 +66,73 @@ void gravUtil::addPath( std::string path )
         path += sep;
     }
     resourceDirList.insert( start, path );
+}
+
+void gravUtil::logVerbose( const char* str, ... )
+{
+    va_list args;
+    va_start( args, str );
+    wxLogVerbose( getWXStringFromArgs( str, args ) );
+    va_end( args );
+}
+
+void gravUtil::logMessage( const char* str, ... )
+{
+    va_list args;
+    va_start( args, str );
+    wxLogMessage( getWXStringFromArgs( str, args ) );
+    va_end( args );
+}
+
+void gravUtil::logStatus( const char* str, ... )
+{
+    va_list args;
+    va_start( args, str );
+    wxLogStatus( getWXStringFromArgs( str, args ) );
+    va_end( args );
+}
+
+void gravUtil::logWarning( const char* str, ... )
+{
+    va_list args;
+    va_start( args, str );
+    wxLogWarning( getWXStringFromArgs( str, args ) );
+    va_end( args );
+}
+
+void gravUtil::logError( const char* str, ... )
+{
+    va_list args;
+    va_start( args, str );
+    wxLogError( getWXStringFromArgs( str, args ) );
+    va_end( args );
+}
+
+void gravUtil::logFatalError( const char* str, ... )
+{
+    va_list args;
+    va_start( args, str );
+    wxLogFatalError( getWXStringFromArgs( str, args ) );
+    va_end( args );
+}
+
+wxString gravUtil::getWXStringFromArgs( const char* str, va_list args )
+{
+    // convert incoming string+format input to final formatted form (via
+    // vsprintf), and then send that result to wxLog
+    // we SHOULD be able to just send the va_args to wxLog but that didn't seem
+    // to parse it properly (wildly random numbers in place of %i/%u, etc.)
+    wxString logString;
+    char* buffer;
+    buffer = new char[256];
+
+    vsprintf( buffer, str, args );
+
+    logString = wxString( buffer, wxConvUTF8 );
+    // to remove trailing space/newline/etc. (gui log ignores it but printout
+    // still has eg newlines which is annoying)
+    logString = logString.Trim();
+    delete[] buffer;
+
+    return logString;
 }

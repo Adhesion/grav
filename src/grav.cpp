@@ -21,6 +21,7 @@
 #include "SideFrame.h"
 #include "Timers.h"
 #include "VenueClientController.h"
+#include "gravUtil.h"
 
 #include <VPMedia/VPMLog.h>
 #include <VPMedia/VPMPayloadDecoderFactory.h>
@@ -58,6 +59,12 @@ bool gravApp::OnInit()
         delete grav;
         return false;
     }
+
+    // Set verbosity here, nothing should use gravUtil::logVerbose before this.
+    wxLog* logger = new wxLogStream();
+    delete wxLog::SetActiveTarget( logger );
+    wxLog::SetVerbose( true );
+    vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
 
     // GUI setup
     mainFrame = new Frame( (wxFrame*)NULL, -1, _("grav"),
@@ -156,8 +163,6 @@ bool gravApp::OnInit()
     grav->setAudio( audioSessionListener ); // may not necessarily be used
 
     venueClientController->setSessionControl( sessionTree );
-
-    vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
 
     mapRTP();
 

@@ -13,6 +13,10 @@
 #include <vector>
 #include <string>
 
+#include <stdarg.h>
+
+#include <wx/string.h>
+
 class gravUtil
 {
 
@@ -28,6 +32,21 @@ public:
      */
     void addPath( std::string path );
 
+    /*
+     * Log functions - goes straight to WX for now, abstracting just in case we
+     * want to switch to something else later.
+     * Static, because they don't depend on class state at all (wx log targets
+     * etc. are global).
+     * Currently, inputs printf format, sends final formatted string to wx log
+     * functions.
+     */
+    static void logVerbose( const char* str, ... );
+    static void logMessage( const char* str, ... );
+    static void logStatus( const char* str, ... );
+    static void logWarning( const char* str, ... );
+    static void logError( const char* str, ... );
+    static void logFatalError( const char* str, ... );
+
 protected:
     gravUtil();
     ~gravUtil();
@@ -40,6 +59,8 @@ private:
      */
     std::vector<std::string> resourceDirList;
     std::string sep;
+
+    static wxString getWXStringFromArgs( const char* str, va_list args );
 
 };
 

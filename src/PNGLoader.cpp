@@ -13,12 +13,13 @@
 
 #include "GLUtil.h"
 #include "PNGLoader.h"
+#include "gravUtil.h"
 
 GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
 {
     int size = 0;
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &size );
-    printf( "max tex size is %i\n", size );
+    gravUtil::logVerbose( "PNGLoader::loadPNG: max tex size is %i", size );
 
     png_byte PNGheader[8];
 
@@ -26,14 +27,16 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     FILE* texfile = fopen( filename.c_str(), "rb" );
     if ( !texfile )
     {
-        printf( "PNGLoader::error opening file %s\n", filename.c_str() );
+        gravUtil::logError( "PNGLoader::loadPNG: error opening file %s\n",
+                filename.c_str() );
         return 0;
     }
 
     size_t retval = fread( PNGheader, 1, 8, texfile );
     if ( retval == 0 )
     {
-        printf( "PNGLoader::error reading file %s?\n", filename.c_str() );
+        gravUtil::logError( "PNGLoader::loadPNG: error reading file %s?\n",
+                filename.c_str() );
         return 0;
     }
 
@@ -94,12 +97,13 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
                     NULL, NULL, NULL );
     width = iwidth; height = iheight;
 
-    printf( "bitDepth: %i, colorType: %i, RGBA: %i\n", bitDepth, colorType,
-        PNG_COLOR_TYPE_RGBA );
+    gravUtil::logVerbose( "PNGLoader::loadPNG: bitDepth: %i, colorType: %i, "
+            "RGBA: %i\n", bitDepth, colorType, PNG_COLOR_TYPE_RGBA );
 
     int pwidth = GLUtil::getInstance()->pow2( iwidth );
     int pheight = GLUtil::getInstance()->pow2( iheight );
-    printf( "read in PNG: image dimensions: %ux%u, pow2 dimensions: %ux%u\n",
+    gravUtil::logVerbose( "PNGLoader::loadPNG: read in PNG: image dimensions: "
+            "%ux%u, pow2 dimensions: %ux%u\n",
             (unsigned int)iwidth, (unsigned int)iheight,
             (unsigned int)pwidth, (unsigned int)pheight );
 
@@ -118,8 +122,10 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     png_read_image( png, rowPointers );
 
     GLenum  gl_error = glGetError();
-    for (; (gl_error); gl_error = glGetError()) {
-        fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
+    for ( ; (gl_error); gl_error = glGetError() )
+    {
+        gravUtil::logError( "PNGLoader::loadPNG: GLError: %s\n",
+                (const GLchar*)gluErrorString( gl_error ) );
     }
 
     GLuint texID;
@@ -128,12 +134,15 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
 
     // allocate a buffer for the pow2 size
     unsigned char *buffer = new unsigned char[pwidth * pheight * 4];
-    printf( "made buffer, allocating texture\n" );
-    memset(buffer, 128, pwidth * pheight * 4);
+    gravUtil::logVerbose( "PNGLoader::loadPNG: made buffer, "
+            "allocating texture\n" );
+    memset( buffer, 128, pwidth * pheight * 4 );
 
     gl_error = glGetError();
-    for (; (gl_error); gl_error = glGetError()) {
-        fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
+    for ( ; (gl_error); gl_error = glGetError() )
+    {
+        gravUtil::logError( "PNGLoader::loadPNG: GLError: %s\n",
+                (const GLchar*)gluErrorString( gl_error ) );
     }
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -147,18 +156,21 @@ GLuint PNGLoader::loadPNG( std::string filename, int &width, int &height )
     glPixelStorei(GL_UNPACK_ROW_LENGTH,
         iwidth);
 
-    printf( "putting PNG in texture area\n" );
+    gravUtil::logVerbose( "PNGLoader::loadPNG: putting PNG in texture area\n" );
 
     // put the actual image in a sub-area of the pow2 memory area
     glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, iwidth, iheight, GL_RGBA,
                     GL_UNSIGNED_BYTE, (GLvoid*)image );
 
     gl_error = glGetError();
-    for (; (gl_error); gl_error = glGetError()) {
-        fprintf(stderr, "%s\n", (const GLchar*)gluErrorString(gl_error));
+    for ( ; (gl_error); gl_error = glGetError() )
+    {
+        gravUtil::logError("PNGLoader::loadPNG: GLError: %s\n",
+                (const GLchar*)gluErrorString( gl_error ) );
     }
 
-    printf( "PNGLoader::generated ID is %i\n", texID );
+    gravUtil::logVerbose( "PNGLoader::loadPNG: PNGLoader::generated ID is %i\n",
+            texID );
 
     png_destroy_read_struct( &png, &pngInfo, &pngEnd );
     delete[] image;

@@ -195,7 +195,7 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
     if ( func == NULL )
     {
         PyErr_Print();
-        fprintf( stderr, "Failed to load function \"%s\"\n",
+        printf( "Failed to load function \"%s\"\n",
                     entryFunc.c_str() );
         return NULL;
     }
@@ -203,7 +203,7 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
     if ( ! PyCallable_Check(func) )
     {
         PyErr_Print();
-        fprintf( stderr, "Attribute \"%s\" is not callable.\n",
+        printf( "Attribute \"%s\" is not callable.\n",
                     entryFunc.c_str() );
         Py_DECREF( func );
         return NULL;
@@ -244,7 +244,7 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
     if ( result == NULL )
     {
         PyErr_Print();
-        fprintf( stderr, "Call failed.\n" );
+        printf( "Call failed.\n" );
         Py_DECREF( func );
         Py_DECREF( entryArgs );
         return NULL;
