@@ -1,5 +1,5 @@
 /*
- * @file Group.h
+ * @file Group.cpp
  * Implementation of the Group class.
  * @author Andrew Ford
  */
@@ -33,12 +33,8 @@ Group::~Group()
 
 void Group::draw()
 {
-    //animateValues();
-    //printf( "drawing group at %f,%f\n", x, y );
-
     RectangleBase::draw();
 
-    //printf( "drawing %i objects in group\n", objects.size() );
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
         objects[i]->draw();
@@ -49,10 +45,7 @@ void Group::add( RectangleBase* object )
 {
     objects.push_back( object );
     object->setGroup( this );
-    //printf( "added %s to group %s\n", object->getName().c_str(),
-    //                                    getName().c_str() );
 
-    //printf( "now rearranging %i objects\n", objects.size() );
     rearrange();
 
     for ( unsigned int i = 0; i < objects.size(); i++ )
@@ -63,8 +56,6 @@ void Group::add( RectangleBase* object )
 
 void Group::remove( RectangleBase* object, bool move )
 {
-    //printf( "removing %s from group %s\n", object->getName().c_str(),
-    //                                    getName().c_str() );
     object->setGroup( NULL );
     object->setSubstring( -1, -1 );
 
@@ -78,8 +69,6 @@ void Group::remove( RectangleBase* object, bool move )
 std::vector<RectangleBase*>::iterator Group::remove(
                             std::vector<RectangleBase*>::iterator i, bool move )
 {
-    //printf( "removing %s from group %s\n", object->getName().c_str(),
-    //                                    getName().c_str() );
     (*i)->setGroup( NULL );
     (*i)->setSubstring( -1, -1 );
 
@@ -130,9 +119,6 @@ void Group::rearrange()
 
     int numCol = ceil( sqrt( objects.size() ) );
     int numRow = objects.size() / numCol + ( objects.size() % numCol > 0 );
-    //printf( "Group:: group %s (%fx%f, %f,%f) rearranging\n", name.c_str(),
-    //            getDestWidth(), getDestHeight(), destX, destY );
-    //printf( "Group::cols %i rows %i\n", numCol, numRow );
 
     // resize the group based on the aspect ratios of the current member(s)
     if ( objects.size() == 1 )
@@ -140,14 +126,12 @@ void Group::rearrange()
         float objAspect =
                 objects[0]->getDestWidth() / objects[0]->getDestHeight();
         float diff = objAspect / ( getDestWidth() / getDestHeight() );
-        //printf( "Group::rearrange: modifying aspect by %f\n", diff );
         RectangleBase::setScale( destScaleX * diff, destScaleY );
     }
     else
     {
         float aspect = getDestWidth() / getDestHeight();
         float newAspect = (numCol*1.33f) / numRow;
-        //printf( "Group::rearrange: old aspect %f new aspect %f\n", aspect, newAspect );
         if ( newAspect > aspect )
             RectangleBase::setScale( destScaleX * (newAspect/aspect),
                                         destScaleY );
@@ -155,9 +139,6 @@ void Group::rearrange()
             RectangleBase::setScale( destScaleX,
                                         destScaleY * (aspect/newAspect) );
     }
-
-    //printf( "Group:: group %s now (%fx%f, %f,%f); rearranging\n", name.c_str(),
-    //                getDestWidth(), getDestHeight(), destX, destY );
 
     std::map<std::string, std::string> opts;
 
@@ -196,8 +177,6 @@ bool Group::updateName()
     // names (ie, NAME vs CNAME)
     if ( !membersFinalized ) return false;
 
-    //printf( "group members names finalized, finding common string...\n" );
-
     int splitPos = 0;
     int startParen = -1;
     int endParen = -1;
@@ -222,7 +201,6 @@ bool Group::updateName()
         // left paren to the left of the difference position (if found)
         startParen = objects[0]->getName().rfind( '(', splitPos );
         endParen = objects[0]->getName().find( ')', splitPos );
-        //printf( ">1 startParen: %i, endParen: %i\n", startParen, endParen );
         if ( endParen != -1 && startParen != -1 )
             splitPos = startParen;
     }
@@ -230,10 +208,7 @@ bool Group::updateName()
     {
         // if there's only one, just split based on the rightmost & outermost
         // matched parens
-        //printf( "Group::updatename: only 1 member\n" );
         int i = objects[0]->getName().length()-1;
-        //printf( "name is %s, length is %i, i is %i\n",
-        //        objects[0]->getName().c_str(), i+1, i );
         int balance = 0;
         while ( i >= 0 && (balance != 0 || endParen == -1) )
         {
@@ -252,7 +227,6 @@ bool Group::updateName()
             i--;
         }
 
-        //printf( "=1 startParen: %i, endParen: %i\n", startParen, endParen );
         if ( endParen != -1 && startParen != -1 )
             splitPos = startParen;
     }
@@ -265,7 +239,6 @@ bool Group::updateName()
         name = objects[0]->getName();
     nameChanged = name.compare( oldName ) != 0;
 
-    //printf( "common substr is %s, up to pos %i\n", name.c_str(), splitPos );
     for ( unsigned int k = 0; k < objects.size(); k++ )
     {
         // if we have more than one object in the group, re-find the positions
@@ -286,8 +259,6 @@ bool Group::updateName()
             objects[k]->setSubstring( splitPos,
                                 objects[k]->getName().length() );
         }
-        //printf( "object name (remainder) set to %s\n",
-        //                    objects[k]->getSubName().c_str() );
     }
 
     if ( nameChanged )
@@ -298,7 +269,6 @@ bool Group::updateName()
 
 void Group::move( float _x, float _y )
 {
-    //printf( "moving group\n" );
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
         objects[i]->move( _x + objects[i]->getDestX() - destX,
@@ -333,8 +303,6 @@ void Group::setScale( float xs, float ys, bool resizeMembers )
         rearrange();
         /*float Xratio = xs / destScaleX;
         float Yratio = ys / destScaleY;
-        printf( "Group::setScale: scaling group %s to %f,%f, ratio is %f/%f\n",
-                    name.c_str(), xs, ys, Xratio, Yratio );
         float min = std::min( Xratio, Yratio );
 
         for ( unsigned int i = 0; i < objects.size(); i++ )
@@ -360,7 +328,6 @@ void Group::setScale( float xs, float ys, bool resizeMembers )
 
 void Group::setRendering( bool r )
 {
-    //printf( "Runway::setting rendering to %i\n", r );
     enableRendering = r;
 
     if ( allowHiding )
