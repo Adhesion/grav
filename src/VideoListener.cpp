@@ -10,6 +10,7 @@
 #include "Group.h"
 #include "TreeControl.h"
 #include "GLUtil.h"
+#include "gravUtil.h"
 
 #include <VPMedia/video/VPMVideoDecoder.h>
 #include <VPMedia/video/VPMVideoBufferSink.h>
@@ -28,12 +29,9 @@ VideoListener::VideoListener( gravManager* g ) :
     pixelCount = 0;
 }
 
-void
-VideoListener::vpmsession_source_created(VPMSession &session,
-                    uint32_t ssrc,
-                    uint32_t pt,
-                    VPMPayload type,
-                    VPMPayloadDecoder *decoder)
+void VideoListener::vpmsession_source_created( VPMSession &session,
+        uint32_t ssrc, uint32_t pt, VPMPayload type,
+        VPMPayloadDecoder* decoder )
 {
     VPMVideoDecoder *d = dynamic_cast<VPMVideoDecoder*>( decoder );
 
@@ -45,7 +43,7 @@ VideoListener::vpmsession_source_created(VPMSession &session,
 
         // if we have shaders available, set the output format to YUV420P so
         // the videosource class will apply the YUV420P -> RGB conversion shader
-        printf( "VideoListener::vpmsession_source_created: "
+        gravUtil::logVerbose( "VideoListener::vpmsession_source_created: "
                 "creating source, have shaders? %i format? %i (yuv420p: %i)\n",
                 GLUtil::getInstance()->areShadersAvailable(), format,
                 VIDEO_FORMAT_YUV420 );
@@ -61,13 +59,12 @@ VideoListener::vpmsession_source_created(VPMSession &session,
 
         if ( !sink->initialise() )
         {
-            printf( "Failed to initialise video sink\n" );
+            gravUtil::logError( "VideoListener::vpmsession_source_created: "
+                    "Failed to initialise video sink\n" );
             return;
         }
 
         d->connectVideoProcessor(sink);
-
-        //printf( "creating new source at %f,%f\n", x, y );
 
         VideoSource* source = new VideoSource( &session, this, ssrc, sink, x,
 													y );
@@ -93,13 +90,10 @@ VideoListener::vpmsession_source_created(VPMSession &session,
     }
 }
 
-void
-VideoListener::vpmsession_source_deleted(VPMSession &session,
-                    uint32_t ssrc,
-                    const char *reason)
+void VideoListener::vpmsession_source_deleted( VPMSession &session,
+        uint32_t ssrc, const char *reason)
 {
     std::vector<VideoSource*>::iterator si;
-    //printf( "grav: deleting ssrc 0x%08x\n", ssrc );
     for ( si = grav->getSources()->begin();
             si != grav->getSources()->end(); ++si )
     {
@@ -115,31 +109,19 @@ VideoListener::vpmsession_source_deleted(VPMSession &session,
     // seems to get a lot of "sources deleted but not in video sources list" on
     // exit - may be that view-only clients are listed in the session. need to
     // test more, but not that much of an issue
-    //printf( "VideoListener::source_deleted: ERROR: ssrc not found?\n" );
 }
 
-void
-VideoListener::vpmsession_source_description(VPMSession &session,
-                    uint32_t ssrc)
+void VideoListener::vpmsession_source_description( VPMSession &session,
+        uint32_t ssrc )
 {
   // Ignore
 }
 
-void
-VideoListener::vpmsession_source_app(VPMSession &session,
-                uint32_t ssrc,
-                const char *app ,
-                const char *data,
-                uint32_t data_len)
+void VideoListener::vpmsession_source_app( VPMSession &session,
+        uint32_t ssrc, const char *app, const char *data, uint32_t data_len )
 {
-    //printf( "RTP app data received\n" );
-    //printf( "app: %s\n", app );
-    //printf( "data: %s\n", data );
-
     std::string appS( app, 4 );
     std::string dataS( data, data_len );
-    //printf( "listener::RTCP_APP: %s,%s\n", appS.c_str(), dataS.c_str() );
-    //printf( "listener::RTCP_APP: data length is %i\n", data_len );
 
     if ( appS.compare( "site" ) == 0 && grav->usingSiteIDGroups() )
     {
@@ -225,7 +207,7 @@ void VideoListener::updatePixelCount( long mod )
     if ( timer )
     {
         long time = timer->Time();
-        if ( time > 38 || time < 28 ) printf( "VideoListener::WARNING: time > 38ms or < 28ms (%lu)\n", time );
+        if ( time > 38 || time < 28 ) gravUtil::logVerbose( "VideoListener::WARNING: time > 38ms or < 28ms (%lu)\n", time );
         timer->Start( 0 );
     }
 }*/
