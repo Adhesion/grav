@@ -7,6 +7,7 @@
 #include "VideoSource.h"
 #include "VideoListener.h"
 #include "GLUtil.h"
+#include "gravUtil.h"
 #include <cmath>
 
 #include <VPMedia/video/VPMVideoDecoder.h>
@@ -38,15 +39,7 @@ VideoSource::~VideoSource()
 
 void VideoSource::draw()
 {
-    /*if ( !videoSink->haveNewFrameAvailable() )
-        printf( "VideoSource::no new frame available\n" );
-    else
-        printf( "VideoSource::new frame available!!!\n" );*/
-    //printf( "VideoSource::drawing %s at %f,%f, size %f,%f\n", getName().c_str(),
-    //        x, y, getWidth(), getHeight() );
-
-    //animateValues();
-    // to draw the border/text/common stuff
+    // to draw the border/text/common stuff, also calls animateValues
     RectangleBase::draw();
 
     // set up our position
@@ -277,8 +270,10 @@ void VideoSource::resizeBuffer()
     else
         tex_height = GLUtil::getInstance()->pow2( vheight );
 
-    printf( "image size is %ix%i\n", vwidth, vheight );
-    printf( "texture size is %ix%i\n", tex_width, tex_height );
+    gravUtil::logVerbose( "VideoSource::resizeBuffer: image size is %ix%i\n",
+            vwidth, vheight );
+    gravUtil::logVerbose( "VideoSource::resizeBuffer: texture size is %ix%i\n",
+            tex_width, tex_height );
 
     // if it's not the first time we're allocating a texture
     // (ie, it's a resize) delete the previous texture
@@ -324,17 +319,11 @@ void VideoSource::scaleNative()
     GLUtil::getInstance()->screenToWorld( (double)0, (double)0, 0.990991f,
                             &topLeftX, &topLeftY, &topLeftZ );
 
-    //printf( "top left of the screen in world coords is %f,%f,%f\n",
-    //        topLeftX, topLeftY, topLeftZ );
-
     // now get the world space position of the video dimensions
     GLdouble dimX; GLdouble dimY; GLdouble dimZ;
     GLUtil::getInstance()->screenToWorld( (GLdouble)vwidth, (GLdouble)vheight,
                                                 0.990991f,
                                             &dimX, &dimY, &dimZ );
-
-    //printf( "video dims in world coords are %f,%f,%f\n",
-    //        dimX, dimY, dimZ );
 
     // the difference between top-left and where the video would be is
     // equal to the size of the video dimensions in world coords
@@ -364,13 +353,15 @@ bool VideoSource::updateName()
         name = sdesName;
         nameChanged = true;
         finalName = true;
-        printf( "in updateName, got name: %s\n", name.c_str() );
+        gravUtil::logVerbose( "VideoSource::updateName: got name: %s\n",
+                name.c_str() );
     }
     if ( sdesCname != "" && sdesCname != altName )
     {
         altName = sdesCname;
         nameChanged = true;
-        printf( "in updateName, got cname: %s\n", altName.c_str() );
+        gravUtil::logVerbose( "VideoSource::updateName: got cname: %s\n",
+                altName.c_str() );
     }
 
     // if we don't have a proper name yet just use cname
