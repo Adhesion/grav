@@ -10,6 +10,7 @@
 #include "Timers.h"
 #include "SessionTreeControl.h"
 #include "GLCanvas.h"
+#include "gravUtil.h"
 
 RenderTimer::RenderTimer( GLCanvas* c, int i ) :
     canvas( c ), interval( i )
@@ -26,14 +27,14 @@ void RenderTimer::Notify()
 
 void RenderTimer::Start()
 {
-    printf( "Timer::starting at interval %i\n", interval);
+    gravUtil::logVerbose( "Timer::starting at interval %i\n", interval );
     wxTimer::Start( interval );
 }
 
 void RenderTimer::printTiming()
 {
     time_t diff = getTiming();
-    printf( "%lu\n", (unsigned long)diff );
+    gravUtil::logVerbose( "%lu\n", (unsigned long)diff );
 
     resetTiming();
 }
