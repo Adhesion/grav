@@ -8,6 +8,7 @@
 #include "RectangleBase.h"
 #include "TreeControl.h"
 #include "gravManager.h"
+#include "gravUtil.h"
 #include "TreeNode.h"
 #include "Runway.h"
 
@@ -34,7 +35,7 @@ TreeControl::~TreeControl()
 void TreeControl::addObject( RectangleBase* obj )
 {
     wxTreeItemId parentID;
-    
+
     // if it's not grouped, or it's in the runway, we can add it to root
     if ( !obj->isGrouped() || ( obj->isGrouped() &&
                             dynamic_cast<Runway*>( obj->getGroup() ) != NULL ) )
@@ -47,7 +48,7 @@ void TreeControl::addObject( RectangleBase* obj )
         RectangleBase* parent = (RectangleBase*)obj->getGroup();
         parentID = findObject( rootID, parent );
     }
-    
+
     if ( parentID.IsOk() )
     {
         wxTreeItemId newItem = AppendItem( parentID,
@@ -56,7 +57,7 @@ void TreeControl::addObject( RectangleBase* obj )
         if ( obj->getName() == "" )
             SetItemText( newItem, _( "(waiting for name...)" ) );
         SortChildren( parentID );
-        
+
         // if we're going from 1 to 2 objects (1 to 2 objects in the tree
         // means 0 to 1 sources since the root node counts as an object)
         // expand the root level automatically so it'll be expanded by
@@ -66,48 +67,42 @@ void TreeControl::addObject( RectangleBase* obj )
     }
     else
     {
-        printf( "TreeControl::addObject: parent NOT found\n" );
+        gravUtil::logWarning( "TreeControl::addObject: parent NOT found\n" );
     }
 }
 
 void TreeControl::removeObject( RectangleBase* obj )
 {
-    //printf( "TreeControl::removeObject: %s\n",
-    //                    obj->getName().c_str() );
     wxTreeItemId item = findObject( rootID, obj );
     if ( !item.IsOk() )
     {
-        printf( "TreeControl::removeObject: ERROR: item %s not found?\n",
+        gravUtil::logWarning( "TreeControl::removeObject: item %s not found?\n",
                     obj->getName().c_str() );
         return;
     }
-    
+
     // if we're removing a group, take all of its children and add them to
     // root
     if ( obj->isGroup() )
     {
-        //printf( "TreeControl::removeObject: was group, removing %i children\n",
-        //        GetChildrenCount( item ) );
         wxTreeItemId parent = rootID;
         wxTreeItemIdValue temp;
         wxTreeItemId current = GetFirstChild( item, temp );
-        
+
         while ( current.IsOk() )
         {
             TreeNode* data = dynamic_cast<TreeNode*>( GetItemData( current ) );
             if ( data != NULL )
             {
                 RectangleBase* obj = data->getObject();
-                //printf( "TreeControl::removeObject: adding child %s to root\n",
-                //            obj->getName().c_str() );
                 addObject( obj );
             }
             current = GetNextChild( item, temp );
         }
-        
+
         DeleteChildren( item );
     }
-    
+
     Delete( item );
 }
 
@@ -116,7 +111,7 @@ wxTreeItemId TreeControl::findObject( wxTreeItemId root, RectangleBase* obj )
     wxTreeItemIdValue temp; // unused var, needed in getchild
     wxTreeItemId targetItem;
     wxTreeItemId current = GetFirstChild( root, temp );
-    
+
     while ( current.IsOk() )
     {
         TreeNode* data = dynamic_cast<TreeNode*>( GetItemData( current ) );
@@ -134,7 +129,7 @@ wxTreeItemId TreeControl::findObject( wxTreeItemId root, RectangleBase* obj )
         }
         current = GetNextChild( root, temp );
     }
-    
+
     wxTreeItemId none;
     return none; // return default value if not found
 }
@@ -153,14 +148,14 @@ int TreeControl::OnCompareItems( const wxTreeItemId& item1,
     TreeNode* node2 = dynamic_cast<TreeNode*>(GetItemData( item2 ));
     if ( node1 == NULL || node2 == NULL )
         return 0;
-    
+
     RectangleBase* obj1 = node1->getObject();
     RectangleBase* obj2 = node2->getObject();
     if ( obj1 == NULL || obj2 == NULL )
         return 0;
     bool group1 = obj1->isGroup();
     bool group2 = obj2->isGroup();
-    
+
     // sort groups higher than non-groups, and if they're the same type,
     // just sort alphabetically by name
     if ( group1 && !group2 )
