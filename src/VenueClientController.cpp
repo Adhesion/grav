@@ -45,7 +45,7 @@ VenueClientController::VenueClientController( float _x, float _y,
     std::string circleLoc = util->findFile( "circle.png" );
     if ( circleLoc.compare( "" ) == 0 )
     {
-        printf( "VenueClientController::warning: "
+        gravUtil::logWarning( "VenueClientController::warning: "
                 "texture circle.png not found\n" );
     }
     else
@@ -56,7 +56,8 @@ VenueClientController::VenueClientController( float _x, float _y,
     AGToolsScript = util->findFile( "AGTools.py" );
     if ( AGToolsScript.compare( "" ) == 0 )
     {
-        printf( "VenueClientController::warning: AGTools.py not found\n" );
+        gravUtil::logWarning( "VenueClientController::warning: "
+                "AGTools.py not found\n" );
     }
 
     updateVenueName();
@@ -121,8 +122,8 @@ void VenueClientController::getVenueClient()
     std::vector<std::string> venueClients = pyTools.ltov( pRes );
     if ( venueClients.size() == 0 )
     {
-        printf( "VenueClientController::getVenueClient(): error: no venue "
-                "client found\n" );
+        gravUtil::logWarning( "VenueClientController::getVenueClient(): error: "
+                "no venue client found\n" );
     }
     else
     {
@@ -141,8 +142,8 @@ void VenueClientController::updateExitMap()
     }
     if ( venueClientUrl.compare( "" ) == 0 )
     {
-        printf( "VenueClientController::updateExitMap(): error: no venue "
-                        "client found\n" );
+        gravUtil::logWarning( "VenueClientController::updateExitMap(): error: "
+                "no venue client found\n" );
         return;
     }
 
@@ -172,18 +173,20 @@ void VenueClientController::printExitMap()
     {
         return;
     }
-    printf( "VenueClientController::printExitMap: from venue client at %s\n",
-                venueClientUrl.c_str() );
+    gravUtil::logVerbose( "VenueClientController::printExitMap: "
+            "from venue client at %s\n", venueClientUrl.c_str() );
     std::map<std::string, std::string>::iterator it;
     for ( it = exitMap.begin(); it != exitMap.end(); ++it )
     {
-        printf( "%s : %s\n", it->first.c_str(), it->second.c_str() );
+        gravUtil::logVerbose( "\t%s : %s\n", it->first.c_str(),
+                it->second.c_str() );
     }
 
-    printf( "Objects, should correspond to venues:\n" );
+    gravUtil::logVerbose( "\tObjects, should correspond to venues:\n" );
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
-        printf( "%i: %s\n", i, objects[i]->getSubName().c_str() );
+        gravUtil::logVerbose( "\t%i: %s\n", i,
+                objects[i]->getSubName().c_str() );
     }
 }
 
@@ -196,16 +199,16 @@ void VenueClientController::enterVenue( std::string venueName )
     }
     if ( venueClientUrl.compare( "" ) == 0 )
     {
-        printf( "VenueClientController::enterVenue(): error: no venue "
-                        "client found\n" );
+        gravUtil::logWarning( "VenueClientController::enterVenue(): error: "
+                "no venue client found\n" );
         return;
     }
 
     std::map<std::string, std::string>::iterator it = exitMap.find( venueName );
     if ( it == exitMap.end() )
     {
-        printf( "VenueClientController::enterVenue: venue %s not found\n",
-                    venueName.c_str() );
+        gravUtil::logWarning( "VenueClientController::enterVenue: "
+                "venue %s not found\n", venueName.c_str() );
         return;
     }
 
@@ -215,8 +218,8 @@ void VenueClientController::enterVenue( std::string venueName )
     PyTuple_SetItem( args, 0, PyString_FromString( venueClientUrl.c_str() ) );
     PyTuple_SetItem( args, 1, PyString_FromString( it->second.c_str() ) );
 
-    printf( "VCC::calling entervenue on %s to %s\n", venueClientUrl.c_str(),
-                it->second.c_str() );
+    gravUtil::logVerbose( "VenueClientController::calling entervenue on %s to"
+            " %s\n", venueClientUrl.c_str(), it->second.c_str() );
 
     pyTools.call( AGToolsScript, "EnterVenue", args );
 
@@ -238,8 +241,8 @@ void VenueClientController::updateVenueStreams()
     }
     if ( venueClientUrl.compare( "" ) == 0 )
     {
-        printf( "VenueClientController::updateVenueStreams(): error: no venue "
-                        "client found\n" );
+        gravUtil::logWarning( "VenueClientController::updateVenueStreams(): "
+                    "error: no venue client found\n" );
         return;
     }
 
@@ -263,8 +266,8 @@ void VenueClientController::updateVenueName()
     }
     if ( venueClientUrl.compare( "" ) == 0 )
     {
-        printf( "VenueClientController::updateVenueName(): error: no venue "
-                        "client found\n" );
+        gravUtil::logWarning( "VenueClientController::updateVenueName(): error:"
+                    " no venue client found\n" );
         return;
     }
 
@@ -283,8 +286,8 @@ void VenueClientController::removeAllVenueStreams()
     for ( it = currentVenueStreams.begin(); it != currentVenueStreams.end();
             ++it )
     {
-        printf( "VenueClientController::remove(): Video stream: %s\n",
-                    it->first.c_str() );
+        gravUtil::logVerbose( "VenueClientController::remove(): "
+                "Video stream: %s\n", it->first.c_str() );
         sessionControl->removeSession( it->first );
     }
 }
@@ -295,8 +298,8 @@ void VenueClientController::addAllVenueStreams()
     for ( it = currentVenueStreams.begin(); it != currentVenueStreams.end();
             ++it )
     {
-        printf( "VenueClientController::add(): Video stream: %s\n",
-                    it->first.c_str() );
+        gravUtil::logVerbose( "VenueClientController::add(): "
+                "Video stream: %s\n", it->first.c_str() );
         sessionControl->addSession( it->first, false, false );
         // __NO_KEY__ is a dummy value to indicate there is no encryption on the
         // stream in question

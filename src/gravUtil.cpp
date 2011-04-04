@@ -46,14 +46,14 @@ std::string gravUtil::findFile( std::string file )
     {
         std::string full = (*i) + file;
         wxString fullwx = wxString( full.c_str(), wxConvUTF8 );
-        printf( "gravUtil::findFile: checking %s...\n", full.c_str() );
+        logVerbose( "gravUtil::findFile: checking %s...\n", full.c_str() );
         if ( wxFile::Exists( fullwx.c_str() ) )
         {
-            printf( "gravUtil::findFile: success!\n" );
+            logVerbose( "gravUtil::findFile: success!\n" );
             return full;
         }
     }
-    printf( "gravUtil::findFile: file %s not found\n", file.c_str() );
+    logError( "gravUtil::findFile: file %s not found\n", file.c_str() );
     return "";
 }
 

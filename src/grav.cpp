@@ -60,7 +60,7 @@ bool gravApp::OnInit()
         return false;
     }
 
-    // some weirdness happens if this is called before arg handling, etc.
+    // Some weirdness happens if this is called before arg handling, etc.
     gravUtil::initLogging();
     // Set verbosity here, nothing should use gravUtil::logVerbose before this.
     wxLog::SetVerbose( true );
