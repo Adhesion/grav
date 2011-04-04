@@ -6,6 +6,7 @@
  */
 
 #include "gravManager.h"
+#include "gravUtil.h"
 #include "GLCanvas.h"
 #include "InputHandler.h"
 #include "Timers.h"
@@ -95,8 +96,8 @@ void GLCanvas::draw()
 
 void GLCanvas::resize( wxSizeEvent& evt )
 {
-    printf( "resize callback: to %ix%i\n", evt.GetSize().GetWidth(),
-                                            evt.GetSize().GetHeight() );
+    gravUtil::logVerbose( "GLCanvas::resize: resize callback: to %ix%i\n",
+            evt.GetSize().GetWidth(), evt.GetSize().GetHeight() );
     OnSize( evt );
     Refresh( false );
     GLreshape( evt.GetSize().GetWidth(), evt.GetSize().GetHeight() );
