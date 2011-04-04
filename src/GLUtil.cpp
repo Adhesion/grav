@@ -37,26 +37,27 @@ bool GLUtil::initGL()
             YUV420yOffsetID = glGetUniformLocation( YUV420Program, "yOffset" );
             YUV420alphaID = glGetUniformLocation( YUV420Program, "alpha" );
             shadersAvailable = true;
-            printf( "GLUtil::initGL(): shaders are available (GL v%s)\n",
-                        glVer );
+            gravUtil::logVerbose( "GLUtil::initGL(): shaders are available "
+                    "(GL v%s)\n", glVer );
         }
         else
         {
             shadersAvailable = false;
-            printf( "GLUtil::initGL(): attempted to load shaders but failed"
-                    " (GL v%s)\n", glVer );
+            gravUtil::logError( "GLUtil::initGL(): attempted to load shaders "
+                    "but failed (GL v%s)\n", glVer );
         }
     }
     else if ( glMajorVer >= 2 && !enableShaders )
     {
         shadersAvailable = false;
-        printf( "GLUtil::initGL(): shaders may be available but are disabled"
-                " (GL v%s)\n", glVer );
+        gravUtil::logVerbose( "GLUtil::initGL(): shaders may be available "
+                "but are disabled (GL v%s)\n", glVer );
     }
     else
     {
         shadersAvailable = false;
-        printf( "GLUtil::initGL(): shaders NOT available (GL v%s)\n", glVer );
+        gravUtil::logVerbose( "GLUtil::initGL(): shaders NOT available "
+                "(GL v%s)\n", glVer );
     }
 
     gravUtil* util = gravUtil::getInstance();
@@ -73,32 +74,32 @@ bool GLUtil::initGL()
     }
     else
     {
-        printf( "GLUtil::initGL(): ERROR: font not found\n" );
+        gravUtil::logError( "GLUtil::initGL(): ERROR: font not found\n" );
         mainFont = NULL;
         return false;
     }
 
     if ( mainFont->Error() )
     {
-        printf( "GLUtil::initGL(): ERROR: font failed to load\n" );
+        gravUtil::logError( "GLUtil::initGL(): ERROR: font failed to load\n" );
         delete mainFont;
         mainFont = NULL;
         return false;
     }
     else
     {
-        printf( "GLUtil::initGL(): font created\n" );
+        gravUtil::logVerbose( "GLUtil::initGL(): font created\n" );
         mainFont->FaceSize( 100 );
     }
 
     // TODO this is platform-specific, see the glxew include in glutil.h
     if ( GLX_SGI_swap_control )
     {
-        printf( "GLUtil::have glx sgi swap control\n" );
+        gravUtil::logVerbose( "GLUtil::initGL(): have glx sgi swap control\n" );
         glXSwapIntervalSGI( 1 );
     }
     else
-        printf( "GLUtil::no swap control\n" );
+        gravUtil::logVerbose( "GLUtil::initGL(): no swap control\n" );
 
     glEnable( GL_DEPTH_TEST );
 
@@ -121,52 +122,52 @@ void GLUtil::printMatrices()
 {
     updateMatrices();
 
-    printf( "printing modelview matrix:\n[" );
+    gravUtil::logVerbose( "printing modelview matrix:\n[" );
     int c = 0;
     for ( int i = 0; i < 16; i++ )
     {
-        printf( "%f", modelview[c%16] );
+        gravUtil::logVerbose( "%f", modelview[c%16] );
         if ( i % 4 == 3 )
-            printf( "]\n[" );
+            gravUtil::logVerbose( "]\n[" );
         else
-            printf( " " );
+            gravUtil::logVerbose( " " );
         if ( c >= 16 ) { c=(c+5)%16; }
         else c+=4;
     }
     c = 0;
 
-    /*printf( "printing modelview matrix row-major (wrong)\n[" );
+    /*gravUtil::logVerbose( "printing modelview matrix row-major (wrong)\n[" );
     for ( int i = 0; i < 16; i++ )
     {
-        printf( "%f", modelview[i] );
+        gravUtil::logVerbose( "%f", modelview[i] );
         if ( i % 4 == 3 )
-            printf( "]\n[" );
+            gravUtil::logVerbose( "]\n[" );
         else
-            printf( " " );
+            gravUtil::logVerbose( " " );
     }
     c=0;*/
 
-    printf( "printing projection matrix\n[" );
+    gravUtil::logVerbose( "printing projection matrix\n[" );
     for ( int i = 0; i < 16; i++ )
     {
-        printf( "%f", projection[c%16] );
+        gravUtil::logVerbose( "%f", projection[c%16] );
         if ( i % 4 == 3 )
-            printf( "]\n[" );
+            gravUtil::logVerbose( "]\n[" );
         else
-            printf( " " );
+            gravUtil::logVerbose( " " );
         c += 4;
         if ( c >= 16 ) { c=(c+5)%16; }
         else c+=4;
     }
     c = 0;
 
-    printf( "printing viewport matrix\n[" );
+    gravUtil::logVerbose( "printing viewport matrix\n[" );
     for ( int i = 0; i < 4; i++ )
     {
-        printf( "%i", viewport[i] );
-        if ( i % 2 == 1 ) printf( "]\n" );
-        else if ( i == 1 ) printf( "[" );
-        else printf( " " );
+        gravUtil::logVerbose( "%i", viewport[i] );
+        if ( i % 2 == 1 ) gravUtil::logVerbose( "]\n" );
+        else if ( i == 1 ) gravUtil::logVerbose( "[" );
+        else gravUtil::logVerbose( " " );
         if ( c >= 4 ) { c=c%4;c++; }
         else c+=2;
     }
@@ -180,7 +181,8 @@ void GLUtil::worldToScreen( GLdouble x, GLdouble y, GLdouble z,
     GLint ret = gluProject( x, y, z, modelview, projection, viewport,
                             scrX, scrY, scrZ );
     if ( ret == 0 )
-        printf( "gluproject returned false\n" );
+        gravUtil::logWarning( "GLUtil::worldToScreen: gluproject returned "
+                "false\n" );
 }
 
 void GLUtil::worldToScreen( Point worldPoint, Point& screenPoint )
@@ -251,8 +253,8 @@ GLuint GLUtil::loadShaders( const char* location )
     glGetShaderiv( vertexShader, GL_INFO_LOG_LENGTH, &logLength );
     char* message = new char[logLength];
     glGetShaderInfoLog( vertexShader, logLength, &numWritten, message );
-    printf( "GLUtil::loadShaders: vertex compilation info log (%i): %s\n",
-                numWritten, message );
+    gravUtil::logVerbose( "GLUtil::loadShaders: vertex compilation info log "
+            "(%i): %s\n", numWritten, message );
     delete message;
 
     glCompileShader( fragmentShader );
@@ -264,17 +266,19 @@ GLuint GLUtil::loadShaders( const char* location )
     glGetShaderiv( fragmentShader, GL_INFO_LOG_LENGTH, &logLength );
     message = new char[logLength];
     glGetShaderInfoLog( fragmentShader, logLength, &numWritten, message );
-    printf( "GLUtil::loadShaders: fragment compilation info log (%i): %s\n",
-                numWritten, message );
+    gravUtil::logVerbose( "GLUtil::loadShaders: fragment compilation info log "
+            "(%i): %s\n", numWritten, message );
     delete message;
 
     if ( vertexCompiled == 0 || fragmentCompiled == 0 )
     {
-        printf( "GLUtil::loadShaders: shaders failed to compile\n" );
+        gravUtil::logError( "GLUtil::loadShaders: "
+                "shaders failed to compile\n" );
         return 0;
     }
-    printf( "GLUtil::loadShaders: shaders compiled (vertex: %i, fragment: %i); "
-            "linking...\n", vertexCompiled, fragmentCompiled );
+    gravUtil::logVerbose( "GLUtil::loadShaders: shaders compiled "
+            "(vertex: %i, fragment: %i); linking...\n",
+            vertexCompiled, fragmentCompiled );
 
     // create program & attempt to link
     GLuint program = glCreateProgram();
@@ -289,17 +293,17 @@ GLuint GLUtil::loadShaders( const char* location )
     glGetProgramiv( program, GL_INFO_LOG_LENGTH, &logLength );
     message = new char[logLength];
     glGetProgramInfoLog( program, logLength, &numWritten, message );
-    printf( "GLUtil::loadShaders: program info log (%i): %s\n",
+    gravUtil::logVerbose( "GLUtil::loadShaders: program info log (%i): %s\n",
                 numWritten, message );
     delete message;
 
     if ( linked == 0 )
     {
-        printf( "GLUtil::loadShaders: shaders failed to link\n" );
+        gravUtil::logError( "GLUtil::loadShaders: shaders failed to link\n" );
         return 0;
     }
-    printf( "GLUtil::loadShaders: linked (status: %i), returning program %i\n",
-                linked, program );
+    gravUtil::logVerbose( "GLUtil::loadShaders: linked (status: %i), "
+            "returning program %i\n", linked, program );
 
     return program;
 }
