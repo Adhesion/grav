@@ -7,6 +7,8 @@
  */
 
 #include "AudioManager.h"
+#include "gravUtil.h"
+
 #include <VPMedia/VPMPayloadDecoder.h>
 #include <VPMedia/audio/linear/VPMLinear16Decoder.h>
 #include <VPMedia/audio/VPMAudioMeter.h>
@@ -31,15 +33,12 @@ float AudioManager::getLevel( std::string name, bool avg, bool cnames )
     float temp = 0.0f;
     int count = 0;
 
-    //printf( "AudioManager::getLevel: getting level for %s\n", name.c_str() );
-
     for ( unsigned int i = 0; i < sources.size(); i++ )
     {
         if ( ( !cnames && sources[i]->siteID.compare( name ) == 0 ) ||
              ( cnames && sources[i]->cName.compare( name ) == 0 ) ||
              name.compare( "" ) == 0 )
         {
-            //printf( "AudioManager::getLevel: found %s\n", name.c_str() );
             if ( avg )
             {
                 temp += sources[i]->meter->levelAverage();
@@ -48,10 +47,8 @@ float AudioManager::getLevel( std::string name, bool avg, bool cnames )
             else
                 temp += sources[i]->meter->level();
             count++;
-            //printf( "audioman returning %f\n", temp );
         }
-        //else
-            //printf( "AudioManager::getLevel: DID NOT find %s\n", name.c_str() );
+        // would fall to else clause if name was not found
     }
 
     if ( count == 1 )
@@ -71,8 +68,9 @@ void AudioManager::printLevels()
 {
     for ( unsigned int i = 0; i < sources.size(); i++ )
     {
-        printf( "source: 0x%08x/%s: %f\n", sources[i]->ssrc,
-                    sources[i]->siteID.c_str(), sources[i]->meter->level() );
+        gravUtil::logVerbose( "AudioManager::printLevels: "
+                "source: 0x%08x/%s: %f\n", sources[i]->ssrc,
+                sources[i]->siteID.c_str(), sources[i]->meter->level() );
     }
 }
 
@@ -92,7 +90,6 @@ void AudioManager::updateNames()
                         VPMSession::VPMSESSION_SDES_CNAME, buffer, bufferLen ) )
         {
             sources[i]->cName = std::string( buffer );
-            //printf( "audioman::updatenames got %s for source 0x%08x\n", sources[i]->cName.c_str(), sources[i]->ssrc );
         }
     }
 }
@@ -103,7 +100,7 @@ void AudioManager::vpmsession_source_created( VPMSession &session,
                                           VPMPayload type,
                                           VPMPayloadDecoder *decoder )
 {
-    printf( "AudioManager::vpmsession_source_created: "
+    gravUtil::logVerbose( "AudioManager::vpmsession_source_created: "
             "adding source ssrc: 0x%08x\n", ssrc );
     VPMLinear16Decoder* dec = dynamic_cast<VPMLinear16Decoder*>(decoder);
     if ( dec )
@@ -117,11 +114,12 @@ void AudioManager::vpmsession_source_created( VPMSession &session,
         dec->connectAudioProcessor( m );
 
         sources.push_back( a );
-        printf( "AudioManager::vpmsession_source_created: source added\n" );
+        gravUtil::logVerbose( "AudioManager::vpmsession_source_created: "
+                "source added\n" );
     }
     else
-        printf( "AudioManager::vpmsession_source_created: failed to cast to"
-                " linear16 decoder\n" );
+        gravUtil::logWarning( "AudioManager::vpmsession_source_created: "
+                "failed to cast to linear16 decoder\n" );
 }
 
 void AudioManager::vpmsession_source_deleted( VPMSession &session,
@@ -155,9 +153,11 @@ void AudioManager::vpmsession_source_app(VPMSession &session,
 {
     std::string appS( app, 4 );
     std::string dataS( data, data_len );
-    printf( "AudioManager::RTCP_APP: ssrc: 0x%08x\n", ssrc );
-    printf( "AudioManager::RTCP_APP: %s,%s\n", appS.c_str(), dataS.c_str() );
-    printf( "AudioManager::RTCP_APP: data length is %i\n", data_len );
+    gravUtil::logVerbose( "AudioManager::RTCP_APP: ssrc: 0x%08x\n", ssrc );
+    gravUtil::logVerbose( "AudioManager::RTCP_APP: %s,%s\n", appS.c_str(),
+            dataS.c_str() );
+    gravUtil::logVerbose( "AudioManager::RTCP_APP: data length is %i\n",
+            data_len );
 
     if ( appS.compare( "site" ) == 0 )
     {
