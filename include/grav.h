@@ -85,6 +85,7 @@ private:
 
     int timerInterval;
     int timerIntervalUS;
+    long int fps;
 
     bool autoVideoSessionRotate;
     int rotateIntervalMS;

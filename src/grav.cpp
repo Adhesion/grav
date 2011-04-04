@@ -77,6 +77,15 @@ bool gravApp::OnInit()
     if ( startFullscreen )
         mainFrame->ShowFullScreen( true );
 
+    // log here instead of in handleargs, see above/in handleargs
+    // (handleargs is where the timer intervals actually get set)
+    // might be that we can't do logging until main window is created
+    if ( fps > 1000 )
+    {
+        gravUtil::logVerbose( "grav::warning: invalid fps value %li, "
+                              "reset to 60\n", fps );
+    }
+
     int treeX = 960; int treeY = 50;
     // forces resize - for some reason it doesn't draw inner contents until
     // resized
@@ -122,7 +131,8 @@ bool gravApp::OnInit()
     if ( !GLUtil::getInstance()->initGL() )
     {
         // bail out if something failed
-        printf( "grav::OnInit(): ERROR: initGL() failed, exiting\n" );
+        gravUtil::logError( "grav::OnInit(): ERROR: initGL() failed, "
+                "exiting\n" );
         delete grav;
         return false;
     }
@@ -132,7 +142,6 @@ bool gravApp::OnInit()
     else
         grav->setHeaderString( "RIT Global Collaboration Grid" );
 
-    //printf( "hide root? %i\n", tree->HasFlag( wxTR_HIDE_ROOT ) );
     timer = new RenderTimer( canvas, timerInterval );
     //timer->Start();
     //wxStopWatch* t2 = new wxStopWatch();
@@ -169,7 +178,7 @@ bool gravApp::OnInit()
     sessionTree->setSessionManager( sessionManager );
     for ( unsigned int i = 0; i < initialVideoAddresses.size(); i++ )
     {
-        printf ( "grav::initializing video address %s\n",
+        gravUtil::logVerbose ( "grav::initializing video address %s\n",
                     initialVideoAddresses[i].c_str() );
         sessionTree->addSession( initialVideoAddresses[i], false,
                                     videoSessionRotate );
@@ -180,7 +189,7 @@ bool gravApp::OnInit()
     }
     for ( unsigned int i = 0; i < initialAudioAddresses.size(); i++ )
     {
-        printf ( "grav::initializing audio address %s\n",
+        gravUtil::logVerbose ( "grav::initializing audio address %s\n",
                     initialAudioAddresses[i].c_str() );
         sessionTree->addSession( initialAudioAddresses[i], true, false );
 
@@ -199,13 +208,13 @@ bool gravApp::OnInit()
     if ( autoVideoSessionRotate )
         rotateTimer->Start( rotateIntervalMS );
 
-    printf( "grav:init function complete\n" );
+    gravUtil::logVerbose( "grav:init function complete\n" );
     return true;
 }
 
 int gravApp::OnExit()
 {
-    printf( "grav::Exiting...\n" );
+    gravUtil::logVerbose( "grav::Exiting...\n" );
     // TODO: test this stuff more, valgrind etc
 
     if ( usingThreads )
@@ -253,7 +262,7 @@ void gravApp::idleHandler( wxIdleEvent& evt )
         unsigned long time = (unsigned long)timer->getTiming();
         if ( time > (unsigned long)timerIntervalUS )
         {
-            //printf( "%lu\n", time );
+            //gravUtil::logVerbose( "%lu\n", time );
             canvas->draw();
             timer->resetTiming();
         }
@@ -328,14 +337,17 @@ bool gravApp::handleArgs()
 
     grav->setGridAuto( parser.Found( _("gridauto") ) );
 
-    long int fps;
+    fps = 0;
     if ( parser.Found( _("fps"), &fps ) )
     {
         timerInterval = floor( 1000.0f / (float)fps );
         timerIntervalUS = floor( 1000000.0f / (float)fps );
+        // if it's not a valid fps value (>1000) reset to 60
         if ( timerInterval < 1 )
         {
-            printf( "ERROR: invalid fps value, resetting to ~60\n" );
+            // log a message regarding this later - we can't use the normal wx
+            // logging stuff at this point yet for some reason, causes weird
+            // behavior
             timerInterval = 16;
             timerIntervalUS = 16667;
         }
@@ -420,7 +432,7 @@ void gravApp::mapRTP()
 
 void* gravApp::threadTest( void* args )
 {
-    printf( "grav::starting network/decoding thread...\n" );
+    gravUtil::logVerbose( "grav::starting network/decoding thread...\n" );
     gravApp* g = (gravApp*)args;
     // wait a bit before starting this thread, since doing it too early might
     // affect the WX tree before it's fully initialized somehow, rarely
@@ -432,11 +444,11 @@ void* gravApp::threadTest( void* args )
         if ( threadDebug )
         {
             if ( threadCounter == 0 )
-                printf( "grav::thread still running\n" );
+                gravUtil::logVerbose( "grav::thread still running\n" );
             threadCounter = (threadCounter+1)%1000;
         }
     }
-    printf( "grav::thread ending...\n" );
+    gravUtil::logVerbose( "grav::thread ending...\n" );
     return 0;
 }
 
