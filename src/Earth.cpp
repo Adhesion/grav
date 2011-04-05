@@ -30,7 +30,7 @@ Earth::Earth()
     }
     else
     {
-        printf( "Earth::warning: earth texture not found\n" );
+        gravUtil::logWarning( "Earth::init: earth texture not found\n" );
     }
 
     animated = true;
@@ -169,7 +169,7 @@ void Earth::convertLatLong( float lat, float lon, float &ex, float &ey,
     float ext = radius * (cos(rlat) * sin(rlon));
     float eyt = radius * (sin(rlat));
     float ezt = radius * (cos(rlat) * cos(rlon));
-    //printf( "ex,ey,ez: %f,%f,%f\n", ex, ey, ez );
+    //gravUtil::logVerbose( "ex,ey,ez: %f,%f,%f\n", ex, ey, ez );
 
     /*glBegin( GL_LINE );
     glVertex3f( 0.0f, 0.0f, 0.0f );
@@ -180,14 +180,14 @@ void Earth::convertLatLong( float lat, float lon, float &ex, float &ey,
     ex = (ext*matrix[0]) + (eyt*matrix[4]) + (ezt*matrix[8]) + matrix[12];
     ey = (ext*matrix[1]) + (eyt*matrix[5]) + (ezt*matrix[9]) + matrix[13];
     ez = (ext*matrix[2]) + (eyt*matrix[6]) + (ezt*matrix[10]) + matrix[14];
-    //printf( "x,y,z: %f,%f,%f\n", ex, ey, ez );
+    //gravUtil::logVerbose( "x,y,z: %f,%f,%f\n", ex, ey, ez );
 
     // row major
     /*ex = (ex*matrix[0]) + (ey*matrix[1]) + (ez*matrix[2]);// + matrix[3];
     ey = (ex*matrix[4]) + (ey*matrix[5]) + (ez*matrix[5]);// + matrix[7];
     ez = (ex*matrix[8]) + (ey*matrix[9]) + (ez*matrix[10]);// + matrix[11];*/
 
-    //printf( "matrix/modelview: %f, %f\n", matrix[1], GLUtil::modelview[1] );
+    //gravUtil::logVerbose( "matrix/modelview: %f, %f\n", matrix[1], GLUtil::modelview[1] );
 
     //ex = (ex*GLUtil::modelview[0]) + (ey*GLUtil::modelview[4]) + (ez*GLUtil::modelview[8]) + GLUtil::modelview[12];
     //ey = (ex*GLUtil::modelview[1]) + (ey*GLUtil::modelview[5]) + (ez*GLUtil::modelview[9]) + GLUtil::modelview[13];

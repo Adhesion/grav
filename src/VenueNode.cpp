@@ -31,7 +31,6 @@ VenueNode::VenueNode()
 
 void VenueNode::draw()
 {
-    //printf( "VN name: %s\n", name.c_str() );
     RectangleBase::draw();
 }
 
