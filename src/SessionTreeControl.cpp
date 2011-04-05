@@ -47,7 +47,6 @@ void SessionTreeControl::setSessionManager( SessionManager* s )
 void SessionTreeControl::addSession( std::string address, bool audio,
                                         bool rotate )
 {
-    printf( "tree control adding session, rotate is %i\n", rotate );
     bool added = false;
     wxTreeItemId node;
     wxTreeItemId current;
@@ -90,8 +89,8 @@ void SessionTreeControl::removeSession( std::string address )
     wxTreeItemId item = findSession( rootID, address );
     if ( !item.IsOk() )
     {
-        printf( "SessionTreeControl::removeObject: ERROR: item %s not found?\n",
-                    address.c_str() );
+        gravUtil::logWarning( "SessionTreeControl::removeObject: "
+                "item %s not found?\n", address.c_str() );
         return;
     }
 
@@ -299,8 +298,6 @@ void SessionTreeControl::removeSessionEvent( wxCommandEvent& evt )
 
 void SessionTreeControl::rotateEvent( wxCommandEvent& evt )
 {
-    printf( "rotate event: have %i sessions\n",
-            sessionManager->getVideoSessionCount() );
     rotateVideoSessions();
 }
 

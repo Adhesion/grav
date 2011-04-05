@@ -74,13 +74,14 @@ bool SessionManager::initSession( std::string address, bool audio )
 
     if ( !session->initialise() )
     {
-        printf( "error: failed to initialise session\n" );
+        gravUtil::logError( "SessionManager::initSession: "
+                "failed to initialise session\n" );
         unlockSessions();
         return false;
     }
 
-    printf( "SessionManager::initialized %s session on %s\n", type.c_str(),
-                address.c_str() );
+    gravUtil::logVerbose( "SessionManager::initialized %s session on %s\n",
+            type.c_str(), address.c_str() );
     (*counter)++;
     entry.sessionTS = random32();
     entry.address = address;
@@ -99,7 +100,6 @@ bool SessionManager::removeSession( std::string addr )
 {
     lockSessions();
 
-    printf( "SessionManager::attempting to remove session %s\n", addr.c_str() );
     std::vector<SessionEntry>::iterator it = sessions.begin();
     while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
         ++it;
@@ -107,7 +107,8 @@ bool SessionManager::removeSession( std::string addr )
     if ( it == sessions.end() )
     {
         unlockSessions();
-        printf( "SessionManager::ERROR: session %s not found\n", addr.c_str() );
+        gravUtil::logWarning( "SessionManager::removeSession: "
+                "session %s not found\n", addr.c_str() );
         return false;
     }
 
@@ -183,8 +184,6 @@ void SessionManager::rotate( bool audio )
     {
         rotatePos = 0;
     }
-    printf( "about to rotate: pos %i, session %s, last session %s\n", rotatePos,
-            videoRotateList[ rotatePos ].c_str(), lastRotateSession.c_str() );
     unlockSessions();
 
     // only remove & rotate if there is a valid old one & it isn't the same as
@@ -317,7 +316,7 @@ bool SessionManager::iterateSessions()
     // mutex should do this but this thread seems way too eager
     if ( pause )
     {
-        //printf( "Sessions temporarily paused...\n" );
+        //gravUtil::logVerbose( "Sessions temporarily paused...\n" );
         wxMicroSleep( 10 );
     }
 
@@ -336,7 +335,8 @@ bool SessionManager::iterateSessions()
     {
         if ( sessions[0].sessionTS % 1000 == 0 )
         {
-            printf( "SessionManager::iterate: have %u sessions, TS=%u\n",
+            gravUtil::logVerbose( "SessionManager::iterate: "
+                    "have %u sessions, TS=%u\n",
                     sessions.size(), sessions[0].sessionTS );
         }
     }
@@ -358,18 +358,14 @@ int SessionManager::getAudioSessionCount()
 
 void SessionManager::lockSessions()
 {
-    //printf( "SessionManager::lock::attempting to get lock...\n" );
     pause = true;
     mutex_lock( sessionMutex );
     lockCount++;
-    //printf( "SessionManager::lock::lock gained, count now %i\n", lockCount );
 }
 
 void SessionManager::unlockSessions()
 {
-    //printf( "SessionManager::lock::unlocking, count %i\n", lockCount );
     pause = false;
     mutex_unlock( sessionMutex );
     lockCount--;
-    //printf( "SessionManager::lock::lock released, count now %i\n", lockCount );
 }
