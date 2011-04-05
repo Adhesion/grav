@@ -103,7 +103,6 @@ void Frame::OnAbout( wxCommandEvent& evt )
 
 void Frame::OnKeyboardShortcuts( wxCommandEvent& evt )
 {
-    printf( "keyboardshortcut frame\n" );
     wxDialog* helpDialog = new wxDialog( this, wxID_ANY,
             _("Keyboard Shortcuts") );
     helpDialog->SetSize( wxSize( 500, 500 ) );
@@ -176,9 +175,6 @@ void Frame::setupMenuBar()
 
 void Frame::cleanup()
 {
-    // can potentially add a "really quit?" dialog here
-    //printf( "Frame::OnCloseWindow (%s)\n", (char*)(GetName().char_str()) );
-
     // Note that destructors for children will automatically be called,
     // including glcanvas (which has the timer stop) and tree control.
     //
