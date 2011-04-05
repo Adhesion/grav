@@ -7,6 +7,7 @@
 
 #include "InputHandler.h"
 #include "GLUtil.h"
+#include "gravUtil.h"
 #include "VideoSource.h"
 #include "RectangleBase.h"
 #include "Group.h"
@@ -226,17 +227,18 @@ void InputHandler::wxMouseRDown( wxMouseEvent& evt )
 
 void InputHandler::handlePrintSelected()
 {
-    printf( "current sources selected: %i\n",
+    gravUtil::logMessage( "InputHandler::current sources selected: %i\n",
             grav->getSelectedObjects()->size() );
     for ( unsigned int i = 0; i < grav->getSelectedObjects()->size(); i++ )
     {
-        printf( "%s\n", (*(grav->getSelectedObjects()))[i]->getName().c_str() );
+        gravUtil::logMessage( "%s\n",
+                (*(grav->getSelectedObjects()))[i]->getName().c_str() );
     }
 }
 
 void InputHandler::handleRearrangeGroups()
 {
-    printf( "rearranging groups...\n" );
+    gravUtil::logMessage( "InputHandler::rearranging groups...\n" );
     for ( unsigned int i = 0; i < grav->getSelectedObjects()->size(); i++ )
     {
         RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
@@ -250,7 +252,7 @@ void InputHandler::handleRearrangeGroups()
 
 void InputHandler::handleUpdateGroupNames()
 {
-    printf( "updating group names...\n" );
+    gravUtil::logMessage( "InputHandler::updating group names...\n" );
     std::map<std::string,Group*>::iterator mapi;
     mapi = grav->getSiteIDGroups()->begin();
     for ( ; mapi != grav->getSiteIDGroups()->end(); mapi++ )
@@ -334,68 +336,73 @@ void InputHandler::handleHelp()
 {
     std::map<std::string, std::string>::const_iterator i;
     std::map<std::string, std::string> helpList = getShortcutHelpList();
-    printf( "List of mapped keys:\n" );
+    gravUtil::logMessage( "InputHandler::List of mapped keys:\n" );
     for ( i = helpList.begin(); i != helpList.end(); ++i )
     {
         std::ostringstream sstr;
         sstr << std::setw(25) << i->first;
-        printf( "%s\t%s\n", sstr.str().c_str(), i->second.c_str() );
+        gravUtil::logMessage( "%s\t%s\n", sstr.str().c_str(),
+                i->second.c_str() );
     }
 }
 
 void InputHandler::handleInformation()
 {
     std::vector<VideoSource*>::const_iterator si;
-    printf( "We currently have %i sources.\n",
+    gravUtil::logMessage( "InputHandler::printing source/object info...\n" );
+    gravUtil::logMessage( "\tWe currently have %i sources.\n",
              grav->getSources()->size() );
-    printf( "We currently have %i objects in drawnObjects.\n",
+    gravUtil::logMessage( "\tWe currently have %i objects in drawnObjects.\n",
              grav->getDrawnObjects()->size() );
-    printf( "Screen size is %f x %f\n",
+    gravUtil::logMessage( "\tScreen size is %f x %f\n",
             grav->getScreenRect().getWidth(),
             grav->getScreenRect().getHeight() );
 
     for ( si = grav->getSources()->begin();
             si != grav->getSources()->end(); si++ )
     {
-        printf( "name: %s\n",
-            (*si)->getMetadata(
-                VPMSession::VPMSESSION_SDES_NAME).c_str() );
-        printf( "stored name: %s\n", (*si)->getName().c_str() );
-        printf( "cname: %s\n",
-            (*si)->getMetadata(
-                VPMSession::VPMSESSION_SDES_CNAME).c_str() );
-        printf( "stored altname: %s\n", (*si)->getAltName().c_str() );
-        printf( "loc: %s\n",
-            (*si)->getMetadata(
-                VPMSession::VPMSESSION_SDES_LOC).c_str() );
-        printf( "ssrc 0x%08x (%d)\n", (*si)->getssrc(),
-                    (*si)->getssrc() );
-        printf( "\tpos (world): %f,%f\n",
+        gravUtil::logMessage( "\t\tname: %s\n",
+                (*si)->getMetadata( VPMSession::VPMSESSION_SDES_NAME).c_str() );
+        gravUtil::logMessage( "\t\tstored name: %s\n",
+                (*si)->getName().c_str() );
+        gravUtil::logMessage( "\t\tcname: %s\n",
+                (*si)->getMetadata(
+                        VPMSession::VPMSESSION_SDES_CNAME).c_str() );
+        gravUtil::logMessage( "\t\tstored altname: %s\n",
+                (*si)->getAltName().c_str() );
+        gravUtil::logMessage( "\t\tloc: %s\n",
+                (*si)->getMetadata( VPMSession::VPMSESSION_SDES_LOC).c_str() );
+        gravUtil::logMessage( "\t\tssrc 0x%08x (%d)\n", (*si)->getssrc(),
+                (*si)->getssrc() );
+        gravUtil::logMessage( "\t\tpos (world): %f,%f\n",
                 (*si)->getX(), (*si)->getY() );
         GLdouble scrX; GLdouble scrY; GLdouble scrZ;
         GLUtil::getInstance()->worldToScreen( (GLdouble)(*si)->getX(),
-                        (GLdouble)(*si)->getY(),
-                        (GLdouble)(*si)->getZ(),
-                        &scrX, &scrY, &scrZ);
-        printf( "\tpos (screen): %f,%f,%f\n", scrX, scrY, scrZ );
-        printf( "\tis grouped? %i\n", (*si)->isGrouped() );
-
-        printf( "\tDescription of codec: %s\n",
-                    (*si)->getPayloadDesc() );
-        printf( "\tis muted? %i\n", (*si)->isMuted() );
-
-        printf( "\tSize: %f x %f\n", (*si)->getWidth(),
-                    (*si)->getHeight() );
-        printf( "\tText size: %f x %f\n", (*si)->getTextWidth(),
-                    (*si)->getTextHeight() );
+                (GLdouble)(*si)->getY(),
+                (GLdouble)(*si)->getZ(),
+                &scrX, &scrY, &scrZ);
+        gravUtil::logMessage( "\t\tpos (screen): %f,%f,%f\n",
+                scrX, scrY, scrZ );
+        gravUtil::logMessage( "\t\tis grouped? %i\n", (*si)->isGrouped() );
+        gravUtil::logMessage( "\t\tDescription of codec: %s\n",
+                (*si)->getPayloadDesc() );
+        gravUtil::logMessage( "\t\tis muted? %i\n", (*si)->isMuted() );
+        gravUtil::logMessage( "\t\tSize: %f x %f\n", (*si)->getWidth(),
+                (*si)->getHeight() );
+        gravUtil::logMessage( "\t\tText size: %f x %f\n", (*si)->getTextWidth(),
+                (*si)->getTextHeight() );
+        gravUtil::logMessage( "" );
     }
-    printf( "DrawnObjects:\n" );
+
+    gravUtil::logMessage( "\tDrawnObjects:\n" );
     for ( unsigned int i = 0; i < grav->getDrawnObjects()->size(); i++ )
     {
         RectangleBase* temp = (*(grav->getDrawnObjects()))[i];
-        printf( "%s (%fx%f)\n", temp->getName().c_str(),
+        gravUtil::logMessage( "\t\t%s (%fx%f)\n", temp->getName().c_str(),
                 temp->getDestWidth(), temp->getDestHeight() );
     }
+
+    gravUtil::logMessage( "InputHandler::done printing source/object info.\n" );
 }
 
 void InputHandler::handleToggleGroupLocks()
@@ -406,10 +413,10 @@ void InputHandler::handleToggleGroupLocks()
         if ( temp->isGroup() )
         {
             Group* g = (Group*)temp;
-            printf( "InputHandler::l:group %s locked? %i\n",
+            gravUtil::logMessage( "InputHandler::group %s locked? %i\n",
                         g->getName().c_str(), g->isLocked() );
             g->changeLock();
-            printf( "after: %i\n", g->isLocked() );
+            gravUtil::logMessage( "\tafter: %i\n", g->isLocked() );
         }
     }
 }
@@ -438,8 +445,8 @@ void InputHandler::handleMuteSelected()
 
 void InputHandler::handleRandomTest()
 {
-    printf( "random32: %i\n", random32() );
-    printf( "random32max: %i\n", random32_max() );
+    gravUtil::logMessage( "InputHandler::random32: %i\n", random32() );
+    gravUtil::logMessage( "InputHandler::random32max: %i\n", random32_max() );
 }
 
 void InputHandler::handleNativeScaleAll()
@@ -640,12 +647,12 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     std::vector<VPMVideoBufferSink*>::iterator t;
     unsigned char key = (unsigned char)keyCode;
     int hash = ktoh(key, this->modifiers);
-    /*printf( "Char pressed is %c (%i)\n", key, key );
-    printf( "keycode is %i\n", keyCode );
-    printf( "x,y in processKeyboard is %i,%i\n", x, y );
-    printf( "is shift (only) held? %i\n", modifiers == wxMOD_SHIFT );
-    printf( "is ctrl (only) held? %i\n", modifiers == wxMOD_CMD );
-    printf( "is alt (only) held? %i\n", modifiers == wxMOD_ALT );*/
+    /*gravUtil::logMessage( "Char pressed is %c (%i)\n", key, key );
+    gravUtil::logMessage( "keycode is %i\n", keyCode );
+    gravUtil::logMessage( "x,y in processKeyboard is %i,%i\n", x, y );
+    gravUtil::logMessage( "is shift (only) held? %i\n", modifiers == wxMOD_SHIFT );
+    gravUtil::logMessage( "is ctrl (only) held? %i\n", modifiers == wxMOD_CMD );
+    gravUtil::logMessage( "is alt (only) held? %i\n", modifiers == wxMOD_ALT );*/
     // how much to scale when doing -/+: flipped in the former case
 
     // Lookup the pressed key in our map of method pointers
@@ -654,8 +661,8 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     if( lookupIter != lookup.end() )
         (this->*(lookup[hash]))();
     else
-        printf( "No handler for registered for key (code is %i):\n%s\n",
-                keyCode, htos(hash).c_str());
+        gravUtil::logVerbose( "InputHandler::No handler for registered for key "
+                "(code is %i):\n\t%s\n", keyCode, htos(hash).c_str());
 
     // TBD -- how do we reconcile this with the map?
     switch ( keyCode )
@@ -680,7 +687,7 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
 void InputHandler::leftClick( int x, int y, bool doubleClick )
 {
     // glut screen coords are y-flipped relative to GL screen coords
-    //printf( "window height? %i\n", grav->getWindowHeight() );
+    //gravUtil::logMessage( "window height? %i\n", grav->getWindowHeight() );
     y = grav->getWindowHeight() - y;
 
     grav->setBoxSelectDrawing( false );
@@ -688,7 +695,7 @@ void InputHandler::leftClick( int x, int y, bool doubleClick )
     // old method for getting world coords for current mouse pos
     //GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.99087065,
     //                            &mouseX, &mouseY, &mouseZ );
-    //printf( "leftClick::old method got %f,%f,%f\n", mouseX, mouseY, mouseZ );
+    //gravUtil::logMessage( "leftClick::old method got %f,%f,%f\n", mouseX, mouseY, mouseZ );
 
     // ray intersect-based click method
     /*Point nearScreen( x, y, 0.0f );
@@ -972,7 +979,7 @@ bool InputHandler::selectVideos()
             // it'll be rendered on top - but only if we just clicked on it
             if ( !leftButtonHeld )
             {
-                //printf( "putting selected video to end\n" );
+                //gravUtil::logMessage( "putting selected video to end\n" );
                 // since we can only delete a normal iterator (not a reverse
                 // one) we have to calculate our current position
                 /*std::vector<RectangleBase*>::iterator current =
@@ -987,7 +994,7 @@ bool InputHandler::selectVideos()
         }
         else
         {
-            //printf( "InputHandler::selectVideos: did not intersect\n" );
+            //gravUtil::logMessage( "InputHandler::selectVideos: did not intersect\n" );
         }
     }
 

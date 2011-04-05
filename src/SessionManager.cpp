@@ -20,6 +20,7 @@
 #include "VideoListener.h"
 #include "AudioManager.h"
 #include "grav.h"
+#include "gravUtil.h"
 
 SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
     : videoSessionListener( vl ), audioSessionListener( al )

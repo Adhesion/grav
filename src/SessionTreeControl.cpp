@@ -13,6 +13,7 @@
 #include "SessionTreeControl.h"
 #include "SessionManager.h"
 #include "Frame.h"
+#include "gravUtil.h"
 
 BEGIN_EVENT_TABLE(SessionTreeControl, wxTreeCtrl)
 EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY, SessionTreeControl::itemRightClick)
