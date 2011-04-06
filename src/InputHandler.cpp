@@ -350,13 +350,11 @@ void InputHandler::handleInformation()
 {
     std::vector<VideoSource*>::const_iterator si;
     gravUtil::logMessage( "InputHandler::printing source/object info...\n" );
+    gravUtil::logMessage( "\tScreen size is %f x %f\n",
+                grav->getScreenRect().getWidth(),
+                grav->getScreenRect().getHeight() );
     gravUtil::logMessage( "\tWe currently have %i sources.\n",
              grav->getSources()->size() );
-    gravUtil::logMessage( "\tWe currently have %i objects in drawnObjects.\n",
-             grav->getDrawnObjects()->size() );
-    gravUtil::logMessage( "\tScreen size is %f x %f\n",
-            grav->getScreenRect().getWidth(),
-            grav->getScreenRect().getHeight() );
 
     for ( si = grav->getSources()->begin();
             si != grav->getSources()->end(); si++ )
@@ -394,7 +392,8 @@ void InputHandler::handleInformation()
         gravUtil::logMessage( "" );
     }
 
-    gravUtil::logMessage( "\tDrawnObjects:\n" );
+    gravUtil::logMessage( "\tWe currently have %i objects in drawnObjects.\n",
+                 grav->getDrawnObjects()->size() );
     for ( unsigned int i = 0; i < grav->getDrawnObjects()->size(); i++ )
     {
         RectangleBase* temp = (*(grav->getDrawnObjects()))[i];

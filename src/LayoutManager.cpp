@@ -52,9 +52,9 @@ bool LayoutManager::arrange( std::string method,
         std::map<std::string, std::string> opts);
 
     std::map<std::string, fn_ptr> lookup;
-    lookup["perimeter"] = &LayoutManager::perimeterArrange;
-    lookup["grid"]      = &LayoutManager::gridArrange;
-    lookup["focus"]     = &LayoutManager::focus;
+    lookup["perimeter"]   = &LayoutManager::perimeterArrange;
+    lookup["grid"]        = &LayoutManager::gridArrange;
+    lookup["focus"]       = &LayoutManager::focus;
     lookup["aspectFocus"] = &LayoutManager::aspectFocus;
 
     if ( lookup.find(method) == lookup.end() )
