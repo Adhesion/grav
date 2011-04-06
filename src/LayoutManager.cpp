@@ -12,14 +12,16 @@
 #include "LayoutManager.h"
 #include "RectangleBase.h"
 
+#include "gravUtil.h"
+
 LayoutManager::LayoutManager()
 { }
 
 bool LayoutManager::arrange( std::string method,
-                             RectangleBase outerRect,
-                             RectangleBase innerRect,
-                             std::map<std::string, std::vector<RectangleBase*> > data,
-                             std::map<std::string, std::string> options)
+        RectangleBase outerRect,
+        RectangleBase innerRect,
+        std::map<std::string, std::vector<RectangleBase*> > data,
+        std::map<std::string, std::string> options )
 {
     float outerL = outerRect.getLBound();
     float outerR = outerRect.getRBound();
@@ -38,12 +40,12 @@ bool LayoutManager::arrange( std::string method,
 }
 
 bool LayoutManager::arrange( std::string method,
-                             float outerL, float outerR,
-                             float outerU, float outerD,
-                             float innerL, float innerR,
-                             float innerU, float innerD,
-                             std::map<std::string, std::vector<RectangleBase*> > data,
-                             std::map<std::string, std::string> options)
+        float outerL, float outerR,
+        float outerU, float outerD,
+        float innerL, float innerR,
+        float innerU, float innerD,
+        std::map<std::string, std::vector<RectangleBase*> > data,
+        std::map<std::string, std::string> options )
 {
     typedef bool (LayoutManager::*fn_ptr)(
         float oL, float oR, float oU, float oD,
@@ -59,8 +61,9 @@ bool LayoutManager::arrange( std::string method,
 
     if ( lookup.find(method) == lookup.end() )
     {
-        printf( "ZOMG:::: a huge error should be thrown here!!!\n" );
-        return false; // double false !!!
+        gravUtil::logError( "InputHandler::arrange: method %s not found\n",
+                method.c_str() );
+        return false;
     }
     return (this->*lookup[method])( outerL, outerR, outerU, outerD,
                                     innerL, innerR, innerU, innerD,
@@ -68,9 +71,9 @@ bool LayoutManager::arrange( std::string method,
 }
 
 bool LayoutManager::perimeterArrange( RectangleBase outerRect,
-                                        RectangleBase innerRect,
-                                        std::map<std::string, std::vector<RectangleBase*> > data,
-                                        std::map<std::string, std::string> opts)
+        RectangleBase innerRect,
+        std::map<std::string, std::vector<RectangleBase*> > data,
+        std::map<std::string, std::string> opts )
 {
     float outerL = outerRect.getLBound();
     float outerR = outerRect.getRBound();
@@ -87,17 +90,18 @@ bool LayoutManager::perimeterArrange( RectangleBase outerRect,
 }
 
 bool LayoutManager::perimeterArrange( float outerL, float outerR,
-                                        float outerU, float outerD,
-                                        float innerL, float innerR,
-                                        float innerU, float innerD,
-                                        std::map<std::string, std::vector<RectangleBase*> > data,
-                                        std::map<std::string, std::string> opts)
+        float outerU, float outerD,
+        float innerL, float innerR,
+        float innerU, float innerD,
+        std::map<std::string, std::vector<RectangleBase*> > data,
+        std::map<std::string, std::string> opts)
 {
-    //printf( "LayoutManager::perimeter: outer inners: %f,%f %f,%f\n",
+    //gravUtil::logVerbose( "LayoutManager::perimeter: outer inners: %f,%f %f,%f\n",
     //        outerL, outerR, outerU, outerD );
     if ( data.find("objects") == data.end() )
     {
-        printf( "ZOMG:::: perimeterArrange was not passed an 'objects'\n" );
+        gravUtil::logError( "InputHandler::perimeterArrange was not passed an "
+                "'objects'\n" );
         return false;
     }
     std::vector<RectangleBase*> objects = data["objects"];
@@ -117,7 +121,7 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
         bottomNum = std::max( (int)objects.size() - topNum - (sideNum*2), 0 );
     }
 
-    //printf( "LayoutManager::perimeter: ratios of area: %f %f, %i %i\n",
+    //gravUtil::logVerbose( "LayoutManager::perimeter: ratios of area: %f %f, %i %i\n",
     //        topRatio, sideRatio, topNum, sideNum );
 
     // create lists of objects on top,right,down,left areas and send them
@@ -127,7 +131,7 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
 
     if ( topNum > 0 )
     {
-        //printf( "arranging objects %d to %d to top\n", 0, end-1 );
+        //gravUtil::logVerbose( "arranging objects %d to %d to top\n", 0, end-1 );
         for ( int i = 0; i < end; i++ )
             topObjs.push_back( objects[i] );
 
@@ -142,7 +146,7 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
 
     if ( sideNum > 0 )
     {
-        //printf( "arranging objects %d to %d to right\n", topNum, end-1 );
+        //gravUtil::logVerbose( "arranging objects %d to %d to right\n", topNum, end-1 );
         for ( int i = topNum; i < end; i++ )
             rightObjs.push_back( objects[i] );
 
@@ -156,7 +160,7 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
 
     if ( bottomNum > 0 )
     {
-        //printf( "arranging objects %d to %d to bottom\n", topNum + sideNum,
+        //gravUtil::logVerbose( "arranging objects %d to %d to bottom\n", topNum + sideNum,
         //        end-1 );
         for ( int i = end-1; i >= topNum + sideNum; i-- )
             bottomObjs.push_back( objects[i] );
@@ -169,7 +173,7 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
 
     if ( sideNum > 0 )
     {
-        //printf( "arranging objects %d to %d to left\n",
+        //gravUtil::logVerbose( "arranging objects %d to %d to left\n",
         //        topNum + sideNum + bottomNum, objects.size()-1 );
         for ( int i = objects.size()-1; i >= topNum + sideNum + bottomNum; i-- )
             leftObjs.push_back( objects[i] );
@@ -184,9 +188,9 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
 }
 
 bool LayoutManager::gridArrange( RectangleBase outerRect,
-                                    bool horiz, bool edge, bool resize,
-                                    std::map<std::string, std::vector<RectangleBase*> > data,
-                                    int numX, int numY )
+        bool horiz, bool edge, bool resize,
+        std::map<std::string, std::vector<RectangleBase*> > data,
+        int numX, int numY )
 {
     float outerL = outerRect.getLBound();
     float outerR = outerRect.getRBound();
@@ -202,12 +206,12 @@ bool str2bool(std::string str) { return str.compare( "True" ) == 0; }
 int str2int(std::string str) { return atoi(str.c_str()); }
 float str2fl(std::string str) { return atof(str.c_str()); }
 
-bool LayoutManager::gridArrange(float outerL, float outerR,
-                                float outerU, float outerD,
-                                float innerL, float innerR,
-                                float innerU, float innerD,
-                                std::map<std::string, std::vector<RectangleBase*> > data,
-                                std::map<std::string, std::string> opts )
+bool LayoutManager::gridArrange( float outerL, float outerR,
+        float outerU, float outerD,
+        float innerL, float innerR,
+        float innerU, float innerD,
+        std::map<std::string, std::vector<RectangleBase*> > data,
+        std::map<std::string, std::string> opts )
 {
     // Setup opts defaults
     std::map<std::string, std::string> dflt = \
@@ -234,15 +238,16 @@ bool LayoutManager::gridArrange(float outerL, float outerR,
 }
 
 bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
-                                    float outerD,
-                                    bool horiz, bool edge, bool resize,
-                                    std::map<std::string, std::vector<RectangleBase*> > data,
-                                    int numX, int numY )
+        float outerD,
+        bool horiz, bool edge, bool resize,
+        std::map<std::string, std::vector<RectangleBase*> > data,
+        int numX, int numY )
 {
     // Extract object data
     if ( data.find("objects") == data.end() )
     {
-        printf( "ZOMG:::: gridArrange was not passed an 'objects'\n" );
+        gravUtil::logError( "InputHandler::gridArrange was not passed an "
+                "'objects'\n" );
         return false;
     }
     std::vector<RectangleBase*> objects = data["objects"];
@@ -256,7 +261,7 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
     {
         numX = ceil( sqrt( objects.size() ) );
         numY = objects.size() / numX + ( objects.size() % numX > 0 );
-        //printf( "layout: doing grid arrangement with %i objects (%ix%i)\n",
+        //gravUtil::logVerbose( "layout: doing grid arrangement with %i objects (%ix%i)\n",
         //            objects.size(), numX, numY );
     }
 
@@ -271,8 +276,8 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
         return true;
     }
 
-    //printf( "grid:outers: %f,%f %f,%f\n", outerL, outerR, outerU, outerD );
-    //printf( "grid:numx %i numy %i\n", numX, numY );
+    //gravUtil::logVerbose( "grid:outers: %f,%f %f,%f\n", outerL, outerR, outerU, outerD );
+    //gravUtil::logVerbose( "grid:numx %i numy %i\n", numX, numY );
 
     float span; // height of rows if going horizontally,
                 // width of columns if going vertically
@@ -289,7 +294,7 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
 
         edgeL = outerL + 0.2f + (stride / 2);
         edgeR = outerR - 0.2f - (stride / 2);
-        //printf( "grid: edges are %f,%f\n", edgeL, edgeR );
+        //gravUtil::logVerbose( "grid: edges are %f,%f\n", edgeL, edgeR );
         if ( edge ) stride = (edgeR-edgeL) / std::max(1, (numX-1));
 
         curY = outerU - (span/2.0f);
@@ -326,9 +331,9 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
         }
     }
 
-    //printf( "grid: starting at %f,%f\n", curX, curY );
-    //printf( "grid: stride is %f\n", stride );
-    //printf( "grid: span is %f\n", span );
+    //gravUtil::logVerbose( "grid: starting at %f,%f\n", curX, curY );
+    //gravUtil::logVerbose( "grid: stride is %f\n", stride );
+    //gravUtil::logVerbose( "grid: span is %f\n", span );
 
     // if we're resizing them, do it on a first pass so the calculations later
     // are correct
@@ -357,12 +362,12 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
             }
             if ( aspect > objectAspect )
             {
-                //printf( "layout setting height to %f\n", newHeight );
+                //gravUtil::logVerbose( "layout setting height to %f\n", newHeight );
                 objects[i]->setTotalHeight( newHeight );
             }
             else
             {
-                //printf( "layout setting width to %f\n", newWidth );
+                //gravUtil::logVerbose( "layout setting width to %f\n", newWidth );
                 objects[i]->setTotalWidth( newWidth );
             }
         }
@@ -370,7 +375,7 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
 
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
-        //printf( "grid: moving object %i to %f,%f\n", i, curX, curY );
+        //gravUtil::logVerbose( "grid: moving object %i to %f,%f\n", i, curX, curY );
         objects[i]->move( curX, curY - objects[i]->getCenterOffsetY() );
         int objectsLeft = (int)objects.size() - i - 1;
 
@@ -379,7 +384,7 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
             curX += stride;
             if ( (i+1) % numX == 0 )
             {
-                //printf( "grid: changing to new row\n" );
+                //gravUtil::logVerbose( "grid: changing to new row\n" );
                 curY -= span;
                 // if the number of objects we have left is less than a full
                 // row/column, change stride such that it's evenly spaced
@@ -417,8 +422,8 @@ bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
 }
 
 bool LayoutManager::focus( RectangleBase outerRect, RectangleBase innerRect,
-                          std::map<std::string, std::vector<RectangleBase*> > data,
-                          std::map<std::string, std::string> opts)
+        std::map<std::string, std::vector<RectangleBase*> > data,
+        std::map<std::string, std::string> opts)
 {
     float innerL = innerRect.getLBound();
     float innerR = innerRect.getRBound();
@@ -436,21 +441,23 @@ bool LayoutManager::focus( RectangleBase outerRect, RectangleBase innerRect,
 }
 
 bool LayoutManager::focus( float outerL, float outerR,
-                           float outerU, float outerD,
-                           float innerL, float innerR,
-                           float innerU, float innerD,
-                           std::map<std::string, std::vector<RectangleBase*> > data,
-                           std::map<std::string, std::string> opts)
+        float outerU, float outerD,
+        float innerL, float innerR,
+        float innerU, float innerD,
+        std::map<std::string, std::vector<RectangleBase*> > data,
+        std::map<std::string, std::string> opts)
 {
     // Extract object data
     if ( data.find("outers") == data.end() )
     {
-        printf( "ZOMG:::: focus was not passed an 'outers'\n" );
+        gravUtil::logError( "InputHandler::focus was not passed an "
+                "'outers'\n" );
         return false;
     }
     if ( data.find("inners") == data.end() )
     {
-        printf( "ZOMG:::: focus was not passed an 'inners'\n" );
+        gravUtil::logError( "InputHandler::focus was not passed an "
+                "'inners'\n" );
         return false;
     }
     std::vector<RectangleBase*> outers = data["outers"];
@@ -528,9 +535,10 @@ bool LayoutManager::focus( float outerL, float outerR,
     return gridRes && perimRes;
 }
 
-bool LayoutManager::aspectFocus( RectangleBase outerRect, RectangleBase innerRect,
-                std::map<std::string, std::vector<RectangleBase*> > data,
-                std::map<std::string, std::string> opts )
+bool LayoutManager::aspectFocus( RectangleBase outerRect,
+        RectangleBase innerRect,
+        std::map<std::string, std::vector<RectangleBase*> > data,
+        std::map<std::string, std::string> opts )
 {
     float innerL = innerRect.getLBound();
     float innerR = innerRect.getRBound();
@@ -547,20 +555,24 @@ bool LayoutManager::aspectFocus( RectangleBase outerRect, RectangleBase innerRec
                   data, opts );
 }
 
-bool LayoutManager::aspectFocus( float outerL, float outerR, float outerU, float outerD,
-            float innerL, float innerR, float innerU, float innerD,
-            std::map<std::string, std::vector<RectangleBase*> > data,
-            std::map<std::string, std::string> opts )
+bool LayoutManager::aspectFocus( float outerL, float outerR,
+        float outerU, float outerD,
+        float innerL, float innerR,
+        float innerU, float innerD,
+        std::map<std::string, std::vector<RectangleBase*> > data,
+        std::map<std::string, std::string> opts )
 {
     // Extract object data
     if ( data.find("outers") == data.end() )
     {
-        printf( "ZOMG:::: aspectfocus was not passed an 'outers'\n" );
+        gravUtil::logError( "InputHandler::aspectfocus was not passed an "
+                "'outers'\n" );
         return false;
     }
     if ( data.find("inners") == data.end() )
     {
-        printf( "ZOMG:::: aspectfocus was not passed an 'inners'\n" );
+        gravUtil::logError( "InputHandler::aspectfocus was not passed an "
+                "'inners'\n" );
         return false;
     }
     std::vector<RectangleBase*> outers = data["outers"];
