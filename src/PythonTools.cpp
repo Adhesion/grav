@@ -42,8 +42,8 @@ PythonTools::PythonTools()
 
     if ( !found )
     {
-        printf( "PythonTools::ERROR: entry script not found - python "
-                "integration not available\n" );
+        gravUtil::logWarning( "PythonTools::init: entry script not found - "
+                "python integration not available\n" );
     }
 }
 
@@ -81,10 +81,12 @@ std::map<std::string, std::string> PythonTools::dtom( PyObject* d )
             curVal = PyDict_GetItem( d, curKey );
             char* valstr = PyString_AsString( curVal );
             if ( valstr == NULL )
-                printf( "PythonTools::dtom(): WARNING: value not a string\n" );
+                gravUtil::logWarning( "PythonTools::dtom(): "
+                        "value not a string\n" );
             char* keystr = PyString_AsString( curKey );
             if ( keystr == NULL )
-                printf( "PythonTools::dtom(): WARNING: key not a string\n" );
+                gravUtil::logWarning( "PythonTools::dtom(): "
+                        "key not a string\n" );
             if ( keystr != NULL && valstr != NULL )
                 results[ keystr ] = valstr;
         }
@@ -99,11 +101,11 @@ std::vector<std::string> PythonTools::ltov( PyObject* l )
     {
         PyObject* item;
         std::string str;
-        for ( int i = 0; i < PyList_Size(l); i++ )
+        for ( int i = 0; i < PyList_Size( l ); i++ )
         {
-            item = PyList_GetItem(l, i);
-            str = std::string(PyString_AsString(item));
-            results.push_back(str);
+            item = PyList_GetItem( l, i );
+            str = std::string( PyString_AsString( item ) );
+            results.push_back( str );
         }
     }
     return results;
@@ -111,20 +113,20 @@ std::vector<std::string> PythonTools::ltov( PyObject* l )
 
 PyObject* PythonTools::vtol( std::vector<std::string> v )
 {
-    PyObject *list = PyList_New(0);
+    PyObject *list = PyList_New( 0 );
     PyObject *item;
     std::vector<std::string>::iterator i;
     for ( i = v.begin(); i != v.end(); ++i )
     {
-        item = PyString_FromString((*i).c_str());
-        PyList_Append(list, item);
+        item = PyString_FromString( (*i).c_str() );
+        PyList_Append( list, item );
     }
     return list;
 }
 
 void PythonTools::inspect_object( PyObject *o )
 {
-    fprintf( stdout, "Inspecting Random Object!\n");
+    gravUtil::logMessage( "PythonTools::Inspecting Random Object!\n" );
 
     PyObject *item, *value, *value_s;
     std::string attr, value_stl;
@@ -132,21 +134,22 @@ void PythonTools::inspect_object( PyObject *o )
     PyObject* l = PyObject_Dir( o );
     for ( int i = 0; i < PyList_Size( l ); i++ )
     {
-        item = PyList_GetItem(l, i);
-        attr = std::string(PyString_AsString(item));
-
-        fprintf( stdout, "(o)%s -> ", attr.c_str() );
+        item = PyList_GetItem( l, i );
+        attr = std::string( PyString_AsString( item ) );
 
         value = PyObject_GetAttr( o, item );
         value_s = PyObject_Str( value );
         value_stl = std::string( PyString_AsString( value_s ) );
 
-        fprintf( stdout, "%s\n", value_stl.c_str()  );
+        gravUtil::logMessage( "\t(o)%s -> %s\n", attr.c_str(),
+                value_stl.c_str() );
 
-        Py_DECREF(value_s);
-        Py_DECREF(value);
+        Py_DECREF( value_s );
+        Py_DECREF( value );
     }
-    Py_DECREF(l);
+    Py_DECREF( l );
+
+    gravUtil::logMessage( "PythonTools::Done Inspecting Random Object\n" );
 }
 
 void PythonTools::inspect_dictionary( PyObject *dict )
@@ -159,24 +162,23 @@ void PythonTools::inspect_dictionary( PyObject *dict )
 
     Py_ssize_t pos = 0;
 
-    fprintf( stdout, "Inspecting Dictionary\n" );
+    gravUtil::logMessage( "PythonTools::Inspecting Dictionary\n" );
     while ( PyDict_Next( dict, &pos, &key, &value ) )
     {
         kstr = PyObject_Str( key );
         stl_kstr = PyString_AsString( kstr );
 
-        fprintf( stdout, "(d)%s -> ", stl_kstr.c_str() );
-        std::cout.flush();
-
         vstr = PyObject_Str( value );
         stl_vstr = PyString_AsString( vstr );
 
-        fprintf( stdout, "%s\n", stl_vstr.c_str()  );
+        gravUtil::logMessage( "\t(d)%s -> %s\n", stl_kstr.c_str(),
+                stl_vstr.c_str() );
 
         Py_DECREF( kstr );
         Py_DECREF( vstr );
     }
-    fprintf( stdout, "*salutes* Done Inspecting Dictionary\n" );
+
+    gravUtil::logMessage( "PythonTools::Done Inspecting Dictionary\n" );
 }
 
 PyObject* PythonTools::call( std::string _script, std::string _func,
@@ -184,7 +186,7 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
 {
     if ( !init )
     {
-        printf( "PythonTools::call: ERROR: PyTools not initialized\n" );
+        gravUtil::logError( "PythonTools::call: PyTools not initialized\n" );
         return NULL;
     }
 
@@ -195,16 +197,16 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
     if ( func == NULL )
     {
         PyErr_Print();
-        printf( "Failed to load function \"%s\"\n",
-                    entryFunc.c_str() );
+        gravUtil::logError( "PythonTools::call: Failed to load function "
+                "\"%s\"\n", entryFunc.c_str() );
         return NULL;
     }
     Py_INCREF( func );
     if ( ! PyCallable_Check(func) )
     {
         PyErr_Print();
-        printf( "Attribute \"%s\" is not callable.\n",
-                    entryFunc.c_str() );
+        gravUtil::logError( "PythonTools::call: Attribute \"%s\" is not "
+                "callable\n", entryFunc.c_str() );
         Py_DECREF( func );
         return NULL;
     }
@@ -244,7 +246,7 @@ PyObject* PythonTools::call( std::string _script, std::string _func,
     if ( result == NULL )
     {
         PyErr_Print();
-        printf( "Call failed.\n" );
+        gravUtil::logError( "PythonTools::call: Call failed\n" );
         Py_DECREF( func );
         Py_DECREF( entryArgs );
         return NULL;
