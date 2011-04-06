@@ -132,9 +132,6 @@ void gravManager::draw()
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    //glLoadIdentity();
-    //gluLookAt(camX, camY, camZ, 0.0, 0.0, -25.0, 0.0, 1.0, 0.0);
-
     cam->animateValues();
     cam->doGLLookat();
 
@@ -147,7 +144,6 @@ void gravManager::draw()
             float avg = audio->getLevelAvg();
             if ( avg > 0.0001f )
                 overalllevel = avg;
-            //printf( "level: %f\n", level );
         }
         gluSphere( sphereQuad, overalllevel * 30.0f + 0.5f, 50, 50 );
     }*/
@@ -210,24 +206,20 @@ void gravManager::draw()
     // same for remove
     if ( objectsToRemoveFromTree->size() > 0 && tree != NULL )
     {
-        //printf( "removing %i objects from tree\n", objectsToRemoveFromTree->size() );
         for ( unsigned int i = 0; i < objectsToRemoveFromTree->size(); i++ )
         {
             tree->removeObject( (*objectsToRemoveFromTree)[i] );
         }
         objectsToRemoveFromTree->clear();
-        //printf( "done removing objs from tree\n" );
     }
     // delete sources that need to be deleted - see deleteSource for the reason
     if ( objectsToDelete->size() > 0 )
     {
-        //printf( "deleting %i objects\n", objectsToDelete->size() );
         for ( unsigned int i = 0; i < objectsToDelete->size(); i++ )
         {
             delete (*objectsToDelete)[i];
         }
         objectsToDelete->clear();
-        //printf( "done deleting objects\n" );
     }
 
     // draw point on geographical position, selected ones on top (and bigger)
@@ -260,7 +252,6 @@ void gravManager::draw()
     // z-fighting on the videos which are coplanar
     glDepthMask( GL_FALSE );
 
-    //printf( "glutDisplay::drawing objects\n" );
     // iterate through all objects to be drawn, and draw
     for ( si = drawnObjects->begin(); si != drawnObjects->end(); si++ )
     {
@@ -307,17 +298,12 @@ void gravManager::draw()
                     outerObjs.push_back( (*si) );
                 }
             }
-            //printf( "glutDisplay::drawing object %s\n", (*si)->getName().c_str());
             (*si)->draw();
         }
         else
         {
-            //printf( "%s is grouped, not drawing\n", (*si)->getName().c_str() );
-            //printf( "its group is %s\n", (*si)->getGroup()->getName().c_str() );
+            // object is grouped, so group will draw it itself
         }
-        //printf( "glutDisplay: siteID: %s level %f\n",
-        //        (*si)->getSiteID().c_str(),
-        //        audioSession_listener.getLevel( (*si)->getSiteID().c_str() ) );
     }
 
     // do the audio focus if it triggered
@@ -405,20 +391,12 @@ void gravManager::draw()
         glTranslatef( 0.0f, screenRectFull.getUBound() * 0.9f, 0.0f );
         float debugScale = textScale / 2.5f;
         glScalef( debugScale, debugScale, debugScale );
-        /*std::string debugText;
-        debugText += canvas->getDrawTime();
-        debugText += videoListener->getPixelCount();
-                std::string( "Draw time: " ) + canvas->getDrawTime() +
-                    std::string( "\nNon-draw time: " ) + canvas->getNonDrawTime() +
-                            std::string( "\nPixel count:\n" ) +
-                                    videoListener->getPixelCount();*/
         char text[100];
         sprintf( text,
                 "Draw time: %3ld  Non-draw time: %3ld  Pixel count: %8ld "
                 "FPS: %2.2f",
                 canvas->getDrawTime(), canvas->getNonDrawTime(),
                 videoListener->getPixelCount(), canvas->getFPS() );
-        //printf( "%s\n", text );
         GLUtil::getInstance()->getMainFont()->Render( text );
 
         glPopMatrix();
@@ -426,14 +404,8 @@ void gravManager::draw()
 
     // back to writeable z-buffer for proper earth/line rendering
     glDepthMask( GL_TRUE );
-    //printf( "glutDisplay::done drawing objects\n" );
 
     glFlush();
-
-    //glDisable( GL_POLYGON_OFFSET_FILL );
-
-    //glutSwapBuffers(); // TODO: change this with wx's buffer-swapping? done?
-    // works in glcanvas's draw?
 
     if ( !input->isLeftButtonHeld() && holdCounter > 0 )
         holdCounter-=2;
@@ -455,7 +427,8 @@ void gravManager::ungroupAll()
 {
     lockSources();
 
-    printf( "deleting %i groups\n", siteIDGroups->size() );
+    gravUtil::logVerbose( "gravManager::ungroupAll: deleting %i groups\n",
+            siteIDGroups->size() );
     std::map<std::string,Group*>::iterator it;
     for ( it = siteIDGroups->begin(); it != siteIDGroups->end(); ++it )
     {
@@ -469,11 +442,12 @@ void gravManager::ungroupAll()
             removeFromLists( g );
             objectsToDelete->push_back( g );
 
-            printf( "single group deleted\n" );
+            gravUtil::logVerbose( "gravManager::ungroupAll: group %s set to be "
+                    "deleted on draw\n", g->getName().c_str() );
         }
     }
     siteIDGroups->clear();
-    printf( "siteIDgroups cleared\n" );
+    gravUtil::logVerbose( "gravManager::ungroupAll: siteIDgroups cleared\n" );
 
     unlockSources();
 }
@@ -643,14 +617,14 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     // object is from the earth point in x/y
     float xydiff = (abs(destx-earthx)+abs(desty-earthy))/
                                             1.5f;
-    printf( "xydiff: %f\n", xydiff );
+    gravUtil::logVerbose( "xydiff: %f\n", xydiff );
     if ( earthz > earth->getZ() )
     {
         fz = earthz;
     }
     else
     {
-        printf( "behind\n" );
+        gravUtil::logVerbose( "behind\n" );
         fz = earth->getZ() + abs((earthz-earth->getZ()));
     }
     fz = std::min( fz+xydiff, destz-1.0f );
@@ -665,8 +639,8 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
 
     float zDist = earthz - destz;
     int iter = ceil( abs(zDist/2.0f) );
-    printf( "%i iterations\n", iter );
-    //printf( "in averaging mode\n" );
+    gravUtil::logVerbose( "%i iterations\n", iter );
+    //gravUtil::logVerbose( "in averaging mode\n" );
 
     // find the radius point
     float rx, ry, rz;
@@ -675,17 +649,18 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     float yDist = earthy - earth->getY();
     float curRadius = sqrt((xDist)*(xDist) +
                            (yDist)*(yDist));
-    printf( "radius & curradius: %f, %f\n", earth->getRadius(), curRadius );
+    gravUtil::logVerbose( "radius & curradius: %f, %f\n", earth->getRadius(),
+            curRadius );
     rx = earth->getX() + (xDist*(earth->getRadius()*1.7f/curRadius));
     ry = earth->getY() + (yDist*(earth->getRadius()*1.7f/curRadius));
-    printf( "radiuspoint: %f,%f,%f\n", rx,ry,rz );
+    gravUtil::logVerbose( "radiuspoint: %f,%f,%f\n", rx,ry,rz );
 
     // draw & average the vectors
     float tx = destx, ty = desty, tz = destz;
     */
     //glVertex3f( destx, desty, destz );
-    /*printf( "earth x,y: %f,%f\n", earthx, earthy );
-    printf( "fx,fy,fz: %f,%f,%f\n", fx, fy, fz );
+    /*gravUtil::logVerbose( "earth x,y: %f,%f\n", earthx, earthy );
+    gravUtil::logVerbose( "fx,fy,fz: %f,%f,%f\n", fx, fy, fz );
     int numVecs = 4;
     int vecs[numVecs][3];
     vecs[0][0] = (fx-tx)/2.0f; vecs[0][1] = (fy-ty)/2.0f;
@@ -720,7 +695,7 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     float distance = sqrt(((earthx-tx)*(earthx-tx))+
                          ((earthy-ty)*(earthy-ty))+
                          ((earthz-tz)*(earthz-tz)));
-    //printf( "starting distance: %f\n", distance );
+    //gravUtil::logVerbose( "starting distance: %f\n", distance );
     float startVecX = (fx-destx)/7.0f;
     float startVecY = (fy-desty)/7.0f;
     float startVecZ = (fz-destz)/7.0f;
@@ -741,7 +716,7 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
         //distance = sqrt(((earthx-tx)*(earthx-tx))+
         //               ((earthy-ty)*(earthy-ty))+
         //                ((earthz-tz)*(earthz-tz)));
-        //printf( "distance: %f\n", distance );
+        //gravUtil::logVerbose( "distance: %f\n", distance );
         count++;
     }
     glVertex3f( earthx, earthy, earthz );
@@ -791,14 +766,6 @@ void gravManager::setWindowSize( int w, int h )
     GLdouble screenL, screenR, screenU, screenD;
     GLUtil* glUtil = GLUtil::getInstance();
 
-    /*
-    GLdouble dummy; // for Z which we don't need
-    // update the screen size (in world space) coordinates
-    glUtil->screenToWorld( (GLdouble)windowWidth, (GLdouble)windowHeight,
-                          0.99087065, &screenR, &screenU, &dummy );
-    glUtil->screenToWorld( (GLdouble)0.0f, (GLdouble)0.0f,
-                          0.99087065, &screenL, &screenD, &dummy );*/
-
     // reset cam to original spot in order to project from correct spot and find
     // the rectangle relative/facing to the original camera position
     Point oldCamPoint = cam->getCenter();
@@ -832,9 +799,6 @@ void gravManager::setWindowSize( int w, int h )
         venueClientController->setScale( screenRectSub.getDestWidth() * 0.9f,
                                      screenRectSub.getDestHeight() * 0.9f );
         venueClientController->rearrange();
-        //printf( "in setwindowsize, set VCC scale to %fx%f\n",
-        //        screenRectSub.getDestWidth() * 0.9f,
-        //        screenRectSub.getDestHeight() * 0.9f );
     }
 }
 
@@ -1119,14 +1083,15 @@ void gravManager::setBorderTex( std::string border )
     }
     else
     {
-        printf( "gravManager::setBorderTex: warning: border texture %s "
-                "not found", border.c_str() );
+        gravUtil::logWarning( "gravManager::setBorderTex: warning: border "
+                "texture %s not found", border.c_str() );
     }
 }
 
 Group* gravManager::createSiteIDGroup( std::string data )
 {
-    printf( "creating siteIDGroup\n" );
+    gravUtil::logVerbose( "gravManager::creating siteIDGroup based on %s\n",
+            data.c_str() );
 
     Group* g = new Group( 0.0f, 0.0f );
     g->setName( data );
@@ -1282,7 +1247,6 @@ void gravManager::lockSources()
     {
         mutex_lock( sourceMutex );
         lockCount++;
-        //printf( "gravManager::lock: count now %i\n", lockCount );
     }
 }
 
@@ -1292,7 +1256,6 @@ void gravManager::unlockSources()
     {
         mutex_unlock( sourceMutex );
         lockCount--;
-        //printf( "gravManager::unlock: count now %i\n", lockCount );
     }
 }
 
@@ -1360,7 +1323,6 @@ void gravManager::toggleShowVenueClientController()
     // TODO just debug stuff here for now
     if ( venueClientController != NULL )
     {
-        //printf( "gravManager::setting VCC rendering, from %i\n", venueClientController->getRendering() );
         venueClientController->setRendering(
                                     !venueClientController->getRendering() );
     }
