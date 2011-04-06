@@ -98,6 +98,9 @@ private:
     bool threadRunning;
     thread* VPMthread;
 
+    bool verbose;
+    bool VPMverbose;
+
     std::vector<std::string> initialVideoAddresses;
     //std::vector<VPMSession*> videoSessions;
     //uint32_t videoSession_ts;
@@ -150,6 +153,17 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     },
 
     {
+        wxCMD_LINE_SWITCH, _("v"), _("verbose"),
+            _("verbose command line output for grav")
+    },
+
+    {
+        wxCMD_LINE_SWITCH, _("vpv"), _("vpmedia-verbose"),
+            _("verbose command line output for VPMedia "
+              "(RTP/decoding processing")
+    },
+
+    {
         wxCMD_LINE_SWITCH, _("nt"), _("no-threads"),
             _("disables threading separation of graphics and network/decoding")
     },
@@ -162,8 +176,8 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     {
         wxCMD_LINE_SWITCH, _("es"), _("enable-shaders"),
             _("enable GLSL shader-based colorspace conversion if it would be "
-                "available (experimental, may not look as good, adds CPU usage "
-                "to rendering thread)")
+              "available (experimental, may not look as good, adds CPU usage "
+              "to rendering thread)")
     },
 
     {

@@ -63,8 +63,10 @@ bool gravApp::OnInit()
     // Some weirdness happens if this is called before arg handling, etc.
     gravUtil::initLogging();
     // Set verbosity here, nothing should use gravUtil::logVerbose before this.
-    wxLog::SetVerbose( true );
-    vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
+    if ( verbose )
+        wxLog::SetVerbose( true );
+    if ( VPMverbose )
+        vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
 
     // GUI setup
     mainFrame = new Frame( (wxFrame*)NULL, -1, _("grav"),
@@ -322,6 +324,9 @@ bool gravApp::handleArgs()
     }
 
     usingThreads = !parser.Found( _("no-threads") );
+
+    verbose = parser.Found( _("verbose") );
+    VPMverbose = parser.Found( _("vpmedia-verbose") );
 
     enableShaders = parser.Found( _("enable-shaders") );
 
