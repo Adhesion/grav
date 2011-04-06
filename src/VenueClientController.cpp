@@ -122,7 +122,7 @@ void VenueClientController::getVenueClient()
     std::vector<std::string> venueClients = pyTools.ltov( pRes );
     if ( venueClients.size() == 0 )
     {
-        gravUtil::logWarning( "VenueClientController::getVenueClient(): error: "
+        gravUtil::logWarning( "VenueClientController::getVenueClient(): "
                 "no venue client found\n" );
     }
     else
@@ -142,7 +142,7 @@ void VenueClientController::updateExitMap()
     }
     if ( venueClientUrl.compare( "" ) == 0 )
     {
-        gravUtil::logWarning( "VenueClientController::updateExitMap(): error: "
+        gravUtil::logWarning( "VenueClientController::updateExitMap(): "
                 "no venue client found\n" );
         return;
     }
@@ -199,7 +199,7 @@ void VenueClientController::enterVenue( std::string venueName )
     }
     if ( venueClientUrl.compare( "" ) == 0 )
     {
-        gravUtil::logWarning( "VenueClientController::enterVenue(): error: "
+        gravUtil::logWarning( "VenueClientController::enterVenue(): "
                 "no venue client found\n" );
         return;
     }
@@ -242,7 +242,7 @@ void VenueClientController::updateVenueStreams()
     if ( venueClientUrl.compare( "" ) == 0 )
     {
         gravUtil::logWarning( "VenueClientController::updateVenueStreams(): "
-                    "error: no venue client found\n" );
+                    "no venue client found\n" );
         return;
     }
 
@@ -266,8 +266,8 @@ void VenueClientController::updateVenueName()
     }
     if ( venueClientUrl.compare( "" ) == 0 )
     {
-        gravUtil::logWarning( "VenueClientController::updateVenueName(): error:"
-                    " no venue client found\n" );
+        gravUtil::logWarning( "VenueClientController::updateVenueName(): "
+                    "no venue client found\n" );
         return;
     }
 
