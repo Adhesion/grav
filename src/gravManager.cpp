@@ -456,7 +456,7 @@ void gravManager::addTestObject()
 {
     RectangleBase* obj = new RectangleBase( 0.0f, 0.0f );
     drawnObjects->push_back( obj );
-    bool useRandName = true;
+    bool useRandName = false;
     if ( useRandName )
     {
         int nameLength = 10;
@@ -467,6 +467,10 @@ void gravManager::addTestObject()
             randName += (char)rand;
         }
         obj->setName( randName );
+    }
+    else if ( drawnObjects->size() % 2 == 0 )
+    {
+        obj->setName( " " );
     }
     else
     {

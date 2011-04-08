@@ -589,8 +589,7 @@ void InputHandler::handleClearSelected()
 
 void InputHandler::handleAddTestObject()
 {
-    for ( int i = 0; i < 100; i++ )
-        grav->addTestObject();
+    grav->addTestObject();
 }
 
 void InputHandler::handleTryDeleteObject()
