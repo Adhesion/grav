@@ -1,14 +1,28 @@
-    /**
+/*
  * @file PythonTools.h
+ *
  * Contains a bucket class with utilities to call python
  * Relied heavily on the python documentation available at:
  *      http://docs.python.org/extending/embedding.html
  *
- * To compile:
- *      g++ -L/usr/lib/python2.6/ -lpython2.6 -I/usr/include PythonTools.cpp
- *
  * @author Ralph Bean
  * @modified Andrew Ford
+ * Copyright (C) 2011 Rochester Institute of Technology
+ *
+ * This file is part of grav.
+ *
+ * grav is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * grav is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with grav.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __PYTHONTOOLS_H_
