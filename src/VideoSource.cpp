@@ -457,6 +457,7 @@ void VideoSource::toggleMute()
         resetColor();
         destSecondaryColor.R = 0.0f; destSecondaryColor.G = 0.0f;
         destSecondaryColor.B = 0.0f; destSecondaryColor.A = 0.0f;
+        setSecondaryColor( destSecondaryColor );
     }
 }
 
@@ -486,6 +487,7 @@ void VideoSource::setRendering( bool r )
             resetColor();
             destSecondaryColor.R = 0.0f; destSecondaryColor.G = 0.0f;
             destSecondaryColor.B = 0.0f; destSecondaryColor.A = 0.0f;
+            setSecondaryColor( destSecondaryColor );
         }
     }
 }

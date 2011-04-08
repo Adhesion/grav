@@ -10,6 +10,8 @@
 #include "GLUtil.h"
 #include "Point.h"
 
+#include "gravUtil.h"
+
 #include <cmath>
 
 RectangleBase::RectangleBase()
@@ -21,7 +23,7 @@ RectangleBase::RectangleBase( float _x, float _y )
 {
     setDefaults();
     x = -15.0f; y = 15.0f; z = 0.0f;
-    destX = _x; destY = _y;
+    move( _x, _y );
 }
 
 RectangleBase::RectangleBase( const RectangleBase& other )
@@ -68,7 +70,12 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     userDeletable = other.userDeletable;
     grouped = other.grouped;
     myGroup = other.myGroup;
+
     animated = other.animated;
+    positionAnimating = other.positionAnimating;
+    scaleAnimating = other.scaleAnimating;
+    borderColAnimating = other.borderColAnimating;
+    secondColAnimating = other.secondColAnimating;
 }
 
 RectangleBase::~RectangleBase()
@@ -117,7 +124,6 @@ void RectangleBase::setDefaults()
     destSecondaryColor.B = 0.0f; destSecondaryColor.A = 0.0f;
     secondaryColor = destSecondaryColor;
 
-    animated = true;
     finalName = false;
     cutoffPos = -1;
     nameStart = -1; nameEnd = -1;
@@ -127,6 +133,12 @@ void RectangleBase::setDefaults()
     myGroup = NULL;
     twidth = 0; theight = 0;
     effectVal = 0.0f;
+
+    animated = true;
+    positionAnimating = false;
+    scaleAnimating = false;
+    borderColAnimating = false;
+    secondColAnimating = false;
 
     // TODO: this should be dynamic
     lat = 43.165556f; lon = -77.611389f;
@@ -284,9 +296,14 @@ float RectangleBase::getCenterOffsetY()
 void RectangleBase::move( float _x, float _y )
 {
     destX = _x;
-    if ( !animated ) x = _x;
     destY = _y;
-    if ( !animated ) y = _y;
+    if ( !animated )
+    {
+        x = _x;
+        y = _y;
+    }
+    else
+        positionAnimating = true;
 }
 
 void RectangleBase::setPos( float _x, float _y )
@@ -298,7 +315,13 @@ void RectangleBase::setPos( float _x, float _y )
 void RectangleBase::setScale( float xs, float ys )
 {
     destScaleX = xs; destScaleY = ys;
-    if ( !animated ) { scaleX = xs; scaleY = ys; }
+    if ( !animated )
+    {
+        scaleX = xs;
+        scaleY = ys;
+    }
+    else
+        scaleAnimating = true;
 }
 
 void RectangleBase::setScale( float xs, float ys, bool resizeMembers )
@@ -568,6 +591,8 @@ void RectangleBase::setColor( RGBAColor c )
 
     if ( !animated )
         borderColor = destBColor;
+    else
+        borderColAnimating = true;
 }
 
 void RectangleBase::setSecondaryColor( RGBAColor c )
@@ -576,6 +601,8 @@ void RectangleBase::setSecondaryColor( RGBAColor c )
 
     if ( !animated )
         secondaryColor = destSecondaryColor;
+    else
+        secondColAnimating = true;
 }
 
 void RectangleBase::resetColor()
@@ -905,44 +932,82 @@ void RectangleBase::drawBorder( float Xdist, float Ydist, float s, float t )
 
 void RectangleBase::animateValues()
 {
+    // note the fabs stuff is to snap to the destination, since we'll never
+    // actually get there via the division calls due to roundoff errors
+
     // movement animation
-    x += (destX-x)/7.5f;
-    y += (destY-y)/7.5f;
-    scaleX += (destScaleX-scaleX)/7.5f;
-    scaleY += (destScaleY-scaleY)/7.5f;
+    if ( positionAnimating )
+    {
+        //gravUtil::logMessage( "RectBase::animate::pos\n" );
+        x += ( destX - x ) / 7.5f;
+        y += ( destY - y ) / 7.5f;
 
-    borderColor.R += (destBColor.R-borderColor.R)/3.0f;
-    borderColor.G += (destBColor.G-borderColor.G)/3.0f;
-    borderColor.B += (destBColor.B-borderColor.B)/3.0f;
-    borderColor.A += (destBColor.A-borderColor.A)/7.0f;
+        if ( fabs( destX - x ) < 0.01f && fabs( destY - y ) < 0.01f )
+        {
+            x = destX;
+            y = destY;
+            positionAnimating = false;
+            //gravUtil::logMessage( "RectBase::animate::done with pos\n" );
+        }
+    }
 
-    secondaryColor.R += (destSecondaryColor.R-secondaryColor.R)/3.0f;
-    secondaryColor.G += (destSecondaryColor.G-secondaryColor.G)/3.0f;
-    secondaryColor.B += (destSecondaryColor.B-secondaryColor.B)/3.0f;
-    secondaryColor.A += (destSecondaryColor.A-secondaryColor.A)/7.0f;
+    if ( scaleAnimating )
+    {
+        //gravUtil::logMessage( "RectBase::animate::scale\n" );
+        scaleX += ( destScaleX - scaleX ) / 7.5f;
+        scaleY += ( destScaleY - scaleY ) / 7.5f;
 
-    // snap to the destination, since we'll never actually get there via
-    // the above lines due to roundoff errors
-    if ( fabs(destX-x) < 0.01f ) x = destX;
-    if ( fabs(destY-y) < 0.01f ) y = destY;
-    if ( fabs(destScaleX-scaleX) < 0.01f ) scaleX = destScaleX;
-    if ( fabs(destScaleY-scaleY) < 0.01f ) scaleY = destScaleY;
+        if ( fabs( destScaleX - scaleX ) < 0.01f &&
+             fabs( destScaleY - scaleY ) < 0.01f )
+        {
+            scaleX = destScaleX;
+            scaleY = destScaleY;
+            scaleAnimating = false;
+            //gravUtil::logMessage( "RectBase::animate::done with scale\n" );
+        }
+    }
 
-    if ( fabs( destBColor.R - borderColor.R ) < 0.01f )
-        borderColor.R = destBColor.R;
-    if ( fabs( destBColor.G - borderColor.G ) < 0.01f )
-        borderColor.G = destBColor.G;
-    if ( fabs( destBColor.B - borderColor.B ) < 0.01f )
-        borderColor.B = destBColor.B;
-    if ( fabs( destBColor.A - borderColor.A ) < 0.01f )
-        borderColor.A = destBColor.A;
+    if ( borderColAnimating )
+    {
+        //gravUtil::logMessage( "RectBase::animate::bordercol\n" );
+        borderColor.R += ( destBColor.R - borderColor.R ) / 3.0f;
+        borderColor.G += ( destBColor.G - borderColor.G ) / 3.0f;
+        borderColor.B += ( destBColor.B - borderColor.B ) / 3.0f;
+        borderColor.A += ( destBColor.A - borderColor.A ) / 7.0f;
 
-    if ( fabs( destSecondaryColor.R - secondaryColor.R ) < 0.01f )
-        secondaryColor.R = destSecondaryColor.R;
-    if ( fabs( destSecondaryColor.G - secondaryColor.G ) < 0.01f )
-        secondaryColor.G = destSecondaryColor.G;
-    if ( fabs( destSecondaryColor.B - secondaryColor.B ) < 0.01f )
-        secondaryColor.B = destSecondaryColor.B;
-    if ( fabs( destSecondaryColor.A - secondaryColor.A ) < 0.01f )
-        secondaryColor.A = destSecondaryColor.A;
+        if ( fabs( destBColor.R - borderColor.R ) < 0.01f &&
+             fabs( destBColor.G - borderColor.G ) < 0.01f &&
+             fabs( destBColor.B - borderColor.B ) < 0.01f &&
+             fabs( destBColor.A - borderColor.A ) < 0.01f )
+        {
+            borderColor.R = destBColor.R;
+            borderColor.G = destBColor.G;
+            borderColor.B = destBColor.B;
+            borderColor.A = destBColor.A;
+            borderColAnimating = false;
+            //gravUtil::logMessage( "RectBase::animate::done with bordercol\n" );
+        }
+    }
+
+    if ( secondColAnimating )
+    {
+        //gravUtil::logMessage( "RectBase::animate::secondcol\n" );
+        secondaryColor.R += ( destSecondaryColor.R - secondaryColor.R ) / 3.0f;
+        secondaryColor.G += ( destSecondaryColor.G - secondaryColor.G ) / 3.0f;
+        secondaryColor.B += ( destSecondaryColor.B - secondaryColor.B ) / 3.0f;
+        secondaryColor.A += ( destSecondaryColor.A - secondaryColor.A ) / 7.0f;
+
+        if ( fabs( destSecondaryColor.R - secondaryColor.R ) < 0.01f &&
+             fabs( destSecondaryColor.G - secondaryColor.G ) < 0.01f &&
+             fabs( destSecondaryColor.B - secondaryColor.B ) < 0.01f &&
+             fabs( destSecondaryColor.A - secondaryColor.A ) < 0.01f )
+        {
+            secondaryColor.R = destSecondaryColor.R;
+            secondaryColor.G = destSecondaryColor.G;
+            secondaryColor.B = destSecondaryColor.B;
+            secondaryColor.A = destSecondaryColor.A;
+            secondColAnimating = false;
+            //gravUtil::logMessage( "RectBase::animate::done with secondcol\n" );
+        }
+    }
 }

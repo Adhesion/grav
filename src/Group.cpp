@@ -17,6 +17,7 @@ Group::Group( float _x, float _y ) :
     baseBColor.B = (float)random32()/(float)random32_max();
     baseBColor.A = 0.7f;
     destBColor = baseBColor;
+    setColor( destBColor );
     name = std::string( "Group" );
 
     locked = true;
@@ -332,9 +333,10 @@ void Group::setRendering( bool r )
 
     if ( allowHiding )
     {
+        RGBAColor newCol = destBColor;
         if ( !r )
         {
-            destBColor.A = 0.0f;
+            newCol.A = 0.0f;
             // set children to unselected just in case they're selected - user will
             // probably end up moving them accidentally
             for ( unsigned int i = 0; i < objects.size(); i++ )
@@ -343,7 +345,8 @@ void Group::setRendering( bool r )
             }
         }
         else
-            destBColor.A = baseBColor.A;
+            newCol.A = baseBColor.A;
+        setColor( newCol );
 
         for ( unsigned int i = 0; i < objects.size(); i++ )
         {

@@ -27,6 +27,10 @@ VenueNode::VenueNode()
     destBColor = baseBColor;
     borderColor = destBColor;
     borderColor.A = 0.0f;
+    setColor( destBColor );
+    setPos( 0.0f, 0.0f );
+    scaleX = destScaleX = 3.0f;
+    scaleY = destScaleY = 3.0f;
 }
 
 void VenueNode::draw()

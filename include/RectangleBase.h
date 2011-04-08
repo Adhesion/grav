@@ -302,6 +302,11 @@ protected:
     bool animated;
     void animateValues();
 
+    bool positionAnimating;
+    bool scaleAnimating;
+    bool borderColAnimating;
+    bool secondColAnimating;
+
 };
 
 #endif /*RECTANGLEBASE_H_*/

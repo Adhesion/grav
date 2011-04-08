@@ -20,7 +20,9 @@ Runway::Runway( float _x, float _y ) :
     intersectCounter = 0;
     destBColor.R = 1.0f; destBColor.G = 1.0f;
     destBColor.B = 1.0f; destBColor.A = 1.0f;
+    baseBColor = destBColor;
     borderColor.A = 0.0f;
+    setColor( destBColor );
 }
 
 void Runway::draw()
