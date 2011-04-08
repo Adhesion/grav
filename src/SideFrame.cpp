@@ -1,5 +1,5 @@
 /*
- * SideFrame.cpp
+ * @file SideFrame.cpp
  *
  * Implementation of the side GUI window.
  *

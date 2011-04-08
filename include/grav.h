@@ -1,4 +1,4 @@
-/**
+/*
  * @file grav.h
  *
  * Header file for main grav app - contains the definition for the main class,

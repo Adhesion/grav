@@ -1,4 +1,4 @@
-/**
+/*
  * @file Frame.h
  *
  * Defines the GUI frame for the main video display window, as well as the side

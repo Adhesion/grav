@@ -1,5 +1,5 @@
-/**
- * SideFrame.h
+/*
+ * @file SideFrame.h
  *
  * Definition of the GUI frame for the side window. Provides hooks to session
  * management in the menubar.

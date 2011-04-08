@@ -1,4 +1,4 @@
-/**
+/*
  * @file grav.cpp
  *
  * Implementation of main grav app behavior, like creating the gravManager &
