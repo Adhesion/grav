@@ -1,13 +1,31 @@
-#ifndef VIDEOSOURCE_H_
-#define VIDEOSOURCE_H_
-
-/**
+/*
  * @file VideoSource.h
+ *
  * Definition of the VideoSource class. A VideoSource is a collection of the
  * video data as well as metadata like the video's position in space (or on the
  * screen canvas) and titles.
+ *
  * @author Andrew Ford
+ * Copyright (C) 2011 Rochester Institute of Technology
+ *
+ * This file is part of grav.
+ *
+ * grav is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * grav is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with grav.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifndef VIDEOSOURCE_H_
+#define VIDEOSOURCE_H_
 
 #include "RectangleBase.h"
 
@@ -23,30 +41,30 @@ public:
     VideoSource( VPMSession* _session, VideoListener* l, uint32_t _ssrc,
 					VPMVideoBufferSink* vs, float x, float y );
     ~VideoSource();
-    
+
     void draw();
-    
+
     /*
      * Change the scale of the video to be native size
      * relative to the screen size.
      */
     void scaleNative();
-    
+
     /*
      * Retrieve stream metadata (SDES-only) from the VPMedia session.
      */
     std::string getMetadata( VPMSession::VPMSession_SDES type );
-    
+
     /*
      * Updates the overall name label of the source from the SDES metadata:
      * SDES_NAME if it's available, SDES_CNAME if not.
      * Also set the alternate name to CNAME if it's available.
      */
     bool updateName();
-    
+
     uint32_t getssrc();
     std::string getName();
-    
+
     const char* getPayloadDesc();
 
     unsigned int getVideoWidth();
