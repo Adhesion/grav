@@ -111,10 +111,14 @@ void Frame::OnAbout( wxCommandEvent& evt )
 {
     wxMessageBox(
             _("grav (C) 2011 Rochester Institute of Technology\n"
+              "Authored by Andrew Ford with contributions from Ralph Bean.\n"
               "grav is free software, released under the GNU GPL. "
               "See COPYING for details.\n\n"
               "This software uses libraries from the FFmpeg project under the "
-              "GPLv3.") );
+              "GPLv3.\n\n"
+              "Earth imagery by NASA from the Visible Earth project.\n"
+              "See http://visibleearth.nasa.gov/view_detail.php?id=2430 "
+              "for more info.") );
 }
 
 void Frame::OnKeyboardShortcuts( wxCommandEvent& evt )
