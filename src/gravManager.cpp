@@ -1,5 +1,5 @@
 /*
- * @file gravManager.pp
+ * @file gravManager.cpp
  *
  * Implementation of major grav functions - holds lists of drawn objects and
  * sources, draws them, executes functions like automatic mode, etc.
