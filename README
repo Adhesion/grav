@@ -1,6 +1,108 @@
-TODO -- add a README file. (test2)
-Just making a change to test git.
-Fri Apr 16 16:27:07 EDT 2010 test by rjbpop
-Fri Apr 16 16:30:43 EDT 2010 test by rjbpop
-Fri Apr 16 16:31:17 EDT 2010 test by rjb0876
-Fri Apr 16 16:31:32 EDT 2010 test by rjbpop
+grav
+----
+
+grav is a GL-based application for receiving & displaying many videos, using RTP. Primarily intended for videoconferencing/telepresence/etc applications, all videos are displayed in a canvas-style window, with a globe displayed in the background for geographical correlation, as well as automatic grouping, both based on RTCP metadata.
+
+For more info, see https://grav.rc.rit.edu
+
+Compilation
+-----------
+
+Compiling on Linux
+
+   1. Make sure to get all the dependencies (see below). Here's an example for Ubuntu or Debian-style Linux distros:
+
+      apt-get install git-core scons subversion cmake ffmpeg libpng12-dev libpng12-0 wx2.8-headers libwxgtk2.8-0 libwxgtk2.8-dev libftgl-dev libftgl2 python-dev libglu1-mesa libglu1-mesa-dev  libglew1.5-dev libglew1.5 libavcodec-dev libswscale-dev libavutil-dev libpthread-stubs0-dev
+
+   2. IF you need to compile ffmpeg (OPTIONAL - you can get ffmpeg from a package but note you need the newer .52 libavcodec version)...
+         1. Get ffmpeg 0.5 from ffmpeg.org, do
+
+            ./configure --enable-gpl --enable-postproc --enable-swscale --enable-pthreads --enable-debug --enable-shared
+
+            then compile & sudo make install (make install will probably install to /usr/local/lib by default)
+               1. Note: having another copy of ffmpeg installed on your machine (things like VLC and mplayer might depend on it) will cause conflicts, ie, when running grav or anything that wants to link to the new ffmpeg 0.5 in /usr/local/lib, you will get a "symbol lookup error", probably looking for av_gcd or similar in your system copy of ffmpeg in /usr/lib. To temporarily fix this, run export LD_LIBRARY_PATH=/usr/local/lib or whichever directory you installed ffmpeg in. Put that command into your startup script if you want to not have to do that each time, though that might break other things that dynamically link to ffmpeg, if they rely on an older version.
+
+   3. SVN checkout the UCL common library from here:  https://mediatools.cs.ucl.ac.uk/repos/mmedia e.g.
+
+      svn co https://mediatools.cs.ucl.ac.uk/repos/mmedia/common/trunk ucl-common
+
+         1. In the common lib directory, do a standard
+
+            ./configure && sudo make install
+
+         2. Or, if you don't want to install (will go to /usr/local/lib by default) just do make and copy the .a file to the eventual grav build directory or somewhere where CMake can find it.
+
+   4. SVN checkout VPMedia from here:  https://svn.ci.uchicago.edu/svn/if-media/
+
+      svn co https://svn.ci.uchicago.edu/svn/if-media/VPMedia VPMedia
+
+         1. In the VPMedia directory, do
+
+            scons configure && scons && sudo scons install
+
+         2. If you don't want to install this, follow the same instructions for the common lib, except with scons to build.
+
+   5. Obtain Grav Source
+         1. Get snapshot tarball from  https://git.rc.rit.edu/git/. Here's an example with wget:
+
+            wget https://git.rc.rit.edu/git/grav-latest-`date +%Y-%m-%d`.tar.bz2 && tar xvfj grav-latest-`date +%Y-%m-%d`.tar.bz2
+
+         2. OR, git clone from the repo (not public yet)
+
+   6. Cmake Grav
+         1. Start the CMake GUI (cmake-gui)...
+               1. Select target (most likely Unix makefiles for Linux), point its source directory to the top-level grav directory (ie, the one that has include/, src/ and CMakeLists.txt), and point the build directory to a new directory (for ease of use), ie mkdir Build/ and point CMake's build dir there
+               2. Click configure, which will tell you if any dependencies are missing (on Linux, lots of the automatically found X11 libs are optional, so don't worry if those are missing), and allow you to change any build settings - it is recommended to enter a build type into CMAKE_BUILD_TYPE so that various cflags get set sanely (ie, to enable -g debug symbols and #def for enabling debug keys for debug, or -O optimizations for release). The supported build types are DEBUG, RELWITHDEBINFO, RELEASE, and MINSIZEREL. Click configure again to solidify settings and click generate to generate Makefiles.
+               3. Go to the build directory you specified and run make.
+         2. Or run Cmake in a Build Directory like so. Note build variables can be set on the command line in cmake.
+
+            cmake -DCMAKE_BUILD_TYPE:STRING="DEBUG" -DCMAKE_VERBOSE_MAKEFILE=True /path/to/gravroot && make
+
+   7. To run grav, run from the top level dir so it can find the resources there (ie, if your build dir is Build/, run Build/grav [options])
+
+Dependencies
+
+Keep in mind, for the library dependencies you'll need the -dev package (headers) as well as the regular runtime library.
+
+Tools:
+
+    * Subversion
+    * CMake
+    * Scons preferably version 1.2 or later, not sure if older versions will work
+    * git (git-core)
+
+For VPMedia:
+
+    * VPMedia, and what VPMedia depends on:
+          o UCL common lib (UCL version recommended, if-media version also works but is not actively developed)
+          o ffmpeg: libavcodec.52, libswscale (see above - make sure you have the .52 version of libavcodec or you'll need to compile yourself)
+          o libpthread
+          o libdv (for DV support, which is not really working/supported at the moment in grav. essentially optional)
+          o libtheora (optional)
+
+From grav:
+
+    * GL
+    * GLU
+    * GLEW
+          o Note this means ~1.5 or later, probably 1.5.8. 1.3.5 (provided version on CentOS 5.5, for example) does not prevent GLX from getting included afterwards, which causes a conflict with wxGLCanvas. Therefore, if you don't have GLEW ~1.5 or above in your repositories, you'll have to compile it from source - get a source tarball from here:  http://glew.sourceforge.net/ and compiling it should be a simple make install.
+          o Ubuntu 10.10 also has this issue, glx.h from both mesa and nvidia have a different #define which screws up the include prevention that GLEW 1.5.2 does in glxew.h. Solution is the same, get GLEW 1.5.8 and compile & install.
+    * FTGL (in turn requires libfreetype)
+    * libpng
+    * wx 2.8 (including OpenGL support)
+    * python 2.6 (for AG venue client control, could be optional but isn't optional in the build process yet)
+
+Usage
+-----
+
+Notes
+-----
+
+grav (C) 2011 Rochester Institute of Technology
+Authored by Andrew Ford with contributions from Ralph Bean.
+
+grav is free software, released under the GNU GPL. See COPYING for details.
+
+This software uses libraries from the FFmpeg project under the GPLv3.
+
+Earth imagery by NASA from the Visible Earth project. See http://visibleearth.nasa.gov/view_detail.php?id=2430 for more info.
