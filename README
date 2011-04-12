@@ -95,6 +95,80 @@ From grav:
 Usage
 -----
 
+Command Line Usage
+
+Usage: grav [-h] [-t] [-v] [-vpv] [-nt] [-am] [-es] [-bf] [-a <str>] [-ht <str>] [-fps <num>] [-fs] [-ga] [-vsr] [-avsr <num>] [-agvs] [-vk <str>] [-ak <str>] [-sx <num>] [-sy <num>] [-sw <num>] [-sh <num>] video address...
+  -h, --help                              	displays this help message
+  -t, --threads                           	threading separation of graphics and network/decoding (this is the default, option left in for legacy purposes)
+  -v, --verbose                           	verbose command line output for grav
+  -vpv, --vpmedia-verbose                 	verbose command line output for VPMedia (network/RTP/decoding backend)
+  -nt, --no-threads                       	disables threading separation of graphics and network/decoding
+  -am, --automatic                        	automatically focus on single objects, rotating through the list at regular intervals
+  -es, --enable-shaders                   	enable GLSL shader-based colorspace conversion if it would be available (experimental, may not look as good, adds CPU usage to rendering thread)
+  -bf, --use-buffer-font                  	enable buffer font rendering method - may save memory and be better for slower machines, but doesn't scale as well CPU-wise for many objects
+  -a, --audio=<str>                       	RTP audio session address
+  -ht, --header=<str>                     	header string
+  -fps, --framerate=<num>                 	framerate for rendering
+  -fs, --fullscreen                       	start in fullscreen mode
+  -ga, --gridauto                         	rearrange all objects in grid on source add/remove
+  -vsr, --video-session-rotate            	add supplied video addresses to rotation list, rather than immediately connect to them
+  -avsr, --auto-video-session-rotate=<num>	rotate through video sessions every [num] seconds
+  -agvs, --get-ag-venue-streams           	grab video sessions from Access Grid venue client, if running
+  -vk, --video-key=<str>                  	encryption key for initial video sessions
+  -ak, --audio-key=<str>                  	encryption key for initial audio sessions
+  -sx, --start-x=<num>                    	initial X position for main window
+  -sy, --start-y=<num>                    	initial Y position for main window
+  -sw, --start-width=<num>                	initial width for main window
+  -sh, --start-height=<num>               	initial height for main window
+
+Keyboard Shortcuts
+
+     (backspace)    Clear selection.
+        (escape)    Quit.
+               +    Upscale selected objects.
+               -    Downscale selected objects.
+               =    Upscale selected objects.
+               F    Rearrange objects to focus on selected objects.
+               G    Toggle site grouping.
+               H    Print this help message to the commandline.
+               L    Toggle group locks.
+               M    Mute selected objects.
+               N    Scale selected videos to native size.
+               P    Arrange objects around the perimeter of the screen.
+               R    Arrange objects into a grid.
+               T    Rearrange groups.
+               U    Update group names.
+               X    Toggle rendering of selected objects.
+   alt + (enter)    Toggle fullscreen.
+         alt + A    Toggle 'automatic' mode (rotating focus)
+         alt + R    Toggle runway visibility.
+        ctrl + A    Select all.
+        ctrl + I    Invert selection.
+        ctrl + Q    Quit.
+        ctrl + V    Toggle venue client controller visibility.
+       shift + F    Fullscreen selected object (includes border and text).
+       shift + N    Scale all videos to native size.
+shift + ctrl + D    Toggle graphics debugging information.
+shift + ctrl + F    Fullscreen selected object (video/inner contents of object).
+
+General
+
+All video streams in the multicast group(s) you are connected to will automatically be displayed. To move objects, you can click on them and click on a destination, or click-and-drag. For selecting multiple objects, click-and-drag starting from empty space for a box selection, or ctrl-click on a video to add it to the selection. You can invert a selection with ctrl-i.
+
+Groups
+
+Videos can be grouped by siteID (metadata that comes from Access Grid). Press g to enable siteID groups - videos will be added the groups automatically. Pressing g again will disable siteID grouping, dissociate videos from their siteID groups and delete the siteID groups. Press l on a selected group to unlock it - unlocking allows you to move a group's members independently of it, and its unlocked status will be noted in its displayed name. Note that resizing a group will automatically rearrange its members if it is in the locked state.
+
+Session Management
+
+All addresses listed on the command line will be added as video sessions. Sessions can be added or removed at runtime with the side window. Sessions can also be temporarily disabled via the right-click menu - disabling a session will not process the incoming packets but you will still receive the data.
+
+Video sessions can also be rotated, ie, only connecting to one video session at a time out of a list. Adding -vsr on the command line will added given sessions to the rotate list. Sessions can be rotated manually by the right-click menu on the rotated video group in the side window, or automatically every X seconds with the -avsr (seconds) command line option.
+
+Runway
+
+The runway is a side area for muted videos (press m on a video to mute it). To remove a video from the runway, simply drag it out of the runway area. The runway will be hidden when turning on automatic mode, or you can manually enable/disable it with alt-r.
+
 Notes
 -----
 
