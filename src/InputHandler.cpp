@@ -103,7 +103,7 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     lookup[ktoh('I', wxMOD_CMD)] = &InputHandler::handleInvertSelection;
     docstr[ktoh('I', wxMOD_CMD)] = "Invert selection.";
     lookup[ktoh('\b')] = &InputHandler::handleClearSelected;
-    docstr[ktoh('\b')] = "Select none.";
+    docstr[ktoh('\b')] = "Clear selection.";
     unprintables['\b'] = "(backspace)";
 
     /* Misc Manipulation */
@@ -124,9 +124,9 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     lookup[ktoh('M')] = &InputHandler::handleMuteSelected;
     docstr[ktoh('M')] = "Mute selected objects.";
     lookup[ktoh('N')] = &InputHandler::handleNativeScaleSelected;
-    docstr[ktoh('N')] = "Scale selected objects to native size.";
+    docstr[ktoh('N')] = "Scale selected videos to native size.";
     lookup[ktoh('N', wxMOD_SHIFT)] = &InputHandler::handleNativeScaleAll;
-    docstr[ktoh('N', wxMOD_SHIFT)] = "Scale all objects to native size.";
+    docstr[ktoh('N', wxMOD_SHIFT)] = "Scale all videos to native size.";
 
     /* Different Layouts */
     lookup[ktoh('P')] = &InputHandler::handlePerimeterArrange;
@@ -136,7 +136,7 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     lookup[ktoh('F')] = &InputHandler::handleFocusArrange;
     docstr[ktoh('F')] = "Rearrange objects to focus on selected objects.";
     lookup[ktoh('A', wxMOD_ALT)] = &InputHandler::handleToggleAutoFocusRotate;
-    docstr[ktoh('A', wxMOD_ALT)] = "Toggle 'automatic' mode.";
+    docstr[ktoh('A', wxMOD_ALT)] = "Toggle 'automatic' mode (rotating focus)";
 
     lookup[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
                         &InputHandler::handleToggleGraphicsDebug;

@@ -158,7 +158,7 @@ private:
 static const wxCmdLineEntryDesc cmdLineDesc[] =
 {
     {
-        wxCMD_LINE_SWITCH, _("h"), _("help"), _("displays the help message"),
+        wxCMD_LINE_SWITCH, _("h"), _("help"), _("displays this help message"),
             wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP
     },
 
@@ -176,7 +176,7 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     {
         wxCMD_LINE_SWITCH, _("vpv"), _("vpmedia-verbose"),
             _("verbose command line output for VPMedia "
-              "(RTP/decoding processing")
+              "(network/RTP/decoding backend)")
     },
 
     {
@@ -186,7 +186,8 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 
     {
         wxCMD_LINE_SWITCH, _("am"), _("automatic"),
-            _("automatically tiles objects when added - if not, uses runway")
+            _("automatically focus on single objects, rotating through the list"
+              " at regular intervals")
     },
 
     {
@@ -209,7 +210,7 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     },
 
     {
-        wxCMD_LINE_OPTION, _("ht"), _("header"), _("Header string"),
+        wxCMD_LINE_OPTION, _("ht"), _("header"), _("header string"),
             wxCMD_LINE_VAL_STRING
     },
 
@@ -225,7 +226,7 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 
     {
         wxCMD_LINE_SWITCH, _("ga"), _("gridauto"),
-            _("rearrange objects in grid on source add/remove")
+            _("rearrange all objects in grid on source add/remove")
     },
 
     {
@@ -236,13 +237,13 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 
     {
         wxCMD_LINE_OPTION, _("avsr"), _("auto-video-session-rotate"),
-            _("rotate video sessions every [num] seconds"),
+            _("rotate through video sessions every [num] seconds"),
             wxCMD_LINE_VAL_NUMBER
     },
 
     {
         wxCMD_LINE_SWITCH, _("agvs"), _("get-ag-venue-streams"),
-            _("grab video sessions from venue client, if running")
+            _("grab video sessions from Access Grid venue client, if running")
     },
 
     {
@@ -259,25 +260,25 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 
     {
         wxCMD_LINE_OPTION, _("sx"), _("start-x"),
-            _("Initial X position for main window"),
+            _("initial X position for main window"),
             wxCMD_LINE_VAL_NUMBER
     },
 
     {
         wxCMD_LINE_OPTION, _("sy"), _("start-y"),
-            _("Initial Y position for main window"),
+            _("initial Y position for main window"),
             wxCMD_LINE_VAL_NUMBER
     },
 
     {
         wxCMD_LINE_OPTION, _("sw"), _("start-width"),
-            _("Initial width for main window"),
+            _("initial width for main window"),
             wxCMD_LINE_VAL_NUMBER
     },
 
     {
         wxCMD_LINE_OPTION, _("sh"), _("start-height"),
-            _("Initial height for main window"),
+            _("initial height for main window"),
             wxCMD_LINE_VAL_NUMBER
     },
 
