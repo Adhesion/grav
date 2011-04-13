@@ -97,22 +97,6 @@ bool gravApp::OnInit()
     if ( startFullscreen )
         mainFrame->ShowFullScreen( true );
 
-    // log here instead of in handleargs, see above/in handleargs
-    // (handleargs is where the timer intervals actually get set)
-    // might be that we can't do logging until main window is created
-    if ( fps > 1000 )
-    {
-        gravUtil::logVerbose( "grav::warning: invalid fps value %li, "
-                              "reset to 60\n", fps );
-    }
-
-    if ( printVersion )
-    {
-        std::string ver = "grav ";
-        ver += gravUtil::getVersionString();
-        gravUtil::logMessage( ver.c_str() );
-    }
-
     int treeX = 960; int treeY = 50;
     // forces resize - for some reason it doesn't draw inner contents until
     // resized
@@ -148,6 +132,27 @@ bool gravApp::OnInit()
 
     // put the main frame on top
     mainFrame->Raise();
+
+    // log here instead of in handleargs, see above/in handleargs
+    // (handleargs is where the timer intervals actually get set)
+    // might be that we can't do logging until main window is created
+    if ( fps > 1000 )
+    {
+        gravUtil::logVerbose( "grav::warning: invalid fps value %li, "
+                              "reset to 60\n", fps );
+    }
+
+    if ( printVersion )
+    {
+        std::string ver = "grav ";
+        ver += gravUtil::getVersionString();
+        gravUtil::logMessage( ver.c_str() );
+    }
+
+    if ( disablePython )
+    {
+        PythonTools::disableInit = true;
+    }
 
     // since these bools are used in init, set them before init
     GLUtil::getInstance()->setShaderEnable( enableShaders );
@@ -235,7 +240,7 @@ bool gravApp::OnInit()
     if ( autoVideoSessionRotate )
         rotateTimer->Start( rotateIntervalMS );
 
-    gravUtil::logVerbose( "grav:init function complete\n" );
+    gravUtil::logVerbose( "grav::init function complete\n" );
     return true;
 }
 
@@ -348,12 +353,14 @@ bool gravApp::handleArgs()
         header = std::string((char*)headerWX.char_str());
     }
 
-    usingThreads = !parser.Found( _("no-threads") );
-
     verbose = parser.Found( _("verbose") );
     VPMverbose = parser.Found( _("vpmedia-verbose") );
 
     printVersion = parser.Found( _("version") );
+
+    usingThreads = !parser.Found( _("no-threads") );
+
+    disablePython = parser.Found( _("no-python") );
 
     enableShaders = parser.Found( _("enable-shaders") );
 

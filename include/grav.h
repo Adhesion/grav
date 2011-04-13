@@ -119,6 +119,8 @@ private:
 
     bool printVersion;
 
+    bool disablePython;
+
     std::vector<std::string> initialVideoAddresses;
     //std::vector<VPMSession*> videoSessions;
     //uint32_t videoSession_ts;
@@ -165,12 +167,6 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     },
 
     {
-        wxCMD_LINE_SWITCH, _("t"), _("threads"),
-            _("threading separation of graphics and network/decoding "
-              "(this is the default, option left in for legacy purposes)")
-    },
-
-    {
         wxCMD_LINE_SWITCH, _("v"), _("verbose"),
             _("verbose command line output for grav")
     },
@@ -186,8 +182,19 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     },
 
     {
+        wxCMD_LINE_SWITCH, _("t"), _("threads"),
+            _("threading separation of graphics and network/decoding "
+              "(this is the default, option left in for legacy purposes)")
+    },
+
+    {
         wxCMD_LINE_SWITCH, _("nt"), _("no-threads"),
             _("disables threading separation of graphics and network/decoding")
+    },
+
+    {
+        wxCMD_LINE_SWITCH, _("np"), _("no-python"),
+            _("disables python tools, including Access Grid integration")
     },
 
     {
