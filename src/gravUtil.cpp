@@ -153,6 +153,20 @@ void gravUtil::logFatalError( const char* str, ... )
     va_end( args );
 }
 
+std::string gravUtil::getVersionString()
+{
+    std::string out;
+    out += GRAV_VERSION_MAJOR;
+    out += ".";
+    out += GRAV_VERSION_MINOR;
+    out += ".";
+    out += GRAV_VERSION_MICRO;
+#ifdef GRAV_DEBUG_MODE
+        out += " (Debug Build)";
+#endif
+    return out;
+}
+
 wxString gravUtil::getWXStringFromArgs( const char* str, va_list args )
 {
     // convert incoming string+format input to final formatted form (via

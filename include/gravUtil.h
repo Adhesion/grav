@@ -65,6 +65,7 @@ public:
     static void logError( const char* str, ... );
     static void logFatalError( const char* str, ... );
 
+    static std::string getVersionString();
 
 protected:
     gravUtil();
