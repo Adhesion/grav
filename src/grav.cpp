@@ -106,6 +106,13 @@ bool gravApp::OnInit()
                               "reset to 60\n", fps );
     }
 
+    if ( printVersion )
+    {
+        std::string ver = "grav ";
+        ver += gravUtil::getVersionString();
+        gravUtil::logMessage( ver.c_str() );
+    }
+
     int treeX = 960; int treeY = 50;
     // forces resize - for some reason it doesn't draw inner contents until
     // resized
@@ -345,6 +352,8 @@ bool gravApp::handleArgs()
 
     verbose = parser.Found( _("verbose") );
     VPMverbose = parser.Found( _("vpmedia-verbose") );
+
+    printVersion = parser.Found( _("version") );
 
     enableShaders = parser.Found( _("enable-shaders") );
 

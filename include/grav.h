@@ -117,6 +117,8 @@ private:
     bool verbose;
     bool VPMverbose;
 
+    bool printVersion;
+
     std::vector<std::string> initialVideoAddresses;
     //std::vector<VPMSession*> videoSessions;
     //uint32_t videoSession_ts;
@@ -177,6 +179,10 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
         wxCMD_LINE_SWITCH, _("vpv"), _("vpmedia-verbose"),
             _("verbose command line output for VPMedia "
               "(network/RTP/decoding backend)")
+    },
+
+    {
+        wxCMD_LINE_SWITCH, _("vr"), _("version"), _("print version string")
     },
 
     {
