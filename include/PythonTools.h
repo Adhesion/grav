@@ -37,8 +37,11 @@ class PythonTools
 {
 
 public:
-    PythonTools();
-    ~PythonTools();
+    static PythonTools* getInstance();
+
+    // as of now, this disable is only meaningful before the python interpreter
+    // etc is initialized (ie, before getInstance is ever called)
+    static bool disableInit;
 
     PyObject* call( std::string _script, std::string _func, PyObject* args );
     PyObject* call( std::string _script, std::string _func, std::string arg );
@@ -53,10 +56,18 @@ public:
     std::vector<std::string> ltov( PyObject* l );
 
     /* Print contents to stdout */
-    void inspect_dictionary(PyObject *dict);
-    void inspect_object(PyObject *obj);
+    void inspect_dictionary( PyObject *dict );
+    void inspect_object( PyObject *obj );
+
+protected:
+    PythonTools();
+    ~PythonTools();
 
 private:
+    static PythonTools* instance;
+
+    bool initialize();
+
     PyObject *main_m, *main_d; // dictionary/globals/locals for python
     std::string entryModule;
     std::string entryFunc;

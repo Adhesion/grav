@@ -52,6 +52,7 @@ VenueClientController::VenueClientController( float _x, float _y,
     setScale( 13.0f, 13.0f );
 
     gravUtil* util = gravUtil::getInstance();
+    pyTools = PythonTools::getInstance();
 
     // this should be safe since this constructor normally gets called after
     // GL stuff gets set up
@@ -134,8 +135,8 @@ std::vector<RectangleBase*>::iterator VenueClientController::remove(
 
 void VenueClientController::getVenueClient()
 {
-    PyObject* pRes = pyTools.call( AGToolsScript, "GetVenueClients" );
-    std::vector<std::string> venueClients = pyTools.ltov( pRes );
+    PyObject* pRes = pyTools->call( AGToolsScript, "GetVenueClients" );
+    std::vector<std::string> venueClients = pyTools->ltov( pRes );
     if ( venueClients.size() == 0 )
     {
         gravUtil::logWarning( "VenueClientController::getVenueClient(): "
@@ -163,9 +164,9 @@ void VenueClientController::updateExitMap()
         return;
     }
 
-    PyObject* pRes = pyTools.call( AGToolsScript, "GetExits",
+    PyObject* pRes = pyTools->call( AGToolsScript, "GetExits",
                                     venueClientUrl );
-    exitMap = pyTools.dtom( pRes );
+    exitMap = pyTools->dtom( pRes );
     Py_XDECREF( pRes );
 
     // TODO check if exitMap changes here, to avoid needless remake?
@@ -237,7 +238,7 @@ void VenueClientController::enterVenue( std::string venueName )
     gravUtil::logVerbose( "VenueClientController::calling entervenue on %s to"
             " %s\n", venueClientUrl.c_str(), it->second.c_str() );
 
-    pyTools.call( AGToolsScript, "EnterVenue", args );
+    pyTools->call( AGToolsScript, "EnterVenue", args );
 
     updateExitMap();
 
@@ -267,9 +268,9 @@ void VenueClientController::updateVenueStreams()
     PyTuple_SetItem( args, 0, PyString_FromString( venueClientUrl.c_str() ) );
     PyTuple_SetItem( args, 1, PyString_FromString( type.c_str() ) );
 
-    PyObject* res = pyTools.call( AGToolsScript, "GetFormattedVenueStreams",
+    PyObject* res = pyTools->call( AGToolsScript, "GetFormattedVenueStreams",
                                     args );
-    currentVenueStreams = pyTools.dtom( res );
+    currentVenueStreams = pyTools->dtom( res );
     Py_XDECREF( res );
 }
 
@@ -287,7 +288,7 @@ void VenueClientController::updateVenueName()
         return;
     }
 
-    PyObject* res = pyTools.call( AGToolsScript, "GetCurrentVenueName",
+    PyObject* res = pyTools->call( AGToolsScript, "GetCurrentVenueName",
                                     venueClientUrl.c_str() );
     if ( res != NULL && res != Py_None )
         currentVenue = PyString_AsString( res );

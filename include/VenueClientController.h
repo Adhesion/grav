@@ -78,7 +78,7 @@ private:
     std::map<std::string, std::string> currentVenueStreams;
     std::string venueClientUrl;
 
-    PythonTools pyTools;
+    PythonTools* pyTools;
     std::string AGToolsScript;
 
     gravManager* grav;

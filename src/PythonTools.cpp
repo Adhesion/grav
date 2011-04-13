@@ -30,11 +30,31 @@
 #include <iostream>
 #include <cstdlib>
 
+PythonTools* PythonTools::instance = NULL;
+bool PythonTools::disableInit = false;
+
+PythonTools* PythonTools::getInstance()
+{
+    if ( instance == NULL )
+    {
+        instance = new PythonTools();
+    }
+    return instance;
+}
+
 PythonTools::PythonTools()
 {
     init = false;
     main_m = NULL;
     main_d = NULL;
+    if ( !disableInit )
+    {
+        init = initialize();
+    }
+}
+
+bool PythonTools::initialize()
+{
     Py_Initialize();
     main_m = PyImport_AddModule( "__main__" );
     main_d = PyModule_GetDict( main_m );
@@ -43,25 +63,31 @@ PythonTools::PythonTools()
     entryModule = util->findFile( "gravEntry.py" );
     entryFunc = "entryFunc";
 
-    bool found = false;
+    bool ret = false;
     if ( entryModule.compare( "" ) != 0 )
     {
         FILE* file_1 = fopen( entryModule.c_str(), "r" );
-        found = file_1 != NULL;
-        if ( found )
+        bool open = file_1 != NULL;
+        if ( open )
         {
             PyRun_File( file_1, entryModule.c_str(), Py_file_input, main_d,
                             main_d );
             fclose( file_1 );
-            init = true;
+            ret = true;
+        }
+        else
+        {
+            gravUtil::logWarning( "PythonTools::init: failed to open %s\n",
+                        entryModule.c_str() );
         }
     }
-
-    if ( !found )
+    else
     {
         gravUtil::logWarning( "PythonTools::init: entry script not found - "
                 "python integration not available\n" );
     }
+
+    return ret;
 }
 
 PythonTools::~PythonTools()
