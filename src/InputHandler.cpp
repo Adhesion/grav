@@ -41,6 +41,8 @@
 #include <sstream>
 #include <iomanip>
 
+int InputHandler::propertyID = wxNewId();
+
 BEGIN_EVENT_TABLE(InputHandler, wxEvtHandler)
 EVT_KEY_DOWN(InputHandler::wxKeyDown)
 EVT_CHAR(InputHandler::wxCharEvt)
@@ -50,8 +52,6 @@ EVT_LEFT_DCLICK(InputHandler::wxMouseLDClick)
 EVT_LEFT_UP(InputHandler::wxMouseLUp)
 EVT_RIGHT_DOWN(InputHandler::wxMouseRDown)
 END_EVENT_TABLE()
-
-int InputHandler::propertyID = wxNewId();
 
 InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     : earth( e ), grav( g ), mainFrame( f )

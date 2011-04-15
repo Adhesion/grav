@@ -31,10 +31,6 @@
 #include "Frame.h"
 #include "gravUtil.h"
 
-BEGIN_EVENT_TABLE(SessionTreeControl, wxTreeCtrl)
-EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY, SessionTreeControl::itemRightClick)
-END_EVENT_TABLE()
-
 int SessionTreeControl::addVideoID = wxNewId();
 int SessionTreeControl::addAudioID = wxNewId();
 int SessionTreeControl::toggleEnableID = wxNewId();
@@ -42,6 +38,10 @@ int SessionTreeControl::removeID = wxNewId();
 int SessionTreeControl::rotateID = wxNewId();
 int SessionTreeControl::setEncryptionID = wxNewId();
 int SessionTreeControl::disableEncryptionID = wxNewId();
+
+BEGIN_EVENT_TABLE(SessionTreeControl, wxTreeCtrl)
+EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY, SessionTreeControl::itemRightClick)
+END_EVENT_TABLE()
 
 SessionTreeControl::SessionTreeControl() :
     wxTreeCtrl( NULL, wxID_ANY )

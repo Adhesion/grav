@@ -33,6 +33,10 @@
 #include "InputHandler.h"
 #include "gravUtil.h"
 
+int Frame::toggleRunwayID = wxNewId();
+int Frame::toggleVCCID = wxNewId();
+int Frame::toggleAutomaticID = wxNewId();
+
 BEGIN_EVENT_TABLE(Frame, wxFrame)
 EVT_CLOSE(Frame::OnCloseWindow)
 // for right click -> properties in main window
@@ -40,6 +44,9 @@ EVT_MENU(InputHandler::propertyID, Frame::spawnPropertyWindow)
 EVT_MENU(wxID_EXIT, Frame::OnExit)
 EVT_MENU(wxID_ABOUT, Frame::OnAbout)
 EVT_MENU(wxID_HELP_COMMANDS, Frame::OnKeyboardShortcuts)
+EVT_MENU(toggleRunwayID, Frame::toggleRunwayEvent)
+EVT_MENU(toggleVCCID, Frame::toggleVCCEvent)
+EVT_MENU(toggleAutomaticID, Frame::toggleAutomaticEvent)
 END_EVENT_TABLE()
 
 Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title ) :
@@ -182,6 +189,12 @@ void Frame::setupMenuBar()
     fileMenu->AppendSeparator();
     fileMenu->Append( wxID_EXIT, _("Quit") );
 
+    wxMenu *viewMenu = new wxMenu();
+    viewMenu->Append( toggleRunwayID, _("Runway") );
+    viewMenu->Append( toggleVCCID, _("Venue Client Controller") );
+    viewMenu->AppendSeparator();
+    viewMenu->Append( toggleAutomaticID, _("Automatic Mode") );
+
     wxMenu *helpMenu = new wxMenu();
     helpMenu->Append( wxID_HELP_COMMANDS, _("Keyboard shortcuts...") );
     helpMenu->AppendSeparator();
@@ -192,6 +205,7 @@ void Frame::setupMenuBar()
 
     wxMenuBar *menuBar = new wxMenuBar();
     menuBar->Append( fileMenu, _("File") );
+    menuBar->Append( viewMenu, _("View") );
     menuBar->Append( helpMenu, _("Help") );
     SetMenuBar( menuBar ) ;
 }
@@ -220,4 +234,19 @@ void Frame::cleanup()
     }
 
     Destroy();
+}
+
+void Frame::toggleRunwayEvent( wxCommandEvent& evt )
+{
+    gravUtil::logVerbose( "Frame::runway event" );
+}
+
+void Frame::toggleVCCEvent( wxCommandEvent& evt )
+{
+    gravUtil::logVerbose( "Frame::vcc event" );
+}
+
+void Frame::toggleAutomaticEvent( wxCommandEvent& evt )
+{
+    gravUtil::logVerbose( "Frame::auto event" );
 }

@@ -63,6 +63,15 @@ private:
     // reference to input to grab keyboard shortcuts to generate help menu
     InputHandler* input;
 
+    void toggleRunwayEvent( wxCommandEvent& evt );
+    void toggleVCCEvent( wxCommandEvent& evt );
+    void toggleAutomaticEvent( wxCommandEvent& evt );
+
+    // IDs for toggles in view section of menubar
+    static int toggleRunwayID;
+    static int toggleVCCID;
+    static int toggleAutomaticID;
+
     DECLARE_EVENT_TABLE()
 
 };
