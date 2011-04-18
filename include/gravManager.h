@@ -199,6 +199,7 @@ public:
     bool getGraphicsDebugMode();
 
     void toggleShowVenueClientController();
+    bool isVenueClientControllerShown();
 
 private:
 

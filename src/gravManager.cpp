@@ -1355,6 +1355,11 @@ void gravManager::toggleShowVenueClientController()
     }
 }
 
+bool gravManager::isVenueClientControllerShown()
+{
+    return venueClientController->getRendering();
+}
+
 bool gravManager::audioAvailable()
 {
     return audioEnabled && audio->getSourceCount() > 0;

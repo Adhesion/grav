@@ -47,17 +47,20 @@ EVT_MENU(wxID_HELP_COMMANDS, Frame::OnKeyboardShortcuts)
 EVT_MENU(toggleRunwayID, Frame::toggleRunwayEvent)
 EVT_MENU(toggleVCCID, Frame::toggleVCCEvent)
 EVT_MENU(toggleAutomaticID, Frame::toggleAutomaticEvent)
+EVT_MENU_OPEN(Frame::OnMenuOpen)
 END_EVENT_TABLE()
 
 Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title ) :
-                wxFrame( parent, id, title, wxDefaultPosition, wxDefaultSize )
+                wxFrame( parent, id, title, wxDefaultPosition, wxDefaultSize ),
+                input( NULL )
 {
     setupMenuBar();
 }
 
 Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title,
                 const wxPoint& pos, const wxSize& size ) :
-                wxFrame( parent, id, title, pos, size )
+                wxFrame( parent, id, title, pos, size ),
+                input( NULL )
 {
     setupMenuBar();
 }
@@ -179,7 +182,18 @@ void Frame::OnMenuOpen( wxMenuEvent& evt )
     wxMenuItemList::iterator i;
     for ( i = list.begin(); i != list.end(); ++i )
     {
-
+        if ( (*i)->GetId() == toggleRunwayID )
+        {
+            (*i)->Check( grav->usingRunway() );
+        }
+        else if ( (*i)->GetId() == toggleVCCID )
+        {
+            (*i)->Check( grav->isVenueClientControllerShown() );
+        }
+        else if ( (*i)->GetId() == toggleAutomaticID )
+        {
+            (*i)->Check( grav->usingAutoFocusRotate() );
+        }
     }
 }
 
@@ -190,18 +204,15 @@ void Frame::setupMenuBar()
     fileMenu->Append( wxID_EXIT, _("Quit") );
 
     wxMenu *viewMenu = new wxMenu();
-    viewMenu->Append( toggleRunwayID, _("Runway") );
-    viewMenu->Append( toggleVCCID, _("Venue Client Controller") );
+    viewMenu->AppendCheckItem( toggleRunwayID, _("Runway") );
+    viewMenu->AppendCheckItem( toggleVCCID, _("Venue Client Controller") );
     viewMenu->AppendSeparator();
-    viewMenu->Append( toggleAutomaticID, _("Automatic Mode") );
+    viewMenu->AppendCheckItem( toggleAutomaticID, _("Automatic Mode") );
 
     wxMenu *helpMenu = new wxMenu();
     helpMenu->Append( wxID_HELP_COMMANDS, _("Keyboard shortcuts...") );
     helpMenu->AppendSeparator();
     helpMenu->Append( wxID_ABOUT, _("About...") );
-
-    //helpMenu->Connect( wxID_ANY, wxEVT_MENU_OPEN,
-    //        wxMenuEventHandler(Frame::OnMenuOpen) );
 
     wxMenuBar *menuBar = new wxMenuBar();
     menuBar->Append( fileMenu, _("File") );
@@ -238,15 +249,17 @@ void Frame::cleanup()
 
 void Frame::toggleRunwayEvent( wxCommandEvent& evt )
 {
-    gravUtil::logVerbose( "Frame::runway event" );
+    grav->setRunwayUsage( !grav->usingRunway() );
+    grav->clearSelected();
 }
 
 void Frame::toggleVCCEvent( wxCommandEvent& evt )
 {
-    gravUtil::logVerbose( "Frame::vcc event" );
+    grav->toggleShowVenueClientController();
 }
 
 void Frame::toggleAutomaticEvent( wxCommandEvent& evt )
 {
-    gravUtil::logVerbose( "Frame::auto event" );
+    grav->setAutoFocusRotate( !grav->usingAutoFocusRotate() );
+    grav->resetAutoCounter();
 }
