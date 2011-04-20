@@ -58,7 +58,7 @@ private:
     void setupMenuBar();
 
     // common close functionality to be accessed by the different entry points
-    void cleanup();
+    void cleanupAndDestroy();
 
     gravManager* grav;
     // reference to input to grab keyboard shortcuts to generate help menu

@@ -93,26 +93,26 @@ void Frame::OnCloseWindow( wxCloseEvent& evt )
     // if the event can't be vetoed (ie, force close) then force close
     if ( !evt.CanVeto() )
     {
-        cleanup();
-        Destroy();
+        cleanupAndDestroy();
     }
-
-    // otherwise show "really quit" dialog, close window if OK clicked
-    wxMessageDialog* exitDialog = new wxMessageDialog( this, _("Really quit?"),
-            _("grav"), wxOK | wxCANCEL );
-    int result = exitDialog->ShowModal();
-    exitDialog->Destroy();
-
-    switch( result )
+    else
     {
-    case wxID_OK:
-        cleanup();
-        Destroy();
-        break;
-    case wxID_CANCEL:
-    default:
-        evt.Veto();
-        break;
+        // otherwise show "really quit" dialog, close window if OK clicked
+        wxMessageDialog* exitDialog = new wxMessageDialog( this,
+                _("Really quit?"), _("grav"), wxOK | wxCANCEL );
+        int result = exitDialog->ShowModal();
+        exitDialog->Destroy();
+
+        switch( result )
+        {
+        case wxID_OK:
+            cleanupAndDestroy();
+            break;
+        case wxID_CANCEL:
+        default:
+            evt.Veto();
+            break;
+        }
     }
 }
 
@@ -234,7 +234,7 @@ void Frame::setupMenuBar()
     SetMenuBar( menuBar ) ;
 }
 
-void Frame::cleanup()
+void Frame::cleanupAndDestroy()
 {
     // Note that destructors for children will automatically be called,
     // including glcanvas (which has the timer stop) and tree control.
