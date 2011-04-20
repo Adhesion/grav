@@ -140,6 +140,9 @@ bool gravApp::OnInit()
     {
         gravUtil::logVerbose( "grav::warning: invalid fps value %li, "
                               "reset to 60\n", fps );
+        // note the "fps" variable here is just the input from the command line,
+        // the timer interval - what actually determines the rendering timing -
+        // has already been reset to 16ms in handleArgs
     }
 
     if ( printVersion )
@@ -154,7 +157,7 @@ bool gravApp::OnInit()
         PythonTools::disableInit = true;
     }
 
-    // since these bools are used in init, set them before init
+    // since these bools are used in glinit, set them before glinit
     GLUtil::getInstance()->setShaderEnable( enableShaders );
     GLUtil::getInstance()->setBufferFontUsage( bufferFont );
 
@@ -171,8 +174,6 @@ bool gravApp::OnInit()
 
     if ( headerSet )
         grav->setHeaderString( header );
-    else
-        grav->setHeaderString( "RIT Global Collaboration Grid" );
 
     timer = new RenderTimer( canvas, timerInterval );
     //timer->Start();
@@ -289,8 +290,8 @@ void gravApp::idleHandler( wxIdleEvent& evt )
 
     if ( timerIntervalUS > 0 )
     {
-        // this is the method for rendering on idle, with a limiter to 16ms
-        // (60fps)
+        // this is the method for rendering on idle, with a limiter based on the
+        // timer interval
         unsigned long time = (unsigned long)timer->getTiming();
         if ( time > (unsigned long)timerIntervalUS )
         {
