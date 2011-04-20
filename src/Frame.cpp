@@ -32,9 +32,11 @@
 #include "gravManager.h"
 #include "InputHandler.h"
 #include "gravUtil.h"
+#include "SideFrame.h"
 
 int Frame::toggleRunwayID = wxNewId();
 int Frame::toggleVCCID = wxNewId();
+int Frame::toggleSideFrameID = wxNewId();
 int Frame::toggleAutomaticID = wxNewId();
 
 BEGIN_EVENT_TABLE(Frame, wxFrame)
@@ -46,6 +48,7 @@ EVT_MENU(wxID_ABOUT, Frame::OnAbout)
 EVT_MENU(wxID_HELP_COMMANDS, Frame::OnKeyboardShortcuts)
 EVT_MENU(toggleRunwayID, Frame::toggleRunwayEvent)
 EVT_MENU(toggleVCCID, Frame::toggleVCCEvent)
+EVT_MENU(toggleSideFrameID, Frame::toggleSideFrameEvent)
 EVT_MENU(toggleAutomaticID, Frame::toggleAutomaticEvent)
 EVT_MENU_OPEN(Frame::OnMenuOpen)
 END_EVENT_TABLE()
@@ -190,6 +193,14 @@ void Frame::OnMenuOpen( wxMenuEvent& evt )
         {
             (*i)->Check( grav->isVenueClientControllerShown() );
         }
+        else if ( (*i)->GetId() == toggleSideFrameID )
+        {
+            SideFrame* sf = findChildSideFrame();
+            if ( sf != NULL )
+            {
+                (*i)->Check( sf->IsShown() );
+            }
+        }
         else if ( (*i)->GetId() == toggleAutomaticID )
         {
             (*i)->Check( grav->usingAutoFocusRotate() );
@@ -206,6 +217,8 @@ void Frame::setupMenuBar()
     wxMenu *viewMenu = new wxMenu();
     viewMenu->AppendCheckItem( toggleRunwayID, _("Runway") );
     viewMenu->AppendCheckItem( toggleVCCID, _("Venue Client Controller") );
+    viewMenu->AppendSeparator();
+    viewMenu->AppendCheckItem( toggleSideFrameID, _("Groups/Sessions Window") );
     viewMenu->AppendSeparator();
     viewMenu->AppendCheckItem( toggleAutomaticID, _("Automatic Mode") );
 
@@ -247,6 +260,23 @@ void Frame::cleanup()
     Destroy();
 }
 
+SideFrame* Frame::findChildSideFrame()
+{
+    wxWindowList children = GetChildren();
+    wxWindowList::iterator i = children.begin();
+    for ( ; i != children.end(); ++i )
+    {
+        SideFrame* sf = dynamic_cast<SideFrame*>( (*i) );
+        if ( sf )
+        {
+            return sf;
+        }
+    }
+    gravUtil::logWarning( "Frame::findChildSideFrame: could not find side frame"
+            " child of this window\n" );
+    return NULL;
+}
+
 void Frame::toggleRunwayEvent( wxCommandEvent& evt )
 {
     grav->setRunwayUsage( !grav->usingRunway() );
@@ -256,6 +286,15 @@ void Frame::toggleRunwayEvent( wxCommandEvent& evt )
 void Frame::toggleVCCEvent( wxCommandEvent& evt )
 {
     grav->toggleShowVenueClientController();
+}
+
+void Frame::toggleSideFrameEvent( wxCommandEvent& evt )
+{
+    SideFrame* sf = findChildSideFrame();
+    if ( sf != NULL )
+    {
+        sf->Show( !sf->IsShown() );
+    }
 }
 
 void Frame::toggleAutomaticEvent( wxCommandEvent& evt )

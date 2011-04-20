@@ -31,6 +31,7 @@
 
 class gravManager;
 class InputHandler;
+class SideFrame;
 
 class Frame : public wxFrame
 {
@@ -63,13 +64,19 @@ private:
     // reference to input to grab keyboard shortcuts to generate help menu
     InputHandler* input;
 
+    // to find a side frame, so we can hide/show it in menubar
+    // (should be a child since this object should be the top-level wxWindow)
+    SideFrame* findChildSideFrame();
+
     void toggleRunwayEvent( wxCommandEvent& evt );
     void toggleVCCEvent( wxCommandEvent& evt );
+    void toggleSideFrameEvent( wxCommandEvent& evt );
     void toggleAutomaticEvent( wxCommandEvent& evt );
 
     // IDs for toggles in view section of menubar
     static int toggleRunwayID;
     static int toggleVCCID;
+    static int toggleSideFrameID;
     static int toggleAutomaticID;
 
     DECLARE_EVENT_TABLE()

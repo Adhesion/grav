@@ -43,6 +43,8 @@ public:
     void addAudioSessionEvent( wxCommandEvent& evt );
     void rotateEvent( wxCommandEvent& evt );
 
+    void OnCloseWindow( wxCloseEvent& evt );
+
     static int addVideoID;
     static int addAudioID;
     static int rotateID;
@@ -51,6 +53,8 @@ private:
     SessionTreeControl* findSessionTree( wxWindow* w );
 
     void setupMenuBar();
+
+    DECLARE_EVENT_TABLE()
 
 };
 

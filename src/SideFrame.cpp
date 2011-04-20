@@ -26,9 +26,15 @@
 #include "SideFrame.h"
 #include "SessionTreeControl.h"
 
+#include "gravUtil.h"
+
 int SideFrame::addVideoID = wxNewId();
 int SideFrame::addAudioID = wxNewId();
 int SideFrame::rotateID = wxNewId();
+
+BEGIN_EVENT_TABLE(SideFrame, wxFrame)
+EVT_CLOSE(SideFrame::OnCloseWindow)
+END_EVENT_TABLE()
 
 SideFrame::SideFrame( wxWindow* parent, wxWindowID id, const wxString& title ) :
                 wxFrame( parent, id, title, wxDefaultPosition, wxDefaultSize )
@@ -128,4 +134,16 @@ void SideFrame::rotateEvent( wxCommandEvent& evt )
     SessionTreeControl* tree = findSessionTree( this );
     if ( tree != NULL )
         tree->rotateVideoSessions();
+}
+
+void SideFrame::OnCloseWindow( wxCloseEvent& evt )
+{
+    if ( evt.CanVeto() )
+    {
+        Show( false );
+    }
+    else
+    {
+        Destroy();
+    }
 }
