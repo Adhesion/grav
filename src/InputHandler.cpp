@@ -372,7 +372,7 @@ void InputHandler::handleInformation()
     gravUtil::logMessage( "\tScreen size is %f x %f\n",
                 grav->getScreenRect().getWidth(),
                 grav->getScreenRect().getHeight() );
-    gravUtil::logMessage( "\tWe currently have %i sources.\n",
+    gravUtil::logMessage( "\tWe currently have %i video sources.\n",
              grav->getSources()->size() );
 
     for ( si = grav->getSources()->begin();
