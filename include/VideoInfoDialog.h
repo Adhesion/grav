@@ -26,7 +26,7 @@
 #ifndef VIDEOINFODIALOG_H_
 #define VIDEOINFODIALOG_H_
 
-#include "wx/dialog.h"
+#include <wx/dialog.h>
 
 class RectangleBase;
 
