@@ -67,6 +67,13 @@ public:
 
     const char* getPayloadDesc();
 
+    /*
+     * Gets the session this video comes from - we need to be able to check this
+     * against the session in the delete callback, so we don't delete the wrong
+     * one if it happens to have the same ssrc as another stream.
+     */
+    VPMSession* getSession();
+
     unsigned int getVideoWidth();
     unsigned int getVideoHeight();
 

@@ -112,12 +112,15 @@ void VideoListener::vpmsession_source_created( VPMSession &session,
 void VideoListener::vpmsession_source_deleted( VPMSession &session,
         uint32_t ssrc, const char *reason)
 {
+    gravUtil::logVerbose( "VideoListener::deleting ssrc 0x%08x\n", ssrc );
     std::vector<VideoSource*>::iterator si;
     for ( si = grav->getSources()->begin();
             si != grav->getSources()->end(); ++si )
     {
-        if ( (*si)->getssrc() == ssrc )
+        if ( &session == (*si)->getSession() && (*si)->getssrc() == ssrc )
         {
+            gravUtil::logVerbose( "VideoListener::found ssrc as source"
+                    " 0x%08x\n", (*si) );
             sourceCount--;
             updatePixelCount( -( (*si)->getVideoWidth() *
                                  (*si)->getVideoHeight() ) );

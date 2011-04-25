@@ -417,6 +417,11 @@ const char* VideoSource::getPayloadDesc()
     return videoSink->getVideoDecoder()->getDesc();
 }
 
+VPMSession* VideoSource::getSession()
+{
+    return session;
+}
+
 unsigned int VideoSource::getVideoWidth()
 {
     return vwidth;
