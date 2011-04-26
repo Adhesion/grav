@@ -42,6 +42,13 @@ try:
             print e
             return None
 
+    def GetFirstValidClientURL():
+        urls = GetVenueClients()
+        for url in urls:
+            if GetClient(url) != None:
+                return url
+        return ""
+
     def GetExits(clientURL):
         client = GetClient(clientURL)
         if client == None:

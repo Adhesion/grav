@@ -182,7 +182,6 @@ bool gravApp::OnInit()
 
     Earth* earth = new Earth();
     InputHandler* input = new InputHandler( earth, grav, mainFrame );
-    venueClientController = new VenueClientController( 0.0f, 0.0f, grav );
 
     // frame needs reference to inputhandler to generate help window for
     // shortcut hotkeys
@@ -195,16 +194,20 @@ bool gravApp::OnInit()
     canvas->SetFocus();
     canvas->setTimer( timer );
 
+    if ( !disablePython )
+    {
+        venueClientController = new VenueClientController( 0.0f, 0.0f, grav );
+        venueClientController->setSessionControl( sessionTree );
+    }
+
     grav->setEarth( earth );
     grav->setInput( input );
     grav->setTree( sourceTree );
     grav->setBorderTex( "border.png" );
     grav->setVideoListener( videoSessionListener );
     grav->setCanvas( canvas );
-    grav->setVenueClientController( venueClientController );
+    grav->setVenueClientController( venueClientController ); // may be null
     grav->setAudio( audioSessionListener ); // may not necessarily be used
-
-    venueClientController->setSessionControl( sessionTree );
 
     mapRTP();
 
@@ -231,7 +234,7 @@ bool gravApp::OnInit()
                                             initialAudioKey );
     }
 
-    if ( getAGVenueStreams )
+    if ( getAGVenueStreams && !disablePython )
     {
         venueClientController->updateVenueStreams();
         venueClientController->addAllVenueStreams();
@@ -267,7 +270,8 @@ int gravApp::OnExit()
     delete videoSessionListener;
     delete audioSessionListener;
 
-    delete venueClientController;
+    if ( venueClientController != NULL )
+        delete venueClientController;
     delete grav;
 
     GLUtil::getInstance()->cleanupGL();

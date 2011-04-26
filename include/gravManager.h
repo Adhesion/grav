@@ -200,6 +200,7 @@ public:
 
     void toggleShowVenueClientController();
     bool isVenueClientControllerShown();
+    bool isVenueClientControllerShowable();
 
 private:
 

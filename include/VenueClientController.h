@@ -54,7 +54,12 @@ public:
     std::vector<RectangleBase*>::iterator remove(
                     std::vector<RectangleBase*>::iterator i, bool move = true );
 
-    void getVenueClient();
+    /*
+     * Attempt to find the first valid venue client via AGTools. If it fails,
+     * return false and set internal venue client URL to "".
+     */
+    bool tryGetValidVenueClient();
+
     void updateExitMap();
     void printExitMap();
 

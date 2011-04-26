@@ -191,7 +191,12 @@ void Frame::OnMenuOpen( wxMenuEvent& evt )
         }
         else if ( (*i)->GetId() == toggleVCCID )
         {
-            (*i)->Check( grav->isVenueClientControllerShown() );
+            bool showable = grav->isVenueClientControllerShowable();
+            (*i)->Enable( showable );
+            if ( showable )
+            {
+                (*i)->Check( grav->isVenueClientControllerShown() );
+            }
         }
         else if ( (*i)->GetId() == toggleSideFrameID )
         {

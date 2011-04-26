@@ -34,7 +34,6 @@ VenueNode::VenueNode()
     borderScale = 0.0f;
     userMovable = false;
     selectable = true;
-    //debugDraw = true;
 
     baseBColor.R = 0.7f;
     baseBColor.G = 0.7f;

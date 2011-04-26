@@ -49,6 +49,8 @@ VenueClientController::VenueClientController( float _x, float _y,
     destBColor.A = 0.0f;
     borderColor = destBColor;
 
+    enableRendering = false;
+
     setScale( 13.0f, 13.0f );
 
     gravUtil* util = gravUtil::getInstance();
@@ -62,7 +64,7 @@ VenueClientController::VenueClientController( float _x, float _y,
     std::string circleLoc = util->findFile( "circle.png" );
     if ( circleLoc.compare( "" ) == 0 )
     {
-        gravUtil::logWarning( "VenueClientController::warning: "
+        gravUtil::logWarning( "VenueClientController::init: warning: "
                 "texture circle.png not found\n" );
     }
     else
@@ -77,12 +79,18 @@ VenueClientController::VenueClientController( float _x, float _y,
                 "AGTools.py not found\n" );
     }
 
-    updateVenueName();
-    updateExitMap();
-    updateVenueStreams();
-
-    enableRendering = false;
-    setRendering( false );
+    if ( tryGetValidVenueClient() )
+    {
+        // if we have a valid venue client, this setrendering call will update
+        // the venue name and exits as well (other actual render-related
+        // functionality is a bit redundant in this case)
+        setRendering( false );
+    }
+    else
+    {
+        gravUtil::logWarning( "VenueClientController::init: venue client not "
+                "found\n" );
+    }
 }
 
 void VenueClientController::draw()
@@ -133,37 +141,47 @@ std::vector<RectangleBase*>::iterator VenueClientController::remove(
     return ret;
 }
 
-void VenueClientController::getVenueClient()
+bool VenueClientController::tryGetValidVenueClient()
 {
-    PyObject* pRes = pyTools->call( AGToolsScript, "GetVenueClients" );
-    std::vector<std::string> venueClients = pyTools->ltov( pRes );
-    if ( venueClients.size() == 0 )
+    PyObject* res = pyTools->call( AGToolsScript, "GetFirstValidClientURL" );
+    if ( res != NULL && res != Py_None )
     {
-        gravUtil::logWarning( "VenueClientController::getVenueClient(): "
-                "no venue client found\n" );
+        venueClientUrl = PyString_AsString( res );
     }
     else
     {
-        // TODO just take first for now - maybe if multiple found, prompt user?
-        venueClientUrl = venueClients[0];
+        venueClientUrl = "";
     }
-    Py_XDECREF( pRes );
+    Py_XDECREF( res );
+
+    if ( venueClientUrl.compare( "" ) == 0 )
+    {
+        gravUtil::logWarning( "VenueClientController::tryGetValidVenueClient: "
+                "no venue clients found\n" );
+        /*
+         * Since this function is equivalent to "is the VCC showable", if it's
+         * not showable, forcibly hide it if it is shown, since that state makes
+         * no sense if there is no available venue client.
+         */
+        if ( enableRendering )
+        {
+            Group::setRendering( false );
+            // move objects for a nice animation effect
+            for ( unsigned int i = 0; i < objects.size(); i++ )
+            {
+                objects[i]->move( getX(), getY() );
+            }
+        }
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 void VenueClientController::updateExitMap()
 {
-    // if no venue client, try to get; if not then fail
-    if ( venueClientUrl.compare( "" ) == 0 )
-    {
-        getVenueClient();
-    }
-    if ( venueClientUrl.compare( "" ) == 0 )
-    {
-        gravUtil::logWarning( "VenueClientController::updateExitMap(): "
-                "no venue client found\n" );
-        return;
-    }
-
     PyObject* pRes = pyTools->call( AGToolsScript, "GetExits",
                                     venueClientUrl );
     exitMap = pyTools->dtom( pRes );
@@ -209,18 +227,6 @@ void VenueClientController::printExitMap()
 
 void VenueClientController::enterVenue( std::string venueName )
 {
-    // if no venue client, try to get; if not then fail
-    if ( venueClientUrl.compare( "" ) == 0 )
-    {
-        getVenueClient();
-    }
-    if ( venueClientUrl.compare( "" ) == 0 )
-    {
-        gravUtil::logWarning( "VenueClientController::enterVenue(): "
-                "no venue client found\n" );
-        return;
-    }
-
     std::map<std::string, std::string>::iterator it = exitMap.find( venueName );
     if ( it == exitMap.end() )
     {
@@ -251,18 +257,6 @@ void VenueClientController::enterVenue( std::string venueName )
 
 void VenueClientController::updateVenueStreams()
 {
-    // if no venue client, try to get; if not then fail
-    if ( venueClientUrl.compare( "" ) == 0 )
-    {
-        getVenueClient();
-    }
-    if ( venueClientUrl.compare( "" ) == 0 )
-    {
-        gravUtil::logWarning( "VenueClientController::updateVenueStreams(): "
-                    "no venue client found\n" );
-        return;
-    }
-
     std::string type = "video";
     PyObject* args = PyTuple_New( 2 );
     PyTuple_SetItem( args, 0, PyString_FromString( venueClientUrl.c_str() ) );
@@ -276,18 +270,6 @@ void VenueClientController::updateVenueStreams()
 
 void VenueClientController::updateVenueName()
 {
-    // if no venue client, try to get; if not then fail
-    if ( venueClientUrl.compare( "" ) == 0 )
-    {
-        getVenueClient();
-    }
-    if ( venueClientUrl.compare( "" ) == 0 )
-    {
-        gravUtil::logWarning( "VenueClientController::updateVenueName(): "
-                    "no venue client found\n" );
-        return;
-    }
-
     PyObject* res = pyTools->call( AGToolsScript, "GetCurrentVenueName",
                                     venueClientUrl.c_str() );
     if ( res != NULL && res != Py_None )
@@ -350,13 +332,21 @@ bool VenueClientController::updateName()
 
 void VenueClientController::setRendering( bool r )
 {
-    // check if venue has changed in the meantime, if so update stuff
-    std::string oldName = currentVenue;
-    updateVenueName();
-    if ( oldName.compare( currentVenue ) != 0 )
+    if ( tryGetValidVenueClient() )
     {
-        updateExitMap();
-        updateVenueStreams();
+        // check if venue has changed in the meantime, if so update stuff
+        std::string oldName = currentVenue;
+        updateVenueName();
+
+        if ( oldName.compare( currentVenue ) != 0 )
+        {
+            updateExitMap();
+            updateVenueStreams();
+        }
+    }
+    else
+    {
+        return;
     }
 
     // do nothing if there aren't any venues, otherwise state will get confusing

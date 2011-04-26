@@ -1246,7 +1246,10 @@ void gravManager::setVenueClientController( VenueClientController* vcc )
         drawnObjects->erase( i );
     }
     venueClientController = vcc;
-    drawnObjects->push_back( venueClientController );
+    if ( venueClientController != NULL)
+    {
+        drawnObjects->push_back( venueClientController );
+    }
 }
 
 void gravManager::setHeaderString( std::string h )
@@ -1347,7 +1350,6 @@ bool gravManager::getGraphicsDebugMode()
 
 void gravManager::toggleShowVenueClientController()
 {
-    // TODO just debug stuff here for now
     if ( venueClientController != NULL )
     {
         venueClientController->setRendering(
@@ -1357,7 +1359,26 @@ void gravManager::toggleShowVenueClientController()
 
 bool gravManager::isVenueClientControllerShown()
 {
-    return venueClientController->getRendering();
+    if ( venueClientController != NULL )
+    {
+        return venueClientController->getRendering();
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool gravManager::isVenueClientControllerShowable()
+{
+    if ( venueClientController != NULL )
+    {
+        return venueClientController->tryGetValidVenueClient();
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool gravManager::audioAvailable()
