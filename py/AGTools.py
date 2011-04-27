@@ -80,10 +80,6 @@ try:
             return {}
 
         streams = client.GetStreams()
-        for stream in streams:
-            # make sure location and networkLocations are the same thing
-            assert(len(stream.networkLocations) == 1 and
-                      repr(stream.location) == repr(stream.networkLocations[0]))
 
         # Lambda expressions are like anonymous functions and are equivalent to
         #   the below.

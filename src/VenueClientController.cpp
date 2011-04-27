@@ -246,13 +246,10 @@ void VenueClientController::enterVenue( std::string venueName )
 
     pyTools->call( AGToolsScript, "EnterVenue", args );
 
-    updateExitMap();
-
-    updateVenueName();
-    updateVenueStreams();
-    addAllVenueStreams();
-
+    // this will in turn update the exit map, venue streams, etc.
     setRendering( false );
+
+    addAllVenueStreams();
 }
 
 void VenueClientController::updateVenueStreams()
