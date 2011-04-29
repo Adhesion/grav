@@ -26,6 +26,10 @@
 #ifndef GRAVUTIL_H_
 #define GRAVUTIL_H_
 
+// this is to prevent issues with FFmpeg, which needs __STDC_CONSTANT_MACROS to
+// be defined before stdint.h is included
+#include <VPMedia/VPMedia_config.h>
+
 #include <vector>
 #include <string>
 

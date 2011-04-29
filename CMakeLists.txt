@@ -66,9 +66,6 @@ link_directories(
 	${PYTHON_LIBRARY_DIRS}
 	)
 
-# for ffmpeg
-add_definitions(-D__STDC_CONSTANT_MACROS)
-
 # setup paths for install
 set(GRAV_RESOURCE_DIR \"${CMAKE_INSTALL_PREFIX}/share/grav/\")
 add_definitions(-DGRAV_RESOURCE_DIR=${GRAV_RESOURCE_DIR})

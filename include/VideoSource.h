@@ -27,10 +27,11 @@
 #ifndef VIDEOSOURCE_H_
 #define VIDEOSOURCE_H_
 
-#include "RectangleBase.h"
-
 #include <VPMedia/video/VPMVideoBufferSink.h>
 #include <VPMedia/VPMSession.h>
+#include <VPMedia/VPMedia_config.h>
+
+#include "RectangleBase.h"
 
 class VideoListener;
 

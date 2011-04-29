@@ -24,9 +24,9 @@
  * along with grav.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gravUtil.h"
 #include "InputHandler.h"
 #include "GLUtil.h"
-#include "gravUtil.h"
 #include "VideoSource.h"
 #include "RectangleBase.h"
 #include "Group.h"

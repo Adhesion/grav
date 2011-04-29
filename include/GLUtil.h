@@ -26,6 +26,8 @@
 #ifndef GLUTIL_H_
 #define GLUTIL_H_
 
+#include "gravUtil.h"
+
 // TODO glxew is platform specific, add some #defs to only include it on
 // supported platforms (just linux?)
 // otherwise include straight glew.h (which glxew.h includes itself)

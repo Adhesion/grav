@@ -22,9 +22,8 @@
  * along with grav.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GLUtil.h"
-#include "gravUtil.h"
 #include "VideoSource.h"
+#include "GLUtil.h"
 #include <string>
 
 GLUtil* GLUtil::instance = NULL;

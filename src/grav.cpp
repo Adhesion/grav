@@ -23,8 +23,9 @@
  * along with grav.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Earth.h"
 #include "grav.h"
+#include "gravUtil.h"
+#include "Earth.h"
 #include "GLCanvas.h"
 #include "gravManager.h"
 #include "InputHandler.h"
@@ -39,7 +40,6 @@
 #include "SideFrame.h"
 #include "Timers.h"
 #include "VenueClientController.h"
-#include "gravUtil.h"
 
 #include <VPMedia/VPMLog.h>
 #include <VPMedia/VPMPayloadDecoderFactory.h>
