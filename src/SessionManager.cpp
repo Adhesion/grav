@@ -218,6 +218,22 @@ void SessionManager::rotate( bool audio )
     }
 }
 
+void SessionManager::unrotate( bool audio )
+{
+    lockSessions();
+
+    std::string current = getCurrentRotateSession();
+    rotatePos = -1;
+
+    lastRotateSession = "";
+
+    unlockSessions();
+    if ( current.compare( "" ) != 0 )
+    {
+        removeSession( current );
+    }
+}
+
 std::string SessionManager::getCurrentRotateSession()
 {
     if ( rotatePos != -1 && rotatePos < (int)videoRotateList.size() )

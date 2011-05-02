@@ -36,6 +36,7 @@ int SessionTreeControl::addAudioID = wxNewId();
 int SessionTreeControl::toggleEnableID = wxNewId();
 int SessionTreeControl::removeID = wxNewId();
 int SessionTreeControl::rotateID = wxNewId();
+int SessionTreeControl::unrotateID = wxNewId();
 int SessionTreeControl::setEncryptionID = wxNewId();
 int SessionTreeControl::disableEncryptionID = wxNewId();
 
@@ -161,9 +162,9 @@ void SessionTreeControl::rotateVideoSessions()
     sessionManager->rotate( false );
 
     wxTreeItemId current = findSession( videoNodeID,
-                               sessionManager->getCurrentRotateSession() );
-    wxTreeItemId last =    findSession( videoNodeID,
-                               sessionManager->getLastRotateSession() );
+            sessionManager->getCurrentRotateSession() );
+    wxTreeItemId last = findSession( videoNodeID,
+            sessionManager->getLastRotateSession() );
 
     if ( last.IsOk() )
     {
@@ -175,6 +176,19 @@ void SessionTreeControl::rotateVideoSessions()
         SetItemBackgroundColour( current, *wxWHITE );
         SetItemTextColour( current, *wxBLUE );
     }
+}
+
+void SessionTreeControl::unrotateVideoSessions()
+{
+    wxTreeItemId current = findSession( videoNodeID,
+            sessionManager->getCurrentRotateSession() );
+    if ( current.IsOk() )
+    {
+        SetItemBackgroundColour( current, *wxBLUE );
+        SetItemTextColour( current, *wxBLACK );
+    }
+
+    sessionManager->unrotate( false );
 }
 
 bool SessionTreeControl::setEncryptionKey( std::string addr, std::string key )
@@ -253,6 +267,12 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
         rightClickMenu.Append( rotateID, _("Rotate video sessions") );
         Connect( rotateID, wxEVT_COMMAND_MENU_SELECTED,
             wxCommandEventHandler( SessionTreeControl::rotateEvent ) );
+        wxMenuItem* unrotateItem = rightClickMenu.Append( unrotateID,
+            _("Disconnect from rotated video session") );
+        Connect( unrotateID, wxEVT_COMMAND_MENU_SELECTED,
+            wxCommandEventHandler( SessionTreeControl::unrotateEvent ) );
+        unrotateItem->Enable(
+            sessionManager->getCurrentRotateSession().compare( "" ) != 0 );
     }
 
     // right clicked on audio group or main group
@@ -316,6 +336,11 @@ void SessionTreeControl::removeSessionEvent( wxCommandEvent& evt )
 void SessionTreeControl::rotateEvent( wxCommandEvent& evt )
 {
     rotateVideoSessions();
+}
+
+void SessionTreeControl::unrotateEvent( wxCommandEvent& evt )
+{
+    unrotateVideoSessions();
 }
 
 void SessionTreeControl::setEncryptionEvent( wxCommandEvent& evt )
