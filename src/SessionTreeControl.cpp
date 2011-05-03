@@ -36,6 +36,7 @@ int SessionTreeControl::addAudioID = wxNewId();
 int SessionTreeControl::toggleEnableID = wxNewId();
 int SessionTreeControl::removeID = wxNewId();
 int SessionTreeControl::rotateID = wxNewId();
+int SessionTreeControl::rotateToID = wxNewId();
 int SessionTreeControl::unrotateID = wxNewId();
 int SessionTreeControl::setEncryptionID = wxNewId();
 int SessionTreeControl::disableEncryptionID = wxNewId();
@@ -178,6 +179,27 @@ void SessionTreeControl::rotateVideoSessions()
     }
 }
 
+void SessionTreeControl::rotateToVideoSession( std::string addr )
+{
+    sessionManager->rotateTo( addr, false );
+
+    wxTreeItemId current = findSession( videoNodeID,
+            sessionManager->getCurrentRotateSession() );
+    wxTreeItemId last = findSession( videoNodeID,
+            sessionManager->getLastRotateSession() );
+
+    if ( last.IsOk() )
+    {
+        SetItemBackgroundColour( last, *wxBLUE );
+        SetItemTextColour( last, *wxBLACK );
+    }
+    if ( current.IsOk() )
+    {
+        SetItemBackgroundColour( current, *wxWHITE );
+        SetItemTextColour( current, *wxBLUE );
+    }
+}
+
 void SessionTreeControl::unrotateVideoSessions()
 {
     wxTreeItemId current = findSession( videoNodeID,
@@ -232,7 +254,7 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
                                     _("Set encryption key...") );
             Connect( setEncryptionID, wxEVT_COMMAND_MENU_SELECTED,
                         wxCommandEventHandler(
-                                SessionTreeControl::setEncryptionEvent) );
+                                SessionTreeControl::setEncryptionEvent ) );
 
             // add disable encryption option for sessions with encryption
             if ( sessionManager->isEncryptionEnabled( text ) )
@@ -241,7 +263,20 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
                                         _("Disable encryption") );
                 Connect( disableEncryptionID, wxEVT_COMMAND_MENU_SELECTED,
                             wxCommandEventHandler(
-                                  SessionTreeControl::disableEncryptionEvent) );
+                                SessionTreeControl::disableEncryptionEvent ) );
+            }
+        }
+        // for rotated video
+        else if ( parent == rotatedVideoNodeID )
+        {
+            // for now, have "rotate to this" for all but selected
+            if ( text.compare(sessionManager->getCurrentRotateSession()) != 0 )
+            {
+                rightClickMenu.Append( rotateToID,
+                                        _("Rotate to this session") );
+                Connect( rotateToID, wxEVT_COMMAND_MENU_SELECTED,
+                            wxCommandEventHandler(
+                                  SessionTreeControl::rotateToEvent ) );
             }
         }
 
@@ -267,6 +302,7 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
         rightClickMenu.Append( rotateID, _("Rotate video sessions") );
         Connect( rotateID, wxEVT_COMMAND_MENU_SELECTED,
             wxCommandEventHandler( SessionTreeControl::rotateEvent ) );
+
         wxMenuItem* unrotateItem = rightClickMenu.Append( unrotateID,
             _("Disconnect from rotated video session") );
         Connect( unrotateID, wxEVT_COMMAND_MENU_SELECTED,
@@ -336,6 +372,13 @@ void SessionTreeControl::removeSessionEvent( wxCommandEvent& evt )
 void SessionTreeControl::rotateEvent( wxCommandEvent& evt )
 {
     rotateVideoSessions();
+}
+
+void SessionTreeControl::rotateToEvent( wxCommandEvent& evt )
+{
+    std::string selectedAddress = std::string(
+                                     GetItemText( GetSelection() ).char_str() );
+    rotateToVideoSession( selectedAddress );
 }
 
 void SessionTreeControl::unrotateEvent( wxCommandEvent& evt )

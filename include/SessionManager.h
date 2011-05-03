@@ -70,6 +70,7 @@ public:
     void addRotatedSession( std::string addr, bool audio );
     void removeRotatedSession( std::string addr, bool audio );
     void rotate( bool audio );
+    void rotateTo( std::string addr, bool audio );
     void unrotate( bool audio );
 
     std::string getCurrentRotateSession();

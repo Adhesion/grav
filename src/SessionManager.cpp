@@ -218,6 +218,57 @@ void SessionManager::rotate( bool audio )
     }
 }
 
+void SessionManager::rotateTo( std::string addr, bool audio )
+{
+    lockSessions();
+
+    int numSessions = (int)videoRotateList.size();
+    int lastRotatePos = rotatePos;
+    if ( lastRotatePos != -1 )
+        lastRotateSession = videoRotateList[ rotatePos ];
+    if ( numSessions == 0 )
+    {
+        unlockSessions();
+        return;
+    }
+
+    int i = 0;
+    std::vector<std::string>::iterator it = videoRotateList.begin();
+    while ( it != videoRotateList.end() && it->compare( addr ) != 0 )
+    {
+        ++it;
+        i++;
+    }
+
+    if ( it == videoRotateList.end() )
+    {
+        gravUtil::logWarning( "SessionManager::rotateTo: session %s"
+                " not found\n", addr.c_str() );
+        unlockSessions();
+        return;
+    }
+    else
+    {
+        rotatePos = i;
+    }
+
+    unlockSessions();
+
+    // only remove & rotate if there is a valid old one & it isn't the same as
+    // current
+    if ( lastRotateSession.compare( "" ) != 0 &&
+            lastRotateSession.compare( videoRotateList[ rotatePos ] ) != 0 )
+    {
+        removeSession( lastRotateSession );
+        initSession( videoRotateList[ rotatePos ], false );
+    }
+    // case for first rotate
+    else if ( lastRotatePos == -1 )
+    {
+        initSession( videoRotateList[ rotatePos ], false );
+    }
+}
+
 void SessionManager::unrotate( bool audio )
 {
     lockSessions();
