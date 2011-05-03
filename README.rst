@@ -259,7 +259,8 @@ Notes
 -----
 
 grav (C) 2011 Rochester Institute of Technology
-Authored by Andrew Ford with contributions from Ralph Bean.
+Authored by `Andrew Ford <http://github.com/adhesion>`_ with
+contributions from `Ralph Bean <http://github.com/ralphbean>`_.
 
 grav is free software, released under the GNU GPL. See COPYING for details.
 
