@@ -61,7 +61,6 @@ Compiling on Linux
          % MMEDIA_URL=https://mediatools.cs.ucl.ac.uk/repos/mmedia/common/trunk
          % svn co $MMEDIA_URL ucl-common
 
-      
    1. In the common lib directory, do a standard::
 
          % ./configure
@@ -189,7 +188,7 @@ Command Line Usage::
               [-a <str>] [-ht <str>] [-fps <num>] [-fs] [-ga]
               [-vsr] [-avsr <num>] [-agvs] [-vk <str>] [-ak <str>]
               [-sx <num>] [-sy <num>] [-sw <num>] [-sh <num>] video address
-  
+
     -h, --help                             	  displays this help message
     -t, --threads                          	  threading separation of graphics
                                               and network/decoding (this is the
@@ -307,8 +306,8 @@ automatically every X seconds with the -avsr (seconds) command line option.
 Runway
 ------
 
-The runway is a side area for muted videos (press m on a video to mute it).  
-To remove a video from the runway, simply drag it out of the runway area.  
+The runway is a side area for muted videos (press m on a video to mute it).
+To remove a video from the runway, simply drag it out of the runway area.
 The runway will be hidden when turning on automatic mode, or you can manually
 enable/disable it with alt-r.
 
