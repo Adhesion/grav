@@ -38,6 +38,7 @@ Compiling on Linux
             to ``/usr/local/lib`` by default).
 
             .. warning::
+
                Having another copy of ffmpeg installed on your machine (things
                like VLC and mplayer might depend on it) will cause conflicts,
                ie, when running `grav` or anything that wants to link to the new
@@ -55,8 +56,8 @@ Compiling on Linux
 3. SVN checkout the UCL common library from here:
    https://mediatools.cs.ucl.ac.uk/repos/mmedia e.g.::
 
-         % mmedia_url=https://mediatools.cs.ucl.ac.uk/repos/mmedia/common/trunk
-         % svn co $mmedia_url ucl-common
+         % MMEDIA_URL=https://mediatools.cs.ucl.ac.uk/repos/mmedia/common/trunk
+         % svn co $MMEDIA_URL ucl-common
 
       
    1. In the common lib directory, do a standard::
@@ -73,6 +74,7 @@ Compiling on Linux
          % svn co https://svn.ci.uchicago.edu/svn/if-media/VPMedia VPMedia
 
    1. In the VPMedia directory, do::
+
          % scons configure
          % scons
          % sudo scons install
@@ -82,14 +84,18 @@ Compiling on Linux
 
 5. Obtain `grav` Source
 
-   1. Get snapshot tarball from https://git.rc.rit.edu/git/.  Here's an example
-      with wget::
+   1. If you want the `grav` source in order to **install and use** `grav`, get
+      a snapshot tarball from https://github.com/adhesion/grav/tarball/master::
 
-         % fname=$(grav-latest-$(date +%Y-%m-%d).tar.bz2)
-         % wget https://git.rc.rit.edu/git/$fname
-         % tar -xvfj $fname
+        % TAR_URL=http://github.com/adhesion/grav/tarball/master
+        % wget --no-check-certificate $TAR_URL
+        % tar -xzvf Adhesion-grav-e9c22d9.tar.gz
 
-   2. OR, git clone from the repo (not public yet)
+   2. **OR**, if you want the `grav` source in order to **contribute to or
+      develop** `grav`, fork and clone the upstream repository located at
+      http://github.com/adhesion/grav.  You may want to read the `general github
+      documentation <http://help.github.com/>`_ and their `documentation on
+      forking projects <http://help.github.com/fork-a-repo/>`_ in particular.
 
 6. Cmake `grav`
 
