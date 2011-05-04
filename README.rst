@@ -345,11 +345,11 @@ http://visibleearth.nasa.gov/view_detail.php?id=2430 for more info.
 
        }}}
 
-  This feature of trac requires that the python ``docutils`` package is
-  installed on the server.  This is already installed on
-  http://grav.rc.rit.edu, but if another instance is being installed somewhere,
-  the ``docutils`` package can be installed with the following command::
+   This feature of trac requires that the python ``docutils`` package is
+   installed on the server.  This is already installed on
+   http://grav.rc.rit.edu, but if another instance is being installed somewhere,
+   the ``docutils`` package can be installed with the following command::
 
        % easy_install docutils
 
-  See http://trac.edgewall.org/wiki/WikiRestructuredText for more information.
+   See http://trac.edgewall.org/wiki/WikiRestructuredText for more information.
