@@ -8,8 +8,10 @@ globe displayed in the background for geographical correlation, as well
 as automatic grouping, both based on RTCP metadata.
 
 .. important::
-    
-    For more info, see https://grav.rc.rit.edu
+
+    For more info, see the grav trac instance at https://grav.rc.rit.edu.  This
+    README file is the 'authoritative source' for documentation [1]_, but the
+    trac instance is where to go for filing/finding bug tickets/issues.
 
 Compilation
 -----------
@@ -323,3 +325,32 @@ This software uses libraries from the FFmpeg project under the GPLv3.
 
 Earth imagery by NASA from the Visible Earth project. See
 http://visibleearth.nasa.gov/view_detail.php?id=2430 for more info.
+
+.. FOOTNOTES:
+
+.. [1] The README.rst and updating wiki pages on http://grav.rc.rit.edu.
+
+   This README.rst file is the 'authoritative source' for
+   documentation.  The information is duplicated in some place on the `grav`
+   trac instance at http://grav.rc.rit.edu, but trac can handle the
+   reStructuredText (.rst) format used here and should be updated with changes
+   made here first.
+
+   To inform trac to render a block of text (the whole page!) as rST, surround
+   the block with::
+
+       {{{
+       #!rst
+
+       <document goes here>
+
+       }}}
+
+  This feature of trac requires that the python ``docutils`` package is
+  installed on the server.  This is already installed on
+  http://grav.rc.rit.edu, but if another instance is being installed somewhere,
+  the ``docutils`` package can be installed with the following command::
+
+       % easy_install docutils
+
+  See http://trac.edgewall.org/wiki/WikiRestructuredText for more information.
