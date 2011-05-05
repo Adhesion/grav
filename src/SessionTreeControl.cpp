@@ -30,6 +30,7 @@
 #include "SessionManager.h"
 #include "Frame.h"
 #include "gravUtil.h"
+#include "Timers.h"
 
 int SessionTreeControl::addVideoID = wxNewId();
 int SessionTreeControl::addAudioID = wxNewId();
@@ -47,7 +48,9 @@ END_EVENT_TABLE()
 
 SessionTreeControl::SessionTreeControl() :
     wxTreeCtrl( NULL, wxID_ANY )
-{ }
+{
+    timer = new RotateTimer( this );
+}
 
 SessionTreeControl::SessionTreeControl( wxWindow* parent ) :
     wxTreeCtrl( parent, wxID_ANY, parent->GetPosition(), parent->GetSize() )
@@ -56,6 +59,13 @@ SessionTreeControl::SessionTreeControl( wxWindow* parent ) :
     videoNodeID = AppendItem( rootID, _("Video") );
     audioNodeID = AppendItem( rootID, _("Audio") );
     Expand( rootID );
+
+    timer = new RotateTimer( this );
+}
+
+SessionTreeControl::~SessionTreeControl()
+{
+    delete timer;
 }
 
 void SessionTreeControl::setSessionManager( SessionManager* s )
@@ -406,4 +416,14 @@ void SessionTreeControl::disableEncryptionEvent( wxCommandEvent& evt )
     std::string selectedAddress = std::string(
                                     GetItemText( GetSelection() ).char_str() );
     disableEncryption( selectedAddress );
+}
+
+void SessionTreeControl::startTimer( int ms )
+{
+    timer->Start( ms );
+}
+
+void SessionTreeControl::stopTimer()
+{
+    timer->Stop();
 }

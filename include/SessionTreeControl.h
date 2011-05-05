@@ -32,6 +32,7 @@
 #include <wx/treectrl.h>
 
 class SessionManager;
+class RotateTimer;
 
 class SessionTreeControl : public wxTreeCtrl
 {
@@ -39,6 +40,8 @@ class SessionTreeControl : public wxTreeCtrl
 public:
     SessionTreeControl();
     SessionTreeControl( wxWindow* parent );
+    ~SessionTreeControl();
+
     void setSessionManager( SessionManager* s );
 
     void addSession( std::string address, bool audio, bool rotate );
@@ -63,6 +66,9 @@ public:
     void setEncryptionEvent( wxCommandEvent& evt );
     void disableEncryptionEvent( wxCommandEvent& evt );
 
+    void startTimer( int ms );
+    void stopTimer();
+
     static int addVideoID;
     static int addAudioID;
     static int toggleEnableID;
@@ -80,6 +86,8 @@ private:
     wxTreeItemId rotatedVideoNodeID;
 
     SessionManager* sessionManager;
+
+    RotateTimer* timer;
 
     DECLARE_EVENT_TABLE()
 

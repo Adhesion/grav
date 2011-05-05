@@ -240,9 +240,8 @@ bool gravApp::OnInit()
         venueClientController->addAllVenueStreams();
     }
 
-    rotateTimer = new RotateTimer( sessionTree );
     if ( autoVideoSessionRotate )
-        rotateTimer->Start( rotateIntervalMS );
+        sessionTree->startTimer( rotateIntervalMS );
 
     gravUtil::logVerbose( "grav::init function complete\n" );
     return true;
@@ -264,7 +263,6 @@ int gravApp::OnExit()
     // and those set the grav manager's tree to null and stop the timer
     // respectively
     delete timer;
-    delete rotateTimer;
 
     delete sessionManager;
     delete videoSessionListener;
