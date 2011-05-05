@@ -169,6 +169,11 @@ wxTreeItemId SessionTreeControl::findSession( wxTreeItemId root,
     return none; // return default value if not found
 }
 
+void SessionTreeControl::shiftSession( std::string address, bool audio )
+{
+
+}
+
 void SessionTreeControl::rotateVideoSessions()
 {
     sessionManager->rotate( false );

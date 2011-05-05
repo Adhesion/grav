@@ -47,6 +47,10 @@ public:
     void addSession( std::string address, bool audio, bool rotate );
     void removeSession( std::string address );
     wxTreeItemId findSession( wxTreeItemId root, std::string address );
+    /*
+     * Moves a session from regular to rotated or vice-versa.
+     */
+    void shiftSession( std::string address, bool audio );
 
     void rotateVideoSessions();
     void rotateToVideoSession( std::string addr );
