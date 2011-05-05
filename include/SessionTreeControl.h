@@ -52,6 +52,8 @@ public:
     void rotateToVideoSession( std::string addr );
     void unrotateVideoSessions();
 
+    void toggleAutomaticRotate();
+
     bool setEncryptionKey( std::string addr, std::string key );
     bool disableEncryption( std::string addr );
 
@@ -63,6 +65,7 @@ public:
     void rotateEvent( wxCommandEvent& evt );
     void rotateToEvent( wxCommandEvent& evt );
     void unrotateEvent( wxCommandEvent& evt );
+    void toggleAutomaticRotateEvent( wxCommandEvent& evt );
     void setEncryptionEvent( wxCommandEvent& evt );
     void disableEncryptionEvent( wxCommandEvent& evt );
 
@@ -76,6 +79,7 @@ public:
     static int rotateID;
     static int rotateToID;
     static int unrotateID;
+    static int toggleAutomaticRotateID;
     static int setEncryptionID;
     static int disableEncryptionID;
 

@@ -39,6 +39,7 @@ int SessionTreeControl::removeID = wxNewId();
 int SessionTreeControl::rotateID = wxNewId();
 int SessionTreeControl::rotateToID = wxNewId();
 int SessionTreeControl::unrotateID = wxNewId();
+int SessionTreeControl::toggleAutomaticRotateID = wxNewId();
 int SessionTreeControl::setEncryptionID = wxNewId();
 int SessionTreeControl::disableEncryptionID = wxNewId();
 
@@ -223,6 +224,18 @@ void SessionTreeControl::unrotateVideoSessions()
     sessionManager->unrotate( false );
 }
 
+void SessionTreeControl::toggleAutomaticRotate()
+{
+    if ( timer->IsRunning() )
+    {
+        timer->Stop();
+    }
+    else
+    {
+        timer->Start( -1 );
+    }
+}
+
 bool SessionTreeControl::setEncryptionKey( std::string addr, std::string key )
 {
     return sessionManager->setEncryptionKey( addr, key );
@@ -313,6 +326,13 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
         Connect( rotateID, wxEVT_COMMAND_MENU_SELECTED,
             wxCommandEventHandler( SessionTreeControl::rotateEvent ) );
 
+        wxMenuItem* automaticItem = rightClickMenu.AppendCheckItem(
+            toggleAutomaticRotateID, _("Automatically rotate sessions") );
+        Connect( toggleAutomaticRotateID, wxEVT_COMMAND_MENU_SELECTED,
+            wxCommandEventHandler(
+                SessionTreeControl::toggleAutomaticRotateEvent ) );
+        automaticItem->Check( timer->IsRunning() );
+
         wxMenuItem* unrotateItem = rightClickMenu.Append( unrotateID,
             _("Disconnect from rotated video session") );
         Connect( unrotateID, wxEVT_COMMAND_MENU_SELECTED,
@@ -394,6 +414,11 @@ void SessionTreeControl::rotateToEvent( wxCommandEvent& evt )
 void SessionTreeControl::unrotateEvent( wxCommandEvent& evt )
 {
     unrotateVideoSessions();
+}
+
+void SessionTreeControl::toggleAutomaticRotateEvent( wxCommandEvent& evt )
+{
+    toggleAutomaticRotate();
 }
 
 void SessionTreeControl::setEncryptionEvent( wxCommandEvent& evt )
