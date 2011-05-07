@@ -38,6 +38,7 @@ int SessionTreeControl::toggleEnableID = wxNewId();
 int SessionTreeControl::removeID = wxNewId();
 int SessionTreeControl::rotateID = wxNewId();
 int SessionTreeControl::rotateToID = wxNewId();
+int SessionTreeControl::shiftID = wxNewId();
 int SessionTreeControl::unrotateID = wxNewId();
 int SessionTreeControl::toggleAutomaticRotateID = wxNewId();
 int SessionTreeControl::setEncryptionID = wxNewId();
@@ -171,7 +172,27 @@ wxTreeItemId SessionTreeControl::findSession( wxTreeItemId root,
 
 void SessionTreeControl::shiftSession( std::string address, bool audio )
 {
+    wxTreeItemId item = findSession( rootID, address );
+    if ( item.IsOk() )
+    {
+        wxTreeItemId parent = GetItemParent( item );
+        bool rotate = false;
+        if ( parent == videoNodeID )
+        {
+            rotate = true;
+        }
+        // disconnect from rotateds and stop rotating (if auto), since moving
+        // sessions around implies we want to make sure too many sessions aren't
+        // running at once
+        if ( timer->IsRunning() )
+        {
+            toggleAutomaticRotate();
+        }
+        unrotateVideoSessions();
 
+        removeSession( address );
+        addSession( address, audio, rotate );
+    }
 }
 
 void SessionTreeControl::rotateVideoSessions()
@@ -278,6 +299,15 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
                         wxCommandEventHandler(
                                 SessionTreeControl::toggleEnableSessionEvent) );
 
+            // only add shift option for video for now
+            if ( parent == videoNodeID )
+            {
+                rightClickMenu.Append( shiftID,
+                    _("Shift session to rotate list") );
+                Connect( shiftID, wxEVT_COMMAND_MENU_SELECTED,
+                    wxCommandEventHandler( SessionTreeControl::shiftEvent ) );
+            }
+
             rightClickMenu.Append( setEncryptionID,
                                     _("Set encryption key...") );
             Connect( setEncryptionID, wxEVT_COMMAND_MENU_SELECTED,
@@ -306,6 +336,10 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
                             wxCommandEventHandler(
                                   SessionTreeControl::rotateToEvent ) );
             }
+
+            rightClickMenu.Append( shiftID, _("Shift session to main list") );
+            Connect( shiftID, wxEVT_COMMAND_MENU_SELECTED,
+                    wxCommandEventHandler( SessionTreeControl::shiftEvent ) );
         }
 
         rightClickMenu.Append( removeID, _("Remove") );
@@ -414,6 +448,13 @@ void SessionTreeControl::rotateToEvent( wxCommandEvent& evt )
     std::string selectedAddress = std::string(
                                      GetItemText( GetSelection() ).char_str() );
     rotateToVideoSession( selectedAddress );
+}
+
+void SessionTreeControl::shiftEvent( wxCommandEvent& evt )
+{
+    std::string selectedAddress = std::string(
+                                     GetItemText( GetSelection() ).char_str() );
+    shiftSession( selectedAddress, false );
 }
 
 void SessionTreeControl::unrotateEvent( wxCommandEvent& evt )

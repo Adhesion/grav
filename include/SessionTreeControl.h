@@ -68,6 +68,7 @@ public:
     void removeSessionEvent( wxCommandEvent& evt );
     void rotateEvent( wxCommandEvent& evt );
     void rotateToEvent( wxCommandEvent& evt );
+    void shiftEvent( wxCommandEvent& evt );
     void unrotateEvent( wxCommandEvent& evt );
     void toggleAutomaticRotateEvent( wxCommandEvent& evt );
     void setEncryptionEvent( wxCommandEvent& evt );
@@ -82,6 +83,7 @@ public:
     static int removeID;
     static int rotateID;
     static int rotateToID;
+    static int shiftID;
     static int unrotateID;
     static int toggleAutomaticRotateID;
     static int setEncryptionID;
