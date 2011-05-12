@@ -59,6 +59,7 @@ GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
 
 GLCanvas::~GLCanvas()
 {
+    delete glContext;
     stopTimer();
 }
 
