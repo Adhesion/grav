@@ -180,8 +180,8 @@ bool gravApp::OnInit()
     //wxStopWatch* t2 = new wxStopWatch();
     //videoSession_listener->setTimer( t2 );
 
-    Earth* earth = new Earth();
-    InputHandler* input = new InputHandler( earth, grav, mainFrame );
+    earth = new Earth();
+    input = new InputHandler( earth, grav, mainFrame );
 
     // frame needs reference to inputhandler to generate help window for
     // shortcut hotkeys
@@ -267,6 +267,9 @@ int gravApp::OnExit()
     delete sessionManager;
     delete videoSessionListener;
     delete audioSessionListener;
+
+    delete earth;
+    delete input;
 
     if ( venueClientController != NULL )
         delete venueClientController;

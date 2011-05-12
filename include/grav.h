@@ -46,6 +46,8 @@ class VideoListener;
 class AudioManager;
 class SessionManager;
 class VenueClientController;
+class Earth;
+class InputHandler;
 
 class gravApp : public wxApp
 {
@@ -98,6 +100,9 @@ private:
     RenderTimer* timer;
     TreeControl* sourceTree;
     SessionTreeControl* sessionTree;
+
+    Earth* earth;
+    InputHandler* input;
 
     int timerInterval;
     int timerIntervalUS;
