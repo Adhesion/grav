@@ -110,7 +110,6 @@ private:
 
     bool autoVideoSessionRotate;
     int rotateIntervalMS;
-    RotateTimer* rotateTimer;
 
     gravManager* grav;
     VenueClientController* venueClientController;
