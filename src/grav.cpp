@@ -277,6 +277,8 @@ int gravApp::OnExit()
 
     GLUtil::getInstance()->cleanupGL();
 
+    VPMPayloadDecoderFactory::shutdown();
+
     return 0;
 }
 
