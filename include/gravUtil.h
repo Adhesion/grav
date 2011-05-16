@@ -42,6 +42,8 @@ class gravUtil
 
 public:
     static gravUtil* getInstance();
+    static void cleanup();
+
     /*
      * Given a filename, search for it in the path list and return the full
      * path. If not found, returns empty string.

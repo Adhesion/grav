@@ -40,6 +40,15 @@ gravUtil* gravUtil::getInstance()
     return instance;
 }
 
+void gravUtil::cleanup()
+{
+    if ( instance )
+    {
+        delete instance;
+        instance = NULL;
+    }
+}
+
 gravUtil::gravUtil()
 {
     sep = wxFileName::GetPathSeparator();
