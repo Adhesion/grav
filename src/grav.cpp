@@ -275,7 +275,7 @@ int gravApp::OnExit()
         delete venueClientController;
     delete grav;
 
-    GLUtil::getInstance()->cleanupGL();
+    GLUtil::cleanupGL();
 
     VPMPayloadDecoderFactory::shutdown();
 

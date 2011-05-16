@@ -125,7 +125,11 @@ bool GLUtil::initGL()
 
 void GLUtil::cleanupGL()
 {
-    delete this;
+    if ( instance )
+    {
+        delete instance;
+        instance = NULL;
+    }
 }
 
 void GLUtil::updateMatrices()

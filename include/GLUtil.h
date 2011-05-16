@@ -51,7 +51,7 @@ public:
      * Call glew init function, check for shaders, and load them if we can.
      */
     bool initGL();
-    void cleanupGL();
+    static void cleanupGL();
 
     // get the matrices that define the camera transforms so we can use those
     // to convert our coordinates
