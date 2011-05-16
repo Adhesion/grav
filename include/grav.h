@@ -126,17 +126,10 @@ private:
     bool disablePython;
 
     std::vector<std::string> initialVideoAddresses;
-    //std::vector<VPMSession*> videoSessions;
-    //uint32_t videoSession_ts;
     VideoListener* videoSessionListener;
-    //bool videoInitialized;
 
     std::vector<std::string> initialAudioAddresses;
-    //bool audioEnabled;
-    //std::vector<VPMSession*> audioSessions;
-    //uint32_t audioSession_ts;
     AudioManager* audioSessionListener;
-    //bool audioInitialized;
 
     SessionManager* sessionManager;
 
