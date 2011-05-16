@@ -42,6 +42,15 @@ PythonTools* PythonTools::getInstance()
     return instance;
 }
 
+void PythonTools::cleanup()
+{
+    if ( instance )
+    {
+        delete instance;
+        instance = NULL;
+    }
+}
+
 PythonTools::PythonTools()
 {
     init = false;

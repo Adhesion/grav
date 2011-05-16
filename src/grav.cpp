@@ -275,10 +275,11 @@ int gravApp::OnExit()
         delete venueClientController;
     delete grav;
 
-    GLUtil::cleanupGL();
-    gravUtil::cleanup();
-
     VPMPayloadDecoderFactory::shutdown();
+
+    GLUtil::cleanupGL();
+    PythonTools::cleanup();
+    gravUtil::cleanup();
 
     return 0;
 }

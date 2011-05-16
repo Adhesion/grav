@@ -38,6 +38,7 @@ class PythonTools
 
 public:
     static PythonTools* getInstance();
+    static void cleanup();
 
     // as of now, this disable is only meaningful before the python interpreter
     // etc is initialized (ie, before getInstance is ever called)
