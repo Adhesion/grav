@@ -122,8 +122,8 @@ Compiling on Linux
    2. Or run Cmake in a Build Directory like so. Note build variables can
       be set on the command line in cmake::
 
-        % OPTS='-DCMAKE_BUILD_TYPE:STRING="DEBUG" -DCMAKE_VERBOSE_MAKEFILE=True'
-        % cmake $OPTS /path/to/gravroot
+        % cmake -DCMAKE_BUILD_TYPE:STRING=DEBUG \
+                -DCMAKE_VERBOSE_MAKEFILE=True /path/to/gravroot
         % make
 
 7. To run `grav`, run from the top level dir so it can find
