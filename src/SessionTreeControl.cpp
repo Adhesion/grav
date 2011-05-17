@@ -86,8 +86,7 @@ void SessionTreeControl::addSession( std::string address, bool audio,
         // make rotated video group if not there
         if ( !rotatedVideoNodeID.IsOk() )
         {
-            rotatedVideoNodeID = AppendItem( videoNodeID, _("Rotated Video") );
-            Expand( videoNodeID );
+            rotatedVideoNodeID = AppendItem( rootID, _("Available Video") );
         }
         node = rotatedVideoNodeID;
         // note rotate is only for video for now
@@ -199,9 +198,9 @@ void SessionTreeControl::rotateVideoSessions()
 {
     sessionManager->rotate( false );
 
-    wxTreeItemId current = findSession( videoNodeID,
+    wxTreeItemId current = findSession( rotatedVideoNodeID,
             sessionManager->getCurrentRotateSession() );
-    wxTreeItemId last = findSession( videoNodeID,
+    wxTreeItemId last = findSession( rotatedVideoNodeID,
             sessionManager->getLastRotateSession() );
 
     if ( last.IsOk() )
@@ -220,9 +219,9 @@ void SessionTreeControl::rotateToVideoSession( std::string addr )
 {
     sessionManager->rotateTo( addr, false );
 
-    wxTreeItemId current = findSession( videoNodeID,
+    wxTreeItemId current = findSession( rotatedVideoNodeID,
             sessionManager->getCurrentRotateSession() );
-    wxTreeItemId last = findSession( videoNodeID,
+    wxTreeItemId last = findSession( rotatedVideoNodeID,
             sessionManager->getLastRotateSession() );
 
     if ( last.IsOk() )
@@ -239,7 +238,7 @@ void SessionTreeControl::rotateToVideoSession( std::string addr )
 
 void SessionTreeControl::unrotateVideoSessions()
 {
-    wxTreeItemId current = findSession( videoNodeID,
+    wxTreeItemId current = findSession( rotatedVideoNodeID,
             sessionManager->getCurrentRotateSession() );
     if ( current.IsOk() )
     {
@@ -285,8 +284,7 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
     // group
     if ( parent.IsOk() &&
             ( parent == videoNodeID || parent == audioNodeID ||
-              parent == rotatedVideoNodeID ) &&
-            item != rotatedVideoNodeID )
+              parent == rotatedVideoNodeID ) )
     {
         // only add enable/disable if it's a real session, not a rotated one
         // also add encryption set
