@@ -48,7 +48,7 @@ public:
     void removeSession( std::string address );
     wxTreeItemId findSession( wxTreeItemId root, std::string address );
     /*
-     * Moves a session from regular to rotated or vice-versa.
+     * Moves a session from regular to available or vice-versa.
      */
     void shiftSession( std::string address, bool audio );
 
@@ -93,7 +93,7 @@ private:
     wxTreeItemId rootID;
     wxTreeItemId videoNodeID;
     wxTreeItemId audioNodeID;
-    wxTreeItemId rotatedVideoNodeID;
+    wxTreeItemId availableVideoNodeID;
 
     SessionManager* sessionManager;
 

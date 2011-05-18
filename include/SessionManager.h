@@ -64,11 +64,13 @@ public:
     bool removeSession( std::string addr );
 
     /*
+     * Methods for modifying the secondary list for available video sessions.
+     * Available video can be rotated through one at a time.
      * Note audio is ignored for this for the time being - only rotating video
      * sessions for now.
      */
-    void addRotatedSession( std::string addr, bool audio );
-    void removeRotatedSession( std::string addr, bool audio );
+    void addAvailableSession( std::string addr, bool audio );
+    void removeAvailableSession( std::string addr, bool audio );
     void rotate( bool audio );
     void rotateTo( std::string addr, bool audio );
     void unrotate( bool audio );
@@ -101,7 +103,7 @@ private:
     int videoSessionCount;
     int audioSessionCount;
 
-    std::vector<std::string> videoRotateList;
+    std::vector<std::string> availableVideoList;
     int rotatePos;
     std::string lastRotateSession;
 

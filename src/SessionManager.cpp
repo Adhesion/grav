@@ -137,24 +137,24 @@ bool SessionManager::removeSession( std::string addr )
     return true;
 }
 
-void SessionManager::addRotatedSession( std::string addr, bool audio )
+void SessionManager::addAvailableSession( std::string addr, bool audio )
 {
     lockSessions();
-    videoRotateList.push_back( addr );
+    availableVideoList.push_back( addr );
     unlockSessions();
 }
 
-void SessionManager::removeRotatedSession( std::string addr, bool audio )
+void SessionManager::removeAvailableSession( std::string addr, bool audio )
 {
     lockSessions();
     int i = 0;
-    std::vector<std::string>::iterator vrlit = videoRotateList.begin();
-    while ( vrlit != videoRotateList.end() && (*vrlit).compare( addr ) != 0 )
+    std::vector<std::string>::iterator vrlit = availableVideoList.begin();
+    while ( vrlit != availableVideoList.end() && (*vrlit).compare( addr ) != 0 )
     {
         ++vrlit;
         i++;
     }
-    if ( vrlit == videoRotateList.end() )
+    if ( vrlit == availableVideoList.end() )
     {
         // if addr not found, exit
         unlockSessions();
@@ -162,7 +162,7 @@ void SessionManager::removeRotatedSession( std::string addr, bool audio )
     }
     else
     {
-        videoRotateList.erase( vrlit );
+        availableVideoList.erase( vrlit );
         // shift rotate position back if what we're removing if before or at it,
         // so we don't skip any
         if ( i <= rotatePos )
@@ -188,10 +188,10 @@ void SessionManager::rotate( bool audio )
 {
     lockSessions();
 
-    int numSessions = (int)videoRotateList.size();
+    int numSessions = (int)availableVideoList.size();
     int lastRotatePos = rotatePos;
     if ( lastRotatePos != -1 )
-        lastRotateSession = videoRotateList[ rotatePos ];
+        lastRotateSession = availableVideoList[ rotatePos ];
     if ( numSessions == 0 )
     {
         unlockSessions();
@@ -206,15 +206,15 @@ void SessionManager::rotate( bool audio )
     // only remove & rotate if there is a valid old one & it isn't the same as
     // current
     if ( lastRotateSession.compare( "" ) != 0 &&
-            lastRotateSession.compare( videoRotateList[ rotatePos ] ) != 0 )
+            lastRotateSession.compare( availableVideoList[ rotatePos ] ) != 0 )
     {
         removeSession( lastRotateSession );
-        initSession( videoRotateList[ rotatePos ], false );
+        initSession( availableVideoList[ rotatePos ], false );
     }
     // case for first rotate
     else if ( lastRotatePos == -1 )
     {
-        initSession( videoRotateList[ rotatePos ], false );
+        initSession( availableVideoList[ rotatePos ], false );
     }
 }
 
@@ -222,10 +222,10 @@ void SessionManager::rotateTo( std::string addr, bool audio )
 {
     lockSessions();
 
-    int numSessions = (int)videoRotateList.size();
+    int numSessions = (int)availableVideoList.size();
     int lastRotatePos = rotatePos;
     if ( lastRotatePos != -1 )
-        lastRotateSession = videoRotateList[ rotatePos ];
+        lastRotateSession = availableVideoList[ rotatePos ];
     if ( numSessions == 0 )
     {
         unlockSessions();
@@ -233,14 +233,14 @@ void SessionManager::rotateTo( std::string addr, bool audio )
     }
 
     int i = 0;
-    std::vector<std::string>::iterator it = videoRotateList.begin();
-    while ( it != videoRotateList.end() && it->compare( addr ) != 0 )
+    std::vector<std::string>::iterator it = availableVideoList.begin();
+    while ( it != availableVideoList.end() && it->compare( addr ) != 0 )
     {
         ++it;
         i++;
     }
 
-    if ( it == videoRotateList.end() )
+    if ( it == availableVideoList.end() )
     {
         gravUtil::logWarning( "SessionManager::rotateTo: session %s"
                 " not found\n", addr.c_str() );
@@ -257,15 +257,15 @@ void SessionManager::rotateTo( std::string addr, bool audio )
     // only remove & rotate if there is a valid old one & it isn't the same as
     // current
     if ( lastRotateSession.compare( "" ) != 0 &&
-            lastRotateSession.compare( videoRotateList[ rotatePos ] ) != 0 )
+            lastRotateSession.compare( availableVideoList[ rotatePos ] ) != 0 )
     {
         removeSession( lastRotateSession );
-        initSession( videoRotateList[ rotatePos ], false );
+        initSession( availableVideoList[ rotatePos ], false );
     }
     // case for first rotate
     else if ( lastRotatePos == -1 )
     {
-        initSession( videoRotateList[ rotatePos ], false );
+        initSession( availableVideoList[ rotatePos ], false );
     }
 }
 
@@ -287,8 +287,8 @@ void SessionManager::unrotate( bool audio )
 
 std::string SessionManager::getCurrentRotateSession()
 {
-    if ( rotatePos != -1 && rotatePos < (int)videoRotateList.size() )
-        return videoRotateList[ rotatePos ];
+    if ( rotatePos != -1 && rotatePos < (int)availableVideoList.size() )
+        return availableVideoList[ rotatePos ];
     else
         return "";
 }

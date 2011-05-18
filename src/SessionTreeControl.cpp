@@ -68,6 +68,7 @@ SessionTreeControl::SessionTreeControl( wxWindow* parent ) :
 SessionTreeControl::~SessionTreeControl()
 {
     delete timer;
+    // note that we don't own the sessionmanager pointer
 }
 
 void SessionTreeControl::setSessionManager( SessionManager* s )
@@ -83,14 +84,14 @@ void SessionTreeControl::addSession( std::string address, bool audio,
     wxTreeItemId current;
     if ( rotate )
     {
-        // make rotated video group if not there
-        if ( !rotatedVideoNodeID.IsOk() )
+        // make available video group if not there
+        if ( !availableVideoNodeID.IsOk() )
         {
-            rotatedVideoNodeID = AppendItem( rootID, _("Available Video") );
+            availableVideoNodeID = AppendItem( rootID, _("Available Video") );
         }
-        node = rotatedVideoNodeID;
+        node = availableVideoNodeID;
         // note rotate is only for video for now
-        sessionManager->addRotatedSession( address, false );
+        sessionManager->addAvailableSession( address, false );
         added = true;
     }
     else
@@ -124,7 +125,7 @@ void SessionTreeControl::removeSession( std::string address )
         return;
     }
 
-    // figure out whether it's a rotated session or not here
+    // figure out whether it's a available session or not here
     if ( GetItemParent( item ) == videoNodeID ||
          GetItemParent( item ) == audioNodeID )
     {
@@ -135,9 +136,9 @@ void SessionTreeControl::removeSession( std::string address )
             // TODO throw error dialog, maybe make consistent with part below
         }
     }
-    else if ( GetItemParent( item ) == rotatedVideoNodeID )
+    else if ( GetItemParent( item ) == availableVideoNodeID )
     {
-        sessionManager->removeRotatedSession( address, false );
+        sessionManager->removeAvailableSession( address, false );
         Delete( item );
     }
 }
@@ -180,7 +181,7 @@ void SessionTreeControl::shiftSession( std::string address, bool audio )
         {
             rotate = true;
         }
-        // disconnect from rotateds and stop rotating (if auto), since moving
+        // disconnect from availables and stop rotating (if auto), since moving
         // sessions around implies we want to make sure too many sessions aren't
         // running at once
         if ( timer->IsRunning() )
@@ -198,9 +199,9 @@ void SessionTreeControl::rotateVideoSessions()
 {
     sessionManager->rotate( false );
 
-    wxTreeItemId current = findSession( rotatedVideoNodeID,
+    wxTreeItemId current = findSession( availableVideoNodeID,
             sessionManager->getCurrentRotateSession() );
-    wxTreeItemId last = findSession( rotatedVideoNodeID,
+    wxTreeItemId last = findSession( availableVideoNodeID,
             sessionManager->getLastRotateSession() );
 
     if ( last.IsOk() )
@@ -219,9 +220,9 @@ void SessionTreeControl::rotateToVideoSession( std::string addr )
 {
     sessionManager->rotateTo( addr, false );
 
-    wxTreeItemId current = findSession( rotatedVideoNodeID,
+    wxTreeItemId current = findSession( availableVideoNodeID,
             sessionManager->getCurrentRotateSession() );
-    wxTreeItemId last = findSession( rotatedVideoNodeID,
+    wxTreeItemId last = findSession( availableVideoNodeID,
             sessionManager->getLastRotateSession() );
 
     if ( last.IsOk() )
@@ -238,7 +239,7 @@ void SessionTreeControl::rotateToVideoSession( std::string addr )
 
 void SessionTreeControl::unrotateVideoSessions()
 {
-    wxTreeItemId current = findSession( rotatedVideoNodeID,
+    wxTreeItemId current = findSession( availableVideoNodeID,
             sessionManager->getCurrentRotateSession() );
     if ( current.IsOk() )
     {
@@ -284,9 +285,9 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
     // group
     if ( parent.IsOk() &&
             ( parent == videoNodeID || parent == audioNodeID ||
-              parent == rotatedVideoNodeID ) )
+              parent == availableVideoNodeID ) )
     {
-        // only add enable/disable if it's a real session, not a rotated one
+        // only add enable/disable if it's a real session, not a available one
         // also add encryption set
         if ( parent == videoNodeID || parent == audioNodeID )
         {
@@ -322,8 +323,8 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
                                 SessionTreeControl::disableEncryptionEvent ) );
             }
         }
-        // for rotated video
-        else if ( parent == rotatedVideoNodeID )
+        // for available video
+        else if ( parent == availableVideoNodeID )
         {
             // for now, have "rotate to this" for all but selected
             if ( text.compare(sessionManager->getCurrentRotateSession()) != 0 )
@@ -356,8 +357,8 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
             wxCommandEventHandler( SessionTreeControl::addVideoSessionEvent ) );
     }
 
-    // right click on rotated video group
-    if ( item == rotatedVideoNodeID )
+    // right click on available video group
+    if ( item == availableVideoNodeID )
     {
         rightClickMenu.Append( rotateID, _("Rotate video sessions") );
         Connect( rotateID, wxEVT_COMMAND_MENU_SELECTED,
@@ -371,7 +372,7 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
         automaticItem->Check( timer->IsRunning() );
 
         wxMenuItem* unrotateItem = rightClickMenu.Append( unrotateID,
-            _("Disconnect from rotated video session") );
+            _("Disconnect from available video session") );
         Connect( unrotateID, wxEVT_COMMAND_MENU_SELECTED,
             wxCommandEventHandler( SessionTreeControl::unrotateEvent ) );
         unrotateItem->Enable(
