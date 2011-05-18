@@ -163,6 +163,10 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     },
 
     {
+        wxCMD_LINE_SWITCH, _("vr"), _("version"), _("print version string")
+    },
+
+    {
         wxCMD_LINE_SWITCH, _("v"), _("verbose"),
             _("verbose command line output for grav")
     },
@@ -171,10 +175,6 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
         wxCMD_LINE_SWITCH, _("vpv"), _("vpmedia-verbose"),
             _("verbose command line output for VPMedia "
               "(network/RTP/decoding backend)")
-    },
-
-    {
-        wxCMD_LINE_SWITCH, _("vr"), _("version"), _("print version string")
     },
 
     {
@@ -194,12 +194,6 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     },
 
     {
-        wxCMD_LINE_SWITCH, _("am"), _("automatic"),
-            _("automatically focus on single objects, rotating through the list"
-              " at regular intervals")
-    },
-
-    {
         wxCMD_LINE_SWITCH, _("es"), _("enable-shaders"),
             _("enable GLSL shader-based colorspace conversion if it would be "
               "available (experimental, may not look as good, adds CPU usage "
@@ -211,11 +205,6 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
             _("enable buffer font rendering method - may save memory and be "
               "better for slower machines, but doesn't scale as well CPU-wise "
               "for many objects")
-    },
-
-    {
-        wxCMD_LINE_OPTION, _("a"), _("audio"), _("RTP audio session address"),
-            wxCMD_LINE_VAL_STRING
     },
 
     {
@@ -231,6 +220,12 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     {
         wxCMD_LINE_SWITCH, _("fs"), _("fullscreen"),
             _("start in fullscreen mode")
+    },
+
+    {
+        wxCMD_LINE_SWITCH, _("am"), _("automatic"),
+            _("automatically focus on single objects, rotating through the list"
+              " at regular intervals")
     },
 
     {
@@ -253,6 +248,12 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     {
         wxCMD_LINE_SWITCH, _("agvs"), _("get-ag-venue-streams"),
             _("grab video sessions from Access Grid venue client, if running")
+    },
+
+    {
+        wxCMD_LINE_OPTION, _("a"), _("audio"), _("RTP audio session address"
+            " (only used for highlighting/centering corresponding video)"),
+            wxCMD_LINE_VAL_STRING
     },
 
     {
