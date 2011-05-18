@@ -217,7 +217,7 @@ bool gravApp::OnInit()
         gravUtil::logVerbose ( "grav::initializing video address %s\n",
                     initialVideoAddresses[i].c_str() );
         sessionTree->addSession( initialVideoAddresses[i], false,
-                                    videoSessionRotate );
+                    addToAvailableVideoList );
 
         if ( haveVideoKey )
             sessionTree->setEncryptionKey( initialVideoAddresses[i],
@@ -240,7 +240,7 @@ bool gravApp::OnInit()
         venueClientController->addAllVenueStreams();
     }
 
-    if ( autoVideoSessionRotate )
+    if ( autoRotateAvailableVideo )
         sessionTree->startTimer( rotateIntervalMS );
 
     gravUtil::logVerbose( "grav::init function complete\n" );
@@ -378,7 +378,7 @@ bool gravApp::handleArgs()
 
     startFullscreen = parser.Found( _("fullscreen") );
 
-    videoSessionRotate = parser.Found( _("video-session-rotate") );
+    addToAvailableVideoList = parser.Found( _("available-video-list") );
 
     getAGVenueStreams = parser.Found( _("get-ag-venue-streams") );
 
@@ -410,9 +410,9 @@ bool gravApp::handleArgs()
     }
 
     long int rotateIntervalS;
-    if ( parser.Found( _("avsr"), &rotateIntervalS ) )
+    if ( parser.Found( _("arav"), &rotateIntervalS ) )
     {
-        autoVideoSessionRotate = true;
+        autoRotateAvailableVideo = true;
         // this is pretty dumb that the second value is a long int and the
         // millisecond interval is a regular int, but that's what the timer
         // input is for Start(), oh well
@@ -420,7 +420,7 @@ bool gravApp::handleArgs()
     }
     else
     {
-        autoVideoSessionRotate = false;
+        autoRotateAvailableVideo = false;
         rotateIntervalMS = -1;
     }
 

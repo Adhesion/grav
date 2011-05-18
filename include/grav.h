@@ -108,7 +108,8 @@ private:
     int timerIntervalUS;
     long int fps;
 
-    bool autoVideoSessionRotate;
+    bool addToAvailableVideoList;
+    bool autoRotateAvailableVideo;
     int rotateIntervalMS;
 
     gravManager* grav;
@@ -145,8 +146,6 @@ private:
     bool bufferFont;
 
     bool startFullscreen;
-
-    bool videoSessionRotate;
 
     bool getAGVenueStreams;
 
