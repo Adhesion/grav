@@ -240,14 +240,14 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     },
 
     {
-        wxCMD_LINE_SWITCH, _("vsr"), _("video-session-rotate"),
-            _("add supplied video addresses to rotation list, rather than "
+        wxCMD_LINE_SWITCH, _("avl"), _("available-video-list"),
+            _("add supplied video addresses to available list, rather than "
               "immediately connect to them")
     },
 
     {
-        wxCMD_LINE_OPTION, _("avsr"), _("auto-video-session-rotate"),
-            _("rotate through video sessions every [num] seconds"),
+        wxCMD_LINE_OPTION, _("arav"), _("auto-rotate-available-video"),
+            _("rotate through available video sessions every [num] seconds"),
             wxCMD_LINE_VAL_NUMBER
     },
 
