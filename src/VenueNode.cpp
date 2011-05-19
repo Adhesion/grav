@@ -48,6 +48,11 @@ VenueNode::VenueNode()
     scaleY = destScaleY = 3.0f;
 }
 
+VenueNode::~VenueNode()
+{
+
+}
+
 void VenueNode::draw()
 {
     RectangleBase::draw();

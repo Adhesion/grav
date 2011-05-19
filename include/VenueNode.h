@@ -33,6 +33,7 @@ class VenueNode : public RectangleBase
 
 public:
     VenueNode();
+    ~VenueNode();
 
     void draw();
 

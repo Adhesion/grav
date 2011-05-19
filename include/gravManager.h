@@ -128,7 +128,7 @@ public:
     std::vector<RectangleBase*> getMovableObjects();
     /*
      * Note that this is actually a subset of the movable objects, meaning it's
-     * not EVERY unselected object, just ones that should be moved.
+     * not EVERY unselected object, just ones that could be moved.
      */
     std::vector<RectangleBase*> getUnselectedObjects();
 
@@ -203,6 +203,13 @@ public:
     bool isVenueClientControllerShowable();
 
 private:
+    /*
+     * Delete video sources set to be deleted. This should ONLY be called from
+     * the main thread (ie, in draw()) since that's the whole point of having
+     * this - we need to do VideoSource deletes on the main thread since it does
+     * a GL call to delete its texture.
+     */
+    void doDelayedDelete();
 
     std::vector<VideoSource*>* sources;
     std::vector<RectangleBase*>* drawnObjects;

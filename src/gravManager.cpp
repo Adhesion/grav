@@ -130,6 +130,8 @@ gravManager::gravManager()
 
 gravManager::~gravManager()
 {
+    doDelayedDelete();
+
     delete sources;
     delete drawnObjects;
     delete selectedObjects;
@@ -236,14 +238,7 @@ void gravManager::draw()
         objectsToRemoveFromTree->clear();
     }
     // delete sources that need to be deleted - see deleteSource for the reason
-    if ( objectsToDelete->size() > 0 )
-    {
-        for ( unsigned int i = 0; i < objectsToDelete->size(); i++ )
-        {
-            delete (*objectsToDelete)[i];
-        }
-        objectsToDelete->clear();
-    }
+    doDelayedDelete();
 
     // draw point on geographical position, selected ones on top (and bigger)
     for ( si = drawnObjects->begin(); si != drawnObjects->end(); si++ )
@@ -1005,7 +1000,7 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
 
     sources->erase( si );
 
-    // TODO need case for runway grouping
+    // TODO need case for runway grouping?
     if ( temp->isGrouped() )
     {
         Group* g = temp->getGroup();
@@ -1039,8 +1034,9 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
         }
     }
 
-    if ( gridAuto ) {
-        std::map<std::string, std::vector<RectangleBase*> > data = \
+    if ( gridAuto )
+    {
+        std::map<std::string, std::vector<RectangleBase*> > data =
             std::map<std::string, std::vector<RectangleBase*> >();
         data["objects"] = getMovableObjects();
         layouts->arrange("grid", getScreenRect(), getEarthRect(), data);
@@ -1384,4 +1380,16 @@ bool gravManager::isVenueClientControllerShowable()
 bool gravManager::audioAvailable()
 {
     return audioEnabled && audio->getSourceCount() > 0;
+}
+
+void gravManager::doDelayedDelete()
+{
+    if ( objectsToDelete->size() > 0 )
+    {
+        for ( unsigned int i = 0; i < objectsToDelete->size(); i++ )
+        {
+            delete (*objectsToDelete)[i];
+        }
+        objectsToDelete->clear();
+    }
 }
