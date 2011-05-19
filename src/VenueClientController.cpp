@@ -93,6 +93,11 @@ VenueClientController::VenueClientController( float _x, float _y,
     }
 }
 
+VenueClientController::~VenueClientController()
+{
+    removeAll();
+}
+
 void VenueClientController::draw()
 {
     animateValues();

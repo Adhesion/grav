@@ -42,6 +42,7 @@ class VenueClientController : public Group
 
 public:
     VenueClientController( float _x, float _y, gravManager* g );
+    ~VenueClientController();
 
     void draw();
 
@@ -83,6 +84,8 @@ private:
     std::map<std::string, std::string> currentVenueStreams;
     std::string venueClientUrl;
 
+    // note we don't own any of these pointers, but we do own the VenueNode
+    // children which is why we delete them in (inherited, overridden) remove()
     PythonTools* pyTools;
     std::string AGToolsScript;
 
