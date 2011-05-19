@@ -84,7 +84,7 @@ Earth::~Earth()
 {
     glDeleteTextures( 1, &earthTex );
     gluDeleteQuadric( sphereQuad );
-    delete matrix;
+    delete[] matrix;
     glDeleteLists( sphereIndex, 1 );
 }
 
