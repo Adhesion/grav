@@ -598,7 +598,7 @@ void InputHandler::handleToggleFullscreen()
 
 void InputHandler::handleQuit()
 {
-    mainFrame->Close();
+    mainFrame->Close( true );
 }
 
 void InputHandler::handleClearSelected()
