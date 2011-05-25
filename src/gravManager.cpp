@@ -181,6 +181,7 @@ void gravManager::draw()
         drawCounter = 0;
         if ( audioAvailable() )
             audio->updateNames();
+        doRandomAction();
     }
 
     // polygon offset to fix z-fighting of coplanar polygons (videos)
@@ -509,6 +510,55 @@ void gravManager::tryDeleteObject( RectangleBase* obj )
         // test object case
         removeFromLists( obj, false );
         delete obj;
+    }
+}
+
+void gravManager::doRandomAction()
+{
+    double val = random_range( 0.0, 1.0 );
+    if ( val <= 0.15 )
+    {
+        addTestObject();
+    }
+    else if ( val <= 0.3 )
+    {
+        if ( getMovableObjects().size() > 0 )
+        {
+            int num = getMovableObjects().size();
+            int choice = floor( random_range( 0.0, (double)num ) );
+            gravUtil::logMessage( "random: delete got %ith object\n", choice );
+            RectangleBase* obj = getMovableObjects()[ choice ];
+
+            tryDeleteObject( obj );
+        }
+    }
+    else if ( val <= 0.45 )
+    {
+        if ( getMovableObjects().size() )
+        {
+            int num = getMovableObjects().size();
+            int choice = floor( random_range( 0.0, (double)num ) );
+            gravUtil::logMessage( "random: scale got %ith object\n", choice );
+            RectangleBase* obj = getMovableObjects()[ choice ];
+
+            float newX = random_range( 0.75, 1.5 );
+            float newY = random_range( 0.75, 1.5 );
+            obj->setScale( newX * obj->getScaleX(), newY * obj->getScaleY() );
+        }
+    }
+    else
+    {
+        if ( getMovableObjects().size() )
+        {
+            int num = getMovableObjects().size();
+            int choice = floor( random_range( 0.0, (double)num ) );
+            gravUtil::logMessage( "random: move got %ith object\n", choice );
+            RectangleBase* obj = getMovableObjects()[ choice ];
+
+            float newX = (float)random_range( -10.0, 10.0 );
+            float newY = (float)random_range( -10.0, 10.0 );
+            obj->move( newX, newY );
+        }
     }
 }
 

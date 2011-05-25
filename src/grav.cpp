@@ -243,6 +243,8 @@ bool gravApp::OnInit()
     if ( autoRotateAvailableVideo )
         sessionTree->startTimer( rotateIntervalMS );
 
+    srand( time( NULL ) );
+
     gravUtil::logVerbose( "grav::init function complete\n" );
     return true;
 }

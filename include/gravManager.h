@@ -72,6 +72,8 @@ public:
      */
     void tryDeleteObject( RectangleBase* obj );
 
+    void doRandomAction();
+
     /*
      * For moving videos to the top of the drawnObjects (for both drawing and
      * selection)
