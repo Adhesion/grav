@@ -560,8 +560,10 @@ void gravManager::doRandomAction()
             gravUtil::logVerbose( "random: move got %ith object\n", choice );
             RectangleBase* obj = getMovableObjects()[ choice ];
 
-            float newX = (float)random_range( -10.0, 10.0 );
-            float newY = (float)random_range( -10.0, 10.0 );
+            float newX = (float)random_range( screenRectFull.getLBound(),
+                    screenRectFull.getRBound() );
+            float newY = (float)random_range( screenRectFull.getDBound(),
+                    screenRectFull.getUBound() );
             obj->move( newX, newY );
         }
     }
