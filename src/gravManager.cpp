@@ -529,7 +529,7 @@ void gravManager::doRandomAction()
     {
         addTestObject();
     }
-    else if ( val <= 0.27 )
+    else if ( val <= 0.25 )
     {
         if ( getMovableObjects().size() > 0 )
         {
