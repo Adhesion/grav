@@ -21,7 +21,7 @@ Compiling on Linux
 1. Make sure to get all the dependencies (see below). Here's an example for
    Ubuntu or Debian-style Linux distros::
 
-       % apt-get install git-core scons subversion cmake ffmpeg libpng12-dev \
+      apt-get install git-core scons subversion cmake ffmpeg libpng12-dev \
            libpng12-0 wx2.8-headers libwxgtk2.8-0 libwxgtk2.8-dev libftgl-dev \
            libftgl2 python-dev libglu1-mesa libglu1-mesa-dev  libglew1.5-dev \
            libglew1.5 libavcodec-dev libswscale-dev libavutil-dev \
@@ -33,7 +33,7 @@ Compiling on Linux
          1. Get ``ffmpeg 0.5`` from `ffmpeg's website <http://ffmpeg.org>`_,
             do::
 
-                % ./configure --enable-gpl --enable-postproc --enable-swscale \
+               ./configure --enable-gpl --enable-postproc --enable-swscale \
                     --enable-pthreads --enable-debug --enable-shared
 
             then compile & sudo make install (make install will probably install
@@ -48,7 +48,7 @@ Compiling on Linux
                error", probably looking for av_gcd or similar in your system
                copy of ffmpeg in ``/usr/lib``. To temporarily fix this, run::
 
-                    % export LD_LIBRARY_PATH=/usr/local/lib
+                   export LD_LIBRARY_PATH=/usr/local/lib
 
                or whichever directory you installed ffmpeg in. Put that command
                into your startup script if you want to not have to do that each
@@ -58,13 +58,13 @@ Compiling on Linux
 3. SVN checkout the UCL common library from here:
    https://mediatools.cs.ucl.ac.uk/repos/mmedia e.g.::
 
-         % MMEDIA_URL=https://mediatools.cs.ucl.ac.uk/repos/mmedia/common/trunk
-         % svn co $MMEDIA_URL ucl-common
+        MMEDIA_URL=https://mediatools.cs.ucl.ac.uk/repos/mmedia/common/trunk
+        svn co $MMEDIA_URL ucl-common
 
    1. In the common lib directory, do a standard::
 
-         % ./configure
-         % sudo make install
+        ./configure
+        sudo make install
 
    2. Or, if you don't want to install (will go to ``/usr/local/lib`` by
       default) just do make and copy the .a file to the eventual `grav` build
@@ -72,13 +72,13 @@ Compiling on Linux
 
 4. SVN checkout VPMedia from here:  https://svn.ci.uchicago.edu/svn/if-media/::
 
-         % svn co https://svn.ci.uchicago.edu/svn/if-media/VPMedia VPMedia
+        svn co https://svn.ci.uchicago.edu/svn/if-media/VPMedia VPMedia
 
    1. In the VPMedia directory, do::
 
-         % scons configure
-         % scons
-         % sudo scons install
+        scons configure
+        scons
+        sudo scons install
 
    2. If you don't want to install this, follow the same instructions for the
       common lib, except with scons to build.
@@ -88,9 +88,9 @@ Compiling on Linux
    1. If you want the `grav` source in order to **install and use** `grav`, get
       a snapshot tarball from https://github.com/adhesion/grav/tarball/master::
 
-        % TAR_URL=http://github.com/adhesion/grav/tarball/master
-        % wget --no-check-certificate $TAR_URL
-        % tar -xzvf Adhesion-grav-e9c22d9.tar.gz
+       TAR_URL=http://github.com/adhesion/grav/tarball/master
+       wget --no-check-certificate $TAR_URL
+       tar -xzvf Adhesion-grav-e9c22d9.tar.gz
 
    2. **OR**, if you want the `grav` source in order to **contribute to or
       develop** `grav`, fork and clone the upstream repository located at
@@ -122,9 +122,9 @@ Compiling on Linux
    2. Or run Cmake in a Build Directory like so. Note build variables can
       be set on the command line in cmake::
 
-        % cmake -DCMAKE_BUILD_TYPE:STRING=DEBUG \
+       cmake -DCMAKE_BUILD_TYPE:STRING=DEBUG \
                 -DCMAKE_VERBOSE_MAKEFILE=True /path/to/gravroot
-        % make
+       make
 
 7. To run `grav`, run from the top level dir so it can find
    the resources there (ie, if your build dir is ``Build/``, run
@@ -350,6 +350,6 @@ http://visibleearth.nasa.gov/view_detail.php?id=2430 for more info.
    http://grav.rc.rit.edu, but if another instance is being installed somewhere,
    the ``docutils`` package can be installed with the following command::
 
-       % easy_install docutils
+      easy_install docutils
 
    See http://trac.edgewall.org/wiki/WikiRestructuredText for more information.
