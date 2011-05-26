@@ -181,8 +181,9 @@ void gravManager::draw()
         drawCounter = 0;
         if ( audioAvailable() )
             audio->updateNames();
-        doRandomAction();
     }
+
+    doRandomAction();
 
     // polygon offset to fix z-fighting of coplanar polygons (videos)
     // disabled, since making the depth buffer read-only in some area takes
@@ -516,6 +517,10 @@ void gravManager::tryDeleteObject( RectangleBase* obj )
 void gravManager::doRandomAction()
 {
     double val = random_range( 0.0, 1.0 );
+    if ( val <= 0.9 )
+        return;
+
+    val = random_range( 0.0, 1.0 );
     if ( val <= 0.18 )
     {
         addTestObject();
