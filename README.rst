@@ -38,23 +38,8 @@ Compiling on Linux
               --enable-pthreads --enable-debug --enable-shared
 
       then compile & sudo make install (make install will probably install
-      to ``/usr/local/lib`` by default).
-
-.. warning::
-
-         Having another copy of ffmpeg installed on your machine (things
-         like VLC and mplayer might depend on it) will cause conflicts,
-         ie, when running `grav` or anything that wants to link to the new
-         ffmpeg 0.5 in ``/usr/local/lib``, you will get a "symbol lookup
-         error", probably looking for av_gcd or similar in your system
-         copy of ffmpeg in ``/usr/lib``. To temporarily fix this, run::
-
-             export LD_LIBRARY_PATH=/usr/local/lib
-
-         or whichever directory you installed ffmpeg in. Put that command
-         into your startup script if you want to not have to do that each
-         time, though that might break other things that dynamically link
-         to ffmpeg, if they rely on an older version.
+      to ``/usr/local/lib`` by default).  Note that if you also have a system
+      copy of ffmpeg installed, there may be conflicts.  See [2]_.
 
 3. SVN checkout the UCL common library from here:
    https://mediatools.cs.ucl.ac.uk/repos/mmedia e.g.::
@@ -354,3 +339,19 @@ http://visibleearth.nasa.gov/view_detail.php?id=2430 for more info.
       easy_install docutils
 
    See http://trac.edgewall.org/wiki/WikiRestructuredText for more information.
+
+.. [2] Multiple ffmpegs.
+
+   Having another copy of ffmpeg installed on your machine (things
+   like VLC and mplayer might depend on it) will cause conflicts,
+   ie, when running `grav` or anything that wants to link to the new
+   ffmpeg 0.5 in ``/usr/local/lib``, you will get a "symbol lookup
+   error", probably looking for av_gcd or similar in your system
+   copy of ffmpeg in ``/usr/lib``. To temporarily fix this, run::
+
+       export LD_LIBRARY_PATH=/usr/local/lib
+
+   or whichever directory you installed ffmpeg in. Put that command
+   into your startup script if you want to not have to do that each
+   time, though that might break other things that dynamically link
+   to ffmpeg, if they rely on an older version.
