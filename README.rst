@@ -30,30 +30,30 @@ Compiling on Linux
 2. **IF** you need to compile ffmpeg (OPTIONAL - you can get ffmpeg from a
    package but note you need the newer .52 libavcodec version)...
 
-         1. Get ``ffmpeg 0.5`` from `ffmpeg's website <http://ffmpeg.org>`_,
-            do::
+   1. Get ``ffmpeg 0.5`` from `ffmpeg's website <http://ffmpeg.org>`_,
+      do::
 
-               ./configure --enable-gpl --enable-postproc --enable-swscale \
-                    --enable-pthreads --enable-debug --enable-shared
+         ./configure --enable-gpl --enable-postproc --enable-swscale \
+              --enable-pthreads --enable-debug --enable-shared
 
-            then compile & sudo make install (make install will probably install
-            to ``/usr/local/lib`` by default).
+      then compile & sudo make install (make install will probably install
+      to ``/usr/local/lib`` by default).
 
-            .. warning::
+      .. warning::
 
-               Having another copy of ffmpeg installed on your machine (things
-               like VLC and mplayer might depend on it) will cause conflicts,
-               ie, when running `grav` or anything that wants to link to the new
-               ffmpeg 0.5 in ``/usr/local/lib``, you will get a "symbol lookup
-               error", probably looking for av_gcd or similar in your system
-               copy of ffmpeg in ``/usr/lib``. To temporarily fix this, run::
+         Having another copy of ffmpeg installed on your machine (things
+         like VLC and mplayer might depend on it) will cause conflicts,
+         ie, when running `grav` or anything that wants to link to the new
+         ffmpeg 0.5 in ``/usr/local/lib``, you will get a "symbol lookup
+         error", probably looking for av_gcd or similar in your system
+         copy of ffmpeg in ``/usr/lib``. To temporarily fix this, run::
 
-                   export LD_LIBRARY_PATH=/usr/local/lib
+             export LD_LIBRARY_PATH=/usr/local/lib
 
-               or whichever directory you installed ffmpeg in. Put that command
-               into your startup script if you want to not have to do that each
-               time, though that might break other things that dynamically link
-               to ffmpeg, if they rely on an older version.
+         or whichever directory you installed ffmpeg in. Put that command
+         into your startup script if you want to not have to do that each
+         time, though that might break other things that dynamically link
+         to ffmpeg, if they rely on an older version.
 
 3. SVN checkout the UCL common library from here:
    https://mediatools.cs.ucl.ac.uk/repos/mmedia e.g.::
