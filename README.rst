@@ -168,7 +168,9 @@ From `grav`:
 Usage
 =====
 
-Command Line Usage::
+Command Line Usage
+------------------
+::
 
   Usage: grav [-h] [-t] [-v] [-vpv] [-nt] [-am] [-es] [-bf]
               [-a <str>] [-ht <str>] [-fps <num>] [-fs] [-ga]
@@ -222,7 +224,9 @@ Command Line Usage::
     -sw, --start-width=<num>                  initial width for main window
     -sh, --start-height=<num>                 initial height for main window
 
-Keyboard Shortcuts::
+Keyboard Shortcuts
+------------------
+::
 
          (backspace)    Clear selection.
             (escape)    Quit.
@@ -258,9 +262,9 @@ General
 All video streams in the multicast group(s) you are connected to will
 automatically be displayed. To move objects, you can click on them and
 click on a destination, or click-and-drag. For selecting multiple objects,
-click-and-drag starting from empty space for a box selection, or ctrl-click
+click-and-drag starting from empty space for a box selection, or ``ctrl-click``
 on a video to add it to the selection. You can invert a selection with
-ctrl-i.
+``ctrl-i``.
 
 Groups
 ------
@@ -284,10 +288,10 @@ session will not process the incoming packets but you will still receive
 the data.
 
 Video sessions can also be rotated, ie, only connecting to one video session
-at a time out of a list. Adding -vsr on the command line will added given
+at a time out of a list. Adding ``-vsr`` on the command line will added given
 sessions to the rotate list. Sessions can be rotated manually by the
 right-click menu on the rotated video group in the side window, or
-automatically every X seconds with the -avsr (seconds) command line option.
+automatically every X seconds with the ``-avsr`` (seconds) command line option.
 
 Runway
 ------
@@ -298,9 +302,10 @@ The runway will be hidden when turning on automatic mode, or you can manually
 enable/disable it with alt-r.
 
 Notes
------
+=====
 
-`grav` (C) 2011 Rochester Institute of Technology
+`grav` (C) 2011 Rochester Institute of Technology.
+
 Authored by `Andrew Ford <http://github.com/adhesion>`_ with
 contributions from `Ralph Bean <http://github.com/ralphbean>`_.
 
@@ -308,8 +313,9 @@ contributions from `Ralph Bean <http://github.com/ralphbean>`_.
 
 This software uses libraries from the FFmpeg project under the GPLv3.
 
-Earth imagery by NASA from the Visible Earth project. See
-http://visibleearth.nasa.gov/view_detail.php?id=2430 for more info.
+Earth imagery by NASA from the
+`Visible Earth project
+<http://visibleearth.nasa.gov/view_detail.php?id=2430>`_.
 
 .. FOOTNOTES:
 
