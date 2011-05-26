@@ -474,7 +474,11 @@ void gravManager::ungroupAll()
 
 void gravManager::addTestObject()
 {
-    RectangleBase* obj = new RectangleBase( 0.0f, 0.0f );
+    float x = random_range( screenRectFull.getLBound(),
+            screenRectFull.getRBound() );
+    float y = random_range( screenRectFull.getDBound(),
+            screenRectFull.getUBound() );
+    RectangleBase* obj = new RectangleBase( x, y );
     drawnObjects->push_back( obj );
     bool useRandName = false;
     if ( useRandName )
