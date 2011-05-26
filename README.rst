@@ -313,7 +313,7 @@ http://visibleearth.nasa.gov/view_detail.php?id=2430 for more info.
 
 .. FOOTNOTES:
 
-.. [1] The README.rst and updating wiki pages on http://grav.rc.rit.edu.
+.. [1] README.rst authority(!)
 
    This README.rst file is the 'authoritative source' for
    documentation.  The information is duplicated in some place on the `grav`
@@ -340,7 +340,7 @@ http://visibleearth.nasa.gov/view_detail.php?id=2430 for more info.
 
    See http://trac.edgewall.org/wiki/WikiRestructuredText for more information.
 
-.. [2] Multiple ffmpegs.
+.. [2] Gotcha:  multiple ffmpegs.
 
    Having another copy of ffmpeg installed on your machine (things
    like VLC and mplayer might depend on it) will cause conflicts,
