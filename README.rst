@@ -1,5 +1,6 @@
+====
 grav
-----
+====
 
 `grav` is a GL-based application for receiving & displaying many videos,
 using RTP. Primarily intended for videoconferencing/telepresence/etc
@@ -14,7 +15,7 @@ as automatic grouping, both based on RTCP metadata.
     trac instance is where to go for filing/finding bug tickets/issues.
 
 Compilation
------------
+===========
 
 Compiling on Linux
 
@@ -180,7 +181,7 @@ From `grav`:
       but isn't optional in the build process yet)
 
 Usage
------
+=====
 
 Command Line Usage::
 
