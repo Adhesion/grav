@@ -168,59 +168,9 @@ From `grav`:
 Usage
 =====
 
-Command Line Usage::
+Command Line Usage:
 
-  Usage: grav [-h] [-t] [-v] [-vpv] [-nt] [-am] [-es] [-bf]
-              [-a <str>] [-ht <str>] [-fps <num>] [-fs] [-ga]
-              [-vsr] [-avsr <num>] [-agvs] [-vk <str>] [-ak <str>]
-              [-sx <num>] [-sy <num>] [-sw <num>] [-sh <num>] video address
-
-    -h, --help                             	  displays this help message
-    -t, --threads                          	  threading separation of graphics
-                                              and network/decoding (this is the
-                                              default, option left in for legacy
-                                              purposes)
-    -v, --verbose                          	  verbose command line output for
-                                              grav
-    -vpv, --vpmedia-verbose                	  verbose command line output for
-                                              VPMedia
-                                              (network/RTP/decoding backend)
-    -nt, --no-threads                         disables threading separation of
-                                              graphics and network/decoding
-    -am, --automatic                          automatically focus on single
-                                              objects, rotating through the list
-                                              at regular intervals
-    -es, --enable-shaders                     enable GLSL shader-based
-                                              colorspace conversion if it would
-                                              be available (experimental, may
-                                              not look as good, adds CPU usage
-                                              to rendering thread)
-    -bf, --use-buffer-font                    enable buffer font rendering
-                                              method - may save memory and be
-                                              better for slower machines, but
-                                              doesn't scale as well CPU-wise for
-                                              many objects
-    -a, --audio=<str>                      	  RTP audio session address
-    -ht, --header=<str>                    	  header string
-    -fps, --framerate=<num>                	  framerate for rendering
-    -fs, --fullscreen                      	  start in fullscreen mode
-    -ga, --gridauto                        	  rearrange all objects in grid on
-                                              source add/remove
-    -vsr, --video-session-rotate           	  add supplied video addresses to
-                                              rotation list, rather
-                                              than immediately connect to them
-    -avsr, --auto-video-session-rotate=<num>  rotate through video sessions
-                                              every [num] seconds
-    -agvs, --get-ag-venue-streams          	  grab video sessions from Access
-                                              Grid venue client, if running
-    -vk, --video-key=<str>                 	  encryption key for initial video
-                                              sessions
-    -ak, --audio-key=<str>                 	  encryption key for initial audio
-                                              sessions
-    -sx, --start-x=<num>                   	  initial X position for main window
-    -sy, --start-y=<num>                   	  initial Y position for main window
-    -sw, --start-width=<num>               	  initial width for main window
-    -sh, --start-height=<num>              	  initial height for main window
+.. include:: USAGE.rst
 
 Keyboard Shortcuts::
 
