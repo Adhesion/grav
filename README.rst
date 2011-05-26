@@ -39,7 +39,7 @@ Compiling on Linux
       then compile & sudo make install (make install will probably install
       to ``/usr/local/lib`` by default).
 
-      .. warning::
+.. warning::
 
          Having another copy of ffmpeg installed on your machine (things
          like VLC and mplayer might depend on it) will cause conflicts,
