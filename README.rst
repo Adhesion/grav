@@ -89,8 +89,8 @@ Compiling on Linux
       a snapshot tarball from https://github.com/adhesion/grav/tarball/master::
 
        TAR_URL=http://github.com/adhesion/grav/tarball/master
-       wget --no-check-certificate $TAR_URL
-       tar -xzvf Adhesion-grav-e9c22d9.tar.gz
+       wget --no-check-certificate -O grav-latest.tar.gz $TAR_URL
+       tar -xzvf grav-latest.tar.gz
 
    2. **OR**, if you want the `grav` source in order to **contribute to or
       develop** `grav`, fork and clone the upstream repository located at
