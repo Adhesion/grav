@@ -521,11 +521,11 @@ void gravManager::doRandomAction()
         return;
 
     val = random_range( 0.0, 1.0 );
-    if ( val <= 0.18 )
+    if ( val <= 0.15 )
     {
         addTestObject();
     }
-    else if ( val <= 0.3 )
+    else if ( val <= 0.27 )
     {
         if ( getMovableObjects().size() > 0 )
         {
@@ -537,9 +537,9 @@ void gravManager::doRandomAction()
             tryDeleteObject( obj );
         }
     }
-    else if ( val <= 0.45 )
+    else if ( val <= 0.4 )
     {
-        if ( getMovableObjects().size() )
+        if ( getMovableObjects().size() > 0 )
         {
             int num = getMovableObjects().size();
             int choice = floor( random_range( 0.0, (double)num ) );
@@ -551,9 +551,9 @@ void gravManager::doRandomAction()
             obj->setScale( newX * obj->getScaleX(), newY * obj->getScaleY() );
         }
     }
-    else if ( val <= 0.99 )
+    else if ( val <= 0.75 )
     {
-        if ( getMovableObjects().size() )
+        if ( getMovableObjects().size() > 0 )
         {
             int num = getMovableObjects().size();
             int choice = floor( random_range( 0.0, (double)num ) );
@@ -565,6 +565,23 @@ void gravManager::doRandomAction()
             float newY = (float)random_range( screenRectFull.getDBound(),
                     screenRectFull.getUBound() );
             obj->move( newX, newY );
+        }
+    }
+    else if ( val <= 0.98 )
+    {
+        if ( getMovableObjects().size() > 0 )
+        {
+            int num = getMovableObjects().size();
+            int choice = floor( random_range( 0.0, (double)num ) );
+            gravUtil::logVerbose( "random: color got %ith object\n", choice );
+            RectangleBase* obj = getMovableObjects()[ choice ];
+
+            RGBAColor col;
+            col.R = (float)random_range( 0.0, 1.0 );
+            col.G = (float)random_range( 0.0, 1.0 );
+            col.B = (float)random_range( 0.0, 1.0 );
+            col.A = (float)random_range( 0.5, 1.0 );
+            obj->setColor( col );
         }
     }
     else
