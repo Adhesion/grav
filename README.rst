@@ -28,6 +28,21 @@ Compiling on Linux
            libglew1.5 libavcodec-dev libswscale-dev libavutil-dev \
            libpthread-stubs0-dev
 
+   Or on a redhat based distro::
+
+      yum install git scons subversion cmake libpng-devel libpng wxGTK-devel \
+           wxGTK ftgl-devel ftgl python-devel mesa-libGLU-devel mesa-libGLU \
+           glew-devel glew
+
+   Note that Fedora doesn't ship with ffmpeg, which greatly enhances codec support.
+   You can either build it from source as is detailed below in step 2, or you can
+   do the following to acquire it from ``rpmfusion.org``::
+
+      yum localinstall --nogpgcheck \
+           http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-rawhide.noarch.rpm \
+           http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-rawhide.noarch.rpm
+      yum install ffmpeg ffmpeg-devel
+
 2. **IF** you need to compile ffmpeg (OPTIONAL - you can get ffmpeg from a
    package but note you need the newer .52 libavcodec version)...
 
