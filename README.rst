@@ -69,7 +69,7 @@ Compiling on Linux
 
    2. Or, if you don't want to install (will go to ``/usr/local/lib`` by
       default) just do make and copy the .a file to the eventual `grav` build
-      directory or somewhere where CMake can find it.
+      directory or somewhere CMake can find it.
 
 4. SVN checkout VPMedia from here:  https://svn.ci.uchicago.edu/svn/if-media/::
 
