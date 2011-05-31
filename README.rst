@@ -129,7 +129,9 @@ Compiling on Linux
 
 7. To run `grav`, run from the top level dir so it can find
    the resources there (ie, if your build dir is ``Build/``, run
-   ``Build/grav [options]``)
+   ``Build/grav [options]``), or, you can do a ``make install``
+   which will copy the resources and binary to the location
+   specified by the ``CMAKE_INSTALL_PREFIX``.
 
 Dependencies
 ------------
