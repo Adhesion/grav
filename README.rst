@@ -18,6 +18,7 @@ Compilation
 ===========
 
 Compiling on Linux
+------------------
 
 1. Make sure to get all the dependencies (see below). Here's an example for
    Ubuntu or Debian-style Linux distros::
