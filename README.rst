@@ -301,7 +301,25 @@ Runway
 The runway is a side area for muted videos (press m on a video to mute it).
 To remove a video from the runway, simply drag it out of the runway area.
 The runway will be hidden when turning on automatic mode, or you can manually
-enable/disable it with alt-r.
+enable/disable it with ``alt-r``.
+
+Venue Client Controller
+-----------------------
+
+If you have the Access Grid toolkit installed, grav can control the Access
+Grid Venue Client, mainly via changing venues. To bring up the Venue Client
+Controller menu, either press ``ctrl-v`` or toggle it via the entry in the
+view menu. If you do not have Access Grid installed, do not have a Venue
+Client running, or if a running Venue Client is not in a venue, this option
+will not be available.
+
+In the Venue Client controller menu, different venue connections will be
+shown. Double click on a venue to signal the Venue Client to move to that
+venue. Doing so will also automatically grab any video addresses in that
+venue and add them to the main list of connected video sessions.
+
+To automatically grab video addresses from a running Venue Client when grav
+is started, use the command line option ``-agvs``.
 
 Notes
 =====
