@@ -272,7 +272,7 @@ Groups
 ------
 
 Videos can be grouped by siteID (metadata that comes from Access Grid).
-Press g to enable siteID groups - videos will be added the groups
+Press g to enable siteID groups - videos will be added to their groups
 automatically. Pressing g again will disable siteID grouping, dissociate
 videos from their siteID groups and delete the siteID groups. Press l
 on a selected group to unlock it - unlocking allows you to move a group's
@@ -289,11 +289,15 @@ can also be temporarily disabled via the right-click menu - disabling a
 session will not process the incoming packets but you will still receive
 the data.
 
-Video sessions can also be rotated, ie, only connecting to one video session
-at a time out of a list. Adding ``-avl`` on the command line will added given
-sessions to the rotate list. Sessions can be rotated manually by the
-right-click menu on the rotated video group in the side window, or
-automatically every X seconds with the ``-arav`` (seconds) command line option.
+Video sessions can also be added to an "available video" list, meaning they
+will not be automatically connected to on startup, and when in this list
+only one can be connected to at a time. Adding ``-avl`` on the command line
+will added given sessions to the available video list. Available video sessions
+can be rotated through manually via the right-click menu on the rotated video
+group in the side window, or automatically every X seconds with the ``-arav``
+(seconds) command line option. In addition, sessions can be shifted between
+the main list and the available video list via the right-click menu in the side
+window.
 
 Runway
 ------
