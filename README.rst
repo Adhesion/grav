@@ -288,10 +288,10 @@ session will not process the incoming packets but you will still receive
 the data.
 
 Video sessions can also be rotated, ie, only connecting to one video session
-at a time out of a list. Adding ``-vsr`` on the command line will added given
+at a time out of a list. Adding ``-avl`` on the command line will added given
 sessions to the rotate list. Sessions can be rotated manually by the
 right-click menu on the rotated video group in the side window, or
-automatically every X seconds with the ``-avsr`` (seconds) command line option.
+automatically every X seconds with the ``-arav`` (seconds) command line option.
 
 Runway
 ------
