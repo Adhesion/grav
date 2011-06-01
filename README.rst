@@ -279,6 +279,10 @@ in the center and move others around them. ``shift-f`` and ``ctrl-shift-f``
 will fullscreen a selected object, including the border and excluding the
 border respectively.
 
+``alt-a`` will enable automatic mode. When automatic mode is on, grav will
+focus on a single object, and focus will automatically rotate between objects
+at a regular interval. Automatic mode can also be toggled in the view menu.
+
 Groups
 ------
 
