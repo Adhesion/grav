@@ -269,6 +269,18 @@ click-and-drag starting from empty space for a box selection, or ``ctrl-click``
 on a video to add it to the selection. You can invert a selection with
 ``ctrl-i``. Resize selected objects with ``+`` (or ``=``) and ``-``.
 
+Videos
+------
+
+In addition to being manipulated as described above, video objects can be
+muted (will not decode or process) with ``m`` or have their rendering disabled
+with ``x`` (will still decode/process in the background but only display the
+last frame). If the runway is visible, muting videos will send them there (see
+"Runway" section below for info). Videos can be scaled to their native size
+with ``n`` (size all videos to native size with ``shift-n``). Right-clicking
+with videos selected will bring up an option for a properties window which
+will display resolution, codec, and metadata info.
+
 Layouts
 -------
 
