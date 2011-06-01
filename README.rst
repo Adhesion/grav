@@ -267,19 +267,30 @@ automatically be displayed. To move objects, you can click on them and
 click on a destination, or click-and-drag. For selecting multiple objects,
 click-and-drag starting from empty space for a box selection, or ``ctrl-click``
 on a video to add it to the selection. You can invert a selection with
-``ctrl-i``.
+``ctrl-i``. Resize selected objects with ``+`` (or ``=``) and ``-``.
+
+Layouts
+-------
+
+grav includes a few automatic layout algorithms. Press ``r`` to rearrange
+objects in a grid. Press ``p`` to arrange objects in a perimeter around
+the earth. Press ``f`` with objects selected to focus on selected objects
+in the center and move others around them. ``shift-f`` and ``ctrl-shift-f``
+will fullscreen a selected object, including the border and excluding the
+border respectively.
 
 Groups
 ------
 
 Videos can be grouped by siteID (metadata that comes from Access Grid).
-Press g to enable siteID groups - videos will be added to their groups
+Press ``g`` to enable siteID groups - videos will be added to their groups
 automatically. Pressing g again will disable siteID grouping, dissociate
-videos from their siteID groups and delete the siteID groups. Press l
+videos from their siteID groups and delete the siteID groups. Press ``l``
 on a selected group to unlock it - unlocking allows you to move a group's
 members independently of it, and its unlocked status will be noted in its
 displayed name. Note that resizing a group will automatically rearrange
-its members if it is in the locked state.
+its members if it is in the locked state. You can also manually rearrange
+internal group members by pressing ``t``.
 
 Session Management
 ------------------
