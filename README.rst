@@ -267,7 +267,8 @@ automatically be displayed. To move objects, you can click on them and
 click on a destination, or click-and-drag. For selecting multiple objects,
 click-and-drag starting from empty space for a box selection, or ``ctrl-click``
 on a video to add it to the selection. You can invert a selection with
-``ctrl-i``. Resize selected objects with ``+`` (or ``=``) and ``-``.
+``ctrl-i``. Resize selected objects with ``+`` (or ``=``) and ``-``. To select
+all objects, press ``ctrl-a``.
 
 Videos
 ------
