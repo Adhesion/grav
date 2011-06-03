@@ -302,7 +302,7 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
             if ( parent == videoNodeID )
             {
                 rightClickMenu.Append( shiftID,
-                    _("Shift session to rotate list") );
+                    _("Shift session to available video list") );
                 Connect( shiftID, wxEVT_COMMAND_MENU_SELECTED,
                     wxCommandEventHandler( SessionTreeControl::shiftEvent ) );
             }
