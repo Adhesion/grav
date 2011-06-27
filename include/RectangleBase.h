@@ -71,8 +71,13 @@ public:
     virtual float getWidth(); virtual float getHeight();
     float getTotalWidth(); float getTotalHeight();
     virtual float getDestWidth(); virtual float getDestHeight();
+    float getDestTotalWidth(); float getDestTotalHeight();
     float getBorderSize(); float getDestBorderSize();
     float getBorderScale();
+    /*
+     * Boundaries of the object - note these use the destination values, ie
+     * ignoring animation.
+     */
     float getLBound(); float getRBound(); float getUBound(); float getDBound();
 
     Vector getNormal();

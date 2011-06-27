@@ -193,6 +193,21 @@ float RectangleBase::getTotalHeight()
     return h;
 }
 
+float RectangleBase::getDestTotalWidth()
+{
+    return getDestWidth() + ( 2.0f * getBorderSize() );
+}
+
+float RectangleBase::getDestTotalHeight()
+{
+    float h = getDestHeight() + ( 2.0f * getBorderSize() );
+    if ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS )
+    {
+        h += getTextOffset() + getTextHeight();
+    }
+    return h;
+}
+
 float RectangleBase::getDestWidth()
 {
     return destScaleX;
