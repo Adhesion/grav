@@ -373,18 +373,14 @@ void RectangleBase::setHeight( float h )
     setScale( destScaleX * h / destScaleY, h );
 }
 
-// TODO make these more generic, maybe if text can be in different places
 void RectangleBase::setTotalWidth( float w )
 {
-    //float newWidth = w * (1.0f - ( 2.0f * getBorderScale() ) );
     float newWidth = w * getWidth() / getTotalWidth();
     setWidth( newWidth );
 }
 
 void RectangleBase::setTotalHeight( float h )
 {
-    //float textRatio = getTextHeight() / getHeight();
-    //float newHeight = h * (1.0f - textRatio - ( 2.0f * getBorderScale() ) );
     float newHeight = h * getHeight() / getTotalHeight();
     setHeight( newHeight );
 }
