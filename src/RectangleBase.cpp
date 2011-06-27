@@ -186,7 +186,8 @@ float RectangleBase::getTotalWidth()
 float RectangleBase::getTotalHeight()
 {
     float h = getHeight() + ( 2.0f * getBorderSize() );
-    if ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS )
+    if ( getTextHeight() > 0.0f &&
+         ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS ) )
     {
         h += getTextOffset() + getTextHeight();
     }
@@ -195,15 +196,16 @@ float RectangleBase::getTotalHeight()
 
 float RectangleBase::getDestTotalWidth()
 {
-    return getDestWidth() + ( 2.0f * getBorderSize() );
+    return getDestWidth() + ( 2.0f * getDestBorderSize() );
 }
 
 float RectangleBase::getDestTotalHeight()
 {
-    float h = getDestHeight() + ( 2.0f * getBorderSize() );
-    if ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS )
+    float h = getDestHeight() + ( 2.0f * getDestBorderSize() );
+    if ( getDestTextHeight() > 0.0f &&
+         ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS ) )
     {
-        h += getTextOffset() + getTextHeight();
+        h += getDestTextOffset() + getDestTextHeight();
     }
     return h;
 }
@@ -307,6 +309,29 @@ float RectangleBase::getTextOffset()
     return getBorderSize() * 0.4f;
 }
 
+float RectangleBase::getDestTextHeight()
+{
+    // this ignores textBounds.Lower(), since 0.0 in its coordinate system is
+    // the baseline
+    return textBounds.Upper().Yf() * getDestTextScale();
+}
+
+float RectangleBase::getDestTextWidth()
+{
+    return ( textBounds.Upper().Xf() - textBounds.Lower().Xf() )
+            * getDestTextScale();
+}
+
+float RectangleBase::getDestTextScale()
+{
+    return destScaleX * relativeTextScale;
+}
+
+float RectangleBase::getDestTextOffset()
+{
+    return getDestBorderSize() * 0.4f;
+}
+
 // TODO this is 0 since the text can only be at the top - maybe change this
 // later if text can be in multiple positions
 float RectangleBase::getCenterOffsetX()
@@ -317,7 +342,8 @@ float RectangleBase::getCenterOffsetX()
 float RectangleBase::getCenterOffsetY()
 {
     float ret = 0.0f;
-    if ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS )
+    if ( getTextHeight() > 0.0f &&
+         ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS ) )
     {
         float textRatio = ( getTextHeight() + getTextOffset() ) / getHeight();
         ret = textRatio * getDestHeight() / 2.0f;
@@ -375,13 +401,13 @@ void RectangleBase::setHeight( float h )
 
 void RectangleBase::setTotalWidth( float w )
 {
-    float newWidth = w * getWidth() / getTotalWidth();
+    float newWidth = w * getDestWidth() / getDestTotalWidth();
     setWidth( newWidth );
 }
 
 void RectangleBase::setTotalHeight( float h )
 {
-    float newHeight = h * getHeight() / getTotalHeight();
+    float newHeight = h * getDestHeight() / getDestTotalHeight();
     setHeight( newHeight );
 }
 
@@ -728,6 +754,7 @@ void RectangleBase::draw()
     // BBox() may do a GL call which needs to be on the main thread
     if ( nameSizeDirty )
     {
+        float oldHeight = getDestTotalHeight();
         cutoffPos = -1;
         textBounds = font->BBox( getSubName().c_str() );
         // only do cutoff if title is at top - so if centered (or other?)
@@ -751,6 +778,14 @@ void RectangleBase::draw()
             cutoffPos = curEnd - ceil( ( 1.0f -
                   ( getWidth() / getTextWidth() ) ) * numChars ) - 1;
             textBounds = font->BBox( getSubName().c_str() );
+        }
+
+        // also, since the text bounds might change, fix the height/pos
+        if ( fabs( oldHeight - getDestTotalHeight() ) > 0.001f &&
+             ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS ) )
+        {
+            setTotalHeight( oldHeight );
+            move( destX - getCenterOffsetX(), destY - getCenterOffsetY() );
         }
 
         nameSizeDirty = false;

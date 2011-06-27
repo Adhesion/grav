@@ -68,6 +68,8 @@ public:
      * ratio in addition to how much it's being scaled. In objects without
      * aspect ratio, these will most likely be equal to the scale factors.
      */
+    // TODO fix this dest stuff, it pretty much sucks (ie, make it dynamic so no
+    // copy pasted code)
     virtual float getWidth(); virtual float getHeight();
     float getTotalWidth(); float getTotalHeight();
     virtual float getDestWidth(); virtual float getDestHeight();
@@ -99,6 +101,11 @@ public:
     float getTextWidth();
     float getTextScale();
     float getTextOffset();
+
+    float getDestTextHeight();
+    float getDestTextWidth();
+    float getDestTextScale();
+    float getDestTextOffset();
 
     /*
      * Offset of the center of just the video/inner rectangle content to the
