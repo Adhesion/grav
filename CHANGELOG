@@ -1,0 +1,14 @@
+==============
+grav CHANGELOG
+==============
+
+Version [next]
+--------------
+
+* Fix miscellaneous sizing bugs (objects will resize correctly on name change)
+
+Version 0.1.0
+-------------
+
+* Initial release
+
