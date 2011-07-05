@@ -755,6 +755,8 @@ void RectangleBase::draw()
     if ( nameSizeDirty )
     {
         float oldHeight = getDestTotalHeight();
+        float oldOffsetX = getCenterOffsetX();
+        float oldOffsetY = getCenterOffsetY();
         cutoffPos = -1;
         textBounds = font->BBox( getSubName().c_str() );
         // only do cutoff if title is at top - so if centered (or other?)
@@ -785,7 +787,8 @@ void RectangleBase::draw()
              ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS ) )
         {
             setTotalHeight( oldHeight );
-            move( destX - getCenterOffsetX(), destY - getCenterOffsetY() );
+            move( destX - ( getCenterOffsetX() - oldOffsetX ),
+                  destY - ( getCenterOffsetY() - oldOffsetY ) );
         }
 
         nameSizeDirty = false;
