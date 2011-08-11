@@ -42,6 +42,8 @@ Group::Group( float _x, float _y ) :
     showLockStatus = true;
     allowHiding = false;
 
+    rearrangeStyle = ONECOLUMN;
+
     buffer = 1.0f;
 }
 
@@ -127,54 +129,97 @@ void Group::rearrange()
     // = 0 will cause div by 0 crashes later
     if ( objects.size() == 0 ) return;
 
-    float largestWidth = 0.0f, largestHeight = 0.0f; // for finding the biggest
-                                                     // object in the group
-
-    for ( unsigned int i = 0; i < objects.size(); i++ )
-    {
-        largestWidth = std::max( largestWidth, objects[i]->getWidth() );
-        largestHeight = std::max( largestHeight, objects[i]->getHeight() );
-    }
-
-    int numCol = ceil( sqrt( objects.size() ) );
-    int numRow = objects.size() / numCol + ( objects.size() % numCol > 0 );
-
-    // resize the group based on the aspect ratios of the current member(s)
-    if ( objects.size() == 1 )
-    {
-        float objAspect =
-                objects[0]->getDestWidth() / objects[0]->getDestHeight();
-        float diff = objAspect / ( getDestWidth() / getDestHeight() );
-        RectangleBase::setScale( destScaleX * diff, destScaleY );
-    }
-    else
-    {
-        float aspect = getDestWidth() / getDestHeight();
-        float newAspect = (numCol*1.33f) / numRow;
-        if ( newAspect > aspect )
-            RectangleBase::setScale( destScaleX * (newAspect/aspect),
-                                        destScaleY );
-        else
-            RectangleBase::setScale( destScaleX,
-                                        destScaleY * (aspect/newAspect) );
-    }
-
-    std::map<std::string, std::string> opts;
-
-    char x[10];
-    char y[10];
-    sprintf( x, "%i", numCol );
-    sprintf( y, "%i", numRow );
-    opts["numX"] = x;
-    opts["numY"] = y;
-
     std::map<std::string, std::vector<RectangleBase*> > data;
     data["objects"] = objects;
 
-    layouts.arrange("grid",
-                    getLBound(), getRBound(), getUBound(), getDBound(),
-                    0, 0, 0, 0,
-                    data, opts);
+    std::map<std::string, std::string> opts;
+
+    std::ostringstream ss;
+
+    switch ( rearrangeStyle )
+    {
+    case ASPECT:
+    {
+        // for finding the biggest object in the group
+        float largestWidth = 0.0f, largestHeight = 0.0f;
+
+        for ( unsigned int i = 0; i < objects.size(); i++ )
+        {
+            largestWidth = std::max( largestWidth, objects[i]->getWidth() );
+            largestHeight = std::max( largestHeight, objects[i]->getHeight() );
+        }
+
+        int numCol = ceil( sqrt( objects.size() ) );
+        int numRow = objects.size() / numCol + ( objects.size() % numCol > 0 );
+
+        // resize the group based on the aspect ratios of the current member(s)
+        if ( objects.size() == 1 )
+        {
+            float objAspect =
+                    objects[0]->getDestWidth() / objects[0]->getDestHeight();
+            float diff = objAspect / ( getDestWidth() / getDestHeight() );
+            RectangleBase::setScale( destScaleX * diff, destScaleY );
+        }
+        else
+        {
+            float aspect = getDestWidth() / getDestHeight();
+            float newAspect = (numCol*1.33f) / numRow;
+            if ( newAspect > aspect )
+                RectangleBase::setScale( destScaleX * (newAspect/aspect),
+                                            destScaleY );
+            else
+                RectangleBase::setScale( destScaleX,
+                                            destScaleY * (aspect/newAspect) );
+        }
+
+        ss << numCol;
+        opts["numX"] = ss.str();
+        ss.str( "" );
+
+        ss << numRow;
+        opts["numY"] = ss.str();
+        ss.str( "" );
+
+        break;
+    }
+
+    case ONEROW:
+    {
+        ss << objects.size();
+        opts["numX"] = ss.str();
+        ss.str( "" );
+        opts["numY"] = "1";
+        break;
+    }
+
+    case ONECOLUMN:
+    {
+        ss << objects.size();
+        opts["numX"] = "1";
+        opts["numY"] = ss.str();
+        ss.str( "" );
+        opts["horiz"] = "False";
+        break;
+    }
+
+    default:
+        break;
+    }
+
+    layouts.arrange( "grid",
+                     getLBound(), getRBound(), getUBound(), getDBound(),
+                     0, 0, 0, 0,
+                     data, opts );
+}
+
+ArrangeStyle Group::getRearrange()
+{
+    return rearrangeStyle;
+}
+
+void Group::setRearrange( ArrangeStyle style )
+{
+    rearrangeStyle = style;
 }
 
 bool Group::updateName()

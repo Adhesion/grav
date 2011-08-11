@@ -37,8 +37,6 @@ public:
 
     void draw();
 
-    void rearrange();
-
     bool updateName();
 
     // check the positions of all members and remove ones that are not inside

@@ -36,6 +36,9 @@ Runway::Runway( float _x, float _y ) :
     orientation = 1;
     setName( "Runway" );
     intersectCounter = 0;
+
+    rearrangeStyle = ONECOLUMN;
+
     destBColor.R = 1.0f; destBColor.G = 1.0f;
     destBColor.B = 1.0f; destBColor.A = 1.0f;
     baseBColor = destBColor;
@@ -105,49 +108,6 @@ void Runway::draw()
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
         objects[i]->draw();
-    }
-}
-
-void Runway::rearrange()
-{
-    if ( objects.size() == 0 ) return;
-
-    std::map<std::string, std::string> opts =
-        std::map<std::string, std::string>();
-    // horizontal
-    if ( orientation == 0 )
-    {
-        std::ostringstream ss;
-        ss << objects.size();
-        opts["numX"] = ss.str();
-        opts["numY"] = "1";
-
-        std::map<std::string, std::vector<RectangleBase*> > data =
-            std::map<std::string, std::vector<RectangleBase*> >();
-        data["objects"] = objects;
-
-        layouts.arrange( "grid",
-                getLBound(), getRBound(), getUBound(), getDBound(),
-                0, 0, 0, 0,
-                data, opts );
-    }
-    // vertical
-    else if ( orientation == 1 )
-    {
-        std::ostringstream ss;
-        ss << objects.size();
-        opts["numX"] = "1";
-        opts["numY"] = ss.str();
-        opts["horiz"] = "False";
-
-        std::map<std::string, std::vector<RectangleBase*> > data = \
-            std::map<std::string, std::vector<RectangleBase*> >();
-        data["objects"] = objects;
-
-        layouts.arrange( "grid",
-                getLBound(), getRBound(), getUBound(), getDBound(),
-                0, 0, 0, 0,
-                data, opts );
     }
 }
 

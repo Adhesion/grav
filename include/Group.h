@@ -32,6 +32,13 @@
 
 #include <vector>
 
+enum ArrangeStyle
+{
+    ASPECT,
+    ONEROW,
+    ONECOLUMN
+};
+
 class Group : public RectangleBase
 {
 
@@ -53,6 +60,8 @@ public:
     bool isGroup();
 
     virtual void rearrange();
+    ArrangeStyle getRearrange();
+    void setRearrange( ArrangeStyle style );
 
     virtual bool updateName();
 
@@ -67,6 +76,8 @@ protected:
     std::vector<RectangleBase*> objects;
     float buffer;
     LayoutManager layouts;
+
+    ArrangeStyle rearrangeStyle;
 
     bool allowHiding;
 
