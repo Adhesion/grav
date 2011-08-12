@@ -23,8 +23,6 @@
  * along with grav.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <VPMedia/VPMSession.h>
-#include <VPMedia/VPMSessionFactory.h>
 #include <VPMedia/thread_helper.h>
 #include <VPMedia/random_helper.h>
 
@@ -33,6 +31,7 @@
 #include <stdio.h>
 
 #include "SessionManager.h"
+#include "SessionEntry.h"
 #include "VideoListener.h"
 #include "AudioManager.h"
 #include "grav.h"
@@ -64,35 +63,18 @@ bool SessionManager::initSession( std::string address, bool audio )
 {
     lockSessions();
 
-    SessionEntry entry;
-    VPMSession* session;
-    VPMSessionFactory* factory = VPMSessionFactory::getInstance();
+    SessionEntry* entry = new SessionEntry( address, audio );
+
     std::string type = std::string( audio ? "audio" : "video" );
     int* counter = audio ? &audioSessionCount : &videoSessionCount;
+    VPMSessionListener* listener = audio ?
+            audioSessionListener : videoSessionListener;
 
-    if ( !audio )
-    {
-        session = factory->createSession( address.c_str(),
-                                        *videoSessionListener );
-
-        session->enableVideo( true );
-        session->enableAudio( false );
-        session->enableOther( false );
-    }
-    else
-    {
-        session = factory->createSession( address.c_str(),
-                                        *audioSessionListener);
-
-        session->enableVideo(false);
-        session->enableAudio(true);
-        session->enableOther(false);
-    }
-
-    if ( !session->initialise() )
+    if ( !entry->initSession( listener ) )
     {
         gravUtil::logError( "SessionManager::initSession: "
-                "failed to initialise session\n" );
+            "failed to initialise %s session on %s\n", type.c_str(),
+                address.c_str() );
         unlockSessions();
         return false;
     }
@@ -100,13 +82,7 @@ bool SessionManager::initSession( std::string address, bool audio )
     gravUtil::logVerbose( "SessionManager::initialized %s session on %s\n",
             type.c_str(), address.c_str() );
     (*counter)++;
-    entry.sessionTS = random32();
-    entry.address = address;
-    entry.encryptionKey = "";
-    entry.encryptionEnabled = false;
-    entry.audio = audio;
-    entry.enabled = true;
-    entry.session = session;
+
     sessions.push_back( entry );
 
     unlockSessions();

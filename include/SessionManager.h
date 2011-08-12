@@ -38,15 +38,7 @@ class mutex;
 
 #include <VPMedia/VPMTypes.h>
 
-typedef struct {
-    std::string address;
-    std::string encryptionKey;
-    bool encryptionEnabled;
-    bool audio;
-    bool enabled;
-    VPMSession* session;
-    uint32_t sessionTS;
-} SessionEntry;
+class SessionEntry;
 
 class SessionManager
 {

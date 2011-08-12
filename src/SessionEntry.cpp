@@ -23,6 +23,9 @@
  * along with grav.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <VPMedia/VPMSession.h>
+#include <VPMedia/VPMSessionFactory.h>
+
 #include "SessionEntry.h"
 
 SessionEntry::SessionEntry( std::string addr, bool aud )
@@ -43,21 +46,21 @@ SessionEntry::~SessionEntry()
     disableSession();
 }
 
-bool initSession()
+bool initSession( VPMSessionListener* listener )
 {
-    if ( !audio )
-    {
+    VPMSessionFactory* factory = VPMSessionFactory::getInstance();
+    session = factory->createSession( address.c_str(), *listener );
 
-    }
-    else
-    {
-
-    }
+    session->enableVideo( !audio );
+    session->enableAudio( audio );
+    session->enableOther( false );
 
     if ( encryptionKey.compare( "__NO_KEY__" ) != 0 )
     {
         session->setEncryptionKey( key.c_str() );
     }
+
+    sessionTS = random32();
 }
 
 void disableSession()
