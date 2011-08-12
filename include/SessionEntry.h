@@ -45,6 +45,10 @@ public:
     void setProcessingEnabled( bool proc );
     bool isProcessingEnabled();
 
+    void setEncryptionKey( std::string addr, std::string key );
+    void disableEncryption( std::string addr );
+    bool isEncryptionEnabled( std::string addr );
+
     std::string getAddress();
 
     void iterate();

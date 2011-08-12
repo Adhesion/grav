@@ -29,6 +29,13 @@ SessionEntry::SessionEntry( std::string addr, bool aud )
 {
     audio = aud;
     setName( addr );
+
+    processingEnabled = true;
+
+    encryptionKey = "__NO_KEY__";
+    encryptionEnabled = false;
+
+    session = NULL;
 }
 
 SessionEntry::~SessionEntry()
@@ -45,6 +52,11 @@ bool initSession()
     else
     {
 
+    }
+
+    if ( encryptionKey.compare( "__NO_KEY__" ) != 0 )
+    {
+        session->setEncryptionKey( key.c_str() );
     }
 }
 
@@ -70,6 +82,30 @@ void SessionEntry::setProcessingEnabled( bool proc )
 bool SessionEntry::getProcessingEnabled()
 {
     return processingEnabled;
+}
+
+void setEncryptionKey( std::string key )
+{
+    encryptionKey = key;
+    encryptionEnabled = true;
+    if ( isSessionEnabled() )
+        session->setEncryptionKey( key.c_str() );
+    // if not enabled, should set on init
+}
+
+void disableEncryption()
+{
+    encryptionKey = "__NO_KEY__";
+    encryptionEnabled = false;
+    if ( isSessionEnabled() )
+        session->setEncryptionKey( NULL );
+    // if not enabled, doesn't really matter since a new session will start with
+    // no encryption
+}
+
+bool isEncryptionEnabled()
+{
+    return encryptionEnabled;
 }
 
 std::string SessionEntry::getAddress()

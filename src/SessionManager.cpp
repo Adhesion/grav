@@ -298,7 +298,7 @@ std::string SessionManager::getLastRotateSession()
     return lastRotateSession;
 }
 
-bool SessionManager::setSessionEnable( std::string addr, bool set )
+bool SessionManager::setSessionProcessEnable( std::string addr, bool set )
 {
     lockSessions();
 
@@ -316,7 +316,7 @@ bool SessionManager::setSessionEnable( std::string addr, bool set )
     return true;
 }
 
-bool SessionManager::isSessionEnabled( std::string addr )
+bool SessionManager::isSessionProcessEnabled( std::string addr )
 {
     lockSessions();
 

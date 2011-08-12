@@ -78,8 +78,8 @@ public:
     std::string getCurrentRotateSession();
     std::string getLastRotateSession();
 
-    bool setSessionEnable( std::string addr, bool set );
-    bool isSessionEnabled( std::string addr );
+    bool setSessionProcessEnable( std::string addr, bool set );
+    bool isSessionProcessEnabled( std::string addr );
 
     bool setEncryptionKey( std::string addr, std::string key );
     bool disableEncryption( std::string addr );
