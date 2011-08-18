@@ -28,6 +28,8 @@
 #ifndef SESSIONENTRY_H_
 #define SESSIONENTRY_H_
 
+class VPMSessionListener;
+
 class SessionEntry : public RectangleBase
 {
 
@@ -35,23 +37,27 @@ public:
     SessionEntry( std::string addr, bool aud );
     ~SessionEntry();
 
+    bool initSession( VPMSessionListener* listener );
+    void disableSession();
+
     // note the difference between these two: if processingEnabled = false, the
     // session will still be active but not processed/iterated, but if
     // sessionEnabled = false, the session object is NULL (therefore you won't
     // be receiving any of the data)
-    bool initSession();
-    void disableSession();
     bool isSessionEnabled();
     void setProcessingEnabled( bool proc );
     bool isProcessingEnabled();
 
-    void setEncryptionKey( std::string addr, std::string key );
-    void disableEncryption( std::string addr );
-    bool isEncryptionEnabled( std::string addr );
+    bool isAudioSession();
+
+    void setEncryptionKey( std::string key );
+    void disableEncryption();
+    bool isEncryptionEnabled();
 
     std::string getAddress();
+    uint32_t getTimestamp();
 
-    void iterate();
+    bool iterate();
 
 private:
     std::string address;

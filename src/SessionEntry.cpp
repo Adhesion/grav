@@ -46,24 +46,30 @@ SessionEntry::~SessionEntry()
     disableSession();
 }
 
-bool initSession( VPMSessionListener* listener )
+bool SessionEntry::initSession( VPMSessionListener* listener )
 {
-    VPMSessionFactory* factory = VPMSessionFactory::getInstance();
-    session = factory->createSession( address.c_str(), *listener );
-
-    session->enableVideo( !audio );
-    session->enableAudio( audio );
-    session->enableOther( false );
-
-    if ( encryptionKey.compare( "__NO_KEY__" ) != 0 )
+    if ( !isSessionEnabled() )
     {
-        session->setEncryptionKey( key.c_str() );
-    }
+        VPMSessionFactory* factory = VPMSessionFactory::getInstance();
+        session = factory->createSession( address.c_str(), *listener );
 
-    sessionTS = random32();
+        session->enableVideo( !audio );
+        session->enableAudio( audio );
+        session->enableOther( false );
+
+        if ( encryptionKey.compare( "__NO_KEY__" ) != 0 )
+        {
+            session->setEncryptionKey( key.c_str() );
+        }
+
+        sessionTS = random32();
+    }
+    else
+        gravUtil::logWarning( "SessionEntry::init: session %s already "
+                                "initialized\n", address.c_str() );
 }
 
-void disableSession()
+void SessionEntry::disableSession()
 {
     if ( isSessionEnabled() )
     {
@@ -72,7 +78,7 @@ void disableSession()
     }
 }
 
-bool isSessionEnabled()
+bool SessionEntry::isSessionEnabled()
 {
     return ( session != NULL );
 }
@@ -82,12 +88,17 @@ void SessionEntry::setProcessingEnabled( bool proc )
     processingEnabled = proc;
 }
 
-bool SessionEntry::getProcessingEnabled()
+bool SessionEntry::isProcessingEnabled()
 {
     return processingEnabled;
 }
 
-void setEncryptionKey( std::string key )
+bool SessionEntry::isAudioSession()
+{
+    return audio;
+}
+
+void SessionEntry::setEncryptionKey( std::string key )
 {
     encryptionKey = key;
     encryptionEnabled = true;
@@ -96,7 +107,7 @@ void setEncryptionKey( std::string key )
     // if not enabled, should set on init
 }
 
-void disableEncryption()
+void SessionEntry::disableEncryption()
 {
     encryptionKey = "__NO_KEY__";
     encryptionEnabled = false;
@@ -106,7 +117,7 @@ void disableEncryption()
     // no encryption
 }
 
-bool isEncryptionEnabled()
+bool SessionEntry::isEncryptionEnabled()
 {
     return encryptionEnabled;
 }
@@ -118,6 +129,8 @@ std::string SessionEntry::getAddress()
 
 void SessionEntry::iterate()
 {
-    if ( isSessionEnabled() && processingEnabled )
+    bool running = isSessionEnabled() && processingEnabled;
+    if ( running )
         session->iterate( sessionTS++ );
+    return running;
 }

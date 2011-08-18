@@ -38,9 +38,18 @@ class mutex;
 
 #include <VPMedia/VPMTypes.h>
 
+#include "Group.h"
+
 class SessionEntry;
 
-class SessionManager
+enum SessionType
+{
+    VIDEOSESSION,
+    AVAILABLEVIDEOSESSION,
+    AUDIOSESSION
+};
+
+class SessionManager : public Group
 {
 
 public:
@@ -48,12 +57,11 @@ public:
     ~SessionManager();
 
     /*
-     * Create a new RTP session and attach it to the proper listener. If
-     * audio is true it's an audio session; video if false.
-     * Returns false if session creation fails, true otherwise.
+     * Add/remove a new session. Will auto-initialize if type = video or audio.
+     * Returns true if creation succeeds.
      */
-    bool initSession( std::string addr, bool audio );
-    bool removeSession( std::string addr );
+    bool addSession( std::string addr, SessionType type );
+    bool removeSession( std::string addr, SessionType type );
 
     /*
      * Methods for modifying the secondary list for available video sessions.
@@ -61,14 +69,12 @@ public:
      * Note audio is ignored for this for the time being - only rotating video
      * sessions for now.
      */
-    void addAvailableSession( std::string addr, bool audio );
-    void removeAvailableSession( std::string addr, bool audio );
     void rotate( bool audio );
     void rotateTo( std::string addr, bool audio );
     void unrotate( bool audio );
 
-    std::string getCurrentRotateSession();
-    std::string getLastRotateSession();
+    std::string getCurrentRotateSessionAddress();
+    std::string getLastRotateSessionAddress();
 
     bool setSessionProcessEnable( std::string addr, bool set );
     bool isSessionProcessEnabled( std::string addr );
@@ -89,15 +95,35 @@ public:
     void unlockSessions();
 
 private:
-    std::vector<SessionEntry> sessions;
+    /*
+     * Initialize (ie, start the connection) or de-initialize a session.
+     * Note these are NOT thread safe and should be enclosed in lock() calls.
+     */
+    bool initSession( SessionEntry* session );
+    void disableSession( SessionEntry* session );
+
+    /*
+     * Finds session by address. In cases of duplicate address, will find the
+     * first one. (order of video -> available video -> audio)
+     */
+    SessionEntry* findSessionByAddress( std::string address );
+    SessionEntry* findSessionByAddress( std::string address, SessionType type );
+    int indexOf( SessionEntry* entry, SessionType type );
+
+    Group* videoSessions;
+    Group* availableVideoSessions;
+    Group* audioSessions;
+
+    std::map<SessionType, Group*> sessionMap;
+
     VideoListener* videoSessionListener;
     AudioManager* audioSessionListener;
     int videoSessionCount;
     int audioSessionCount;
 
-    std::vector<std::string> availableVideoList;
+    //std::vector<std::string> availableVideoList;
     int rotatePos;
-    std::string lastRotateSession;
+    SessionEntry* lastRotateSession;
 
     mutex* sessionMutex;
     int lockCount;

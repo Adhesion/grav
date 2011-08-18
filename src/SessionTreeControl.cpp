@@ -82,6 +82,8 @@ void SessionTreeControl::addSession( std::string address, bool audio,
     bool added = false;
     wxTreeItemId node;
     wxTreeItemId current;
+    SessionType type;
+
     if ( rotate )
     {
         // make available video group if not there
@@ -200,9 +202,9 @@ void SessionTreeControl::rotateVideoSessions()
     sessionManager->rotate( false );
 
     wxTreeItemId current = findSession( availableVideoNodeID,
-            sessionManager->getCurrentRotateSession() );
+            sessionManager->getCurrentRotateSessionAddress() );
     wxTreeItemId last = findSession( availableVideoNodeID,
-            sessionManager->getLastRotateSession() );
+            sessionManager->getLastRotateSessionAddress() );
 
     if ( last.IsOk() )
     {
@@ -221,9 +223,9 @@ void SessionTreeControl::rotateToVideoSession( std::string addr )
     sessionManager->rotateTo( addr, false );
 
     wxTreeItemId current = findSession( availableVideoNodeID,
-            sessionManager->getCurrentRotateSession() );
+            sessionManager->getCurrentRotateSessionAddress() );
     wxTreeItemId last = findSession( availableVideoNodeID,
-            sessionManager->getLastRotateSession() );
+            sessionManager->getLastRotateSessionAddress() );
 
     if ( last.IsOk() )
     {
@@ -240,7 +242,7 @@ void SessionTreeControl::rotateToVideoSession( std::string addr )
 void SessionTreeControl::unrotateVideoSessions()
 {
     wxTreeItemId current = findSession( availableVideoNodeID,
-            sessionManager->getCurrentRotateSession() );
+            sessionManager->getCurrentRotateSessionAddress() );
     if ( current.IsOk() )
     {
         SetItemBackgroundColour( current, *wxBLUE );
@@ -327,7 +329,8 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
         else if ( parent == availableVideoNodeID )
         {
             // for now, have "rotate to this" for all but selected
-            if ( text.compare(sessionManager->getCurrentRotateSession()) != 0 )
+            if ( text.compare(
+                    sessionManager->getCurrentRotateSessionAddress() ) != 0 )
             {
                 rightClickMenu.Append( rotateToID,
                                         _("Rotate to this session") );
@@ -376,7 +379,7 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
         Connect( unrotateID, wxEVT_COMMAND_MENU_SELECTED,
             wxCommandEventHandler( SessionTreeControl::unrotateEvent ) );
         unrotateItem->Enable(
-            sessionManager->getCurrentRotateSession().compare( "" ) != 0 );
+            sessionManager->getCurrentRotateSessionAddress().compare( "" ) != 0 );
     }
 
     // right clicked on audio group or main group

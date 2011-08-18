@@ -38,7 +38,8 @@
 #include "gravUtil.h"
 
 SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
-    : videoSessionListener( vl ), audioSessionListener( al )
+    : Group( 0.0f, -8.0f), videoSessionListener( vl ),
+      audioSessionListener( al )
 {
     sessionMutex = mutex_create();
 
@@ -48,56 +49,60 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
     pause = false;
 
     rotatePos = -1;
+
+    videoSessions = new Group( getDestX(), getDestY() );
+    availableVideoSessions = new Group( getDestX(), getDestY() );
+    audioSessions = new Group( getDestX(), getDestY() );
+
+    add( videoSessions );
+    add( availableVideoSessions );
+    add( audioSessions );
+
+    sessionMap[ VIDEOSESSION ] = videoSessions;
+    sessionMap[ AVAILABLEVIDEOSESSION ] = availableVideoSessions;
+    sessionMap[ AUDIOSESSION ] = audioSessions;
 }
 
 SessionManager::~SessionManager()
 {
     mutex_free( sessionMutex );
-    for ( unsigned int i = 0; i < sessions.size(); i++ )
+
+    Group* sessions;
+    SessionEntry* session;
+    for ( int i = 0; i < numObjects(); i++ )
     {
-        delete sessions[i].session;
+        sessions = static_cast<Group*>( (*this)[i] );
+        for ( int j = 0; j < sessions->numObjects(); j++ )
+        {
+            session = static_cast<SessionEntry*>( (*sessions)[j] );
+            delete session;
+        }
+        delete sessions;
     }
 }
 
-bool SessionManager::initSession( std::string address, bool audio )
+bool SessionManager::addSession( std::string address, SessionType type )
 {
     lockSessions();
 
+    bool audio = ( type == AUDIOSESSION );
     SessionEntry* entry = new SessionEntry( address, audio );
+    Group* sessions = sessionMap[ type ];
+    sessions->add( entry );
 
-    std::string type = std::string( audio ? "audio" : "video" );
-    int* counter = audio ? &audioSessionCount : &videoSessionCount;
-    VPMSessionListener* listener = audio ?
-            audioSessionListener : videoSessionListener;
-
-    if ( !entry->initSession( listener ) )
-    {
-        gravUtil::logError( "SessionManager::initSession: "
-            "failed to initialise %s session on %s\n", type.c_str(),
-                address.c_str() );
-        unlockSessions();
-        return false;
-    }
-
-    gravUtil::logVerbose( "SessionManager::initialized %s session on %s\n",
-            type.c_str(), address.c_str() );
-    (*counter)++;
-
-    sessions.push_back( entry );
+    if ( type != AVAILABLEVIDEOSESSION )
+        initSession( entry );
 
     unlockSessions();
     return true;
 }
 
-bool SessionManager::removeSession( std::string addr )
+bool SessionManager::removeSession( std::string addr, SessionType type )
 {
     lockSessions();
 
-    std::vector<SessionEntry>::iterator it = sessions.begin();
-    while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
-        ++it;
-
-    if ( it == sessions.end() )
+    SessionEntry* entry = findSessionByAddress( addr, type );
+    if ( entry == NULL )
     {
         unlockSessions();
         gravUtil::logWarning( "SessionManager::removeSession: "
@@ -105,189 +110,187 @@ bool SessionManager::removeSession( std::string addr )
         return false;
     }
 
-    int* counter = (*it).audio ? &audioSessionCount : &videoSessionCount;
-    (*counter)--;
-    delete (*it).session;
-    sessions.erase( it );
+    if ( type == AVAILABLEVIDEOSESSION )
+    {
+        int i = indexOf( entry, type );
+        // shift rotate position back if what we're removing is before or at it,
+        // so we don't skip any
+        if ( i <= rotatePos )
+            rotatePos--;
+    }
+
+    delete entry; //destructor will remove object from its group
     unlockSessions();
     return true;
 }
 
-void SessionManager::addAvailableSession( std::string addr, bool audio )
-{
-    lockSessions();
-    availableVideoList.push_back( addr );
-    unlockSessions();
-}
-
-void SessionManager::removeAvailableSession( std::string addr, bool audio )
-{
-    lockSessions();
-    int i = 0;
-    std::vector<std::string>::iterator vrlit = availableVideoList.begin();
-    while ( vrlit != availableVideoList.end() && (*vrlit).compare( addr ) != 0 )
-    {
-        ++vrlit;
-        i++;
-    }
-    if ( vrlit == availableVideoList.end() )
-    {
-        // if addr not found, exit
-        unlockSessions();
-        return;
-    }
-    else
-    {
-        availableVideoList.erase( vrlit );
-        // shift rotate position back if what we're removing if before or at it,
-        // so we don't skip any
-        if ( i <= rotatePos )
-            rotatePos--;
-        // find session & remove it from main list if it's active
-        std::vector<SessionEntry>::iterator it2 = sessions.begin();
-        while ( it2 != sessions.end() && (*it2).address.compare( addr ) != 0 )
-            ++it2;
-        if ( it2 == sessions.end() )
-        {
-            unlockSessions();
-            return;
-        }
-        else
-        {
-            unlockSessions();
-            removeSession( (*it2).address );
-        }
-    }
-}
-
 void SessionManager::rotate( bool audio )
 {
-    lockSessions();
-
-    int numSessions = (int)availableVideoList.size();
-    int lastRotatePos = rotatePos;
-    if ( lastRotatePos != -1 )
-        lastRotateSession = availableVideoList[ rotatePos ];
-    if ( numSessions == 0 )
-    {
-        unlockSessions();
-        return;
-    }
-    if ( ++rotatePos >= numSessions )
-    {
-        rotatePos = 0;
-    }
-    unlockSessions();
-
-    // only remove & rotate if there is a valid old one & it isn't the same as
-    // current
-    if ( lastRotateSession.compare( "" ) != 0 &&
-            lastRotateSession.compare( availableVideoList[ rotatePos ] ) != 0 )
-    {
-        removeSession( lastRotateSession );
-        initSession( availableVideoList[ rotatePos ], false );
-    }
-    // case for first rotate
-    else if ( lastRotatePos == -1 )
-    {
-        initSession( availableVideoList[ rotatePos ], false );
-    }
+    rotateTo( "", audio );
 }
 
 void SessionManager::rotateTo( std::string addr, bool audio )
 {
     lockSessions();
 
-    int numSessions = (int)availableVideoList.size();
+    int numSessions = availableVideoSessions->numObjects();
     int lastRotatePos = rotatePos;
     if ( lastRotatePos != -1 )
-        lastRotateSession = availableVideoList[ rotatePos ];
+        lastRotateSession =
+           static_cast<SessionEntry*>( (*availableVideoSessions)[ rotatePos ] );
     if ( numSessions == 0 )
     {
         unlockSessions();
         return;
     }
 
-    int i = 0;
-    std::vector<std::string>::iterator it = availableVideoList.begin();
-    while ( it != availableVideoList.end() && it->compare( addr ) != 0 )
-    {
-        ++it;
-        i++;
-    }
+    SessionEntry* current;
 
-    if ( it == availableVideoList.end() )
+    // if arg is an empty string, just rotate to next. otherwise, figure out
+    // rotate pos of string arg
+    if ( addr.compare( "" ) == 0 )
     {
-        gravUtil::logWarning( "SessionManager::rotateTo: session %s"
-                " not found\n", addr.c_str() );
-        unlockSessions();
-        return;
+        if ( ++rotatePos >= numSessions )
+        {
+            rotatePos = 0;
+        }
+        current =
+           static_cast<SessionEntry*>( (*availableVideoSessions)[ rotatePos ] );
     }
     else
     {
-        rotatePos = i;
-    }
+        current = findSessionByAddress( addr, AVAILABLEVIDEOSESSION );
 
-    unlockSessions();
+        if ( current == NULL )
+        {
+            gravUtil::logWarning( "SessionManager::rotateTo: session %s"
+                    " not found\n", addr.c_str() );
+            unlockSessions();
+            return;
+        }
+        else
+        {
+            rotatePos = indexOf( current, AVAILABLEVIDEOSESSION );
+        }
+    }
 
     // only remove & rotate if there is a valid old one & it isn't the same as
     // current
-    if ( lastRotateSession.compare( "" ) != 0 &&
-            lastRotateSession.compare( availableVideoList[ rotatePos ] ) != 0 )
+    if ( lastRotateSession != NULL && current != NULL &&
+            lastRotateSession != current )
     {
-        removeSession( lastRotateSession );
-        initSession( availableVideoList[ rotatePos ], false );
+        disableSession( lastRotateSession );
+        initSession( current );
     }
     // case for first rotate
     else if ( lastRotatePos == -1 )
     {
-        initSession( availableVideoList[ rotatePos ], false );
+        initSession( current );
     }
+
+    unlockSessions();
 }
 
 void SessionManager::unrotate( bool audio )
 {
     lockSessions();
 
-    std::string current = getCurrentRotateSession();
+    SessionEntry* current = NULL;
+    if ( rotatePos >= 0 && rotatePos < availableVideoSessions->numObjects() )
+        current =
+           static_cast<SessionEntry*>( (*availableVideoSessions)[ rotatePos ] );
+
     rotatePos = -1;
 
-    lastRotateSession = "";
+    lastRotateSession = NULL;
+
+    if ( current != NULL )
+    {
+        disableSession( current );
+    }
 
     unlockSessions();
-    if ( current.compare( "" ) != 0 )
-    {
-        removeSession( current );
-    }
 }
 
-std::string SessionManager::getCurrentRotateSession()
+SessionEntry* SessionManager::findSessionByAddress( std::string address )
 {
-    if ( rotatePos != -1 && rotatePos < (int)availableVideoList.size() )
-        return availableVideoList[ rotatePos ];
+    Group* sessions;
+    SessionEntry* session;
+    for ( int i = 0; i < numObjects(); i++ )
+    {
+        sessions = static_cast<Group*>( (*this)[i] );
+        for ( int j = 0; j < sessions->numObjects(); j++ )
+        {
+            session = static_cast<SessionEntry*>( (*sessions)[j] );
+            if ( session->getAddress().compare( address ) == 0 )
+                return session;
+        }
+    }
+
+    return NULL;
+}
+
+SessionEntry* SessionManager::findSessionByAddress( std::string address,
+        SessionType type )
+{
+    Group* sessions = sessionMap[ type ];
+    SessionEntry* session;
+
+    for ( int j = 0; j < sessions->numObjects(); j++ )
+    {
+        session = static_cast<SessionEntry*>( (*sessions)[j] );
+        if ( session->getAddress().compare( address ) == 0 )
+            return session;
+    }
+
+    gravUtil::logWarning( "SessionManager::findSessionByAddress: session %s "
+                            "not found\n", address.c_str() );
+    return NULL;
+}
+
+int SessionManager::indexOf( SessionEntry* entry, SessionType type )
+{
+    Group* sessions = sessionMap[ type ];
+    int i = 0;
+    while ( entry != (*sessions)[i] && i < sessions->numObjects() ) i++;
+    if ( i == sessions->numObjects() )
+        return -1;
+    else
+        return i;
+}
+
+std::string SessionManager::getCurrentRotateSessionAddress()
+{
+    if ( rotatePos != -1 && rotatePos < availableVideoSessions->numObjects() )
+    {
+        SessionEntry* entry = static_cast<SessionEntry*>(
+                (*availableVideoSessions)[ rotatePos ] );
+        return entry->getAddress();
+    }
     else
         return "";
 }
 
-std::string SessionManager::getLastRotateSession()
+std::string SessionManager::getLastRotateSessionAddress()
 {
-    return lastRotateSession;
+    if ( lastRotateSession != NULL )
+        return lastRotateSession->getAddress();
+    else
+        return "";
 }
 
 bool SessionManager::setSessionProcessEnable( std::string addr, bool set )
 {
     lockSessions();
 
-    std::vector<SessionEntry>::iterator it = sessions.begin();
-    while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
-        ++it;
-    if ( it == sessions.end() )
+    SessionEntry* entry = findSessionByAddress( addr );
+    if ( entry == NULL )
     {
         unlockSessions();
         return false;
     }
 
-    (*it).enabled = set;
+    entry->setProcessingEnabled( set );
     unlockSessions();
     return true;
 }
@@ -296,16 +299,14 @@ bool SessionManager::isSessionProcessEnabled( std::string addr )
 {
     lockSessions();
 
-    std::vector<SessionEntry>::iterator it = sessions.begin();
-    while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
-        ++it;
-    if ( it == sessions.end() )
+    SessionEntry* entry = findSessionByAddress( addr );
+    if ( entry == NULL )
     {
         unlockSessions();
         return false;
     }
 
-    bool ret = (*it).enabled;
+    bool ret = entry->isProcessingEnabled();
     unlockSessions();
     return ret;
 }
@@ -314,18 +315,14 @@ bool SessionManager::setEncryptionKey( std::string addr, std::string key )
 {
     lockSessions();
 
-    std::vector<SessionEntry>::iterator it = sessions.begin();
-    while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
-        ++it;
-    if ( it == sessions.end() )
+    SessionEntry* entry = findSessionByAddress( addr );
+    if ( entry == NULL )
     {
         unlockSessions();
         return false;
     }
 
-    (*it).encryptionKey = key;
-    (*it).encryptionEnabled = true;
-    (*it).session->setEncryptionKey( key.c_str() );
+    entry->setEncryptionKey( key );
 
     unlockSessions();
     return true;
@@ -335,17 +332,14 @@ bool SessionManager::disableEncryption( std::string addr )
 {
     lockSessions();
 
-    std::vector<SessionEntry>::iterator it = sessions.begin();
-    while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
-        ++it;
-    if ( it == sessions.end() )
+    SessionEntry* entry = findSessionByAddress( addr );
+    if ( entry == NULL )
     {
         unlockSessions();
         return false;
     }
 
-    (*it).encryptionEnabled = false;
-    (*it).session->setEncryptionKey( NULL );
+    entry->disableEncryption();
 
     unlockSessions();
     return true;
@@ -355,17 +349,15 @@ bool SessionManager::isEncryptionEnabled( std::string addr )
 {
     lockSessions();
 
-    std::vector<SessionEntry>::iterator it = sessions.begin();
-    while ( it != sessions.end() && (*it).address.compare( addr ) != 0 )
-        ++it;
-    if ( it == sessions.end() )
+    SessionEntry* entry = findSessionByAddress( addr );
+    if ( entry == NULL )
     {
         unlockSessions();
         return false; // this doesn't quite make sense - should throw some other
                       // kind of error for session not found?
     }
 
-    bool ret = (*it).encryptionEnabled;
+    bool ret = entry->isEncryptionEnabled();
     unlockSessions();
     return ret;
 }
@@ -385,19 +377,25 @@ bool SessionManager::iterateSessions()
     lockCount++;
 
     bool haveSessions = false;
-    for ( unsigned int i = 0; i < sessions.size(); i++ )
+    Group* sessions;
+    SessionEntry* session;
+    for ( int i = 0; i < numObjects(); i++ )
     {
-        if ( sessions[i].enabled )
-            sessions[i].session->iterate( sessions[i].sessionTS++ );
-        haveSessions = haveSessions || sessions[i].enabled;
-    }
-    if ( sessions.size() >= 1 && gravApp::threadDebug )
-    {
-        if ( sessions[0].sessionTS % 1000 == 0 )
+        sessions = static_cast<Group*>( (*this)[i] );
+        for ( int j = 0; j < sessions->numObjects(); j++ )
         {
-            gravUtil::logVerbose( "SessionManager::iterate: "
-                    "have %u sessions, TS=%u\n",
-                    sessions.size(), sessions[0].sessionTS );
+            session = static_cast<SessionEntry*>( (*sessions)[j] );
+            haveSessions = haveSessions || session->iterate();
+        }
+
+        if ( i == 0 && haveSessions && gravApp::threadDebug )
+        {
+            if ( session->getTimestamp() % 1000 == 0 )
+            {
+                gravUtil::logVerbose( "SessionManager::iterate: "
+                        "have %u sessions, 0th TS=%u\n",
+                        sessions->numObjects(), session->getTimestamp() );
+            }
         }
     }
 
@@ -428,4 +426,33 @@ void SessionManager::unlockSessions()
     pause = false;
     mutex_unlock( sessionMutex );
     lockCount--;
+}
+
+/*
+ * Again note these two are NOT thread-safe.
+ */
+bool SessionManager::initSession( SessionEntry* session )
+{
+    bool audio = session->isAudioSession();
+    std::string type = std::string( audio ? "audio" : "video" );
+    VPMSessionListener* listener = audio ?
+        (VPMSessionListener*)audioSessionListener :
+            (VPMSessionListener*)videoSessionListener;
+
+    if ( !session->initSession( listener ) )
+    {
+        gravUtil::logError( "SessionManager::initSession: "
+            "failed to initialise %s session on %s\n", type.c_str(),
+                session->getAddress().c_str() );
+        unlockSessions();
+        return false;
+    }
+
+    gravUtil::logVerbose( "SessionManager::initialized %s session on %s\n",
+            type.c_str(), session->getAddress().c_str() );
+}
+
+void disableSession( SessionEntry* session )
+{
+    session->disableSession();
 }
