@@ -28,6 +28,8 @@
 #ifndef SESSIONENTRY_H_
 #define SESSIONENTRY_H_
 
+#include "RectangleBase.h"
+
 class VPMSessionListener;
 
 class SessionEntry : public RectangleBase

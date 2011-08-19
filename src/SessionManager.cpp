@@ -24,7 +24,6 @@
  */
 
 #include <VPMedia/thread_helper.h>
-#include <VPMedia/random_helper.h>
 
 #include <wx/utils.h>
 
@@ -453,7 +452,7 @@ bool SessionManager::initSession( SessionEntry* session )
             type.c_str(), session->getAddress().c_str() );
 }
 
-void disableSession( SessionEntry* session )
+void SessionManager::disableSession( SessionEntry* session )
 {
     session->disableSession();
 }

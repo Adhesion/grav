@@ -25,12 +25,14 @@
 
 #include <VPMedia/VPMSession.h>
 #include <VPMedia/VPMSessionFactory.h>
+#include <VPMedia/random_helper.h>
 
 #include "SessionEntry.h"
 
 SessionEntry::SessionEntry( std::string addr, bool aud )
 {
     audio = aud;
+    address = addr;
     setName( addr );
 
     processingEnabled = true;
@@ -57,16 +59,28 @@ bool SessionEntry::initSession( VPMSessionListener* listener )
         session->enableAudio( audio );
         session->enableOther( false );
 
+        if ( !session->initialise() )
+        {
+            gravUtil::logError( "SessionEntry::init: failed to initialize on "
+                                "address %s\n", address.c_str() );
+            return false;
+        }
+
         if ( encryptionKey.compare( "__NO_KEY__" ) != 0 )
         {
-            session->setEncryptionKey( key.c_str() );
+            session->setEncryptionKey( encryptionKey.c_str() );
         }
 
         sessionTS = random32();
+
+        return true;
     }
     else
+    {
         gravUtil::logWarning( "SessionEntry::init: session %s already "
                                 "initialized\n", address.c_str() );
+        return false;
+    }
 }
 
 void SessionEntry::disableSession()
@@ -127,7 +141,12 @@ std::string SessionEntry::getAddress()
     return address;
 }
 
-void SessionEntry::iterate()
+uint32_t SessionEntry::getTimestamp()
+{
+    return sessionTS;
+}
+
+bool SessionEntry::iterate()
 {
     bool running = isSessionEnabled() && processingEnabled;
     if ( running )

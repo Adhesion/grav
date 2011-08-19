@@ -100,6 +100,7 @@ set(SOURCES
 	src/PythonTools.cpp
 	src/RectangleBase.cpp
 	src/Runway.cpp
+	src/SessionEntry.cpp
 	src/SessionManager.cpp
 	src/SessionTreeControl.cpp
 	src/SideFrame.cpp
