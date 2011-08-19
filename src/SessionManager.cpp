@@ -85,16 +85,17 @@ bool SessionManager::addSession( std::string address, SessionType type )
 {
     lockSessions();
 
+    bool ret = true;
     bool audio = ( type == AUDIOSESSION );
     SessionEntry* entry = new SessionEntry( address, audio );
     Group* sessions = sessionMap[ type ];
     sessions->add( entry );
 
     if ( type != AVAILABLEVIDEOSESSION )
-        initSession( entry );
+        ret = ret && initSession( entry );
 
     unlockSessions();
-    return true;
+    return ret;
 }
 
 bool SessionManager::removeSession( std::string addr, SessionType type )

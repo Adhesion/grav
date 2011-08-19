@@ -84,37 +84,45 @@ void SessionTreeControl::addSession( std::string address, bool audio,
     wxTreeItemId current;
     SessionType type;
 
-    if ( rotate )
+    // we don't account for audio + rotate since that's not supported
+    if ( audio )
     {
+        type = AUDIOSESSION;
+        node = audioNodeID;
+    }
+    else if ( rotate )
+    {
+        type = AVAILABLEVIDEOSESSION;
+
         // make available video group if not there
         if ( !availableVideoNodeID.IsOk() )
         {
             availableVideoNodeID = AppendItem( rootID, _("Available Video") );
         }
         node = availableVideoNodeID;
-        // note rotate is only for video for now
-        sessionManager->addAvailableSession( address, false );
-        added = true;
     }
     else
     {
-        node = audio ? audioNodeID : videoNodeID;
-        added = sessionManager->initSession( address, audio );
+        type = VIDEOSESSION;
+        node = videoNodeID;
     }
+
+    added = sessionManager->addSession( address, type );
 
     if ( added )
     {
-        current = AppendItem( node, wxString( address.c_str(),
-                                            wxConvUTF8 ) );
+        current = AppendItem( node, wxString( address.c_str(), wxConvUTF8 ) );
         Expand( node );
+
+        if ( rotate )
+            SetItemBackgroundColour( current, *wxBLUE );
     }
     else
     {
+        gravUtil::logError( "SessionTreeControl::removeObject: "
+                            "failed to initialize %s\n", address.c_str() );
         // TODO throw error dialog
     }
-
-    if ( rotate )
-        SetItemBackgroundColour( current, *wxBLUE );
 }
 
 void SessionTreeControl::removeSession( std::string address )
@@ -127,21 +135,29 @@ void SessionTreeControl::removeSession( std::string address )
         return;
     }
 
-    // figure out whether it's a available session or not here
-    if ( GetItemParent( item ) == videoNodeID ||
-         GetItemParent( item ) == audioNodeID )
+    SessionType type;
+    wxTreeItemId parent = GetItemParent( item );
+
+    if ( parent == videoNodeID )
+        type = VIDEOSESSION;
+    else if ( parent == audioNodeID )
+        type = AUDIOSESSION;
+    else if ( parent == availableVideoNodeID )
+        type = AVAILABLEVIDEOSESSION;
+    else
     {
-        if ( sessionManager->removeSession( address ) )
-            Delete( item );
-        else
-        {
-            // TODO throw error dialog, maybe make consistent with part below
-        }
+        gravUtil::logError( "SessionTreeControl::removeObject: "
+                    "cannot remove %s - invalid tree\n", address.c_str() );
+        return;
     }
-    else if ( GetItemParent( item ) == availableVideoNodeID )
-    {
-        sessionManager->removeAvailableSession( address, false );
+
+    if ( sessionManager->removeSession( address, type ) )
         Delete( item );
+    else
+    {
+        gravUtil::logError( "SessionTreeControl::removeObject: "
+                        "removal of %s failed \n", address.c_str() );
+        // TODO throw GUI error dialog
     }
 }
 
@@ -293,7 +309,8 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
         // also add encryption set
         if ( parent == videoNodeID || parent == audioNodeID )
         {
-            wxString toggleLabel = sessionManager->isSessionEnabled( text ) ?
+            wxString toggleLabel =
+                    sessionManager->isSessionProcessEnabled( text ) ?
                             _("Disable") : _("Enable");
             rightClickMenu.Append( toggleEnableID, toggleLabel );
             Connect( toggleEnableID, wxEVT_COMMAND_MENU_SELECTED,
@@ -379,7 +396,8 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
         Connect( unrotateID, wxEVT_COMMAND_MENU_SELECTED,
             wxCommandEventHandler( SessionTreeControl::unrotateEvent ) );
         unrotateItem->Enable(
-            sessionManager->getCurrentRotateSessionAddress().compare( "" ) != 0 );
+            sessionManager->getCurrentRotateSessionAddress().compare( "" ) !=
+                    0 );
     }
 
     // right clicked on audio group or main group
@@ -424,10 +442,11 @@ void SessionTreeControl::toggleEnableSessionEvent( wxCommandEvent& evt )
 {
     std::string selectedAddress = std::string(
                                      GetItemText( GetSelection() ).char_str() );
-    if ( sessionManager->setSessionEnable( selectedAddress,
-            !sessionManager->isSessionEnabled( selectedAddress ) ) )
+    if ( sessionManager->setSessionProcessEnable( selectedAddress,
+            !sessionManager->isSessionProcessEnabled( selectedAddress ) ) )
     {
-        wxColour col = sessionManager->isSessionEnabled( selectedAddress ) ?
+        wxColour col =
+                sessionManager->isSessionProcessEnabled( selectedAddress ) ?
                         *wxWHITE : *wxLIGHT_GREY;
         SetItemBackgroundColour( GetSelection(), col );
     }
