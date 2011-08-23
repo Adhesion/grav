@@ -209,6 +209,8 @@ bool gravApp::OnInit()
     grav->setVenueClientController( venueClientController ); // may be null
     grav->setAudio( audioSessionListener ); // may not necessarily be used
 
+    //grav->addToDrawList( sessionManager );
+
     mapRTP();
 
     sessionTree->setSessionManager( sessionManager );

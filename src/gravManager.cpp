@@ -514,8 +514,21 @@ void gravManager::tryDeleteObject( RectangleBase* obj )
 
 void gravManager::moveToTop( RectangleBase* object, bool checkGrouping )
 {
+    if ( object == NULL )
+    {
+        gravUtil::logError( "gravManager::moveToTop: object %s is NULL\n",
+                            object->getName().c_str() );
+        return;
+    }
+
     std::vector<RectangleBase*>::iterator i = drawnObjects->begin();
-    while ( (*i) != object ) i++;
+    while ( i != drawnObjects->end() && (*i) != object ) ++i;
+    if ( i == drawnObjects->end() )
+    {
+        gravUtil::logError( "gravManager::moveToTop: object %s not found in "
+                            "draw list\n", object->getName().c_str() );
+        return;
+    }
     moveToTop( i, checkGrouping );
 }
 
@@ -540,6 +553,7 @@ void gravManager::moveToTop( std::vector<RectangleBase*>::iterator i,
 
         if ( temp->isGroup() )
         {
+            // TODO another spot to check nested groups?
             Group* g = (Group*)temp;
             for ( int i = 0; i < g->numObjects(); i++ )
                 moveToTop( (*g)[i], false );
