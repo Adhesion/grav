@@ -395,7 +395,7 @@ bool SessionManager::iterateSessions()
         for ( int j = 0; j < sessions->numObjects(); j++ )
         {
             session = static_cast<SessionEntry*>( (*sessions)[j] );
-            haveSessions = haveSessions || session->iterate();
+            haveSessions = session->iterate() || haveSessions;
         }
 
         if ( i == 0 && haveSessions && gravApp::threadDebug )
@@ -403,7 +403,7 @@ bool SessionManager::iterateSessions()
             if ( session->getTimestamp() % 1000 == 0 )
             {
                 gravUtil::logVerbose( "SessionManager::iterate: "
-                        "have %u sessions, 0th TS=%u\n",
+                        "have %u video sessions, last TS=%u\n",
                         sessions->numObjects(), session->getTimestamp() );
             }
         }
