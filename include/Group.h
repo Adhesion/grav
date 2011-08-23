@@ -56,6 +56,8 @@ public:
 
     RectangleBase* operator[]( int i );
     int numObjects();
+    std::vector<RectangleBase*>::iterator getBeginIterator();
+    std::vector<RectangleBase*>::iterator getEndIterator();
 
     bool isGroup();
 

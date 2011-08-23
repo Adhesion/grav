@@ -77,11 +77,24 @@ void Group::add( RectangleBase* object )
 
 void Group::remove( RectangleBase* object, bool move )
 {
+    if ( object == NULL )
+    {
+        gravUtil::logError( "Group::remove: NULL object input\n" );
+        return;
+    }
+
+    std::vector<RectangleBase*>::iterator i = objects.begin();
+    while ( i != objects.end() && *i != object ) i++;
+    if ( i == objects.end() )
+    {
+        gravUtil::logError( "Group::remove: object %s not found\n",
+            object->getName().c_str() );
+        return;
+    }
+
     object->setGroup( NULL );
     object->setSubstring( -1, -1 );
 
-    std::vector<RectangleBase*>::iterator i = objects.begin();
-    while ( *i != object ) i++;
     objects.erase( i );
     if ( objects.size() > 0 && move )
         rearrange();
@@ -90,6 +103,12 @@ void Group::remove( RectangleBase* object, bool move )
 std::vector<RectangleBase*>::iterator Group::remove(
                             std::vector<RectangleBase*>::iterator i, bool move )
 {
+    if ( i == objects.end() || (*i) == NULL )
+    {
+        gravUtil::logError( "Group::remove: invalid object input\n" );
+        return objects.end();
+    }
+
     (*i)->setGroup( NULL );
     (*i)->setSubstring( -1, -1 );
 
@@ -97,6 +116,16 @@ std::vector<RectangleBase*>::iterator Group::remove(
     if ( objects.size() > 0 && move )
         rearrange();
     return ret;
+}
+
+std::vector<RectangleBase*>::iterator Group::getBeginIterator()
+{
+    return objects.begin();
+}
+
+std::vector<RectangleBase*>::iterator Group::getEndIterator()
+{
+    return objects.end();
 }
 
 void Group::removeAll()

@@ -87,8 +87,15 @@ void SessionEntry::disableSession()
 {
     if ( isSessionEnabled() )
     {
+        gravUtil::logVerbose( "SessionEntry::disableSession: disabling session "
+                                "%s\n", address.c_str() );
         delete session;
         session = NULL;
+    }
+    else
+    {
+        gravUtil::logVerbose( "SessionEntry::disableSession: session (%s) not "
+                                "active\n", address.c_str() );
     }
 }
 

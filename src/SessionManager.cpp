@@ -50,8 +50,11 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
     rotatePos = -1;
 
     videoSessions = new Group( getDestX(), getDestY() );
+    videoSessions->setName( "Video" );
     availableVideoSessions = new Group( getDestX(), getDestY() );
+    availableVideoSessions->setName( "Available Video" );
     audioSessions = new Group( getDestX(), getDestY() );
+    audioSessions->setName( "Audio" );
 
     add( videoSessions );
     add( availableVideoSessions );
@@ -68,14 +71,21 @@ SessionManager::~SessionManager()
 
     Group* sessions;
     SessionEntry* session;
-    for ( int i = 0; i < numObjects(); i++ )
+    std::vector<RectangleBase*>::iterator groupIt = getBeginIterator();
+    while ( groupIt != getEndIterator() )
     {
-        sessions = static_cast<Group*>( (*this)[i] );
-        for ( int j = 0; j < sessions->numObjects(); j++ )
+        sessions = static_cast<Group*>( *groupIt );
+        std::vector<RectangleBase*>::iterator sessionIt =
+                sessions->getBeginIterator();
+        while ( sessionIt != sessions->getEndIterator() )
         {
-            session = static_cast<SessionEntry*>( (*sessions)[j] );
+            // no need to do a static cast here since we don't use methods
+            // specific to sessionentry
+            RectangleBase* session = *sessionIt;
+            sessionIt = sessions->remove( sessionIt );
             delete session;
         }
+        groupIt = remove( groupIt );
         delete sessions;
     }
 }
