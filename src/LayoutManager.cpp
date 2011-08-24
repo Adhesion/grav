@@ -101,7 +101,7 @@ bool LayoutManager::arrange( std::string method,
 
     if ( lookup.find(method) == lookup.end() )
     {
-        gravUtil::logError( "InputHandler::arrange: method %s not found\n",
+        gravUtil::logError( "LayoutManager::arrange: method %s not found\n",
                 method.c_str() );
         return false;
     }
@@ -121,7 +121,7 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
     //        outerL, outerR, outerU, outerD );
     if ( data.find("objects") == data.end() )
     {
-        gravUtil::logError( "InputHandler::perimeterArrange was not passed an "
+        gravUtil::logError( "LayoutManager::perimeterArrange was not passed an "
                 "'objects'\n" );
         return false;
     }
@@ -262,7 +262,7 @@ bool LayoutManager::gridArrange( float outerL, float outerR,
     // Extract object data
     if ( data.find("objects") == data.end() )
     {
-        gravUtil::logError( "InputHandler::gridArrange was not passed an "
+        gravUtil::logError( "LayoutManager::gridArrange was not passed an "
                 "'objects'\n" );
         return false;
     }
@@ -447,13 +447,13 @@ bool LayoutManager::focus( float outerL, float outerR,
     // Extract object data
     if ( data.find("outers") == data.end() )
     {
-        gravUtil::logError( "InputHandler::focus was not passed an "
+        gravUtil::logError( "LayoutManager::focus was not passed an "
                 "'outers'\n" );
         return false;
     }
     if ( data.find("inners") == data.end() )
     {
-        gravUtil::logError( "InputHandler::focus was not passed an "
+        gravUtil::logError( "LayoutManager::focus was not passed an "
                 "'inners'\n" );
         return false;
     }
@@ -550,13 +550,13 @@ bool LayoutManager::aspectFocus( float outerL, float outerR,
     // Extract object data
     if ( data.find("outers") == data.end() )
     {
-        gravUtil::logError( "InputHandler::aspectfocus was not passed an "
+        gravUtil::logError( "LayoutManager::aspectfocus was not passed an "
                 "'outers'\n" );
         return false;
     }
     if ( data.find("inners") == data.end() )
     {
-        gravUtil::logError( "InputHandler::aspectfocus was not passed an "
+        gravUtil::logError( "LayoutManager::aspectfocus was not passed an "
                 "'inners'\n" );
         return false;
     }
