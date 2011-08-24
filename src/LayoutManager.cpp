@@ -232,7 +232,7 @@ bool LayoutManager::gridArrange( float outerL, float outerR,
         std::map<std::string, std::string> opts )
 {
     // Setup opts defaults
-    std::map<std::string, std::string> dflt = \
+    std::map<std::string, std::string> dflt =
         std::map<std::string, std::string>();
     dflt["horiz"] = "True"; dflt["edge"] = "False"; dflt["resize"] = "True";
     dflt["numX"] = "0";     dflt["numY"] = "0";
