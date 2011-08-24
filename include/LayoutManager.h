@@ -85,6 +85,10 @@ private:
                         bool horiz, bool edge, bool resize,
                         std::map<std::string, std::vector<RectangleBase*> > data,
                         int numX = 0, int numY = 0 );
+    /*
+     * Arranges objects in a grid based on options.
+     * Inner rectangle is ignored.
+     */
     bool gridArrange( float outerL, float outerR, float outerU, float outerD,
                       float innerL, float innerR, float innerU, float innerD,
                       std::map<std::string, std::vector<RectangleBase*> > data,

@@ -26,11 +26,33 @@
 
 #include <cstdio>
 #include <cmath>
+#include <sstream>
 
 #include "LayoutManager.h"
 #include "RectangleBase.h"
 
 #include "gravUtil.h"
+
+// Little utility... should be phased out with a better usage of std::map
+bool str2bool(std::string str) { return str.compare( "True" ) == 0; }
+int str2int(std::string str) { return atoi(str.c_str()); }
+float str2fl(std::string str) { return atof(str.c_str()); }
+
+std::string bool2str(bool b) { return std::string( b ? "True" : "False" ); }
+
+std::string int2str(int i)
+{
+    std::ostringstream ss;
+    ss << i;
+    return ss.str();
+}
+
+std::string fl2str(float f)
+{
+    std::ostringstream ss;
+    ss << f;
+    return ss.str();
+}
 
 LayoutManager::LayoutManager()
 { }
@@ -128,6 +150,9 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
     float sideRatio = (outerU-outerD) / ((outerU-outerD)+(innerR-innerL));
     int topNum, sideNum, bottomNum;
 
+    std::map<std::string, std::string> gridOpts =
+            std::map<std::string, std::string>();
+
     if ( objects.size() == 1 )
     {
         topNum = 1; sideNum = 0; bottomNum = 0;
@@ -154,10 +179,15 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
             topObjs.push_back( objects[i] );
 
         data["objects"] = topObjs;
+        gridOpts["horiz"] = "True";
+        gridOpts["edge"] = "False";
+        gridOpts["resize"] = "True";
+        gridOpts["numX"] = int2str( topNum );
+        gridOpts["numY"] = "1";
 
         // constant on top is for space for text
-        gridArrange( innerL, innerR, outerU-0.8f, innerU, true, false, true,
-                     data, topNum, 1 );
+        gridArrange( innerL, innerR, outerU-0.8f, innerU,
+                0.0f, 0.0f, 0.0f, 0.0f, data, gridOpts );
     }
 
     end = topNum + sideNum;
@@ -169,9 +199,14 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
             rightObjs.push_back( objects[i] );
 
         data["objects"] = rightObjs;
+        gridOpts["horiz"] = "False";
+        gridOpts["edge"] = "True";
+        gridOpts["resize"] = "True";
+        gridOpts["numX"] = "1";
+        gridOpts["numY"] = int2str( sideNum );
 
-        gridArrange( innerR, outerR, outerU, outerD, false, true, true,
-                     data, 1, sideNum );
+        gridArrange( innerR, outerR, outerU, outerD,
+                0.0f, 0.0f, 0.0f, 0.0f, data, gridOpts );
     }
 
     end = topNum + sideNum + bottomNum;
@@ -184,9 +219,14 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
             bottomObjs.push_back( objects[i] );
 
         data["objects"] = bottomObjs;
+        gridOpts["horiz"] = "True";
+        gridOpts["edge"] = "False";
+        gridOpts["resize"] = "True";
+        gridOpts["numX"] = int2str( bottomNum );
+        gridOpts["numY"] = "1";
 
-        gridArrange( innerL, innerR, innerD, outerD, true, false, true,
-                     data, bottomNum, 1 );
+        gridArrange( innerL, innerR, innerD, outerD,
+                0.0f, 0.0f, 0.0f, 0.0f, data, gridOpts );
     }
 
     if ( sideNum > 0 )
@@ -197,9 +237,14 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
             leftObjs.push_back( objects[i] );
 
         data["objects"] = leftObjs;
+        gridOpts["horiz"] = "False";
+        gridOpts["edge"] = "True";
+        gridOpts["resize"] = "True";
+        gridOpts["numX"] = "1";
+        gridOpts["numY"] = int2str( sideNum );
 
-        gridArrange( outerL, innerL, outerU, outerD, false, true, true,
-                     data, 1, sideNum );
+        gridArrange( outerL, innerL, outerU, outerD,
+                0.0f, 0.0f, 0.0f, 0.0f, data, gridOpts );
     }
     // TODO - return the conjunction of the above gridArrange return values
     return true;
@@ -218,11 +263,6 @@ bool LayoutManager::gridArrange( RectangleBase outerRect,
     return gridArrange( outerL, outerR, outerU, outerD, horiz, edge,
                             resize, data, numX, numY );
 }
-
-// Little utility... should be phased out with a better usage of std::map
-bool str2bool(std::string str) { return str.compare( "True" ) == 0; }
-int str2int(std::string str) { return atoi(str.c_str()); }
-float str2fl(std::string str) { return atof(str.c_str()); }
 
 bool LayoutManager::gridArrange( float outerL, float outerR,
         float outerU, float outerD,
