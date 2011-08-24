@@ -250,20 +250,6 @@ bool LayoutManager::perimeterArrange( float outerL, float outerR,
     return true;
 }
 
-bool LayoutManager::gridArrange( RectangleBase outerRect,
-        bool horiz, bool edge, bool resize,
-        std::map<std::string, std::vector<RectangleBase*> > data,
-        int numX, int numY )
-{
-    float outerL = outerRect.getLBound();
-    float outerR = outerRect.getRBound();
-    float outerU = outerRect.getUBound();
-    float outerD = outerRect.getDBound();
-
-    return gridArrange( outerL, outerR, outerU, outerD, horiz, edge,
-                            resize, data, numX, numY );
-}
-
 bool LayoutManager::gridArrange( float outerL, float outerR,
         float outerU, float outerD,
         float innerL, float innerR,
@@ -286,21 +272,12 @@ bool LayoutManager::gridArrange( float outerL, float outerR,
             opts[i->first] = i->second;
     }
 
-    return gridArrange(outerL, outerR, outerU, outerD,
-                       str2bool(opts["horiz"]),
-                       str2bool(opts["edge"]),
-                       str2bool(opts["resize"]),
-                       data,
-                       str2int(opts["numX"]),
-                       str2int(opts["numY"]));
-}
+    bool horiz = str2bool( opts["horiz"] );
+    bool edge = str2bool( opts["edge"] );
+    bool resize = str2bool( opts["resize"] );
+    int numX = str2int( opts["numX"] );
+    int numY = str2int( opts["numY"] );
 
-bool LayoutManager::gridArrange( float outerL, float outerR, float outerU,
-        float outerD,
-        bool horiz, bool edge, bool resize,
-        std::map<std::string, std::vector<RectangleBase*> > data,
-        int numX, int numY )
-{
     // Extract object data
     if ( data.find("objects") == data.end() )
     {
@@ -572,22 +549,30 @@ bool LayoutManager::focus( float outerL, float outerR,
         perimeterInnerD = centerY - Ydist;
     }
 
-    std::map<std::string, std::vector<RectangleBase*> > a_data =
+    std::map<std::string, std::vector<RectangleBase*> > gridData =
         std::map<std::string, std::vector<RectangleBase*> >();
-    a_data["objects"] = inners;
+    gridData["objects"] = inners;
+
+    std::map<std::string, std::string> gridOpts =
+                std::map<std::string, std::string>();
+    gridOpts["horiz"] = "True";
+    gridOpts["edge"] = "False";
+    gridOpts["resize"] = "True";
 
     bool gridRes = gridArrange( gridBoundL, gridBoundR, gridBoundU, gridBoundD,
-                                 true, false, true,
-                                 a_data );
+                                 0.0f, 0.0f, 0.0f, 0.0f,
+                                 gridData, gridOpts );
 
     bool perimRes = true;
     if ( !outers.empty() )
     {
-        a_data["objects"] = outers;
+        std::map<std::string, std::vector<RectangleBase*> > perimData =
+                std::map<std::string, std::vector<RectangleBase*> >();
+        perimData["objects"] = outers;
         perimRes = perimeterArrange( outerL, outerR, outerU, outerD,
                             perimeterInnerL, perimeterInnerR,
                             perimeterInnerU, perimeterInnerD,
-                            a_data );
+                            perimData );
     }
 
     return gridRes && perimRes;

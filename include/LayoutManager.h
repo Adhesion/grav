@@ -81,10 +81,6 @@ private:
                             std::map<std::string, std::vector<RectangleBase*> > data,
                             std::map<std::string, std::string> options=std::map<std::string, std::string>());
 
-    bool gridArrange( RectangleBase innerRect,
-                        bool horiz, bool edge, bool resize,
-                        std::map<std::string, std::vector<RectangleBase*> > data,
-                        int numX = 0, int numY = 0 );
     /*
      * Arranges objects in a grid based on options.
      * Inner rectangle is ignored.
@@ -93,10 +89,6 @@ private:
                       float innerL, float innerR, float innerU, float innerD,
                       std::map<std::string, std::vector<RectangleBase*> > data,
                       std::map<std::string, std::string> options);
-    bool gridArrange( float innerL, float innerR, float innerU, float innerD,
-                        bool horiz, bool edge, bool resize,
-                        std::map<std::string, std::vector<RectangleBase*> > data,
-                        int numX = 0, int numY = 0 );
 };
 
 #endif /*LAYOUTMANAGER_H_*/
