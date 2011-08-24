@@ -110,25 +110,6 @@ bool LayoutManager::arrange( std::string method,
                                     data, options );
 }
 
-bool LayoutManager::perimeterArrange( RectangleBase outerRect,
-        RectangleBase innerRect,
-        std::map<std::string, std::vector<RectangleBase*> > data,
-        std::map<std::string, std::string> opts )
-{
-    float outerL = outerRect.getLBound();
-    float outerR = outerRect.getRBound();
-    float outerU = outerRect.getUBound();
-    float outerD = outerRect.getDBound();
-
-    float innerL = innerRect.getLBound();
-    float innerR = innerRect.getRBound();
-    float innerU = innerRect.getUBound();
-    float innerD = innerRect.getDBound();
-
-    return perimeterArrange( outerL, outerR, outerU, outerD, innerL, innerR,
-                                innerU, innerD, data );
-}
-
 bool LayoutManager::perimeterArrange( float outerL, float outerR,
         float outerU, float outerD,
         float innerL, float innerR,
@@ -456,25 +437,6 @@ bool LayoutManager::gridArrange( float outerL, float outerR,
     return true;
 }
 
-bool LayoutManager::focus( RectangleBase outerRect, RectangleBase innerRect,
-        std::map<std::string, std::vector<RectangleBase*> > data,
-        std::map<std::string, std::string> opts)
-{
-    float innerL = innerRect.getLBound();
-    float innerR = innerRect.getRBound();
-    float innerU = innerRect.getUBound();
-    float innerD = innerRect.getDBound();
-
-    float outerL = outerRect.getLBound();
-    float outerR = outerRect.getRBound();
-    float outerU = outerRect.getUBound();
-    float outerD = outerRect.getDBound();
-
-    return focus( outerL, outerR, outerU, outerD,
-                  innerL, innerR, innerU, innerD,
-                  data, opts );
-}
-
 bool LayoutManager::focus( float outerL, float outerR,
         float outerU, float outerD,
         float innerL, float innerR,
@@ -576,26 +538,6 @@ bool LayoutManager::focus( float outerL, float outerR,
     }
 
     return gridRes && perimRes;
-}
-
-bool LayoutManager::aspectFocus( RectangleBase outerRect,
-        RectangleBase innerRect,
-        std::map<std::string, std::vector<RectangleBase*> > data,
-        std::map<std::string, std::string> opts )
-{
-    float innerL = innerRect.getLBound();
-    float innerR = innerRect.getRBound();
-    float innerU = innerRect.getUBound();
-    float innerD = innerRect.getDBound();
-
-    float outerL = outerRect.getLBound();
-    float outerR = outerRect.getRBound();
-    float outerU = outerRect.getUBound();
-    float outerD = outerRect.getDBound();
-
-    return aspectFocus( outerL, outerR, outerU, outerD,
-                  innerL, innerR, innerU, innerD,
-                  data, opts );
 }
 
 bool LayoutManager::aspectFocus( float outerL, float outerR,

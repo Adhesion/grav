@@ -52,9 +52,6 @@ public:
                   std::map<std::string, std::string> options=std::map<std::string, std::string>());
 
 private:
-    bool focus( RectangleBase outerRect, RectangleBase innerRect,
-                    std::map<std::string, std::vector<RectangleBase*> > data,
-                    std::map<std::string, std::string> options=std::map<std::string, std::string>());
     bool focus( float outerL, float outerR, float outerU, float outerD,
                 float innerL, float innerR, float innerU, float innerD,
                 std::map<std::string, std::vector<RectangleBase*> > data,
@@ -64,17 +61,11 @@ private:
     // options.
     // inner rect supplied is ignored.
     // like focus, must be passed data["outers"] and data["inners"]
-    bool aspectFocus( RectangleBase outerRect, RectangleBase innerRect,
-                    std::map<std::string, std::vector<RectangleBase*> > data,
-                    std::map<std::string, std::string> options=std::map<std::string, std::string>());
     bool aspectFocus( float outerL, float outerR, float outerU, float outerD,
                 float innerL, float innerR, float innerU, float innerD,
                 std::map<std::string, std::vector<RectangleBase*> > data,
                 std::map<std::string, std::string> options=std::map<std::string, std::string>());
 
-    bool perimeterArrange( RectangleBase outerRect, RectangleBase innerRect,
-                            std::map<std::string, std::vector<RectangleBase*> > data,
-                            std::map<std::string, std::string> options=std::map<std::string, std::string>());
     bool perimeterArrange( float outerL, float outerR, float outerU,
                             float outerD, float innerL, float innerR,
                             float innerU, float innerD,
