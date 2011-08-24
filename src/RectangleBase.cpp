@@ -353,6 +353,27 @@ float RectangleBase::getCenterOffsetY()
     return ret;
 }
 
+// TODO see above
+float RectangleBase::getDestCenterOffsetX()
+{
+    return 0.0f;
+}
+
+float RectangleBase::getDestCenterOffsetY()
+{
+    float ret = 0.0f;
+    if ( getDestTextHeight() > 0.0f &&
+         ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS ) )
+    {
+        float textRatio = ( getDestTextHeight() + getDestTextOffset() ) /
+                getDestHeight();
+        ret = textRatio * getDestHeight() / 2.0f;
+        if ( titleStyle == FULLCAPTIONS )
+            ret *= -1.0f;
+    }
+    return ret;
+}
+
 void RectangleBase::move( float _x, float _y )
 {
     destX = _x;

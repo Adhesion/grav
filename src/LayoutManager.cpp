@@ -241,8 +241,12 @@ bool LayoutManager::gridArrange( float outerL, float outerR,
     // Setup opts defaults
     std::map<std::string, std::string> dflt =
         std::map<std::string, std::string>();
-    dflt["horiz"] = "True"; dflt["edge"] = "False"; dflt["resize"] = "True";
-    dflt["numX"] = "0";     dflt["numY"] = "0";
+    dflt["horiz"] = "True";
+    dflt["edge"] = "False";
+    dflt["resize"] = "True";
+    dflt["preserveAspect"] = "True";
+    dflt["numX"] = "0";
+    dflt["numY"] = "0";
 
     // Apply the opts defaults to opts
     for (std::map<std::string,std::string>::iterator i = dflt.begin();
@@ -256,6 +260,7 @@ bool LayoutManager::gridArrange( float outerL, float outerR,
     bool horiz = str2bool( opts["horiz"] );
     bool edge = str2bool( opts["edge"] );
     bool resize = str2bool( opts["resize"] );
+    bool preserveAspect = str2bool( opts["preserveAspect"] );
     int numX = str2int( opts["numX"] );
     int numY = str2int( opts["numY"] );
 
@@ -376,15 +381,30 @@ bool LayoutManager::gridArrange( float outerL, float outerR,
                 newHeight = stride * 0.95f;
                 newWidth = span * 0.95f;
             }
-            if ( aspect > objectAspect )
+
+            if ( preserveAspect )
             {
-                //gravUtil::logVerbose( "layout setting height to %f\n", newHeight );
-                objects[i]->setTotalHeight( newHeight );
+                if ( aspect > objectAspect )
+                {
+                    //gravUtil::logVerbose( "layout setting height to %f\n", newHeight );
+                    objects[i]->setTotalHeight( newHeight );
+                }
+                else
+                {
+                    //gravUtil::logVerbose( "layout setting width to %f\n", newWidth );
+                    objects[i]->setTotalWidth( newWidth );
+                }
             }
             else
             {
-                //gravUtil::logVerbose( "layout setting width to %f\n", newWidth );
-                objects[i]->setTotalWidth( newWidth );
+                // only reason we check aspect here is if we could be resizing
+                // a video
+                // (ie, replicate what videosource does internally, forcing it
+                // to change the aspect ratio while still sizing to the correct
+                // total width)
+                //gravUtil::logVerbose( "layout setting scale to %f/%f\n", newWidth / objects[i]->getOriginalAspect(), newHeight );
+                objects[i]->setScale(
+                        newWidth / objects[i]->getOriginalAspect(), newHeight );
             }
         }
     }
@@ -392,7 +412,7 @@ bool LayoutManager::gridArrange( float outerL, float outerR,
     for ( unsigned int i = 0; i < objects.size(); i++ )
     {
         //gravUtil::logVerbose( "grid: moving object %i to %f,%f\n", i, curX, curY );
-        objects[i]->move( curX, curY - objects[i]->getCenterOffsetY() );
+        objects[i]->move( curX, curY - objects[i]->getDestCenterOffsetY() );
         int objectsLeft = (int)objects.size() - i - 1;
 
         if ( horiz )

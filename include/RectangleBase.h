@@ -112,6 +112,7 @@ public:
      * center of the whole, meaning the borders and text are included.
      */
     float getCenterOffsetX(); float getCenterOffsetY();
+    float getDestCenterOffsetX(); float getDestCenterOffsetY();
 
     /*
      * Change the position of the object. Move may or may not have animation
