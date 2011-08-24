@@ -82,6 +82,7 @@ public:
     float getWidth(); float getHeight();
     float getDestWidth(); float getDestHeight();
     void setWidth( float w ); void setHeight( float h );
+    float getOriginalAspect();
 
     // set/get for mute (controls state of decoder)
     void toggleMute();
@@ -108,7 +109,7 @@ private:
     // original dimensions of the video
     unsigned int vwidth, vheight;
 
-    // aspect ratio of the video
+    // original aspect ratio of the video
     float aspect;
 
     // remake the buffer when the video gets resized

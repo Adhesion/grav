@@ -462,6 +462,11 @@ void VideoSource::setHeight( float h )
     setScale( destScaleX * (h/destScaleY), h );
 }
 
+float VideoSource::getOriginalAspect()
+{
+    return aspect;
+}
+
 void VideoSource::toggleMute()
 {
     session->enableSource( ssrc, isMuted() );

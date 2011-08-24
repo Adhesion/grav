@@ -507,6 +507,11 @@ float RectangleBase::getLon()
     return lon;
 }
 
+float RectangleBase::getOriginalAspect()
+{
+    return 1.0;
+}
+
 void RectangleBase::setName( std::string s )
 {
     bool nameChanged = s.compare( name ) == 0;

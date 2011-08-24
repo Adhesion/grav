@@ -166,6 +166,12 @@ public:
     float getScaleX(); float getScaleY();
     float getLat(); float getLon();
 
+    /*
+     * Returns the original aspect ratio of the object. Will be the aspect ratio
+     * of the video for a VideoSource, probably 1.0 for everything else.
+     */
+    virtual float getOriginalAspect();
+
     void setName( std::string s );
     void setSiteID( std::string sid );
     std::string getName();
