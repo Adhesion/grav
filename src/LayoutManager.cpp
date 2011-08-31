@@ -397,12 +397,10 @@ bool LayoutManager::gridArrange( float outerL, float outerR,
             {
                 if ( aspect > objectAspect )
                 {
-                    //gravUtil::logVerbose( "layout setting height to %f\n", newHeight );
                     objects[i]->setTotalHeight( newHeight );
                 }
                 else
                 {
-                    //gravUtil::logVerbose( "layout setting width to %f\n", newWidth );
                     objects[i]->setTotalWidth( newWidth );
                 }
             }

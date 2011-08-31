@@ -41,6 +41,7 @@ Group::Group( float _x, float _y ) :
     locked = true;
     showLockStatus = true;
     allowHiding = false;
+    preserveChildAspect = true;
 
     rearrangeStyle = ONECOLUMN;
 
@@ -154,6 +155,7 @@ bool Group::isGroup()
 
 void Group::rearrange()
 {
+
     // it doesn't make sense to rearrange 0 objects, plus having objects.size
     // = 0 will cause div by 0 crashes later
     if ( objects.size() == 0 ) return;
@@ -162,6 +164,8 @@ void Group::rearrange()
     data["objects"] = objects;
 
     std::map<std::string, std::string> opts;
+    opts["preserveAspect"] =
+            std::string( preserveChildAspect ? "True" : "False" );
 
     std::ostringstream ss;
 

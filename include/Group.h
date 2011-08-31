@@ -80,6 +80,7 @@ protected:
     LayoutManager layouts;
 
     ArrangeStyle rearrangeStyle;
+    bool preserveChildAspect;
 
     bool allowHiding;
 
