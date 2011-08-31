@@ -273,12 +273,12 @@ bool RectangleBase::findRayIntersect( Ray r, Point& intersect )
 
 float RectangleBase::getBorderSize()
 {
-    return scaleY * borderScale;
+    return scaleX * borderScale;
 }
 
 float RectangleBase::getDestBorderSize()
 {
-    return destScaleY * borderScale;
+    return destScaleX * borderScale;
 }
 
 float RectangleBase::getBorderScale()
@@ -430,6 +430,30 @@ void RectangleBase::setTotalHeight( float h )
 {
     float newHeight = h * getDestHeight() / getDestTotalHeight();
     setHeight( newHeight );
+}
+
+/*
+ * Note how this method replicates the definition of height/width as far as
+ * border size & text go - so if those change this needs to as well.
+ * Not sure if there's a way around this.
+ */
+void RectangleBase::setTotalSize( float w, float h )
+{
+    // we need to set X first since border, text etc depend on it...
+    // (using the original aspect here will correctly size videos since their
+    // width calculation is based on that as well)
+    float newX = w / ( getOriginalAspect() + ( 2 * borderScale ) );
+    setScale( newX, destScaleY );
+
+    // ...then we can figure out Y based on those values
+    float newY = h - ( 2 * getDestBorderSize() );
+    if ( getDestTextHeight() > 0.0f &&
+        ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS ) )
+    {
+        newY -= getDestTextOffset() + getDestTextHeight();
+    }
+
+    setScale( newX, newY );
 }
 
 void RectangleBase::setBorderScale( float b )

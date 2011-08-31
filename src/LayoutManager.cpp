@@ -293,7 +293,18 @@ bool LayoutManager::gridArrange( float outerL, float outerR,
     // if we only have one object, just fullscreen it to the area
     if ( objects.size() == 1 )
     {
-        objects[0]->fillToRect( outerL, outerR, outerU, outerD );
+        if ( preserveAspect )
+        {
+            objects[0]->fillToRect( outerL, outerR, outerU, outerD );
+        }
+        else
+        {
+            objects[0]->setTotalSize( outerR - outerL, outerU - outerD );
+            objects[0]->move( ( ( outerR + outerL ) / 2.0f ) -
+                        objects[0]->getDestCenterOffsetX(),
+                    ( ( outerU + outerD ) / 2.0f ) -
+                        objects[0]->getDestCenterOffsetY() );
+        }
         return true;
     }
 
@@ -397,14 +408,7 @@ bool LayoutManager::gridArrange( float outerL, float outerR,
             }
             else
             {
-                // only reason we check aspect here is if we could be resizing
-                // a video
-                // (ie, replicate what videosource does internally, forcing it
-                // to change the aspect ratio while still sizing to the correct
-                // total width)
-                //gravUtil::logVerbose( "layout setting scale to %f/%f\n", newWidth / objects[i]->getOriginalAspect(), newHeight );
-                objects[i]->setScale(
-                        newWidth / objects[i]->getOriginalAspect(), newHeight );
+                objects[i]->setTotalSize( newWidth, newHeight );
             }
         }
     }

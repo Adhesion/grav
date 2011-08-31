@@ -122,7 +122,7 @@ public:
     virtual void setPos( float _x, float _y );
 
     /*
-     * Change the size of the object.
+     * Change the scaling of the object.
      */
     virtual void setScale( float xs, float ys );
     /*
@@ -132,8 +132,8 @@ public:
     virtual void setScale( float xs, float ys, bool resizeMembers );
 
     /*
-     * Change the selected size to be equal to the argument given, preserving
-     * aspect ratio.
+     * Change the selected dimension to be equal to the argument given,
+     * preserving aspect ratio.
      */
     virtual void setWidth( float w );
     virtual void setHeight( float h );
@@ -144,6 +144,12 @@ public:
      */
     void setTotalWidth( float w );
     void setTotalHeight( float h );
+
+    /*
+     * Change the total size, ie, including borders and text, WITHOUT preserving
+     * aspect ratio.
+     */
+    void setTotalSize( float w, float h );
 
     /*
      * Set the scale of the border, relative to vertical scaling.
