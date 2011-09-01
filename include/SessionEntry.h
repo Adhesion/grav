@@ -70,6 +70,7 @@ private:
     bool audio;
 
     bool processingEnabled;
+    bool initialized;
 
     VPMSession* session;
     uint32_t sessionTS;

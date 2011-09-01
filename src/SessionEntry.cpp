@@ -36,6 +36,7 @@ SessionEntry::SessionEntry( std::string addr, bool aud )
     setName( addr );
 
     processingEnabled = true;
+    initialized = false;
 
     encryptionKey = "__NO_KEY__";
     encryptionEnabled = false;
@@ -45,6 +46,7 @@ SessionEntry::SessionEntry( std::string addr, bool aud )
 
 SessionEntry::~SessionEntry()
 {
+    gravUtil::logVerbose( "~SessionEntry\n" );
     disableSession();
 }
 
@@ -63,6 +65,10 @@ bool SessionEntry::initSession( VPMSessionListener* listener )
         {
             gravUtil::logError( "SessionEntry::init: failed to initialize on "
                                 "address %s\n", address.c_str() );
+            initialized = false;
+            // might as well delete the session object here to prevent potential
+            // memleaks (ie, reinitializing a session that failed to init)
+            disableSession();
             return false;
         }
 
@@ -73,6 +79,7 @@ bool SessionEntry::initSession( VPMSessionListener* listener )
 
         sessionTS = random32();
 
+        initialized = true;
         return true;
     }
     else
@@ -85,23 +92,25 @@ bool SessionEntry::initSession( VPMSessionListener* listener )
 
 void SessionEntry::disableSession()
 {
-    if ( isSessionEnabled() )
+    // even if it failed to initalize, we still need to delete the session
+    // object
+    if ( session != NULL )
     {
-        gravUtil::logVerbose( "SessionEntry::disableSession: disabling session "
-                                "%s\n", address.c_str() );
+        gravUtil::logVerbose( "SessionEntry::disableSession: deleting "
+                                "VPMSession object for %s\n", address.c_str() );
         delete session;
         session = NULL;
     }
     else
     {
         gravUtil::logVerbose( "SessionEntry::disableSession: session (%s) not "
-                                "active\n", address.c_str() );
+                                "active, not deleting\n", address.c_str() );
     }
 }
 
 bool SessionEntry::isSessionEnabled()
 {
-    return ( session != NULL );
+    return ( session != NULL && initialized );
 }
 
 void SessionEntry::setProcessingEnabled( bool proc )

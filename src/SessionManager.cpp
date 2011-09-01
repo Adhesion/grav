@@ -103,6 +103,9 @@ bool SessionManager::addSession( std::string address, SessionType type )
     if ( type != AVAILABLEVIDEOSESSION )
         ret = ret && initSession( entry );
 
+    if ( !ret )
+        delete entry;
+
     unlockSessions();
     return ret;
 }

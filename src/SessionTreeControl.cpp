@@ -119,7 +119,7 @@ void SessionTreeControl::addSession( std::string address, bool audio,
     }
     else
     {
-        gravUtil::logError( "SessionTreeControl::removeObject: "
+        gravUtil::logError( "SessionTreeControl::addObject: "
                             "failed to initialize %s\n", address.c_str() );
         // TODO throw error dialog
     }
