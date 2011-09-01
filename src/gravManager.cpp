@@ -47,6 +47,7 @@
 #include "TreeControl.h"
 #include "LayoutManager.h"
 #include "VenueClientController.h"
+#include "SessionManager.h"
 #include "Camera.h"
 #include "Point.h"
 
@@ -836,6 +837,10 @@ void gravManager::setWindowSize( int w, int h )
                                      screenRectSub.getDestHeight() * 0.9f );
         venueClientController->rearrange();
     }
+
+    sessionManager->setScale( screenRectSub.getDestWidth() * 0.6f,
+                             screenRectSub.getDestHeight() * 0.2f );
+    sessionManager->rearrange();
 }
 
 void gravManager::recalculateRectSizes()
@@ -1260,6 +1265,12 @@ void gravManager::setVenueClientController( VenueClientController* vcc )
     {
         drawnObjects->push_back( venueClientController );
     }
+}
+
+void gravManager::setSessionManager( SessionManager* s )
+{
+    sessionManager = s;
+    //drawnObjects->push_back( sessionManager );
 }
 
 void gravManager::setHeaderString( std::string h )

@@ -207,9 +207,8 @@ bool gravApp::OnInit()
     grav->setVideoListener( videoSessionListener );
     grav->setCanvas( canvas );
     grav->setVenueClientController( venueClientController ); // may be null
+    grav->setSessionManager( sessionManager );
     grav->setAudio( audioSessionListener ); // may not necessarily be used
-
-    //grav->addToDrawList( sessionManager );
 
     mapRTP();
 

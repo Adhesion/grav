@@ -37,7 +37,7 @@
 #include "gravUtil.h"
 
 SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
-    : Group( 0.0f, -8.0f), videoSessionListener( vl ),
+    : Group( 0.0f, -6.0f ), videoSessionListener( vl ),
       audioSessionListener( al )
 {
     sessionMutex = mutex_create();
@@ -48,6 +48,12 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
     pause = false;
 
     rotatePos = -1;
+
+    preserveChildAspect = false;
+
+    locked = false;
+    selectable = false;
+    userMovable = false;
 
     videoSessions = new Group( getDestX(), getDestY() );
     videoSessions->setName( "Video" );

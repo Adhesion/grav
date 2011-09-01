@@ -47,6 +47,7 @@ class TreeControl;
 class LayoutManager;
 class Runway;
 class VenueClientController;
+class SessionManager;
 class Camera;
 class Point;
 
@@ -174,6 +175,7 @@ public:
     void setVideoListener( VideoListener* v );
     void setCanvas( GLCanvas* c );
     void setVenueClientController( VenueClientController* vcc );
+    void setSessionManager( SessionManager* s );
     /*
      * Note, this should be called after GL setup since it needs to calculate
      * the text size, which depends on the font being set up.
@@ -245,6 +247,8 @@ private:
     GLCanvas* canvas;
 
     VenueClientController* venueClientController;
+
+    SessionManager* sessionManager;
 
     std::string headerString;
     bool useHeader;
