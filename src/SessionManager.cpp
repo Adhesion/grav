@@ -51,7 +51,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
 
     preserveChildAspect = false;
 
-    locked = false;
+    locked = true;
     selectable = false;
     userMovable = false;
 

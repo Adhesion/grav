@@ -869,12 +869,13 @@ void RectangleBase::draw()
         glEnable( GL_BLEND );
         glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
+        // draw border box
         glBegin( GL_QUADS );
-        // set the border color
-        glColor4f( borderColor.R/2.0f,
-                   borderColor.G/1.5f,
-                   borderColor.B/1.3f,
-                   borderColor.A/3.0f );
+
+        glColor4f( borderColor.R/2.5f,
+                   borderColor.G/2.5f,
+                   borderColor.B/2.5f,
+                   borderColor.A/2.5f );
 
         glVertex3f(-Xdist, -Ydist, 0.0);
         glVertex3f(-Xdist, Ydist, 0.0);
@@ -883,8 +884,27 @@ void RectangleBase::draw()
 
         glEnd();
 
+        // draw main box
         glBegin( GL_QUADS );
-        // set the border color
+
+        glColor4f( borderColor.R/1.25f,
+                   borderColor.G/1.25f,
+                   borderColor.B/1.25f,
+                   borderColor.A/1.25f );
+
+        float Xdist2 = (getWidth()/2.0f);
+        float Ydist2 = (getHeight()/2.0f);
+
+        glVertex3f(-Xdist2, -Ydist2, 0.0);
+        glVertex3f(-Xdist2, Ydist2, 0.0);
+        glVertex3f(Xdist2, Ydist2, 0.0);
+        glVertex3f(Xdist2, -Ydist2, 0.0);
+
+        glEnd();
+
+        // draw text box
+        glBegin( GL_QUADS );
+
         glColor4f( borderColor.R/1.0f,
                    borderColor.G/3.5f,
                    borderColor.B/2.3f,
@@ -900,12 +920,13 @@ void RectangleBase::draw()
 
         glEnd();
 
+        // draw x/y axes lines
         glBegin( GL_LINES );
 
         glColor4f( borderColor.R/3.5f,
                    borderColor.G/1.0f,
                    borderColor.B/2.3f,
-                   borderColor.A/2.0f );
+                   borderColor.A/1.3f );
 
         glVertex3f(-Xdist, 0.0, 0.0);
         glVertex3f(Xdist, 0.0, 0.0);

@@ -155,7 +155,6 @@ bool Group::isGroup()
 
 void Group::rearrange()
 {
-
     // it doesn't make sense to rearrange 0 objects, plus having objects.size
     // = 0 will cause div by 0 crashes later
     if ( objects.size() == 0 ) return;
