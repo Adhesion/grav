@@ -838,8 +838,8 @@ void gravManager::setWindowSize( int w, int h )
         venueClientController->rearrange();
     }
 
-    sessionManager->setScale( screenRectSub.getDestWidth() * 0.6f,
-                             screenRectSub.getDestHeight() * 0.2f );
+    sessionManager->setScale( screenRectSub.getDestWidth() * 0.55f,
+                             screenRectSub.getDestHeight() * 0.25f );
     sessionManager->rearrange();
 }
 

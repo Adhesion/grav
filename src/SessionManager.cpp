@@ -55,12 +55,47 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
     selectable = false;
     userMovable = false;
 
+    setBorderScale( 0.005 );
+
+    RGBAColor mainColor;
+    mainColor.R = 0.1f;
+    mainColor.G = 0.1f;
+    mainColor.B = 0.1f;
+    mainColor.A = 0.3f;
+    setColor( mainColor );
+
     videoSessions = new Group( getDestX(), getDestY() );
     videoSessions->setName( "Video" );
+    videoSessions->setBorderScale( 0.005 );
+    videoSessions->setRearrange( ONEROW );
+    RGBAColor videoColor;
+    videoColor.R = 0.1f;
+    videoColor.G = 0.8f;
+    videoColor.B = 0.1f;
+    videoColor.A = 0.3f;
+    videoSessions->setColor( videoColor );
+
     availableVideoSessions = new Group( getDestX(), getDestY() );
     availableVideoSessions->setName( "Available Video" );
+    availableVideoSessions->setBorderScale( 0.005 );
+    availableVideoSessions->setRearrange( ONEROW );
+    RGBAColor aVideoColor;
+    aVideoColor.R = 0.1f;
+    aVideoColor.G = 0.1f;
+    aVideoColor.B = 0.8f;
+    aVideoColor.A = 0.3f;
+    availableVideoSessions->setColor( aVideoColor );
+
     audioSessions = new Group( getDestX(), getDestY() );
     audioSessions->setName( "Audio" );
+    audioSessions->setBorderScale( 0.005 );
+    audioSessions->setRearrange( ONEROW );
+    RGBAColor audioColor;
+    audioColor.R = 0.8f;
+    audioColor.G = 0.1f;
+    audioColor.B = 0.1f;
+    audioColor.A = 0.3f;
+    audioSessions->setColor( audioColor );
 
     add( videoSessions );
     add( availableVideoSessions );
