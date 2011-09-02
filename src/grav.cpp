@@ -213,6 +213,8 @@ bool gravApp::OnInit()
     mapRTP();
 
     sessionTree->setSessionManager( sessionManager );
+    sessionManager->setSessionTreeControl( sessionTree );
+
     for ( unsigned int i = 0; i < initialVideoAddresses.size(); i++ )
     {
         gravUtil::logVerbose ( "grav::initializing video address %s\n",

@@ -33,6 +33,7 @@ class VPMSession;
 class VideoListener;
 class AudioManager;
 class mutex;
+class SessionTreeControl;
 
 #include <vector>
 
@@ -94,6 +95,8 @@ public:
     void lockSessions();
     void unlockSessions();
 
+    void setSessionTreeControl( SessionTreeControl* s );
+
 private:
     /*
      * Initialize (ie, start the connection) or de-initialize a session.
@@ -109,6 +112,11 @@ private:
     SessionEntry* findSessionByAddress( std::string address );
     SessionEntry* findSessionByAddress( std::string address, SessionType type );
     int indexOf( SessionEntry* entry, SessionType type );
+
+    // The only reason we need this is for when entries get double clicked on -
+    // we need to make sure the rotate call originates from the tree so its
+    // display gets updated correctly.
+    SessionTreeControl* sessionTree;
 
     Group* videoSessions;
     Group* availableVideoSessions;
@@ -128,6 +136,8 @@ private:
     mutex* sessionMutex;
     int lockCount;
     bool pause;
+
+    RGBAColor availableVideoColor;
 
 };
 

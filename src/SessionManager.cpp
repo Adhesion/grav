@@ -35,6 +35,7 @@
 #include "AudioManager.h"
 #include "grav.h"
 #include "gravUtil.h"
+#include "SessionTreeControl.h"
 
 SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
     : Group( 0.0f, -6.0f ), videoSessionListener( vl ),
@@ -79,12 +80,16 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
     availableVideoSessions->setName( "Available Video" );
     availableVideoSessions->setBorderScale( 0.005 );
     availableVideoSessions->setRearrange( ONEROW );
-    RGBAColor aVideoColor;
-    aVideoColor.R = 0.1f;
-    aVideoColor.G = 0.1f;
-    aVideoColor.B = 0.8f;
-    aVideoColor.A = 0.3f;
-    availableVideoSessions->setColor( aVideoColor );
+    availableVideoColor.R = 0.1f;
+    availableVideoColor.G = 0.1f;
+    availableVideoColor.B = 0.8f;
+    availableVideoColor.A = 0.3f;
+    availableVideoSessions->setColor( availableVideoColor );
+    // for setting color of available video session entries
+    availableVideoColor.R += 0.25f;
+    availableVideoColor.G += 0.25f;
+    availableVideoColor.B += 0.2f;
+    availableVideoColor.A += 0.25f;
 
     audioSessions = new Group( getDestX(), getDestY() );
     audioSessions->setName( "Audio" );
@@ -141,7 +146,9 @@ bool SessionManager::addSession( std::string address, SessionType type )
     Group* sessions = sessionMap[ type ];
     sessions->add( entry );
 
-    if ( type != AVAILABLEVIDEOSESSION )
+    if ( type == AVAILABLEVIDEOSESSION )
+        entry->setColor( availableVideoColor );
+    else
         ret = ret && initSession( entry );
 
     if ( !ret )
@@ -234,12 +241,15 @@ void SessionManager::rotateTo( std::string addr, bool audio )
             lastRotateSession != current )
     {
         disableSession( lastRotateSession );
+        lastRotateSession->setColor( availableVideoColor );
         initSession( current );
+        current->resetColor();
     }
     // case for first rotate
     else if ( lastRotatePos == -1 )
     {
         initSession( current );
+        current->resetColor();
     }
 
     unlockSessions();
@@ -261,6 +271,7 @@ void SessionManager::unrotate( bool audio )
     if ( current != NULL )
     {
         disableSession( current );
+        current->setColor( availableVideoColor );
     }
 
     unlockSessions();
@@ -480,6 +491,11 @@ void SessionManager::unlockSessions()
     pause = false;
     mutex_unlock( sessionMutex );
     lockCount--;
+}
+
+void SessionManager::setSessionTreeControl( SessionTreeControl* s )
+{
+    sessionTree = s;
 }
 
 /*
