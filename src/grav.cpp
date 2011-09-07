@@ -69,7 +69,7 @@ bool gravApp::OnInit()
     videoSessionListener = new VideoListener( grav );
     audioSessionListener = new AudioManager();
     sessionManager = new SessionManager( videoSessionListener,
-                                            audioSessionListener );
+                                            audioSessionListener, grav );
     //videoInitialized = false; audioInitialized = false;
 
     if ( !handleArgs() )

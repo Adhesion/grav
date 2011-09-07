@@ -1270,7 +1270,7 @@ void gravManager::setVenueClientController( VenueClientController* vcc )
 void gravManager::setSessionManager( SessionManager* s )
 {
     sessionManager = s;
-    //drawnObjects->push_back( sessionManager );
+    drawnObjects->push_back( sessionManager );
 }
 
 void gravManager::setHeaderString( std::string h )

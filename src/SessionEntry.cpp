@@ -28,6 +28,8 @@
 #include <VPMedia/random_helper.h>
 
 #include "SessionEntry.h"
+#include "Group.h"
+#include "SessionManager.h"
 
 SessionEntry::SessionEntry( std::string addr, bool aud )
 {
@@ -168,4 +170,33 @@ bool SessionEntry::iterate()
     if ( running )
         session->iterate( sessionTS++ );
     return running;
+}
+
+void SessionEntry::doubleClickAction()
+{
+    Group* parent = getGroup();
+    if ( parent == NULL )
+    {
+        gravUtil::logWarning( "SessionEntry::doubleClick: entry not grouped? "
+                "(invalid session setup)\n" );
+        return;
+    }
+
+    Group* gParent = parent->getGroup();
+    if ( gParent == NULL )
+    {
+        gravUtil::logWarning( "SessionEntry::doubleClick: parent not grouped? "
+                "(invalid session setup)\n" );
+        return;
+    }
+
+    SessionManager* manager = dynamic_cast<SessionManager*>( gParent );
+    if ( manager == NULL )
+    {
+        gravUtil::logWarning( "SessionEntry::doubleClick: not member of one of "
+                "session manager's groups? (invalid session setup)\n" );
+        return;
+    }
+
+    manager->sessionEntryAction( this );
 }

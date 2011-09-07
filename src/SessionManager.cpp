@@ -36,10 +36,12 @@
 #include "grav.h"
 #include "gravUtil.h"
 #include "SessionTreeControl.h"
+#include "gravManager.h"
 
-SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
+SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
+                                gravManager* g )
     : Group( 0.0f, -6.0f ), videoSessionListener( vl ),
-      audioSessionListener( al )
+      audioSessionListener( al ), objectManager( g )
 {
     sessionMutex = mutex_create();
 
@@ -105,6 +107,9 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al )
     add( videoSessions );
     add( availableVideoSessions );
     add( audioSessions );
+    objectManager->addToDrawList( videoSessions );
+    objectManager->addToDrawList( availableVideoSessions );
+    objectManager->addToDrawList( audioSessions );
 
     sessionMap[ VIDEOSESSION ] = videoSessions;
     sessionMap[ AVAILABLEVIDEOSESSION ] = availableVideoSessions;
@@ -129,9 +134,11 @@ SessionManager::~SessionManager()
             // specific to sessionentry
             RectangleBase* session = *sessionIt;
             sessionIt = sessions->remove( sessionIt );
+            objectManager->removeFromLists( session, false );
             delete session;
         }
         groupIt = remove( groupIt );
+        objectManager->removeFromLists( sessions, false );
         delete sessions;
     }
 }
@@ -144,7 +151,6 @@ bool SessionManager::addSession( std::string address, SessionType type )
     bool audio = ( type == AUDIOSESSION );
     SessionEntry* entry = new SessionEntry( address, audio );
     Group* sessions = sessionMap[ type ];
-    sessions->add( entry );
 
     if ( type == AVAILABLEVIDEOSESSION )
         entry->setColor( availableVideoColor );
@@ -152,7 +158,14 @@ bool SessionManager::addSession( std::string address, SessionType type )
         ret = ret && initSession( entry );
 
     if ( !ret )
+    {
         delete entry;
+    }
+    else
+    {
+        sessions->add( entry );
+        objectManager->addToDrawList( entry );
+    }
 
     unlockSessions();
     return ret;
@@ -180,6 +193,7 @@ bool SessionManager::removeSession( std::string addr, SessionType type )
             rotatePos--;
     }
 
+    objectManager->removeFromLists( entry, false );
     delete entry; //destructor will remove object from its group
     unlockSessions();
     return true;
@@ -275,6 +289,28 @@ void SessionManager::unrotate( bool audio )
     }
 
     unlockSessions();
+}
+
+void SessionManager::sessionEntryAction( SessionEntry* entry )
+{
+    Group* group = entry->getGroup();
+    if ( group == videoSessions )
+    {
+        // do nothing here for now
+    }
+    else if ( group == availableVideoSessions )
+    {
+        sessionTree->rotateToVideoSession( entry->getAddress() );
+    }
+    else if ( group == audioSessions )
+    {
+        // do nothing here for now
+    }
+    else
+    {
+        gravUtil::logWarning( "SessionManager::sessionEntryAction: entry not "
+                                "grouped?\n" );
+    }
 }
 
 SessionEntry* SessionManager::findSessionByAddress( std::string address )

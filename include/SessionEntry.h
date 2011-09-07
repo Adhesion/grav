@@ -61,6 +61,8 @@ public:
 
     bool iterate();
 
+    void doubleClickAction();
+
 private:
     std::string address;
 

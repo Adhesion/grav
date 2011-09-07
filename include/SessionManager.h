@@ -34,14 +34,14 @@ class VideoListener;
 class AudioManager;
 class mutex;
 class SessionTreeControl;
+class SessionEntry;
+class gravManager;
 
 #include <vector>
 
 #include <VPMedia/VPMTypes.h>
 
 #include "Group.h"
-
-class SessionEntry;
 
 enum SessionType
 {
@@ -54,7 +54,7 @@ class SessionManager : public Group
 {
 
 public:
-    SessionManager( VideoListener* vl, AudioManager* al );
+    SessionManager( VideoListener* vl, AudioManager* al, gravManager* g );
     ~SessionManager();
 
     /*
@@ -73,6 +73,12 @@ public:
     void rotate( bool audio );
     void rotateTo( std::string addr, bool audio );
     void unrotate( bool audio );
+
+    /*
+     * Method that determines what happens on SessionEntry double-click.
+     * For now, only do rotate on available video sessions.
+     */
+    void sessionEntryAction( SessionEntry* entry );
 
     std::string getCurrentRotateSessionAddress();
     std::string getLastRotateSessionAddress();
@@ -123,6 +129,8 @@ private:
     Group* audioSessions;
 
     std::map<SessionType, Group*> sessionMap;
+
+    gravManager* objectManager;
 
     VideoListener* videoSessionListener;
     AudioManager* audioSessionListener;
