@@ -101,6 +101,7 @@ set(SOURCES
 	src/RectangleBase.cpp
 	src/Runway.cpp
 	src/SessionEntry.cpp
+	src/SessionGroup.cpp
 	src/SessionManager.cpp
 	src/SessionTreeControl.cpp
 	src/SideFrame.cpp

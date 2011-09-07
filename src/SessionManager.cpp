@@ -31,6 +31,7 @@
 
 #include "SessionManager.h"
 #include "SessionEntry.h"
+#include "SessionGroup.h"
 #include "VideoListener.h"
 #include "AudioManager.h"
 #include "grav.h"
@@ -67,10 +68,9 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     mainColor.A = 0.3f;
     setColor( mainColor );
 
-    videoSessions = new Group( getDestX(), getDestY() );
+    videoSessions = new SessionGroup( getDestX(), getDestY() );
     videoSessions->setName( "Video" );
     videoSessions->setBorderScale( 0.005 );
-    videoSessions->setRearrange( ONEROW );
     RGBAColor videoColor;
     videoColor.R = 0.1f;
     videoColor.G = 0.8f;
@@ -78,10 +78,9 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     videoColor.A = 0.3f;
     videoSessions->setColor( videoColor );
 
-    availableVideoSessions = new Group( getDestX(), getDestY() );
+    availableVideoSessions = new SessionGroup( getDestX(), getDestY() );
     availableVideoSessions->setName( "Available Video" );
     availableVideoSessions->setBorderScale( 0.005 );
-    availableVideoSessions->setRearrange( ONEROW );
     availableVideoColor.R = 0.1f;
     availableVideoColor.G = 0.1f;
     availableVideoColor.B = 0.8f;
@@ -93,10 +92,9 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     availableVideoColor.B += 0.2f;
     availableVideoColor.A += 0.25f;
 
-    audioSessions = new Group( getDestX(), getDestY() );
+    audioSessions = new SessionGroup( getDestX(), getDestY() );
     audioSessions->setName( "Audio" );
     audioSessions->setBorderScale( 0.005 );
-    audioSessions->setRearrange( ONEROW );
     RGBAColor audioColor;
     audioColor.R = 0.8f;
     audioColor.G = 0.1f;
