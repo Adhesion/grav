@@ -39,8 +39,8 @@ Runway::Runway( float _x, float _y ) :
 
     rearrangeStyle = ONECOLUMN;
 
-    destBColor.R = 1.0f; destBColor.G = 1.0f;
-    destBColor.B = 1.0f; destBColor.A = 1.0f;
+    destBColor.R = 0.4f; destBColor.G = 0.4f;
+    destBColor.B = 0.4f; destBColor.A = 0.35f;
     baseBColor = destBColor;
     borderColor.A = 0.0f;
     setColor( destBColor );
@@ -77,8 +77,8 @@ void Runway::draw()
     // the main box
     glBegin( GL_QUADS );
 
-    glColor4f( borderColor.R * 0.2f, borderColor.G * 0.2f,
-                borderColor.B * 0.25f, borderColor.A * 0.25f );
+    glColor4f( borderColor.R * 0.5f, borderColor.G * 0.5f,
+                borderColor.B * 0.5f, borderColor.A * 0.7f );
 
     glVertex3f( -Xdist, -Ydist, 0.0 );
     glVertex3f( -Xdist, Ydist, 0.0 );
@@ -90,8 +90,8 @@ void Runway::draw()
     // the outline
     glBegin( GL_LINE_LOOP );
 
-    glColor4f( borderColor.R * 0.4f, borderColor.G * 0.4f,
-                borderColor.B * 0.45f, borderColor.A * 0.35f );
+    glColor4f( borderColor.R, borderColor.G,
+                borderColor.B, borderColor.A );
 
     glVertex3f( -Xdist, -Ydist, 0.0 );
     glVertex3f( -Xdist, Ydist, 0.0 );
