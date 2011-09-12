@@ -54,7 +54,7 @@ void Runway::draw()
         return;
 
     if ( intersectCounter == 0 && objects.size() > 0 )
-        checkMemberIntersect();
+        handleOutsideMembers();
 
     intersectCounter = ( intersectCounter + 1 ) % 10;
 
@@ -119,12 +119,12 @@ bool Runway::updateName()
     return false;
 }
 
-void Runway::checkMemberIntersect()
+std::vector<RectangleBase*> Runway::checkMemberIntersect()
 {
-    bool removed = false;
     unsigned int num = objects.size();
+    std::vector<RectangleBase*> outsideList;
 
-    for ( unsigned int i = 0; i < num; )
+    for ( unsigned int i = 0; i < num; i++ )
     {
         RectangleBase* obj = objects[i];
         float ox = obj->getDestX();
@@ -133,16 +133,21 @@ void Runway::checkMemberIntersect()
         if ( ox > getRBound() || ox < getLBound() ||
                 oy > getUBound() || oy < getDBound() )
         {
-            remove( obj, false );
-            removed = true;
-            num--;
-        }
-        else
-        {
-            i++;
+            outsideList.push_back( obj );
         }
     }
 
-    if ( removed )
+    return outsideList;
+}
+
+void Runway::handleOutsideMembers()
+{
+    std::vector<RectangleBase*> outsideList = checkMemberIntersect();
+    for ( int i = 0; i < outsideList.size(); i++ )
+    {
+        remove( outsideList[i], false );
+    }
+
+    if ( outsideList.size() > 0 )
         rearrange();
 }

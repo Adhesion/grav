@@ -39,9 +39,10 @@ public:
 
     bool updateName();
 
-    // check the positions of all members and remove ones that are not inside
-    // the runway bounds
-    void checkMemberIntersect();
+    // check the positions of all members and return list of members that are
+    // outside the bounds
+    std::vector<RectangleBase*> checkMemberIntersect();
+    virtual void handleOutsideMembers();
 
 private:
     // 0 means horizontal, 1 means vertical

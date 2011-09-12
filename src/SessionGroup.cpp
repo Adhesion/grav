@@ -30,3 +30,25 @@ SessionGroup::SessionGroup( float _x, float _y ) :
 {
     rearrangeStyle = ONEROW;
 }
+
+void SessionGroup::handleOutsideMembers()
+{
+    std::vector<RectangleBase*> outsideList = checkMemberIntersect();
+    if ( outsideList.size() > 0 )
+    {
+        Group* parent = getGroup();
+        if ( parent == NULL )
+        {
+            gravUtil::logWarning( "SessionGroup::handleOutsideMembers: "
+                    "no parent? invalid group setup\n" );
+            return;
+        }
+        SessionManager* manager = dynamic_cast<SessionManager*>( parent );
+        if ( manager == NULL )
+        {
+            gravUtil::logWarning( "SessionGroup::handleOutsideMembers: "
+                    "parent not SessionManager? invalid group setup\n" );
+            return;
+        }
+    }
+}

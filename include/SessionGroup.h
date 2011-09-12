@@ -37,6 +37,8 @@ class SessionGroup : public Runway
 public:
     SessionGroup( float _x, float _y );
 
+    void handleOutsideMembers();
+
 };
 
 #endif /* SESSIONGROUP_H_ */
