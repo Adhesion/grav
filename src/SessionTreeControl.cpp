@@ -194,11 +194,35 @@ void SessionTreeControl::shiftSession( std::string address, bool audio )
     if ( item.IsOk() )
     {
         wxTreeItemId parent = GetItemParent( item );
-        bool rotate = false;
+        wxTreeItemId newParent;
+        SessionType type;
+
         if ( parent == videoNodeID )
         {
-            rotate = true;
+            type = VIDEOSESSION;
+
+            // make available video group if not there
+            if ( !availableVideoNodeID.IsOk() )
+            {
+                availableVideoNodeID = AppendItem( rootID,
+                                                    _("Available Video") );
+            }
+
+            newParent = availableVideoNodeID;
         }
+        else if ( parent == availableVideoNodeID )
+        {
+            type = AVAILABLEVIDEOSESSION;
+            newParent = videoNodeID;
+        }
+        else
+        {
+            gravUtil::logError( "SessionTreeControl::shiftSession: "
+                                "cannot shift %s, invalid tree position\n",
+                                address.c_str() );
+            return;
+        }
+
         // disconnect from availables and stop rotating (if auto), since moving
         // sessions around implies we want to make sure too many sessions aren't
         // running at once
@@ -208,8 +232,26 @@ void SessionTreeControl::shiftSession( std::string address, bool audio )
         }
         unrotateVideoSessions();
 
-        removeSession( address );
-        addSession( address, audio, rotate );
+        if ( !sessionManager->shiftSession( address, type ) )
+        {
+            gravUtil::logError( "SessionTreeControl::shiftSession: "
+                                "shift of %s failed \n", address.c_str() );
+            return;
+        }
+
+        Delete( item );
+
+        wxTreeItemId newNode = AppendItem( newParent,
+                wxString( address.c_str(), wxConvUTF8 ) );
+        Expand( newParent );
+
+        if ( newParent == availableVideoNodeID )
+            SetItemBackgroundColour( newNode, *wxBLUE );
+    }
+    else
+    {
+        gravUtil::logWarning( "SessionTreeControl::shiftSession: "
+                                "item %s not found?\n", address.c_str() );
     }
 }
 

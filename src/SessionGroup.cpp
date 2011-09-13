@@ -24,6 +24,7 @@
  */
 
 #include "SessionGroup.h"
+#include "SessionManager.h"
 
 SessionGroup::SessionGroup( float _x, float _y ) :
     Runway( _x, _y )

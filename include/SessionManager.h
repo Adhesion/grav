@@ -65,6 +65,13 @@ public:
     bool removeSession( std::string addr, SessionType type );
 
     /*
+     * Shift a session from video to available video or vice versa.
+     * Type argument signifies where the session currently is, unlike the above
+     * methods.
+     */
+    bool shiftSession( std::string addr, SessionType type );
+
+    /*
      * Methods for modifying the secondary list for available video sessions.
      * Available video can be rotated through one at a time.
      * Note audio is ignored for this for the time being - only rotating video

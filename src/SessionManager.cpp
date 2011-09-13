@@ -178,7 +178,7 @@ bool SessionManager::removeSession( std::string addr, SessionType type )
     {
         unlockSessions();
         gravUtil::logWarning( "SessionManager::removeSession: "
-                "session %s not found\n", addr.c_str() );
+                                "session %s not found\n", addr.c_str() );
         return false;
     }
 
@@ -193,6 +193,49 @@ bool SessionManager::removeSession( std::string addr, SessionType type )
 
     objectManager->removeFromLists( entry, false );
     delete entry; //destructor will remove object from its group
+    unlockSessions();
+    return true;
+}
+
+bool SessionManager::shiftSession( std::string addr, SessionType type )
+{
+    lockSessions();
+
+    gravUtil::logVerbose( "SessionManager: shifting %s\n", addr.c_str() );
+
+    if ( type != VIDEOSESSION && type != AVAILABLEVIDEOSESSION )
+    {
+        gravUtil::logError( "SessionManager::shiftSession: invalid SessionType "
+                            "input\n" );
+        unlockSessions();
+        return false;
+    }
+
+    SessionEntry* entry = findSessionByAddress( addr, type );
+    if ( entry == NULL )
+    {
+        gravUtil::logError( "SessionManager::shiftSession: address %s not "
+                            "found\n", addr.c_str() );
+        unlockSessions();
+        return false;
+    }
+
+    if ( type == VIDEOSESSION )
+    {
+        videoSessions->remove( entry );
+        availableVideoSessions->add( entry );
+        disableSession( entry );
+    }
+    else if ( type == AVAILABLEVIDEOSESSION )
+    {
+        availableVideoSessions->remove( entry );
+        videoSessions->add( entry );
+        if ( !entry->isSessionEnabled() )
+        {
+            initSession( entry );
+        }
+    }
+
     unlockSessions();
     return true;
 }
@@ -247,7 +290,7 @@ void SessionManager::rotateTo( std::string addr, bool audio )
         }
     }
 
-    // only remove & rotate if there is a valid old one & it isn't the same as
+    // only rotate if there is a valid old one & it isn't the same as
     // current
     if ( lastRotateSession != NULL && current != NULL &&
             lastRotateSession != current )
@@ -326,6 +369,8 @@ SessionEntry* SessionManager::findSessionByAddress( std::string address )
         }
     }
 
+    gravUtil::logWarning( "SessionManager::findSessionByAddress: session %s "
+                            "not found\n", address.c_str() );
     return NULL;
 }
 
