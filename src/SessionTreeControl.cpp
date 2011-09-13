@@ -223,15 +223,6 @@ void SessionTreeControl::shiftSession( std::string address, bool audio )
             return;
         }
 
-        // disconnect from availables and stop rotating (if auto), since moving
-        // sessions around implies we want to make sure too many sessions aren't
-        // running at once
-        if ( timer->IsRunning() )
-        {
-            toggleAutomaticRotate();
-        }
-        unrotateVideoSessions();
-
         if ( !sessionManager->shiftSession( address, type ) )
         {
             gravUtil::logError( "SessionTreeControl::shiftSession: "
