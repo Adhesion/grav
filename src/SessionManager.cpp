@@ -151,9 +151,14 @@ bool SessionManager::addSession( std::string address, SessionType type )
     Group* sessions = sessionMap[ type ];
 
     if ( type == AVAILABLEVIDEOSESSION )
+    {
+        entry->setBaseColor( availableVideoColor );
         entry->setColor( availableVideoColor );
+    }
     else
+    {
         ret = ret && initSession( entry );
+    }
 
     if ( !ret )
     {
@@ -224,12 +229,22 @@ bool SessionManager::shiftSession( std::string addr, SessionType type )
     {
         videoSessions->remove( entry );
         availableVideoSessions->add( entry );
+        entry->setBaseColor( availableVideoColor );
+        entry->setColor( availableVideoColor );
         disableSession( entry );
     }
     else if ( type == AVAILABLEVIDEOSESSION )
     {
         availableVideoSessions->remove( entry );
         videoSessions->add( entry );
+        entry->resetColor();
+
+        int i = indexOf( entry, type );
+        // shift rotate position back if what we're removing is before or at it,
+        // so we don't skip any
+        if ( i <= rotatePos )
+            rotatePos--;
+
         if ( !entry->isSessionEnabled() )
         {
             initSession( entry );

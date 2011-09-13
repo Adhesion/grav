@@ -701,6 +701,11 @@ void RectangleBase::setColor( RGBAColor c )
         borderColAnimating = true;
 }
 
+void RectangleBase::setBaseColor( RGBAColor c )
+{
+    baseBColor = c;
+}
+
 void RectangleBase::setSecondaryColor( RGBAColor c )
 {
     destSecondaryColor = c;

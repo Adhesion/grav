@@ -222,6 +222,7 @@ public:
     RGBAColor getBaseColor();
     RGBAColor getSecondaryColor();
     void setColor( RGBAColor c );
+    void setBaseColor( RGBAColor c );
     void setSecondaryColor( RGBAColor c );
     /*
      * Resets color back to regular gray color.
