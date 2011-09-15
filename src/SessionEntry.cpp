@@ -50,6 +50,11 @@ SessionEntry::SessionEntry( std::string addr, bool aud )
     disabledColor.B = 1.0f;
     disabledColor.A = 0.55f;
 
+    failedColor.R = 1.0f;
+    failedColor.G = 0.15f;
+    failedColor.B = 0.15f;
+    failedColor.A = 0.55f;
+
     baseBColor = disabledColor;
     borderColor = disabledColor;
     borderColor.A = 0.0f;
@@ -81,6 +86,7 @@ bool SessionEntry::initSession( VPMSessionListener* listener )
             // might as well delete the session object here to prevent potential
             // memleaks (ie, reinitializing a session that failed to init)
             disableSession();
+            setBaseColor( failedColor );
             return false;
         }
 
@@ -113,13 +119,13 @@ void SessionEntry::disableSession()
                                 "VPMSession object for %s\n", address.c_str() );
         delete session;
         session = NULL;
-        setBaseColor( disabledColor );
     }
     else
     {
         gravUtil::logVerbose( "SessionEntry::disableSession: session (%s) not "
                                 "active, not deleting\n", address.c_str() );
     }
+    setBaseColor( disabledColor );
 }
 
 bool SessionEntry::isSessionEnabled()

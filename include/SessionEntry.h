@@ -75,6 +75,7 @@ private:
     bool initialized;
 
     RGBAColor disabledColor;
+    RGBAColor failedColor;
 
     VPMSession* session;
     uint32_t sessionTS;

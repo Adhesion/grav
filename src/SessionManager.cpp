@@ -351,6 +351,10 @@ void SessionManager::sessionEntryAction( SessionEntry* entry )
         gravUtil::logWarning( "SessionManager::sessionEntryAction: entry not "
                                 "grouped?\n" );
     }
+
+    // TODO this makes it so the user doesn't move sessions around after
+    // potentially rotating them. probably should make this not so blunt
+    objectManager->clearSelected();
 }
 
 SessionEntry* SessionManager::findSessionByAddress( std::string address )
