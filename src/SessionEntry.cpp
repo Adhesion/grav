@@ -44,6 +44,16 @@ SessionEntry::SessionEntry( std::string addr, bool aud )
     encryptionEnabled = false;
 
     session = NULL;
+
+    disabledColor.R = 0.15f;
+    disabledColor.G = 0.15f;
+    disabledColor.B = 1.0f;
+    disabledColor.A = 0.55f;
+
+    baseBColor = disabledColor;
+    borderColor = disabledColor;
+    borderColor.A = 0.0f;
+    setColor( disabledColor );
 }
 
 SessionEntry::~SessionEntry()
@@ -82,6 +92,7 @@ bool SessionEntry::initSession( VPMSessionListener* listener )
         sessionTS = random32();
 
         initialized = true;
+        resetColor();
         return true;
     }
     else
@@ -94,7 +105,7 @@ bool SessionEntry::initSession( VPMSessionListener* listener )
 
 void SessionEntry::disableSession()
 {
-    // even if it failed to initalize, we still need to delete the session
+    // even if it failed to initialize, we still need to delete the session
     // object
     if ( session != NULL )
     {
@@ -102,6 +113,7 @@ void SessionEntry::disableSession()
                                 "VPMSession object for %s\n", address.c_str() );
         delete session;
         session = NULL;
+        setBaseColor( disabledColor );
     }
     else
     {

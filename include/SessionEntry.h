@@ -74,6 +74,8 @@ private:
     bool processingEnabled;
     bool initialized;
 
+    RGBAColor disabledColor;
+
     VPMSession* session;
     uint32_t sessionTS;
 

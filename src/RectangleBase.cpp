@@ -704,6 +704,12 @@ void RectangleBase::setColor( RGBAColor c )
 void RectangleBase::setBaseColor( RGBAColor c )
 {
     baseBColor = c;
+
+    // only change the actual visual color if not selected - otherwise would
+    // override and lose the visual indication of selectedness and confuse the
+    // user
+    if ( !selected )
+        setColor( baseBColor );
 }
 
 void RectangleBase::setSecondaryColor( RGBAColor c )
@@ -723,9 +729,7 @@ void RectangleBase::resetColor()
     original.B = 1.0f; original.A = 0.7f;
     baseBColor = original;
 
-    // only change the actual visual color if not selected - otherwise would
-    // override and lose the visual indication of selectedness and confuse the
-    // user
+    // like setBaseColor, defer color change to when deselected
     if ( !selected )
         setColor( original );
 }

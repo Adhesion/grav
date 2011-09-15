@@ -81,16 +81,12 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     availableVideoSessions = new SessionGroup( getDestX(), getDestY() );
     availableVideoSessions->setName( "Available Video" );
     availableVideoSessions->setBorderScale( 0.005 );
+    RGBAColor availableVideoColor;
     availableVideoColor.R = 0.1f;
     availableVideoColor.G = 0.1f;
     availableVideoColor.B = 0.8f;
     availableVideoColor.A = 0.3f;
     availableVideoSessions->setColor( availableVideoColor );
-    // for setting color of available video session entries
-    availableVideoColor.R += 0.25f;
-    availableVideoColor.G += 0.25f;
-    availableVideoColor.B += 0.2f;
-    availableVideoColor.A += 0.25f;
 
     audioSessions = new SessionGroup( getDestX(), getDestY() );
     audioSessions->setName( "Audio" );
@@ -150,12 +146,7 @@ bool SessionManager::addSession( std::string address, SessionType type )
     SessionEntry* entry = new SessionEntry( address, audio );
     Group* sessions = sessionMap[ type ];
 
-    if ( type == AVAILABLEVIDEOSESSION )
-    {
-        entry->setBaseColor( availableVideoColor );
-        entry->setColor( availableVideoColor );
-    }
-    else
+    if ( type != AVAILABLEVIDEOSESSION )
     {
         ret = ret && initSession( entry );
     }
@@ -229,15 +220,12 @@ bool SessionManager::shiftSession( std::string addr, SessionType type )
     {
         videoSessions->remove( entry );
         availableVideoSessions->add( entry );
-        entry->setBaseColor( availableVideoColor );
-        entry->setColor( availableVideoColor );
         disableSession( entry );
     }
     else if ( type == AVAILABLEVIDEOSESSION )
     {
         availableVideoSessions->remove( entry );
         videoSessions->add( entry );
-        entry->resetColor();
 
         int i = indexOf( entry, type );
         // shift rotate position back if what we're removing is before or at it,
@@ -311,15 +299,12 @@ void SessionManager::rotateTo( std::string addr, bool audio )
             lastRotateSession != current )
     {
         disableSession( lastRotateSession );
-        lastRotateSession->setColor( availableVideoColor );
         initSession( current );
-        current->resetColor();
     }
     // case for first rotate
     else if ( lastRotatePos == -1 )
     {
         initSession( current );
-        current->resetColor();
     }
 
     unlockSessions();
@@ -341,7 +326,6 @@ void SessionManager::unrotate( bool audio )
     if ( current != NULL )
     {
         disableSession( current );
-        current->setColor( availableVideoColor );
     }
 
     unlockSessions();
@@ -606,7 +590,7 @@ bool SessionManager::initSession( SessionEntry* session )
     if ( !session->initSession( listener ) )
     {
         gravUtil::logError( "SessionManager::initSession: "
-            "failed to initialise %s session on %s\n", type.c_str(),
+            "failed to initialize %s session on %s\n", type.c_str(),
                 session->getAddress().c_str() );
         unlockSessions();
         return false;

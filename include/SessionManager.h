@@ -152,8 +152,6 @@ private:
     int lockCount;
     bool pause;
 
-    RGBAColor availableVideoColor;
-
 };
 
 #endif /* SESSIONMANAGER_H_ */
