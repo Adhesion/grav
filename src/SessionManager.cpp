@@ -183,7 +183,7 @@ bool SessionManager::removeSession( std::string addr, SessionType type )
         int i = indexOf( entry, type );
         // shift rotate position back if what we're removing is before or at it,
         // so we don't skip any
-        if ( i <= rotatePos )
+        if ( i <= rotatePos && i != -1 )
             rotatePos--;
     }
 
@@ -224,14 +224,14 @@ bool SessionManager::shiftSession( std::string addr, SessionType type )
     }
     else if ( type == AVAILABLEVIDEOSESSION )
     {
-        availableVideoSessions->remove( entry );
-        videoSessions->add( entry );
-
         int i = indexOf( entry, type );
         // shift rotate position back if what we're removing is before or at it,
         // so we don't skip any
-        if ( i <= rotatePos )
+        if ( i <= rotatePos && i != -1 )
             rotatePos--;
+
+        availableVideoSessions->remove( entry );
+        videoSessions->add( entry );
 
         if ( !entry->isSessionEnabled() )
         {
@@ -404,14 +404,24 @@ int SessionManager::indexOf( SessionEntry* entry, SessionType type )
 
 std::string SessionManager::getCurrentRotateSessionAddress()
 {
+    lockSessions();
+
     if ( rotatePos != -1 && rotatePos < availableVideoSessions->numObjects() )
     {
         SessionEntry* entry = static_cast<SessionEntry*>(
                 (*availableVideoSessions)[ rotatePos ] );
-        return entry->getAddress();
+        if ( entry != NULL )
+        {
+            unlockSessions();
+            return entry->getAddress();
+        }
     }
-    else
-        return "";
+
+    gravUtil::logVerbose( "SessionManager::getCurrentRotateSessionAddress: "
+                            "failed to find valid session (rotate position %i)",
+                            rotatePos );
+    unlockSessions();
+    return "";
 }
 
 std::string SessionManager::getLastRotateSessionAddress()
