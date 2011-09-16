@@ -50,6 +50,8 @@ public:
     void setProcessingEnabled( bool proc );
     bool isProcessingEnabled();
 
+    bool isInFailedState();
+
     bool isAudioSession();
 
     void setEncryptionKey( std::string key );
@@ -73,6 +75,8 @@ private:
 
     bool processingEnabled;
     bool initialized;
+    // this should match with the failed color. will reset on disableSession()
+    bool inFailedState;
 
     RGBAColor disabledColor;
     RGBAColor failedColor;

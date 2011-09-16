@@ -151,15 +151,14 @@ bool SessionManager::addSession( std::string address, SessionType type )
         ret = ret && initSession( entry );
     }
 
-    if ( !ret )
-    {
-        delete entry;
-    }
-    else
-    {
-        sessions->add( entry );
-        objectManager->addToDrawList( entry );
-    }
+    /*
+     * Note - used to delete entries on fail. Now will display an entry in a
+     * failed state, so it can potentially be reenabled when it could work.
+     * (But still returns false on failed init)
+     */
+
+    sessions->add( entry );
+    objectManager->addToDrawList( entry );
 
     unlockSessions();
     return ret;
@@ -357,6 +356,9 @@ void SessionManager::sessionEntryAction( SessionEntry* entry )
     objectManager->clearSelected();
 }
 
+/*
+ * Note, not thread-safe.
+ */
 SessionEntry* SessionManager::findSessionByAddress( std::string address )
 {
     Group* sessions;
@@ -377,6 +379,9 @@ SessionEntry* SessionManager::findSessionByAddress( std::string address )
     return NULL;
 }
 
+/*
+ * Note, not thread-safe.
+ */
 SessionEntry* SessionManager::findSessionByAddress( std::string address,
         SessionType type )
 {
@@ -464,6 +469,22 @@ bool SessionManager::isSessionProcessEnabled( std::string addr )
     }
 
     bool ret = entry->isProcessingEnabled();
+    unlockSessions();
+    return ret;
+}
+
+bool SessionManager::isInFailedState( std::string addr, SessionType type )
+{
+    lockSessions();
+
+    SessionEntry* entry = findSessionByAddress( addr, type );
+    if ( entry == NULL )
+    {
+        unlockSessions();
+        return false;
+    }
+
+    bool ret = entry->isInFailedState();
     unlockSessions();
     return ret;
 }
@@ -606,12 +627,12 @@ bool SessionManager::initSession( SessionEntry* session )
         gravUtil::logError( "SessionManager::initSession: "
             "failed to initialize %s session on %s\n", type.c_str(),
                 session->getAddress().c_str() );
-        unlockSessions();
         return false;
     }
 
     gravUtil::logVerbose( "SessionManager::initialized %s session on %s\n",
             type.c_str(), session->getAddress().c_str() );
+    return true;
 }
 
 void SessionManager::disableSession( SessionEntry* session )

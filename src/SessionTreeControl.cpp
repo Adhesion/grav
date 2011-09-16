@@ -109,19 +109,18 @@ void SessionTreeControl::addSession( std::string address, bool audio,
 
     added = sessionManager->addSession( address, type );
 
-    if ( added )
-    {
-        current = AppendItem( node, wxString( address.c_str(), wxConvUTF8 ) );
-        Expand( node );
+    current = AppendItem( node, wxString( address.c_str(), wxConvUTF8 ) );
+    Expand( node );
 
-        if ( rotate )
-            SetItemBackgroundColour( current, *wxBLUE );
-    }
-    else
+    // note, these two cases shouldn't overlap - a rotate add won't return false
+    // in SessionManager
+    if ( rotate )
+        SetItemBackgroundColour( current, *wxBLUE );
+    else if ( !added )
     {
-        gravUtil::logError( "SessionTreeControl::addObject: "
+        SetItemBackgroundColour( current, *wxRED );
+        gravUtil::logWarning( "SessionTreeControl::addObject: "
                             "failed to initialize %s\n", address.c_str() );
-        // TODO throw error dialog
     }
 }
 
@@ -238,6 +237,9 @@ void SessionTreeControl::shiftSession( std::string address, bool audio )
 
         if ( newParent == availableVideoNodeID )
             SetItemBackgroundColour( newNode, *wxBLUE );
+        if ( newParent == videoNodeID &&
+                sessionManager->isInFailedState( address, VIDEOSESSION ) )
+            SetItemBackgroundColour( newNode, *wxRED );
     }
     else
     {
@@ -248,23 +250,7 @@ void SessionTreeControl::shiftSession( std::string address, bool audio )
 
 void SessionTreeControl::rotateVideoSessions()
 {
-    sessionManager->rotate( false );
-
-    wxTreeItemId current = findSession( availableVideoNodeID,
-            sessionManager->getCurrentRotateSessionAddress() );
-    wxTreeItemId last = findSession( availableVideoNodeID,
-            sessionManager->getLastRotateSessionAddress() );
-
-    if ( last.IsOk() )
-    {
-        SetItemBackgroundColour( last, *wxBLUE );
-        SetItemTextColour( last, *wxBLACK );
-    }
-    if ( current.IsOk() )
-    {
-        SetItemBackgroundColour( current, *wxWHITE );
-        SetItemTextColour( current, *wxBLUE );
-    }
+    rotateToVideoSession( "" );
 }
 
 void SessionTreeControl::rotateToVideoSession( std::string addr )
@@ -283,8 +269,17 @@ void SessionTreeControl::rotateToVideoSession( std::string addr )
     }
     if ( current.IsOk() )
     {
-        SetItemBackgroundColour( current, *wxWHITE );
-        SetItemTextColour( current, *wxBLUE );
+        if ( sessionManager->isInFailedState(
+                sessionManager->getCurrentRotateSessionAddress(),
+                AVAILABLEVIDEOSESSION ) )
+        {
+            SetItemBackgroundColour( current, *wxRED );
+        }
+        else
+        {
+            SetItemBackgroundColour( current, *wxWHITE );
+            SetItemTextColour( current, *wxBLUE );
+        }
     }
 }
 

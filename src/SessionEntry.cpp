@@ -39,6 +39,7 @@ SessionEntry::SessionEntry( std::string addr, bool aud )
 
     processingEnabled = true;
     initialized = false;
+    inFailedState = false;
 
     encryptionKey = "__NO_KEY__";
     encryptionEnabled = false;
@@ -87,6 +88,7 @@ bool SessionEntry::initSession( VPMSessionListener* listener )
             // memleaks (ie, reinitializing a session that failed to init)
             disableSession();
             setBaseColor( failedColor );
+            inFailedState = true;
             return false;
         }
 
@@ -98,6 +100,7 @@ bool SessionEntry::initSession( VPMSessionListener* listener )
         sessionTS = random32();
 
         initialized = true;
+        inFailedState = false;
         resetColor();
         return true;
     }
@@ -125,7 +128,14 @@ void SessionEntry::disableSession()
         gravUtil::logVerbose( "SessionEntry::disableSession: session (%s) not "
                                 "active, not deleting\n", address.c_str() );
     }
+
+    initialized = false;
     setBaseColor( disabledColor );
+    inFailedState = false;
+    // was originally going to call this var "lastInitFailed" but that name
+    // wouldn't be accurate in this case. here we're sort of in an unknown
+    // state, ie, if it were a DNS problem DNS could have come back in the
+    // meantime. this should reflect the failed color being set
 }
 
 bool SessionEntry::isSessionEnabled()
@@ -141,6 +151,11 @@ void SessionEntry::setProcessingEnabled( bool proc )
 bool SessionEntry::isProcessingEnabled()
 {
     return processingEnabled;
+}
+
+bool SessionEntry::isInFailedState()
+{
+    return inFailedState;
 }
 
 bool SessionEntry::isAudioSession()

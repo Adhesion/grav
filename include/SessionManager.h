@@ -59,7 +59,10 @@ public:
 
     /*
      * Add/remove a new session. Will auto-initialize if type = video or audio.
-     * Returns true if creation succeeds.
+     * Returns true if creation/removal succeeds.
+     * In add's case, will return false if new session failed to
+     * initialize.
+     * In remove's case, will return false if session was not found.
      */
     bool addSession( std::string addr, SessionType type );
     bool removeSession( std::string addr, SessionType type );
@@ -93,6 +96,8 @@ public:
     bool setSessionProcessEnable( std::string addr, bool set );
     bool isSessionProcessEnabled( std::string addr );
 
+    bool isInFailedState( std::string addr, SessionType type );
+
     bool setEncryptionKey( std::string addr, std::string key );
     bool disableEncryption( std::string addr );
     bool isEncryptionEnabled( std::string addr );
@@ -121,6 +126,8 @@ private:
     /*
      * Finds session by address. In cases of duplicate address, will find the
      * first one. (order of video -> available video -> audio)
+     * These are also not thread safe. (mostly since they get called by other
+     * functions, inside their own lock()s)
      */
     SessionEntry* findSessionByAddress( std::string address );
     SessionEntry* findSessionByAddress( std::string address, SessionType type );

@@ -53,6 +53,10 @@ public:
      */
     void shiftSession( std::string address, bool audio );
 
+    /*
+     * Rotate through the available video list.
+     * Calling rotateTo with "" will rotate to next video.
+     */
     void rotateVideoSessions();
     void rotateToVideoSession( std::string addr );
     void unrotateVideoSessions();
