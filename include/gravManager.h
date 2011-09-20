@@ -100,9 +100,9 @@ public:
     void setSiteIDGrouping( bool site );
 
     /*
-     * Add to the counter used to control the drawing of the selection box.
+     * Access the counter used to control the drawing of the selection box.
+     * (Needed for a deselect check in InputHandler)
      */
-    void incrementHoldCounter();
     int getHoldCounter();
 
     void resetAutoCounter();

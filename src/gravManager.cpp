@@ -444,8 +444,8 @@ void gravManager::draw()
     // directly depend on it, as above
     if ( !input->isLeftButtonHeld() && holdCounter > 0 )
         holdCounter-=2;
-    else
-        incrementHoldCounter();
+    else if ( holdCounter < 24 )
+        holdCounter++;
 
     drawCounter = ( drawCounter + 1 ) % 30;
     intersectCounter = ( intersectCounter + 1 ) % 10;
@@ -899,11 +899,6 @@ bool gravManager::usingSiteIDGroups()
 void gravManager::setSiteIDGrouping( bool site )
 {
     enableSiteIDGroups = site;
-}
-
-void gravManager::incrementHoldCounter()
-{
-    if ( holdCounter < 25 ) holdCounter++;
 }
 
 int gravManager::getHoldCounter()
