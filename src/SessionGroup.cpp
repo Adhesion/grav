@@ -34,24 +34,7 @@ SessionGroup::SessionGroup( float _x, float _y ) :
 
 void SessionGroup::handleOutsideMembers()
 {
-    std::vector<RectangleBase*> outsideList = checkMemberIntersect();
-    if ( outsideList.size() > 0 )
-    {
-        Group* parent = getGroup();
-        if ( parent == NULL )
-        {
-            gravUtil::logWarning( "SessionGroup::handleOutsideMembers: "
-                    "no parent? invalid group setup\n" );
-            return;
-        }
-        SessionManager* manager = dynamic_cast<SessionManager*>( parent );
-        if ( manager == NULL )
-        {
-            gravUtil::logWarning( "SessionGroup::handleOutsideMembers: "
-                    "parent not SessionManager? invalid group setup\n" );
-            return;
-        }
-
-        manager->checkGUISessionShift( outsideList, this );
-    }
+    // do nothing here - parent (SessionManager) will have its check method
+    // called, which will get the list of outside members and figure out where
+    // they should go (ie, shouldn't necessarily remove like runway does)
 }

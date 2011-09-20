@@ -93,10 +93,9 @@ public:
 
     /*
      * Used for checking if user-moved SessionEntries should be shifted between
-     * groups or not.
+     * groups or not. Public, thread-safe interface.
      */
-    void checkGUISessionShift( std::vector<RectangleBase*> outsideList,
-                                SessionGroup* parent );
+    void checkGUISessionShift();
 
     std::string getCurrentRotateSessionAddress();
     std::string getLastRotateSessionAddress();
@@ -158,9 +157,9 @@ private:
      */
     SessionTreeControl* sessionTree;
 
-    Group* videoSessions;
-    Group* availableVideoSessions;
-    Group* audioSessions;
+    SessionGroup* videoSessions;
+    SessionGroup* availableVideoSessions;
+    SessionGroup* audioSessions;
 
     std::map<SessionType, Group*> sessionMap;
 

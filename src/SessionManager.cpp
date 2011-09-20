@@ -337,51 +337,50 @@ void SessionManager::sessionEntryAction( SessionEntry* entry )
     unlockSessions();
 }
 
-void SessionManager::checkGUISessionShift(
-                                std::vector<RectangleBase*> outsideList,
-                                SessionGroup* parent )
+void SessionManager::checkGUISessionShift()
 {
     lockSessions();
     Group* target;
+    SessionGroup* parent = videoSessions;
 
-    if ( parent == videoSessions )
+    for ( unsigned int i = 0; i < 2; i++ )
     {
-        target = availableVideoSessions;
-    }
-    else if ( parent == availableVideoSessions )
-    {
-        target = videoSessions;
-    }
-    else
-    {
-        const char* name = parent != NULL ? parent->getName().c_str() : "NULL";
-        gravUtil::logVerbose( "SessionManager::checkGUISessionShift: invalid "
-                                "parent for session shift (%s)\n", name );
-        unlockSessions();
-        return;
-    }
-
-    for ( unsigned int i = 0; i < outsideList.size(); i++ )
-    {
-        SessionEntry* entry = dynamic_cast<SessionEntry*>( outsideList[i] );
-        if ( entry == NULL )
+        if ( parent == videoSessions )
         {
-            gravUtil::logWarning( "SessionManager::checkGUISessionShift: "
-                                    "invalid SessionGroup child?\n" );
+            target = availableVideoSessions;
         }
-        else
+        else if ( parent == availableVideoSessions )
         {
-            // check intersect with projected destination, shift if so
-            if ( entry->intersect( target ) )
+            target = videoSessions;
+        }
+
+        std::vector<RectangleBase*> outsideList =
+                parent->checkMemberIntersect();
+
+        for ( unsigned int i = 0; i < outsideList.size(); i++ )
+        {
+            SessionEntry* entry = dynamic_cast<SessionEntry*>( outsideList[i] );
+            if ( entry == NULL )
             {
-                // we have to use the external method here to ensure that the
-                // side window GUI stays accurate - that will in turn call the
-                // shiftSession() method in this class
-                unlockSessions();
-                sessionTree->shiftSession( entry->getAddress(), false );
-                lockSessions();
+                gravUtil::logWarning( "SessionManager::checkGUISessionShift: "
+                                        "invalid SessionGroup child?\n" );
+            }
+            else
+            {
+                // check intersect with projected destination, shift if so
+                if ( entry->intersect( target ) )
+                {
+                    // we have to use the external method here to ensure that
+                    // the side window GUI stays accurate - that will in turn
+                    // call the shiftSession() method in this class
+                    unlockSessions();
+                    sessionTree->shiftSession( entry->getAddress(), false );
+                    lockSessions();
+                }
             }
         }
+
+        parent = availableVideoSessions;
     }
 
     unlockSessions();

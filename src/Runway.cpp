@@ -53,11 +53,6 @@ void Runway::draw()
     if ( borderColor.A < 0.01f )
         return;
 
-    if ( intersectCounter == 0 && objects.size() > 0 )
-        handleOutsideMembers();
-
-    intersectCounter = ( intersectCounter + 1 ) % 10;
-
     // note this must set up the position itself, since it doesn't call the
     // inherited draw method from RectangleBase
     glPushMatrix();

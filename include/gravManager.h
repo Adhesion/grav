@@ -285,14 +285,9 @@ private:
     int holdCounter;
     int drawCounter;
     int autoCounter;
+    int intersectCounter;
     bool enableSiteIDGroups;
 
-    /*float camX;
-    float camY;
-    float camZ;
-    float origCamX;
-    float origCamY;
-    float origCamZ;*/
     Point origCamPoint;
 
     bool usingThreads;

@@ -59,7 +59,10 @@ gravManager::gravManager()
 {
     windowWidth = 0; windowHeight = 0; // this should be set immediately
                                        // after init
-    holdCounter = 0; drawCounter = 0; autoCounter = 0;
+    holdCounter = 0;
+    drawCounter = 0;
+    autoCounter = 0;
+    intersectCounter = 0;
 
     origCamPoint = Point( 0.0f, 0.0f, 9.0f );
     Point lookat( 0.0f, 0.0f, -25.0f );
@@ -176,10 +179,9 @@ void gravManager::draw()
 
     // set it to update names only every 30 frames
     bool updateNames = false;
-    if ( drawCounter > 29 )
+    if ( drawCounter == 0 )
     {
         updateNames = true;
-        drawCounter = 0;
         if ( audioAvailable() )
             audio->updateNames();
     }
@@ -343,7 +345,19 @@ void gravManager::draw()
         innerObjs.clear();
     }
 
+    // check runway members for potential removal if outside
+    if ( intersectCounter == 0 && runway->numObjects() > 0 &&
+            runway->getColor().A > 0.01f )
+        runway->handleOutsideMembers();
+
     unlockSources();
+
+    // check session manager for moved session entry objects & shift if
+    // necessary - this needs to be outside the lock() since a shift might
+    // trigger a session disable, which may delete a video which needs to lock
+    // on its own (ie, we're not doing reentrant mutexes)
+    if ( intersectCounter == 0 && sessionManager->getColor().A > 0.01f )
+        sessionManager->checkGUISessionShift();
 
     // draw the click-and-drag selection box
     if ( holdCounter > 1 && drawSelectionBox )
@@ -426,12 +440,16 @@ void gravManager::draw()
 
     glFlush();
 
+    // hold counter is a bit different than the others since alpha values
+    // directly depend on it, as above
     if ( !input->isLeftButtonHeld() && holdCounter > 0 )
         holdCounter-=2;
     else
         incrementHoldCounter();
-    drawCounter++;
-    autoCounter = (autoCounter+1)%900;
+
+    drawCounter = ( drawCounter + 1 ) % 30;
+    intersectCounter = ( intersectCounter + 1 ) % 10;
+    autoCounter = ( autoCounter + 1 ) % 900;
 }
 
 void gravManager::clearSelected()
