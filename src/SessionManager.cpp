@@ -179,7 +179,7 @@ bool SessionManager::removeSession( std::string addr, SessionType type )
 
     if ( type == AVAILABLEVIDEOSESSION )
     {
-        int i = indexOf( entry, type );
+        int i = indexOf( entry );
         // shift rotate position back if what we're removing is before or at it,
         // so we don't skip any
         if ( i <= rotatePos && i != -1 )
@@ -192,13 +192,11 @@ bool SessionManager::removeSession( std::string addr, SessionType type )
     return true;
 }
 
-bool SessionManager::shiftSession( std::string addr, SessionType type )
+bool SessionManager::shiftSession( std::string addr, SessionType fromType )
 {
     lockSessions();
 
-    gravUtil::logVerbose( "SessionManager: shifting %s\n", addr.c_str() );
-
-    if ( type != VIDEOSESSION && type != AVAILABLEVIDEOSESSION )
+    if ( fromType != VIDEOSESSION && fromType != AVAILABLEVIDEOSESSION )
     {
         gravUtil::logError( "SessionManager::shiftSession: invalid SessionType "
                             "input\n" );
@@ -206,7 +204,7 @@ bool SessionManager::shiftSession( std::string addr, SessionType type )
         return false;
     }
 
-    SessionEntry* entry = findSessionByAddress( addr, type );
+    SessionEntry* entry = findSessionByAddress( addr, fromType );
     if ( entry == NULL )
     {
         gravUtil::logError( "SessionManager::shiftSession: address %s not "
@@ -215,28 +213,7 @@ bool SessionManager::shiftSession( std::string addr, SessionType type )
         return false;
     }
 
-    if ( type == VIDEOSESSION )
-    {
-        videoSessions->remove( entry );
-        availableVideoSessions->add( entry );
-        disableSession( entry );
-    }
-    else if ( type == AVAILABLEVIDEOSESSION )
-    {
-        int i = indexOf( entry, type );
-        // shift rotate position back if what we're removing is before or at it,
-        // so we don't skip any
-        if ( i <= rotatePos && i != -1 )
-            rotatePos--;
-
-        availableVideoSessions->remove( entry );
-        videoSessions->add( entry );
-
-        if ( !entry->isSessionEnabled() )
-        {
-            initSession( entry );
-        }
-    }
+    bool ret = shiftSession( entry );
 
     unlockSessions();
     return true;
@@ -288,7 +265,7 @@ void SessionManager::rotateTo( std::string addr, bool audio )
         }
         else
         {
-            rotatePos = indexOf( current, AVAILABLEVIDEOSESSION );
+            rotatePos = indexOf( current );
         }
     }
 
@@ -332,6 +309,8 @@ void SessionManager::unrotate( bool audio )
 
 void SessionManager::sessionEntryAction( SessionEntry* entry )
 {
+    lockSessions();
+
     Group* group = entry->getGroup();
     if ( group == videoSessions )
     {
@@ -354,61 +333,58 @@ void SessionManager::sessionEntryAction( SessionEntry* entry )
     // TODO this makes it so the user doesn't move sessions around after
     // potentially rotating them. probably should make this not so blunt
     objectManager->clearSelected();
+
+    unlockSessions();
 }
 
-/*
- * Note, not thread-safe.
- */
-SessionEntry* SessionManager::findSessionByAddress( std::string address )
+void SessionManager::checkGUISessionShift(
+                                std::vector<RectangleBase*> outsideList,
+                                SessionGroup* parent )
 {
-    Group* sessions;
-    SessionEntry* session;
-    for ( int i = 0; i < numObjects(); i++ )
+    lockSessions();
+    Group* target;
+
+    if ( parent == videoSessions )
     {
-        sessions = static_cast<Group*>( (*this)[i] );
-        for ( int j = 0; j < sessions->numObjects(); j++ )
+        target = availableVideoSessions;
+    }
+    else if ( parent == availableVideoSessions )
+    {
+        target = videoSessions;
+    }
+    else
+    {
+        const char* name = parent != NULL ? parent->getName().c_str() : "NULL";
+        gravUtil::logVerbose( "SessionManager::checkGUISessionShift: invalid "
+                                "parent for session shift (%s)\n", name );
+        unlockSessions();
+        return;
+    }
+
+    for ( unsigned int i = 0; i < outsideList.size(); i++ )
+    {
+        SessionEntry* entry = dynamic_cast<SessionEntry*>( outsideList[i] );
+        if ( entry == NULL )
         {
-            session = static_cast<SessionEntry*>( (*sessions)[j] );
-            if ( session->getAddress().compare( address ) == 0 )
-                return session;
+            gravUtil::logWarning( "SessionManager::checkGUISessionShift: "
+                                    "invalid SessionGroup child?\n" );
+        }
+        else
+        {
+            // check intersect with projected destination, shift if so
+            if ( entry->intersect( target ) )
+            {
+                // we have to use the external method here to ensure that the
+                // side window GUI stays accurate - that will in turn call the
+                // shiftSession() method in this class
+                unlockSessions();
+                sessionTree->shiftSession( entry->getAddress(), false );
+                lockSessions();
+            }
         }
     }
 
-    gravUtil::logWarning( "SessionManager::findSessionByAddress: session %s "
-                            "not found\n", address.c_str() );
-    return NULL;
-}
-
-/*
- * Note, not thread-safe.
- */
-SessionEntry* SessionManager::findSessionByAddress( std::string address,
-        SessionType type )
-{
-    Group* sessions = sessionMap[ type ];
-    SessionEntry* session;
-
-    for ( int j = 0; j < sessions->numObjects(); j++ )
-    {
-        session = static_cast<SessionEntry*>( (*sessions)[j] );
-        if ( session->getAddress().compare( address ) == 0 )
-            return session;
-    }
-
-    gravUtil::logWarning( "SessionManager::findSessionByAddress: session %s "
-                            "not found\n", address.c_str() );
-    return NULL;
-}
-
-int SessionManager::indexOf( SessionEntry* entry, SessionType type )
-{
-    Group* sessions = sessionMap[ type ];
-    int i = 0;
-    while ( entry != (*sessions)[i] && i < sessions->numObjects() ) i++;
-    if ( i == sessions->numObjects() )
-        return -1;
-    else
-        return i;
+    unlockSessions();
 }
 
 std::string SessionManager::getCurrentRotateSessionAddress()
@@ -546,7 +522,7 @@ bool SessionManager::iterateSessions()
     // mutex should do this but this thread seems way too eager
     if ( pause )
     {
-        //gravUtil::logVerbose( "Sessions temporarily paused...\n" );
+        gravUtil::logVerbose( "Sessions temporarily paused...\n" );
         wxMicroSleep( 10 );
     }
 
@@ -612,8 +588,9 @@ void SessionManager::setSessionTreeControl( SessionTreeControl* s )
 }
 
 /*
- * Again note these two are NOT thread-safe.
+ * Note all the following functions are private and NOT thread-safe.
  */
+
 bool SessionManager::initSession( SessionEntry* session )
 {
     bool audio = session->isAudioSession();
@@ -638,4 +615,95 @@ bool SessionManager::initSession( SessionEntry* session )
 void SessionManager::disableSession( SessionEntry* session )
 {
     session->disableSession();
+}
+
+SessionEntry* SessionManager::findSessionByAddress( std::string address )
+{
+    Group* sessions;
+    SessionEntry* session;
+
+    for ( int i = 0; i < numObjects(); i++ )
+    {
+        sessions = static_cast<Group*>( (*this)[i] );
+        for ( int j = 0; j < sessions->numObjects(); j++ )
+        {
+            session = static_cast<SessionEntry*>( (*sessions)[j] );
+            if ( session->getAddress().compare( address ) == 0 )
+                return session;
+        }
+    }
+
+    gravUtil::logWarning( "SessionManager::findSessionByAddress: session %s "
+                            "not found\n", address.c_str() );
+    return NULL;
+}
+
+SessionEntry* SessionManager::findSessionByAddress( std::string address,
+        SessionType type )
+{
+    Group* sessions = sessionMap[ type ];
+    SessionEntry* session;
+
+    for ( int j = 0; j < sessions->numObjects(); j++ )
+    {
+        session = static_cast<SessionEntry*>( (*sessions)[j] );
+        if ( session->getAddress().compare( address ) == 0 )
+            return session;
+    }
+
+    gravUtil::logWarning( "SessionManager::findSessionByAddress: session %s "
+                            "not found\n", address.c_str() );
+    return NULL;
+}
+
+int SessionManager::indexOf( SessionEntry* entry )
+{
+    Group* sessions = entry->getGroup();
+    if ( sessions == NULL )
+        return -1;
+
+    int i = 0;
+    while ( entry != (*sessions)[i] && i < sessions->numObjects() ) i++;
+    if ( i == sessions->numObjects() )
+        return -1;
+    else
+        return i;
+}
+
+bool SessionManager::shiftSession( SessionEntry* entry )
+{
+    Group* to;
+    Group* from = entry->getGroup();
+
+    if ( from == videoSessions )
+    {
+        to = availableVideoSessions;
+        disableSession( entry );
+    }
+    else if ( from = availableVideoSessions )
+    {
+        to = videoSessions;
+
+        if ( !entry->isSessionEnabled() )
+        {
+            initSession( entry );
+        }
+
+        int i = indexOf( entry );
+        // shift rotate position back if what we're removing is before or at it,
+        // so we don't skip any
+        if ( i <= rotatePos && i != -1 )
+            rotatePos--;
+    }
+    else
+    {
+        const char* name = from != NULL ? from->getName().c_str() : "NULL";
+        gravUtil::logWarning( "SessionManager::shiftSession: invalid source "
+                                "group input (%s)\n", name );
+        return false;
+    }
+
+    from->remove( entry );
+    to->add( entry );
+    return true;
 }

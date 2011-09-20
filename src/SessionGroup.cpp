@@ -51,5 +51,7 @@ void SessionGroup::handleOutsideMembers()
                     "parent not SessionManager? invalid group setup\n" );
             return;
         }
+
+        manager->checkGUISessionShift( outsideList, this );
     }
 }

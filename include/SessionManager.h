@@ -34,6 +34,7 @@ class VideoListener;
 class AudioManager;
 class mutex;
 class SessionTreeControl;
+class SessionGroup;
 class SessionEntry;
 class gravManager;
 
@@ -72,7 +73,7 @@ public:
      * Type argument signifies where the session currently is, unlike the above
      * methods.
      */
-    bool shiftSession( std::string addr, SessionType type );
+    bool shiftSession( std::string addr, SessionType fromType );
 
     /*
      * Methods for modifying the secondary list for available video sessions.
@@ -90,6 +91,13 @@ public:
      */
     void sessionEntryAction( SessionEntry* entry );
 
+    /*
+     * Used for checking if user-moved SessionEntries should be shifted between
+     * groups or not.
+     */
+    void checkGUISessionShift( std::vector<RectangleBase*> outsideList,
+                                SessionGroup* parent );
+
     std::string getCurrentRotateSessionAddress();
     std::string getLastRotateSessionAddress();
 
@@ -103,7 +111,7 @@ public:
     bool isEncryptionEnabled( std::string addr );
 
     /*
-     * Returns true if there were enabled sessions to iterate.
+     * Returns true if there were enabled sessions to iterate through.
      */
     bool iterateSessions();
 
@@ -117,8 +125,12 @@ public:
 
 private:
     /*
+     * Note that all of these private functions are NOT thread safe and should
+     * be enclosed in lock() calls.
+     */
+
+    /*
      * Initialize (ie, start the connection) or de-initialize a session.
-     * Note these are NOT thread safe and should be enclosed in lock() calls.
      */
     bool initSession( SessionEntry* session );
     void disableSession( SessionEntry* session );
@@ -131,11 +143,19 @@ private:
      */
     SessionEntry* findSessionByAddress( std::string address );
     SessionEntry* findSessionByAddress( std::string address, SessionType type );
-    int indexOf( SessionEntry* entry, SessionType type );
+    int indexOf( SessionEntry* entry );
 
-    // The only reason we need this is for when entries get double clicked on -
-    // we need to make sure the rotate call originates from the tree so its
-    // display gets updated correctly.
+    /*
+     * Internal non-thread-safe implementation of shift, so we can call it from
+     * multiple places.
+     */
+    bool shiftSession( SessionEntry* entry );
+
+    /*
+     * The only reason we need this is for when entries get double clicked on -
+     * we need to make sure the rotate call originates from the tree so its
+     * display gets updated correctly.
+     */
     SessionTreeControl* sessionTree;
 
     Group* videoSessions;
@@ -151,7 +171,6 @@ private:
     int videoSessionCount;
     int audioSessionCount;
 
-    //std::vector<std::string> availableVideoList;
     int rotatePos;
     SessionEntry* lastRotateSession;
 

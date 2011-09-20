@@ -237,6 +237,10 @@ void SessionTreeControl::shiftSession( std::string address, bool audio )
 
         if ( newParent == availableVideoNodeID )
             SetItemBackgroundColour( newNode, *wxBLUE );
+        // if we added a session to the regular video list but it failed to
+        // initialize, keep it there but note it by making it red
+        // in the future, may have dialog option for choosing whether to keep
+        // it in the list or not
         if ( newParent == videoNodeID &&
                 sessionManager->isInFailedState( address, VIDEOSESSION ) )
             SetItemBackgroundColour( newNode, *wxRED );
