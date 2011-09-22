@@ -343,6 +343,7 @@ void SessionManager::checkGUISessionShift()
     Group* target;
     SessionGroup* parent = videoSessions;
 
+    // just loop over video & available video for now
     for ( unsigned int i = 0; i < 2; i++ )
     {
         if ( parent == videoSessions )
