@@ -360,6 +360,7 @@ void SessionManager::checkGUISessionShift()
 
         std::vector<RectangleBase*> outsideList =
                 parent->checkMemberIntersect();
+        bool gotIntersect = false;
 
         for ( unsigned int i = 0; i < outsideList.size(); i++ )
         {
@@ -378,9 +379,15 @@ void SessionManager::checkGUISessionShift()
                     // the side window GUI stays accurate - that will in turn
                     // call the shiftSession() method in this class
                     sessionTree->shiftSession( entry->getAddress(), false );
+                    gotIntersect = true;
                 }
             }
         }
+
+        // rearrange when there was at least one object moved outside of the
+        // group bounds but not in the target
+        if ( outsideList.size() > 0 && !gotIntersect )
+            parent->rearrange();
 
         parent = availableVideoSessions;
     }

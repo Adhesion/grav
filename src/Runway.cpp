@@ -118,6 +118,7 @@ std::vector<RectangleBase*> Runway::checkMemberIntersect()
 {
     unsigned int num = objects.size();
     std::vector<RectangleBase*> outsideList;
+    bool foundSelected = false;
 
     for ( unsigned int i = 0; i < num; i++ )
     {
@@ -125,12 +126,26 @@ std::vector<RectangleBase*> Runway::checkMemberIntersect()
         float ox = obj->getDestX();
         float oy = obj->getDestY();
 
-        if ( ox > getRBound() || ox < getLBound() ||
-                oy > getUBound() || oy < getDBound() )
+        // don't add selected objects to outside list - user might be dragging
+        // them, so we don't want to interrupt that
+        if ( obj->isSelected() )
+        {
+            foundSelected = true;
+        }
+        // note that this is slightly different from RectBase's intersect in
+        // that it's checking the center - should help with overlap conditions
+        // in SessionManager groups
+        else if ( ox > getRBound() || ox < getLBound() ||
+                  oy > getUBound() || oy < getDBound() )
         {
             outsideList.push_back( obj );
         }
     }
+
+    // rearrange in the general case if none are selected or outside - accounts
+    // for resetting position of objects moved internally
+    if ( outsideList.size() == 0 && !foundSelected )
+        rearrange();
 
     return outsideList;
 }
