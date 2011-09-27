@@ -309,7 +309,10 @@ void SessionManager::unrotate( bool audio )
 
 void SessionManager::sessionEntryAction( SessionEntry* entry )
 {
-    lockSessions();
+    // since this doesn't modify any of the lists of sessions, it should be safe
+    // not to do mutex locking. (otherwise, it would just lock, do these ifs,
+    // then have to unlock and relock around the rotate since it eventually
+    // locks itself.) this may change in the future
 
     Group* group = entry->getGroup();
     if ( group == videoSessions )
@@ -333,13 +336,13 @@ void SessionManager::sessionEntryAction( SessionEntry* entry )
     // TODO this makes it so the user doesn't move sessions around after
     // potentially rotating them. probably should make this not so blunt
     objectManager->clearSelected();
-
-    unlockSessions();
 }
 
 void SessionManager::checkGUISessionShift()
 {
-    lockSessions();
+    // this method doesn't do mutex locking - similar reasons to
+    // sessionEntryAction(), see above for details
+
     Group* target;
     SessionGroup* parent = videoSessions;
 
@@ -374,17 +377,13 @@ void SessionManager::checkGUISessionShift()
                     // we have to use the external method here to ensure that
                     // the side window GUI stays accurate - that will in turn
                     // call the shiftSession() method in this class
-                    unlockSessions();
                     sessionTree->shiftSession( entry->getAddress(), false );
-                    lockSessions();
                 }
             }
         }
 
         parent = availableVideoSessions;
     }
-
-    unlockSessions();
 }
 
 std::string SessionManager::getCurrentRotateSessionAddress()
@@ -553,8 +552,9 @@ bool SessionManager::iterateSessions()
         }
     }
 
-    mutex_unlock( sessionMutex );
     lockCount--;
+    mutex_unlock( sessionMutex );
+
     return haveSessions;
 }
 
@@ -578,8 +578,8 @@ void SessionManager::lockSessions()
 void SessionManager::unlockSessions()
 {
     pause = false;
-    mutex_unlock( sessionMutex );
     lockCount--;
+    mutex_unlock( sessionMutex );
 }
 
 void SessionManager::setSessionTreeControl( SessionTreeControl* s )
