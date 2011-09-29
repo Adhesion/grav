@@ -863,10 +863,10 @@ void gravManager::setWindowSize( int w, int h )
 
 void gravManager::recalculateRectSizes()
 {
-    float screenU = screenRectFull.getUBound();
-    float screenD = screenRectFull.getDBound();
-    float screenL = screenRectFull.getLBound();
-    float screenR = screenRectFull.getRBound();
+    float screenU = screenRectFull.getDestUBound();
+    float screenD = screenRectFull.getDestDBound();
+    float screenL = screenRectFull.getDestLBound();
+    float screenR = screenRectFull.getDestRBound();
     // if we have header, make the sub rectangle smaller accordingly
     // same for moving runway down, and shifting sub to the right because of the
     // runway

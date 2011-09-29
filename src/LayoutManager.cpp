@@ -63,15 +63,15 @@ bool LayoutManager::arrange( std::string method,
         std::map<std::string, std::vector<RectangleBase*> > data,
         std::map<std::string, std::string> options )
 {
-    float outerL = outerRect.getLBound();
-    float outerR = outerRect.getRBound();
-    float outerU = outerRect.getUBound();
-    float outerD = outerRect.getDBound();
+    float outerL = outerRect.getDestLBound();
+    float outerR = outerRect.getDestRBound();
+    float outerU = outerRect.getDestUBound();
+    float outerD = outerRect.getDestDBound();
 
-    float innerL = innerRect.getLBound();
-    float innerR = innerRect.getRBound();
-    float innerU = innerRect.getUBound();
-    float innerD = innerRect.getDBound();
+    float innerL = innerRect.getDestLBound();
+    float innerR = innerRect.getDestRBound();
+    float innerU = innerRect.getDestUBound();
+    float innerD = innerRect.getDestDBound();
 
     return arrange(method,
             outerL, outerR, outerU, outerD,

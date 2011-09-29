@@ -76,11 +76,20 @@ public:
     float getDestTotalWidth(); float getDestTotalHeight();
     float getBorderSize(); float getDestBorderSize();
     float getBorderScale();
+
     /*
-     * Boundaries of the object - note these use the destination values, ie
-     * ignoring animation.
+     * Boundaries of the object, for both current & final positions. Note that
+     * these do not include border/text.
      */
-    float getLBound(); float getRBound(); float getUBound(); float getDBound();
+    float getLBound();
+    float getRBound();
+    float getUBound();
+    float getDBound();
+
+    float getDestLBound();
+    float getDestRBound();
+    float getDestUBound();
+    float getDestDBound();
 
     Vector getNormal();
 
@@ -258,6 +267,9 @@ public:
      */
     bool intersect( float L, float R, float U, float D );
     bool intersect( RectangleBase* other );
+
+    bool destIntersect( float L, float R, float U, float D );
+    bool destIntersect( RectangleBase* other );
 
     /*
      * Only used for VenueNode override for now.

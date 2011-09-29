@@ -61,6 +61,8 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
 
     setBorderScale( 0.005 );
 
+    setName( "Session Manager" );
+
     RGBAColor mainColor;
     mainColor.R = 0.1f;
     mainColor.G = 0.1f;
@@ -372,8 +374,9 @@ void SessionManager::checkGUISessionShift()
             }
             else
             {
+                gravUtil::logMessage( "SessionMan::checking %s against %s\n", entry->getAddress().c_str(), target->getName().c_str() );
                 // check intersect with projected destination, shift if so
-                if ( entry->intersect( target ) )
+                if ( entry->destIntersect( target ) )
                 {
                     // we have to use the external method here to ensure that
                     // the side window GUI stays accurate - that will in turn
@@ -387,7 +390,10 @@ void SessionManager::checkGUISessionShift()
         // rearrange when there was at least one object moved outside of the
         // group bounds but not in the target
         if ( outsideList.size() > 0 && !gotIntersect )
+        {
+            printf( "SessionManager::outside but no target intersect -> rearrange\n" );
             parent->rearrange();
+        }
 
         parent = availableVideoSessions;
     }

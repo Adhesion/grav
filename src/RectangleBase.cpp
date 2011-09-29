@@ -222,20 +222,40 @@ float RectangleBase::getDestHeight()
 
 float RectangleBase::getLBound()
 {
-    return destX - (getDestWidth()/2.0f);
+    return x - (getWidth()/2.0f);
 }
 
 float RectangleBase::getRBound()
 {
-    return destX + (getDestWidth()/2.0f);
+    return x + (getWidth()/2.0f);
 }
 
 float RectangleBase::getUBound()
 {
-    return destY + (getDestHeight()/2.0f);
+    return y + (getHeight()/2.0f);
 }
 
 float RectangleBase::getDBound()
+{
+    return y - (getHeight()/2.0f);
+}
+
+float RectangleBase::getDestLBound()
+{
+    return destX - (getDestWidth()/2.0f);
+}
+
+float RectangleBase::getDestRBound()
+{
+    return destX + (getDestWidth()/2.0f);
+}
+
+float RectangleBase::getDestUBound()
+{
+    return destY + (getDestHeight()/2.0f);
+}
+
+float RectangleBase::getDestDBound()
 {
     return destY - (getDestHeight()/2.0f);
 }
@@ -463,8 +483,8 @@ void RectangleBase::setBorderScale( float b )
 
 void RectangleBase::fillToRect( RectangleBase r, bool full )
 {
-    fillToRect( r.getLBound(), r.getRBound(), r.getUBound(), r.getDBound(),
-                    full );
+    fillToRect( r.getDestLBound(), r.getDestRBound(), r.getDestUBound(),
+                    r.getDestDBound(), full );
 }
 
 void RectangleBase::fillToRect( float innerL, float innerR,
@@ -772,24 +792,29 @@ void RectangleBase::setSubstring( int start, int end )
 
 bool RectangleBase::intersect( float L, float R, float U, float D )
 {
-    // find the bounds of this object
-    float left = getX() - getWidth()/2;
-    float right = getX() + getWidth()/2;
-    float bottom = getY() - getHeight()/2;
-    float top = getY() + getHeight()/2;
-
-    return !(L > right || R < left || D > top || U < bottom);
+    return !( L > getRBound() || R < getLBound() ||
+              D > getUBound() || U < getDBound() );
 }
 
 bool RectangleBase::intersect( RectangleBase* other )
 {
-    // find the bounds of the other object
-    float left = other->getX() - other->getWidth()/2;
-    float right = other->getX() + other->getWidth()/2;
-    float bottom = other->getY() - other->getHeight()/2;
-    float top = other->getY() + other->getHeight()/2;
+    return intersect( other->getLBound(), other->getRBound(),
+                      other->getUBound(), other->getDBound() );
+}
 
-    return intersect( left, right, top, bottom );
+bool RectangleBase::destIntersect( float L, float R, float U, float D )
+{
+    gravUtil::logMessage( "Rectbase::destIntersect: this %f,%f %f,%f other %f,%f %f,%f\n",
+            getDestLBound(), getDestRBound(), getDestUBound(), getDestDBound(),
+            L, R, U, D );
+    return !( L > getDestRBound() || R < getDestLBound() ||
+              D > getDestUBound() || U < getDestDBound() );
+}
+
+bool RectangleBase::destIntersect( RectangleBase* other )
+{
+    return destIntersect( other->getDestLBound(), other->getDestRBound(),
+                          other->getDestUBound(), other->getDestDBound() );
 }
 
 void RectangleBase::doubleClickAction()
