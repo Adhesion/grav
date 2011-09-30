@@ -135,8 +135,8 @@ std::vector<RectangleBase*> Runway::checkMemberIntersect()
         // note that this is slightly different from RectBase's intersect in
         // that it's checking the center - should help with overlap conditions
         // in SessionManager groups
-        else if ( ox > getRBound() || ox < getLBound() ||
-                  oy > getUBound() || oy < getDBound() )
+        else if ( ox > getDestRBound() || ox < getDestLBound() ||
+                  oy > getDestUBound() || oy < getDestDBound() )
         {
             outsideList.push_back( obj );
         }
