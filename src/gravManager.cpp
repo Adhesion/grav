@@ -448,7 +448,7 @@ void gravManager::draw()
         holdCounter++;
 
     drawCounter = ( drawCounter + 1 ) % 30;
-    intersectCounter = ( intersectCounter + 1 ) % 10;
+    intersectCounter = ( intersectCounter + 1 ) % 20;
     autoCounter = ( autoCounter + 1 ) % 900;
 }
 
@@ -852,13 +852,12 @@ void gravManager::setWindowSize( int w, int h )
     if ( venueClientController != NULL )
     {
         venueClientController->setScale( screenRectSub.getDestWidth() * 0.9f,
-                                     screenRectSub.getDestHeight() * 0.9f );
-        venueClientController->rearrange();
+                                     screenRectSub.getDestHeight() * 0.9f,
+                                     true );
     }
 
     sessionManager->setScale( screenRectSub.getDestWidth() * 0.55f,
-                             screenRectSub.getDestHeight() * 0.25f );
-    sessionManager->rearrange();
+                             screenRectSub.getDestHeight() * 0.25f, true );
 }
 
 void gravManager::recalculateRectSizes()

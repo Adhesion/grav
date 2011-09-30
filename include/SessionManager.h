@@ -58,6 +58,8 @@ public:
     SessionManager( VideoListener* vl, AudioManager* al, gravManager* g );
     ~SessionManager();
 
+    void rearrange();
+
     /*
      * Add/remove a new session. Will auto-initialize if type = video or audio.
      * Returns true if creation/removal succeeds.

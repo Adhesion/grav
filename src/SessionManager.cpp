@@ -44,6 +44,9 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     : Group( 0.0f, -6.0f ), videoSessionListener( vl ),
       audioSessionListener( al ), objectManager( g )
 {
+    x = destX;
+    y = destY - 10.0f;
+
     sessionMutex = mutex_create();
 
     videoSessionCount = 0;
@@ -71,6 +74,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     setColor( mainColor );
 
     videoSessions = new SessionGroup( getDestX(), getDestY() );
+    videoSessions->setPos( x, y );
     videoSessions->setName( "Video" );
     videoSessions->setBorderScale( 0.005 );
     RGBAColor videoColor;
@@ -81,6 +85,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     videoSessions->setColor( videoColor );
 
     availableVideoSessions = new SessionGroup( getDestX(), getDestY() );
+    availableVideoSessions->setPos( x, y );
     availableVideoSessions->setName( "Available Video" );
     availableVideoSessions->setBorderScale( 0.005 );
     RGBAColor availableVideoColor;
@@ -91,6 +96,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     availableVideoSessions->setColor( availableVideoColor );
 
     audioSessions = new SessionGroup( getDestX(), getDestY() );
+    audioSessions->setPos( x, y );
     audioSessions->setName( "Audio" );
     audioSessions->setBorderScale( 0.005 );
     RGBAColor audioColor;
@@ -139,6 +145,19 @@ SessionManager::~SessionManager()
     }
 }
 
+void SessionManager::rearrange()
+{
+    // override regular group rearrange to add a forced rearrange on groups -
+    // they're unlocked to allow user movement but that causes setScale()
+    // to not resize their children (SessionEntries), so force that here
+    Group::rearrange();
+    for ( int i = 0; i < objects.size(); i++ )
+    {
+        Group* sessions = static_cast<Group*>( objects[i] );
+        sessions->rearrange();
+    }
+}
+
 bool SessionManager::addSession( std::string address, SessionType type )
 {
     lockSessions();
@@ -147,6 +166,7 @@ bool SessionManager::addSession( std::string address, SessionType type )
     bool audio = ( type == AUDIOSESSION );
     SessionEntry* entry = new SessionEntry( address, audio );
     Group* sessions = sessionMap[ type ];
+    entry->setPos( sessions->getX(), sessions->getY() );
 
     if ( type != AVAILABLEVIDEOSESSION )
     {
@@ -545,9 +565,9 @@ bool SessionManager::iterateSessions()
     bool haveSessions = false;
     Group* sessions;
     SessionEntry* session;
-    for ( int i = 0; i < numObjects(); i++ )
+    for ( int i = 0; i < objects.size(); i++ )
     {
-        sessions = static_cast<Group*>( (*this)[i] );
+        sessions = static_cast<Group*>( objects[i] );
         for ( int j = 0; j < sessions->numObjects(); j++ )
         {
             session = static_cast<SessionEntry*>( (*sessions)[j] );

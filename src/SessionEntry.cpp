@@ -37,6 +37,9 @@ SessionEntry::SessionEntry( std::string addr, bool aud )
     address = addr;
     setName( addr );
 
+    scaleX = 0.5;
+    scaleY = 0.5;
+
     processingEnabled = true;
     initialized = false;
     inFailedState = false;
