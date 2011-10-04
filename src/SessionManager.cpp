@@ -394,7 +394,6 @@ void SessionManager::checkGUISessionShift()
             }
             else
             {
-                gravUtil::logMessage( "SessionMan::checking %s against %s\n", entry->getAddress().c_str(), target->getName().c_str() );
                 // check intersect with projected destination, shift if so
                 if ( entry->destIntersect( target ) )
                 {
@@ -411,7 +410,6 @@ void SessionManager::checkGUISessionShift()
         // group bounds but not in the target
         if ( outsideList.size() > 0 && !gotIntersect )
         {
-            printf( "SessionManager::outside but no target intersect -> rearrange\n" );
             parent->rearrange();
         }
 

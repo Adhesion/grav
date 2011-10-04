@@ -804,9 +804,6 @@ bool RectangleBase::intersect( RectangleBase* other )
 
 bool RectangleBase::destIntersect( float L, float R, float U, float D )
 {
-    gravUtil::logMessage( "Rectbase::destIntersect: this %f,%f %f,%f other %f,%f %f,%f\n",
-            getDestLBound(), getDestRBound(), getDestUBound(), getDestDBound(),
-            L, R, U, D );
     return !( L > getDestRBound() || R < getDestLBound() ||
               D > getDestUBound() || U < getDestDBound() );
 }

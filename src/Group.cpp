@@ -159,8 +159,6 @@ void Group::rearrange()
     // = 0 will cause div by 0 crashes later
     if ( objects.size() == 0 ) return;
 
-    printf( "\tGroup %s rearranging\n", getName().c_str() );
-
     std::map<std::string, std::vector<RectangleBase*> > data;
     data["objects"] = objects;
 
