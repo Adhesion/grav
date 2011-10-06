@@ -60,6 +60,7 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     dragging = false;
     clickedInside = false;
     leftButtonHeld = false;
+    validMousePos = false;
     ctrlHeld = false;
     modifiers = 0;
     bool debug = false;
@@ -198,8 +199,29 @@ void InputHandler::wxCharEvt( wxKeyEvent& evt )
 
 void InputHandler::wxMouseMove( wxMouseEvent& evt )
 {
+    // update mouse world position on mouse move - adds negligible CPU (~1%) and
+    // obviously only when the mouse is moving. if need be, can potentially be
+    // put off to gravManager::draw() (ie every X frames)
+
+    // note that calculating screen pos -> world pos needs to do a GL call so
+    // this has to be on the main thread
+
+    int x = evt.GetPosition().x;
+    // GL screen coords are y-flipped relative to GL screen coords
+    int y = grav->getWindowHeight() - evt.GetPosition().y;
+
+    Point intersect;
+    validMousePos = GLUtil::getInstance()->screenToRectIntersect( x, y,
+                                                          grav->getScreenRect(),
+                                                          intersect );
+    if ( !validMousePos )
+        return;
+
+    mouseX = intersect.getX();
+    mouseY = intersect.getY();
+
     if ( leftButtonHeld )
-        mouseLeftHeldMove( evt.GetPosition().x, evt.GetPosition().y );
+        mouseLeftHeldMove();
 }
 
 void InputHandler::wxMouseLDown( wxMouseEvent& evt )
@@ -211,13 +233,13 @@ void InputHandler::wxMouseLDown( wxMouseEvent& evt )
         ctrlHeld = false;
     //modifiers = evt.GetModifiers();
 
-    leftClick( evt.GetPosition().x, evt.GetPosition().y );
+    leftClick();
     evt.Skip();
 }
 
 void InputHandler::wxMouseLUp( wxMouseEvent& evt )
 {
-    leftRelease( evt.GetPosition().x, evt.GetPosition().y );
+    leftRelease();
     evt.Skip();
 }
 
@@ -230,7 +252,7 @@ void InputHandler::wxMouseLDClick( wxMouseEvent& evt )
         ctrlHeld = false;
     //modifiers = evt.GetModifiers();
 
-    leftClick( evt.GetPosition().x, evt.GetPosition().y, true );
+    leftClick( true );
     evt.Skip();
 }
 
@@ -702,48 +724,18 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     }
 }
 
-void InputHandler::leftClick( int x, int y, bool doubleClick )
+void InputHandler::leftClick( bool doubleClick )
 {
-    // glut screen coords are y-flipped relative to GL screen coords
-    //gravUtil::logMessage( "window height? %i\n", grav->getWindowHeight() );
-    y = grav->getWindowHeight() - y;
-
-    grav->setBoxSelectDrawing( false );
-
-    // old method for getting world coords for current mouse pos
-    //GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.99087065,
-    //                            &mouseX, &mouseY, &mouseZ );
-    //gravUtil::logMessage( "leftClick::old method got %f,%f,%f\n", mouseX, mouseY, mouseZ );
-
-    // ray intersect-based click method
-    /*Point nearScreen( x, y, 0.0f );
-    Point farScreen( x, y, 0.5f );
-    Point near, far;
-    GLUtil::getInstance()->screenToWorld( nearScreen, near );
-    GLUtil::getInstance()->screenToWorld( farScreen, far );
-
-    Ray r;
-    r.location = near;
-    r.direction = far - near;
-    Point intersect;
-    bool rayRetVal = grav->getScreenRect().findRayIntersect( r, intersect );
-    if ( !rayRetVal )
-        return;*/
-
-    Point intersect;
-    bool ret = GLUtil::getInstance()->screenToRectIntersect( x, y,
-                                                          grav->getScreenRect(),
-                                                          intersect );
-    if ( !ret )
+    if ( !validMousePos )
         return;
-    mouseX = intersect.getX();
-    mouseY = intersect.getY();
 
     // on click, any potential dragging afterwards must start here
     dragStartX = mouseX;
     dragStartY = mouseY;
     dragPrevX = mouseX;
     dragPrevY = mouseY;
+
+    grav->setBoxSelectDrawing( false );
 
     // if we didn't click on a video, and we're not holding down ctrl to
     // begin a multi selection, so move the selected video(s) to the
@@ -818,7 +810,7 @@ void InputHandler::leftClick( int x, int y, bool doubleClick )
     leftButtonHeld = true;
 }
 
-void InputHandler::leftRelease( int x, int y )
+void InputHandler::leftRelease()
 {
     // shift the temporary list of selected objects to the main list to
     // allow for multiple box selection
@@ -845,39 +837,8 @@ void InputHandler::leftRelease( int x, int y )
     dragging = false;
 }
 
-void InputHandler::mouseLeftHeldMove( int x, int y )
+void InputHandler::mouseLeftHeldMove()
 {
-    // glut screen coords are y-flipped relative to GL screen coords
-    y = grav->getWindowHeight() - y;
-
-    // old method for getting world coords for current mouse pos
-    //GLUtil::getInstance()->screenToWorld( (GLdouble)x, (GLdouble)y, 0.990991f,
-    //                        &mouseX, &mouseY, &mouseZ );
-
-    // ray intersect-based click method
-    /*Point nearScreen( x, y, 0.0f );
-    Point farScreen( x, y, 0.5f );
-    Point near, far;
-    GLUtil::getInstance()->screenToWorld( nearScreen, near );
-    GLUtil::getInstance()->screenToWorld( farScreen, far );
-
-    Ray r;
-    r.location = near;
-    r.direction = far - near;
-    Point intersect;
-    bool rayRetVal = grav->getScreenRect().findRayIntersect( r, intersect );
-    if ( !rayRetVal )
-        return;*/
-
-    Point intersect;
-    bool ret = GLUtil::getInstance()->screenToRectIntersect( x, y,
-                                                          grav->getScreenRect(),
-                                                          intersect );
-    if ( !ret )
-        return;
-    mouseX = intersect.getX();
-    mouseY = intersect.getY();
-
     dragEndX = mouseX;
     dragEndY = mouseY;
 
@@ -1042,6 +1003,11 @@ float InputHandler::getDragEndX()
 float InputHandler::getDragEndY()
 {
     return dragEndY;
+}
+
+bool InputHandler::haveValidMousePos()
+{
+    return validMousePos;
 }
 
 std::map<std::string, std::string> InputHandler::getShortcutHelpList()

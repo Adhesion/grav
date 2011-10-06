@@ -101,9 +101,9 @@ public:
 
     void processKeyboard( int keyCode, int x, int y );
 
-    void leftClick( int x, int y, bool doubleClick = false );
-    void leftRelease( int x, int y );
-    void mouseLeftHeldMove( int x, int y );
+    void leftClick( bool doubleClick = false );
+    void leftRelease();
+    void mouseLeftHeldMove();
 
     bool selectVideos();
     static int propertyID;
@@ -114,6 +114,7 @@ public:
     bool isLeftButtonHeld();
     float getDragStartX(); float getDragStartY();
     float getDragEndX(); float getDragEndY();
+    bool haveValidMousePos();
 
     /*
      * From the docstr dict, generate a list of strings that acts as a help file
@@ -144,7 +145,7 @@ private:
     // special input modifiers like CTRL
     int special;
 
-    GLdouble mouseX, mouseY, mouseZ;
+    GLdouble mouseX, mouseY;
 
     // start & end pos for click-and-dragging
     float dragStartX;
@@ -157,6 +158,15 @@ private:
     float dragPrevY;
 
     bool leftButtonHeld;
+
+    // if the camera is in a weird state (shouldn't happen normally, but just in
+    // case), the camera lookat may not intersect with the screen rectangle
+    // (the plane all the videos etc. are on), so the mouse position will be
+    // undefined. (actually the posX/posY will just hold the previous value)
+    // this will signify if we're in that state.
+    // note this may change later, eg if it's ever possible to click on other
+    // 3d objects
+    bool validMousePos;
 
     // this should only be for mouse callbacks
     bool ctrlHeld;
