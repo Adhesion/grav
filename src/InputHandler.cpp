@@ -985,6 +985,16 @@ bool InputHandler::isLeftButtonHeld()
     return leftButtonHeld;
 }
 
+float InputHandler::getMouseX()
+{
+    return mouseX;
+}
+
+float InputHandler::getMouseY()
+{
+    return mouseY;
+}
+
 float InputHandler::getDragStartX()
 {
     return dragStartX;

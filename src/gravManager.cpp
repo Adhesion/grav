@@ -440,6 +440,22 @@ void gravManager::draw()
 
     glFlush();
 
+    if ( input->haveValidMousePos() )
+    {
+        bool sessionMouseover = input->getMouseX() > sessionManager->getLBound()
+                && input->getMouseX() < sessionManager->getRBound()
+                && input->getMouseY() < sessionManager->getUBound()
+                && input->getMouseY() > sessionManager->getDBound();
+        if ( sessionMouseover && !sessionManager->getRendering() )
+        {
+            sessionManager->setRendering( true );
+        }
+        else if ( !sessionMouseover && sessionManager->getRendering() )
+        {
+            sessionManager->setRendering( false );
+        }
+    }
+
     // hold counter is a bit different than the others since alpha values
     // directly depend on it, as above
     if ( !input->isLeftButtonHeld() && holdCounter > 0 )

@@ -109,9 +109,11 @@ public:
     static int propertyID;
 
     /*
-     * Various accessors.
+     * Various accessors. Note that the positions are in world space (ie not
+     * screen pixels).
      */
     bool isLeftButtonHeld();
+    float getMouseX(); float getMouseY();
     float getDragStartX(); float getDragStartY();
     float getDragEndX(); float getDragEndY();
     bool haveValidMousePos();

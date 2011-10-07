@@ -61,6 +61,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     locked = true;
     selectable = false;
     userMovable = false;
+    allowHiding = true;
 
     setBorderScale( 0.005 );
 
@@ -82,7 +83,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     videoColor.G = 0.8f;
     videoColor.B = 0.1f;
     videoColor.A = 0.3f;
-    videoSessions->setColor( videoColor );
+    videoSessions->setBaseColor( videoColor );
 
     availableVideoSessions = new SessionGroup( getDestX(), getDestY() );
     availableVideoSessions->setPos( x, y );
@@ -93,7 +94,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     availableVideoColor.G = 0.1f;
     availableVideoColor.B = 0.8f;
     availableVideoColor.A = 0.3f;
-    availableVideoSessions->setColor( availableVideoColor );
+    availableVideoSessions->setBaseColor( availableVideoColor );
 
     audioSessions = new SessionGroup( getDestX(), getDestY() );
     audioSessions->setPos( x, y );
@@ -104,7 +105,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     audioColor.G = 0.1f;
     audioColor.B = 0.1f;
     audioColor.A = 0.3f;
-    audioSessions->setColor( audioColor );
+    audioSessions->setBaseColor( audioColor );
 
     add( videoSessions );
     add( availableVideoSessions );

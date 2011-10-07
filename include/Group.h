@@ -82,6 +82,7 @@ protected:
     ArrangeStyle rearrangeStyle;
     bool preserveChildAspect;
 
+    // whether the group will hide its children on setRendering( false )
     bool allowHiding;
 
 };
