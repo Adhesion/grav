@@ -148,7 +148,7 @@ bool VenueClientController::tryGetValidVenueClient( bool instantHide )
 
     if ( venueClientUrl.compare( "" ) == 0 )
     {
-        gravUtil::logWarning( "VenueClientController::tryGetValidVenueClient: "
+        gravUtil::logVerbose( "VenueClientController::tryGetValidVenueClient: "
                 "no venue clients found\n" );
         /*
          * Since this function is equivalent to "is the VCC showable", if it's
