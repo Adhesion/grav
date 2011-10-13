@@ -43,6 +43,7 @@ VideoSource::VideoSource( VPMSession* _session, VideoListener* l,
     texid = 0;
     aspect = 1.33f;
     useAlpha = false;
+    enableRendering = true;
 }
 
 VideoSource::~VideoSource()
