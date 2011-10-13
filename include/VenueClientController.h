@@ -58,8 +58,10 @@ public:
     /*
      * Attempt to find the first valid venue client via AGTools. If it fails,
      * return false and set internal venue client URL to "".
+     * Will automatically hide if there is no venue client found. The bool
+     * argument determines animation for this.
      */
-    bool tryGetValidVenueClient();
+    bool tryGetValidVenueClient( bool instantHide = false );
 
     void updateExitMap();
     void printExitMap();
@@ -73,7 +75,7 @@ public:
     void rearrange();
 
     bool updateName();
-    void setRendering( bool r );
+    void show( bool s, bool instant = false );
 
     void setSessionControl( SessionTreeControl* s );
 

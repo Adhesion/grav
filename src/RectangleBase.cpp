@@ -64,7 +64,11 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     secondaryColor = other.secondaryColor;
     destSecondaryColor = other.destSecondaryColor;
 
-    enableRendering = other.enableRendering;
+    oldBorderAlpha = other.oldBorderAlpha;
+    oldSecondaryAlpha = other.oldSecondaryAlpha;
+
+    shown = other.shown;
+
     debugDraw = other.debugDraw;
 
     name = other.name;
@@ -127,7 +131,8 @@ void RectangleBase::setDefaults()
     showLockStatus = false;
     locked = false;
 
-    enableRendering = true;
+    shown = true;
+
     debugDraw = false;
 
     relativeTextScale = 0.0009;
@@ -142,6 +147,9 @@ void RectangleBase::setDefaults()
     destSecondaryColor.R = 0.0f; destSecondaryColor.G = 0.0f;
     destSecondaryColor.B = 0.0f; destSecondaryColor.A = 0.0f;
     secondaryColor = destSecondaryColor;
+
+    oldBorderAlpha = destBColor.A;
+    oldSecondaryAlpha = destSecondaryColor.A;
 
     finalName = false;
     cutoffPos = -1;
@@ -624,7 +632,7 @@ bool RectangleBase::isSelected()
 
 bool RectangleBase::isSelectable()
 {
-    return selectable;
+    return selectable && shown;
 }
 
 void RectangleBase::setSelect( bool select )
@@ -713,7 +721,15 @@ RGBAColor RectangleBase::getSecondaryColor()
 
 void RectangleBase::setColor( RGBAColor c )
 {
-    destBColor = c;
+    if ( shown )
+        destBColor = c;
+    else
+    {
+        destBColor.R = c.R;
+        destBColor.G = c.G;
+        destBColor.B = c.B;
+        oldBorderAlpha = c.A;
+    }
 
     if ( !animated )
         borderColor = destBColor;
@@ -734,7 +750,15 @@ void RectangleBase::setBaseColor( RGBAColor c )
 
 void RectangleBase::setSecondaryColor( RGBAColor c )
 {
-    destSecondaryColor = c;
+    if ( shown )
+        destSecondaryColor = c;
+    else
+    {
+        destSecondaryColor.R = c.R;
+        destSecondaryColor.G = c.G;
+        destSecondaryColor.B = c.B;
+        oldSecondaryAlpha = c.A;
+    }
 
     if ( !animated )
         secondaryColor = destSecondaryColor;
@@ -819,14 +843,55 @@ void RectangleBase::doubleClickAction()
     // do nothing for now
 }
 
-void RectangleBase::setRendering( bool r )
+void RectangleBase::show( bool s, bool instant )
 {
-    enableRendering = r;
+    bool wasAnimated = animated;
+    if ( instant && wasAnimated )
+        animated = false;
+
+    float newAlpha, newSecondAlpha;
+
+    if ( !s )
+    {
+        if ( selected )
+            setSelect( false );
+
+        newAlpha = 0.0f;
+        newSecondAlpha = 0.0f;
+        oldBorderAlpha = destBColor.A;
+        oldSecondaryAlpha = destSecondaryColor.A;
+    }
+    else
+    {
+        newAlpha = oldBorderAlpha;
+        newSecondAlpha = oldSecondaryAlpha;
+    }
+
+    destBColor.A = newAlpha;
+    destSecondaryColor.A = newSecondAlpha;
+
+    if ( !animated )
+    {
+        borderColor.A = destBColor.A;
+        secondaryColor.A = destSecondaryColor.A;
+    }
+    else
+    {
+        borderColAnimating = true;
+        secondColAnimating = true;
+    }
+
+    // this is done late since setSelect( false ) above will call setcolor
+    // which depends on the shown bool being accurate for the current state
+    shown = s;
+
+    if ( instant && wasAnimated )
+        animated = true;
 }
 
-bool RectangleBase::getRendering()
+bool RectangleBase::isShown()
 {
-    return enableRendering;
+    return shown;
 }
 
 void RectangleBase::draw()
@@ -876,6 +941,9 @@ void RectangleBase::draw()
     }
 
     animateValues();
+
+    if ( borderColor.A < 0.01f )
+        return;
 
     // set up our position
     glPushMatrix();

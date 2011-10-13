@@ -473,7 +473,7 @@ void InputHandler::handleMuteSelected()
             // add it to the runway if we're using it, it's visible, etc.
             if ( !(*si)->isGrouped() && (*si)->isMuted() &&
                     grav->usingRunway() &&
-                    grav->getRunway()->getRendering() )
+                    grav->getRunway()->isShown() )
             {
                 grav->getRunway()->add( (*si) );
                 (*si)->setSelect( false );

@@ -32,7 +32,6 @@ Runway::Runway( float _x, float _y ) :
     locked = false;
     selectable = false;
     userMovable = false;
-    allowHiding = true;
     orientation = 1;
     setName( "Runway" );
     intersectCounter = 0;
@@ -50,6 +49,17 @@ void Runway::draw()
 {
     animateValues();
 
+    drawRunwayBorder();
+
+    // draw members like a normal group
+    for ( unsigned int i = 0; i < objects.size(); i++ )
+    {
+        objects[i]->draw();
+    }
+}
+
+void Runway::drawRunwayBorder()
+{
     if ( borderColor.A < 0.01f )
         return;
 
@@ -98,12 +108,6 @@ void Runway::draw()
     glDisable( GL_BLEND );
 
     glPopMatrix();
-
-    // draw members like a normal group
-    for ( unsigned int i = 0; i < objects.size(); i++ )
-    {
-        objects[i]->draw();
-    }
 }
 
 bool Runway::updateName()

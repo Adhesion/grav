@@ -276,12 +276,17 @@ public:
      */
     virtual void doubleClickAction();
 
-    // set/get enable/disable for rendering
-    // this means different things for different subclasses - in base it means
-    // nothing, videosource uses it to disable rendering, runway makes it
-    // invisible
-    virtual void setRendering( bool r );
-    bool getRendering();
+    /*
+     * Shows/hides the object. (Hide will cause the alpha animate to 0, and make
+     * the object unselectable while it is hidden)
+     * Instant will set the color instantly, ie temporarily disable animation
+     * for the duration of the method. If you want to create an object that
+     * starts as hidden, the best thing to do would be to call setColor() or
+     * setBaseColor() and then call show( false, true ) when the object is
+     * created.
+     */
+    virtual void show( bool s, bool instant = false );
+    bool isShown();
 
     /*
      * GL draw function to render the object.
@@ -314,6 +319,10 @@ protected:
     RGBAColor baseBColor;
     RGBAColor secondaryColor;
     RGBAColor destSecondaryColor;
+
+    // save old alpha values for use in show()
+    float oldBorderAlpha;
+    float oldSecondaryAlpha;
 
     std::string name;
     std::string altName;
@@ -352,7 +361,8 @@ protected:
     bool locked;
     bool showLockStatus;
 
-    bool enableRendering;
+    bool shown;
+
     bool debugDraw;
 
     bool animated;

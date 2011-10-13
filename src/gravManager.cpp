@@ -350,6 +350,23 @@ void gravManager::draw()
             runway->getColor().A > 0.01f )
         runway->handleOutsideMembers();
 
+    if ( input->haveValidMousePos() )
+    {
+        bool sessionMouseover = input->getMouseX() > sessionManager->getLBound()
+                && input->getMouseX() < sessionManager->getRBound()
+                && input->getMouseY() < sessionManager->getUBound()
+                && input->getMouseY() > sessionManager->getDBound();
+        if ( sessionMouseover && !sessionManager->isShown() )
+        {
+            sessionManager->show( true );
+            moveToTop( sessionManager );
+        }
+        else if ( !sessionMouseover && sessionManager->isShown() )
+        {
+            sessionManager->show( false );
+        }
+    }
+
     unlockSources();
 
     // check session manager for moved session entry objects & shift if
@@ -439,22 +456,6 @@ void gravManager::draw()
     glDepthMask( GL_TRUE );
 
     glFlush();
-
-    if ( input->haveValidMousePos() )
-    {
-        bool sessionMouseover = input->getMouseX() > sessionManager->getLBound()
-                && input->getMouseX() < sessionManager->getRBound()
-                && input->getMouseY() < sessionManager->getUBound()
-                && input->getMouseY() > sessionManager->getDBound();
-        if ( sessionMouseover && !sessionManager->getRendering() )
-        {
-            sessionManager->setRendering( true );
-        }
-        else if ( !sessionMouseover && sessionManager->getRendering() )
-        {
-            sessionManager->setRendering( false );
-        }
-    }
 
     // hold counter is a bit different than the others since alpha values
     // directly depend on it, as above
@@ -1362,7 +1363,7 @@ void gravManager::setRunwayUsage( bool run )
 {
     useRunway = run;
 
-    runway->setRendering( run );
+    runway->show( run );
 
     recalculateRectSizes();
 }
@@ -1401,8 +1402,7 @@ void gravManager::toggleShowVenueClientController()
 {
     if ( venueClientController != NULL )
     {
-        venueClientController->setRendering(
-                                    !venueClientController->getRendering() );
+        venueClientController->show( !venueClientController->isShown() );
     }
 }
 
@@ -1410,7 +1410,7 @@ bool gravManager::isVenueClientControllerShown()
 {
     if ( venueClientController != NULL )
     {
-        return venueClientController->getRendering();
+        return venueClientController->isShown();
     }
     else
     {

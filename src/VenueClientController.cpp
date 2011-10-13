@@ -37,7 +37,6 @@ VenueClientController::VenueClientController( float _x, float _y,
     locked = false;
     selectable = false;
     userMovable = false;
-    allowHiding = true;
     setName( "Venues" );
     debugDraw = false;
 
@@ -46,10 +45,7 @@ VenueClientController::VenueClientController( float _x, float _y,
     baseBColor.B = 1.0f;
     baseBColor.A = 0.8f;
     destBColor = baseBColor;
-    destBColor.A = 0.0f;
     borderColor = destBColor;
-
-    enableRendering = false;
 
     setScale( 13.0f, 13.0f );
 
@@ -79,18 +75,9 @@ VenueClientController::VenueClientController( float _x, float _y,
                 "AGTools.py not found\n" );
     }
 
-    if ( tryGetValidVenueClient() )
-    {
-        // if we have a valid venue client, this setrendering call will update
-        // the venue name and exits as well (other actual render-related
-        // functionality is a bit redundant in this case)
-        setRendering( false );
-    }
-    else
-    {
-        gravUtil::logWarning( "VenueClientController::init: venue client not "
-                "found\n" );
-    }
+    // if we have a valid venue client, this show call will update
+    // the venue name and exits as well as hide the interface by default
+    show( false, true );
 }
 
 VenueClientController::~VenueClientController()
@@ -146,7 +133,7 @@ std::vector<RectangleBase*>::iterator VenueClientController::remove(
     return ret;
 }
 
-bool VenueClientController::tryGetValidVenueClient()
+bool VenueClientController::tryGetValidVenueClient( bool instantHide )
 {
     PyObject* res = pyTools->call( AGToolsScript, "GetFirstValidClientURL" );
     if ( res != NULL && res != Py_None )
@@ -168,9 +155,9 @@ bool VenueClientController::tryGetValidVenueClient()
          * not showable, forcibly hide it if it is shown, since that state makes
          * no sense if there is no available venue client.
          */
-        if ( enableRendering )
+        if ( shown )
         {
-            Group::setRendering( false );
+            Group::show( false, instantHide );
             // move objects for a nice animation effect
             for ( unsigned int i = 0; i < objects.size(); i++ )
             {
@@ -252,7 +239,7 @@ void VenueClientController::enterVenue( std::string venueName )
     pyTools->call( AGToolsScript, "EnterVenue", args );
 
     // this will in turn update the exit map, venue streams, etc.
-    setRendering( false );
+    show( false );
 
     addAllVenueStreams();
 }
@@ -332,9 +319,9 @@ bool VenueClientController::updateName()
     return false;
 }
 
-void VenueClientController::setRendering( bool r )
+void VenueClientController::show( bool s, bool instant )
 {
-    if ( tryGetValidVenueClient() )
+    if ( tryGetValidVenueClient( instant ) )
     {
         // check if venue has changed in the meantime, if so update stuff
         std::string oldName = currentVenue;
@@ -349,6 +336,8 @@ void VenueClientController::setRendering( bool r )
     else
     {
         return;
+        // tryGetValidVenueClient() will hide the object itself if it is shown &
+        // the venue client check fails
     }
 
     // do nothing if there aren't any venues, otherwise state will get confusing
@@ -359,8 +348,8 @@ void VenueClientController::setRendering( bool r )
         return;
     }
 
-    Group::setRendering( r );
-    if ( !r )
+    Group::show( s, instant );
+    if ( !s )
     {
         // move objects for a nice animation effect
         for ( unsigned int i = 0; i < objects.size(); i++ )

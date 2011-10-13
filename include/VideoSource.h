@@ -88,10 +88,12 @@ public:
     void toggleMute();
     bool isMuted();
 
-    // override RectangleBase::setRendering to account for muting
+    // enable/disable texture push
     void setRendering( bool r );
-    // override RectangleBase::setSelectable to affect alpha usage
-    void setSelectable( bool s );
+    bool getRendering();
+
+    // override RectangleBase::show to affect alpha usage for video rendering
+    void show( bool s, bool instant );
 
 private:
     // reference to the session that this video comes from - needed for grabbing
@@ -121,6 +123,9 @@ private:
     // GL texture identifier
     GLuint texid;
     bool init;
+
+    // whether the texture push is enabled
+    bool enableRendering;
 
     // whether to apply color's alpha to video
     bool useAlpha;

@@ -72,7 +72,7 @@ public:
     void setScale( float xs, float ys );
     void setScale( float xs, float ys, bool resizeMembers );
 
-    void setRendering( bool r );
+    void show( bool s, bool instant = false );
 
 protected:
     std::vector<RectangleBase*> objects;
@@ -81,9 +81,6 @@ protected:
 
     ArrangeStyle rearrangeStyle;
     bool preserveChildAspect;
-
-    // whether the group will hide its children on setRendering( false )
-    bool allowHiding;
 
 };
 

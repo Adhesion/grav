@@ -45,7 +45,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
       audioSessionListener( al ), objectManager( g )
 {
     x = destX;
-    y = destY - 10.0f;
+    y = destY - 10.0f; // for move-from-bottom animation
 
     sessionMutex = mutex_create();
 
@@ -61,7 +61,6 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     locked = true;
     selectable = false;
     userMovable = false;
-    allowHiding = true;
 
     setBorderScale( 0.005 );
 
@@ -117,6 +116,8 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     sessionMap[ VIDEOSESSION ] = videoSessions;
     sessionMap[ AVAILABLEVIDEOSESSION ] = availableVideoSessions;
     sessionMap[ AUDIOSESSION ] = audioSessions;
+
+    show( false, true );
 }
 
 SessionManager::~SessionManager()
@@ -182,6 +183,7 @@ bool SessionManager::addSession( std::string address, SessionType type )
 
     sessions->add( entry );
     objectManager->addToDrawList( entry );
+    entry->show( shown, !shown );
 
     unlockSessions();
     return ret;

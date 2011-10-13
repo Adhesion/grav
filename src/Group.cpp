@@ -40,7 +40,6 @@ Group::Group( float _x, float _y ) :
 
     locked = true;
     showLockStatus = true;
-    allowHiding = false;
     preserveChildAspect = true;
 
     rearrangeStyle = ONECOLUMN;
@@ -423,43 +422,11 @@ void Group::setScale( float xs, float ys, bool resizeMembers )
     }
 }
 
-void Group::setRendering( bool r )
+void Group::show( bool s, bool instant )
 {
-    enableRendering = r;
-
-    if ( allowHiding )
+    RectangleBase::show( s, instant );
+    for ( unsigned int i = 0; i < objects.size(); i++ )
     {
-        RGBAColor newCol = destBColor;
-        if ( !r )
-        {
-            newCol.A = 0.0f;
-            // set children to unselected just in case they're selected - user will
-            // probably end up moving them accidentally
-            for ( unsigned int i = 0; i < objects.size(); i++ )
-            {
-                objects[i]->setSelect( false );
-            }
-        }
-        else
-            newCol.A = baseBColor.A;
-        setColor( newCol );
-
-        for ( unsigned int i = 0; i < objects.size(); i++ )
-        {
-            RGBAColor col = objects[i]->getBaseColor();
-            RGBAColor col2 = objects[i]->getSecondaryColor();
-            if ( !r )
-            {
-                col.A = 0.0f;
-                col2.A = 0.0f;
-            }
-            // note secondary color is going to lose its previous alpha here,
-            // TODO fix this somehow? adding a base-secondary-color seems excessive
-            else
-                col2.A = 1.0f;
-            objects[i]->setColor( col );
-            objects[i]->setSecondaryColor( col2 );
-            objects[i]->setSelectable( r );
-        }
+        objects[i]->show( s, instant );
     }
 }

@@ -36,6 +36,7 @@ public:
     Runway( float _x, float _y );
 
     void draw();
+    void drawRunwayBorder();
 
     bool updateName();
 

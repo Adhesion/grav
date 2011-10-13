@@ -60,6 +60,11 @@ void VideoSource::draw()
     // to draw the border/text/common stuff, also calls animateValues
     RectangleBase::draw();
 
+    // replicate the invisible -> don't draw thing here; above needs to be
+    // called since it does the animation
+    if ( borderColor.A < 0.01f )
+        return;
+
     // set up our position
     glPushMatrix();
 
@@ -195,7 +200,6 @@ void VideoSource::draw()
         glColor4f( 1.0f, 1.0f, 1.0f, borderColor.A );
         glEnable( GL_BLEND );
         glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
     }
     else
     {
@@ -520,8 +524,13 @@ void VideoSource::setRendering( bool r )
     }
 }
 
-void VideoSource::setSelectable( bool s )
+bool VideoSource::getRendering()
 {
-    RectangleBase::setSelectable( s );
-    useAlpha = !selectable;
+    return enableRendering;
+}
+
+void VideoSource::show( bool s, bool instant )
+{
+    RectangleBase::show( s, instant );
+    useAlpha = !s;
 }
