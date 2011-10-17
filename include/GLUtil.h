@@ -36,8 +36,16 @@
 #include <FTGL/ftgl.h>
 
 #include <iostream>
+#include <map>
 
 #include "Point.h"
+
+typedef struct
+{
+    GLuint ID;
+    int width;
+    int height;
+} Texture;
 
 class RectangleBase;
 
@@ -124,6 +132,16 @@ public:
 
     void setBufferFontUsage( bool buf );
 
+    /*
+     * Loads a PNG file as a texture and puts it in the textures map, indexed by
+     * name.
+     * Note, if when calling getTexture() the input is not found, it will return
+     * a Texture with 0 in all fields, which will be safe to render (will just
+     * be white)
+     */
+    bool addTexture( std::string name, std::string fileName );
+    Texture getTexture( std::string name );
+
 protected:
     GLUtil();
     ~GLUtil();
@@ -150,6 +168,8 @@ private:
     FTFont* mainFont;
     // switch to change to use buffer font - texture font is default
     bool useBufferFont;
+
+    std::map<std::string, Texture> textures;
 
 };
 

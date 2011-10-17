@@ -95,11 +95,6 @@ private:
 
     SessionTreeControl* sessionControl;
 
-    // background texture for venue nodes
-    GLuint circleTex;
-    int circleWidth;
-    int circleHeight;
-
 };
 
 #endif /* VENUECLIENTCONTROLLER_H_ */

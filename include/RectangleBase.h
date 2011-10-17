@@ -33,14 +33,16 @@
 #include "Vector.h"
 #include "Ray.h"
 
-typedef struct {
+typedef struct
+{
     float R;
     float G;
     float B;
     float A;
 } RGBAColor;
 
-enum TextStyle {
+enum TextStyle
+{
     TOPTEXT,
     CENTEREDTEXT,
     FULLCAPTIONS

@@ -169,6 +169,8 @@ bool SessionManager::addSession( std::string address, SessionType type )
     SessionEntry* entry = new SessionEntry( address, audio );
     Group* sessions = sessionMap[ type ];
     entry->setPos( sessions->getX(), sessions->getY() );
+    Texture t = GLUtil::getInstance()->getTexture( "circle" );
+    entry->setTexture( t.ID, t.width, t.height );
 
     if ( type != AVAILABLEVIDEOSESSION )
     {

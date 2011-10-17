@@ -24,8 +24,6 @@
  */
 
 #include "Earth.h"
-#include "gravUtil.h"
-#include "PNGLoader.h"
 
 #include <cmath>
 
@@ -39,17 +37,10 @@ Earth::Earth()
     destXRot = xRot; destYRot = yRot; destZRot = zRot;
     moveAmt = 1.0f;
 
-    earthTex = 0;
-    gravUtil* util = gravUtil::getInstance();
-    std::string earthTexLoc = util->findFile( "earth.png" );
-    if ( earthTexLoc.compare( "" ) != 0 )
-    {
-        earthTex = PNGLoader::loadPNG( earthTexLoc, texWidth, texHeight );
-    }
-    else
-    {
-        gravUtil::logWarning( "Earth::init: earth texture not found\n" );
-    }
+    Texture t = GLUtil::getInstance()->getTexture( "earth" );
+    earthTex = t.ID;
+    texWidth = t.width;
+    texHeight = t.height;
 
     animated = true;
     rotating = false;

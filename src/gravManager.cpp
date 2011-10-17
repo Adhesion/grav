@@ -41,7 +41,6 @@
 #include "Group.h"
 #include "Runway.h"
 #include "Earth.h"
-#include "PNGLoader.h"
 #include "InputHandler.h"
 #include "VideoListener.h"
 #include "TreeControl.h"
@@ -126,8 +125,6 @@ gravManager::gravManager()
 
     graphicsDebugView = false;
     pixelCount = 0;
-
-    borderTex = 0;
 
     venueClientController = NULL; // just for before it gets set
 }
@@ -530,7 +527,8 @@ void gravManager::addTestObject()
     {
         obj->setName( "TEST" );
     }
-    obj->setTexture( borderTex, borderWidth, borderHeight );
+    Texture t = GLUtil::getInstance()->getTexture( "border" );
+    obj->setTexture( t.ID, t.width, t.height );
     obj->setUserDeletable( true );
 }
 
@@ -990,7 +988,8 @@ void gravManager::addNewSource( VideoSource* s )
 {
     if ( s == NULL ) return;
 
-    s->setTexture( borderTex, borderWidth, borderHeight );
+    Texture t = GLUtil::getInstance()->getTexture( "border" );
+    s->setTexture( t.ID, t.width, t.height );
 
     lockSources();
 
@@ -1143,22 +1142,6 @@ void gravManager::removeFromLists( RectangleBase* obj, bool treeRemove )
     }
 }
 
-void gravManager::setBorderTex( std::string border )
-{
-    gravUtil* util = gravUtil::getInstance();
-    std::string borderTexLoc = util->findFile( border );
-    if ( borderTexLoc.compare( "" ) != 0 )
-    {
-        borderTex = PNGLoader::loadPNG( borderTexLoc, borderWidth,
-                                            borderHeight );
-    }
-    else
-    {
-        gravUtil::logWarning( "gravManager::setBorderTex: warning: border "
-                "texture %s not found", border.c_str() );
-    }
-}
-
 Group* gravManager::createSiteIDGroup( std::string data )
 {
     gravUtil::logVerbose( "gravManager::creating siteIDGroup based on %s\n",
@@ -1167,7 +1150,8 @@ Group* gravManager::createSiteIDGroup( std::string data )
     Group* g = new Group( 0.0f, 0.0f );
     g->setName( data );
     g->setSiteID( data );
-    g->setTexture( borderTex, borderWidth, borderHeight );
+    Texture t = GLUtil::getInstance()->getTexture( "border" );
+    g->setTexture( t.ID, t.width, t.height );
 
     // something that calls this function should mutex around it itself
     //lockSources();

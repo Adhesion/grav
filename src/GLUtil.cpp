@@ -24,6 +24,7 @@
 
 #include "VideoSource.h"
 #include "GLUtil.h"
+#include "PNGLoader.h"
 #include <string>
 
 GLUtil* GLUtil::instance = NULL;
@@ -369,6 +370,53 @@ void GLUtil::setBufferFontUsage( bool buf )
     useBufferFont = buf;
 }
 
+bool GLUtil::addTexture( std::string name, std::string fileName )
+{
+    Texture t;
+
+    std::string texLoc = gravUtil::getInstance()->findFile( fileName );
+    if ( texLoc.compare( "" ) != 0 )
+    {
+        t.ID = PNGLoader::loadPNG( texLoc, t.width, t.height );
+        if ( t.ID != 0 )
+        {
+            textures[ name ] = t;
+            return true;
+        }
+        else
+        {
+            gravUtil::logWarning( "gravManager::addTexture: warning: "
+                    "texture %s failed to load", fileName.c_str() );
+            return false;
+        }
+    }
+    else
+    {
+        gravUtil::logWarning( "gravManager::addTexture: warning: "
+                "texture %s not found", fileName.c_str() );
+        return false;
+    }
+}
+
+Texture GLUtil::getTexture( std::string name )
+{
+    std::map<std::string, Texture>::iterator i = textures.find( name );
+    if ( i != textures.end() )
+    {
+        return i->second;
+    }
+    else
+    {
+        gravUtil::logWarning( "GLUtil::getTexture: did not find texture %s",
+                name.c_str() );
+        Texture t;
+        t.ID = 0;
+        t.width = 0;
+        t.height = 0;
+        return t;
+    }
+}
+
 GLUtil::GLUtil()
 {
     enableShaders = false;
@@ -423,4 +471,10 @@ GLUtil::GLUtil()
 GLUtil::~GLUtil()
 {
     delete mainFont;
+
+    std::map<std::string, Texture>::iterator i;
+    for ( i = textures.begin(); i != textures.end(); ++i )
+    {
+        glDeleteTextures( 1, &( i->second.ID ) );
+    }
 }

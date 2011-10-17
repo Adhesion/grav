@@ -27,7 +27,6 @@
 #include "gravManager.h"
 #include "SessionTreeControl.h"
 #include "VenueNode.h"
-#include "PNGLoader.h"
 #include "gravUtil.h"
 
 VenueClientController::VenueClientController( float _x, float _y,
@@ -49,26 +48,9 @@ VenueClientController::VenueClientController( float _x, float _y,
 
     setScale( 13.0f, 13.0f );
 
-    gravUtil* util = gravUtil::getInstance();
     pyTools = PythonTools::getInstance();
 
-    // this should be safe since this constructor normally gets called after
-    // GL stuff gets set up
-    circleWidth = 256;
-    circleHeight = 256;
-    circleTex = 0;
-    std::string circleLoc = util->findFile( "circle.png" );
-    if ( circleLoc.compare( "" ) == 0 )
-    {
-        gravUtil::logWarning( "VenueClientController::init: warning: "
-                "texture circle.png not found\n" );
-    }
-    else
-    {
-        circleTex = PNGLoader::loadPNG( circleLoc, circleWidth, circleHeight );
-    }
-
-    AGToolsScript = util->findFile( "AGTools.py" );
+    AGToolsScript = gravUtil::getInstance()->findFile( "AGTools.py" );
     if ( AGToolsScript.compare( "" ) == 0 )
     {
         gravUtil::logWarning( "VenueClientController::warning: "
@@ -186,7 +168,8 @@ void VenueClientController::updateExitMap()
     {
         VenueNode* node = new VenueNode();
         node->setName( i->first );
-        node->setTexture( circleTex, circleWidth, circleHeight );
+        Texture t = GLUtil::getInstance()->getTexture( "circle" );
+        node->setTexture( t.ID, t.width, t.height );
         grav->addToDrawList( node );
         add( node );
     }

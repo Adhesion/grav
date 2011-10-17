@@ -149,14 +149,6 @@ public:
     void removeFromLists( RectangleBase* obj, bool treeRemove = true );
 
     /*
-     * This would be done in the constructor, but it has to be done after
-     * the GL context is set up (and in the WX case, the constructor for this
-     * class has to be done before that).
-     * Input is just a filename, this function will calculate full path.
-     */
-    void setBorderTex( std::string border );
-
-    /*
      * Creates a group for siteID-based grouping, with the data string as the
      * name, adds it to the list, and returns a pointer to it.
      */
@@ -276,11 +268,6 @@ private:
     // rectangle that roughly defines where the earth is relative to the camera
     RectangleBase earthRect;
     void recalculateRectSizes();
-
-    // background texture for groups & video objects
-    GLuint borderTex;
-    int borderWidth;
-    int borderHeight;
 
     int holdCounter;
     int drawCounter;
