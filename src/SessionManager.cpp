@@ -106,12 +106,11 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     audioColor.A = 0.3f;
     audioSessions->setBaseColor( audioColor );
 
+    // note we don't add audio here - this just hides it visually
     add( videoSessions );
     add( availableVideoSessions );
-    add( audioSessions );
     objectManager->addToDrawList( videoSessions );
     objectManager->addToDrawList( availableVideoSessions );
-    objectManager->addToDrawList( audioSessions );
 
     sessionMap[ VIDEOSESSION ] = videoSessions;
     sessionMap[ AVAILABLEVIDEOSESSION ] = availableVideoSessions;
