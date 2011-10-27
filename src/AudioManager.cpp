@@ -144,6 +144,8 @@ void AudioManager::vpmsession_source_deleted( VPMSession &session,
                                           uint32_t ssrc,
                                           const char *reason )
 {
+    gravUtil::logVerbose( "AudioManager::vpmsession_source_deleted: "
+            "deleting source ssrc: 0x%08x\n", ssrc );
     std::vector<AudioSource*>::iterator it;
     for ( it = sources.begin(); it != sources.end(); ++it )
     {

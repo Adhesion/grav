@@ -70,7 +70,7 @@ SessionEntry::SessionEntry( std::string addr, bool aud )
 
 SessionEntry::~SessionEntry()
 {
-    gravUtil::logVerbose( "~SessionEntry\n" );
+    gravUtil::logVerbose( "~SessionEntry (%s)\n", address.c_str() );
     disableSession();
 }
 

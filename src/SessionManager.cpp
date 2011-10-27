@@ -126,10 +126,11 @@ SessionManager::~SessionManager()
 
     Group* sessions;
     SessionEntry* session;
-    std::vector<RectangleBase*>::iterator groupIt = getBeginIterator();
-    while ( groupIt != getEndIterator() )
+    std::map<SessionType, Group*>::iterator i;
+
+    for ( i = sessionMap.begin(); i != sessionMap.end(); ++i )
     {
-        sessions = static_cast<Group*>( *groupIt );
+        sessions = i->second;
         std::vector<RectangleBase*>::iterator sessionIt =
                 sessions->getBeginIterator();
         while ( sessionIt != sessions->getEndIterator() )
@@ -141,7 +142,6 @@ SessionManager::~SessionManager()
             objectManager->removeFromLists( session, false );
             delete session;
         }
-        groupIt = remove( groupIt );
         objectManager->removeFromLists( sessions, false );
         delete sessions;
     }
@@ -568,21 +568,27 @@ bool SessionManager::iterateSessions()
     bool haveSessions = false;
     Group* sessions;
     SessionEntry* session;
-    for ( int i = 0; i < objects.size(); i++ )
+    std::map<SessionType, Group*>::iterator i;
+
+    // we iterate over the sessionmap here, instead of the regular group
+    // children, since we might want to remove individual sessiongroups (like
+    // audio) from that list for visual reasons
+    for ( i = sessionMap.begin(); i != sessionMap.end(); ++i )
     {
-        sessions = static_cast<Group*>( objects[i] );
+        sessions = i->second;
         for ( int j = 0; j < sessions->numObjects(); j++ )
         {
             session = static_cast<SessionEntry*>( (*sessions)[j] );
+            if ( session == NULL ) printf( "\t!!!!!!!!!!\n\n" );
             haveSessions = session->iterate() || haveSessions;
         }
 
-        if ( i == 0 && haveSessions && gravApp::threadDebug )
+        if ( haveSessions && gravApp::threadDebug )
         {
             if ( session->getTimestamp() % 1000 == 0 )
             {
                 gravUtil::logVerbose( "SessionManager::iterate: "
-                        "have %u video sessions, last TS=%u\n",
+                        "have %u sessions in this group, last TS=%u\n",
                         sessions->numObjects(), session->getTimestamp() );
             }
         }
