@@ -109,8 +109,10 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     // note we don't add audio here - this just hides it visually
     add( videoSessions );
     add( availableVideoSessions );
+    objectManager->lockSources();
     objectManager->addToDrawList( videoSessions );
     objectManager->addToDrawList( availableVideoSessions );
+    objectManager->unlockSources();
 
     sessionMap[ VIDEOSESSION ] = videoSessions;
     sessionMap[ AVAILABLEVIDEOSESSION ] = availableVideoSessions;
@@ -183,7 +185,9 @@ bool SessionManager::addSession( std::string address, SessionType type )
      */
 
     sessions->add( entry );
+    objectManager->lockSources();
     objectManager->addToDrawList( entry );
+    objectManager->unlockSources();
     entry->show( shown, !shown );
 
     unlockSessions();

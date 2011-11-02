@@ -146,9 +146,12 @@ public:
      */
     void addNewSource( VideoSource* s );
     void deleteSource( std::vector<VideoSource*>::iterator si );
-
-    // TODO not thread safe
     void deleteGroup( Group* g );
+
+    /*
+     * Note these are NOT thread-safe, lockSources() should be called around
+     * them.
+     */
     void addToDrawList( RectangleBase* obj );
     void removeFromLists( RectangleBase* obj, bool treeRemove = true );
 

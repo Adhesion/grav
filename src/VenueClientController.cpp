@@ -170,7 +170,9 @@ void VenueClientController::updateExitMap()
         node->setName( i->first );
         Texture t = GLUtil::getInstance()->getTexture( "circle" );
         node->setTexture( t.ID, t.width, t.height );
+        grav->lockSources();
         grav->addToDrawList( node );
+        grav->unlockSources();
         add( node );
     }
 }
