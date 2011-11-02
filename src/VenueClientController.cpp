@@ -343,7 +343,9 @@ void VenueClientController::show( bool s, bool instant )
     else
     {
         rearrange();
+        grav->lockSources();
         grav->moveToTop( this );
+        grav->unlockSources();
     }
 }
 

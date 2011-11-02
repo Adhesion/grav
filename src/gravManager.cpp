@@ -505,6 +505,8 @@ void gravManager::ungroupAll()
 
 void gravManager::addTestObject()
 {
+    lockSources();
+
     RectangleBase* obj = new RectangleBase( 0.0f, 0.0f );
     drawnObjects->push_back( obj );
     bool useRandName = false;
@@ -530,10 +532,14 @@ void gravManager::addTestObject()
     Texture t = GLUtil::getInstance()->getTexture( "border" );
     obj->setTexture( t.ID, t.width, t.height );
     obj->setUserDeletable( true );
+
+    unlockSources();
 }
 
 void gravManager::tryDeleteObject( RectangleBase* obj )
 {
+    lockSources();
+
     // note this will only check userdeletable objects. Videos should probably
     // not be deletable.
     if ( obj->isUserDeletable() )
@@ -544,8 +550,14 @@ void gravManager::tryDeleteObject( RectangleBase* obj )
         removeFromLists( obj, false );
         delete obj;
     }
+
+    unlockSources();
 }
 
+/*
+ * Note this is NOT thread-safe, lockSources() should be called around any calls
+ * to this.
+ */
 void gravManager::moveToTop( RectangleBase* object, bool checkGrouping )
 {
     if ( object == NULL )
@@ -566,6 +578,10 @@ void gravManager::moveToTop( RectangleBase* object, bool checkGrouping )
     moveToTop( i, checkGrouping );
 }
 
+/*
+ * Note this is NOT thread-safe, lockSources() should be called around any calls
+ * to this.
+ */
 void gravManager::moveToTop( std::vector<RectangleBase*>::iterator i,
                                 bool checkGrouping )
 {
@@ -587,7 +603,6 @@ void gravManager::moveToTop( std::vector<RectangleBase*>::iterator i,
 
         if ( temp->isGroup() )
         {
-            // TODO another spot to check nested groups?
             Group* g = (Group*)temp;
             for ( int i = 0; i < g->numObjects(); i++ )
                 moveToTop( (*g)[i], false );

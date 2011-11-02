@@ -75,10 +75,12 @@ public:
 
     /*
      * For moving videos to the top of the drawnObjects (for both drawing and
-     * selection)
+     * selection).
      * Bool val is used when checking the object's group to prevent infinite
      * loops - group checking is done to move groups to top when moving group
-     * members to top
+     * members to top.
+     * Note these are NOT thread-safe, lockSources() should be called around
+     * them.
      */
     void moveToTop( RectangleBase* object, bool checkGrouping = true );
     void moveToTop( std::vector<RectangleBase*>::iterator i,
@@ -144,6 +146,8 @@ public:
      */
     void addNewSource( VideoSource* s );
     void deleteSource( std::vector<VideoSource*>::iterator si );
+
+    // TODO not thread safe
     void deleteGroup( Group* g );
     void addToDrawList( RectangleBase* obj );
     void removeFromLists( RectangleBase* obj, bool treeRemove = true );
@@ -151,6 +155,7 @@ public:
     /*
      * Creates a group for siteID-based grouping, with the data string as the
      * name, adds it to the list, and returns a pointer to it.
+     * Note this is NOT thread-safe, lockSources() should be called around this.
      */
     Group* createSiteIDGroup( std::string data );
 

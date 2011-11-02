@@ -958,14 +958,9 @@ bool InputHandler::selectVideos()
             // it'll be rendered on top - but only if we just clicked on it
             if ( !leftButtonHeld )
             {
-                //gravUtil::logMessage( "putting selected video to end\n" );
-                // since we can only delete a normal iterator (not a reverse
-                // one) we have to calculate our current position
-                /*std::vector<RectangleBase*>::iterator current =
-                    grav->getDrawnObjects()->begin() - 1 +
-                    distance( si, grav->getDrawnObjects()->rend() );
-                grav->moveToTop( current );*/
+                grav->lockSources();
                 grav->moveToTop( temp );
+                grav->unlockSources();
 
                 break; // so we only select one video per click
                        // when single-clicking
