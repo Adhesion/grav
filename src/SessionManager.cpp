@@ -129,6 +129,8 @@ SessionManager::~SessionManager()
     SessionEntry* session;
     std::map<SessionType, Group*>::iterator i;
 
+    objectManager->lockSources();
+
     for ( i = sessionMap.begin(); i != sessionMap.end(); ++i )
     {
         sessions = i->second;
@@ -146,6 +148,8 @@ SessionManager::~SessionManager()
         objectManager->removeFromLists( sessions, false );
         delete sessions;
     }
+
+    objectManager->unlockSources();
 }
 
 void SessionManager::rearrange()
@@ -216,7 +220,9 @@ bool SessionManager::removeSession( std::string addr, SessionType type )
             rotatePos--;
     }
 
+    objectManager->lockSources();
     objectManager->removeFromLists( entry, false );
+    objectManager->unlockSources();
     delete entry; //destructor will remove object from its group
     unlockSessions();
     return true;

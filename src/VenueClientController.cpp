@@ -101,7 +101,9 @@ void VenueClientController::draw()
 void VenueClientController::remove( RectangleBase* object, bool move )
 {
     Group::remove( object, move );
+    grav->lockSources();
     grav->removeFromLists( object, false );
+    grav->unlockSources();
     delete object;
 }
 
@@ -110,7 +112,9 @@ std::vector<RectangleBase*>::iterator VenueClientController::remove(
 {
     RectangleBase* object = (*i);
     std::vector<RectangleBase*>::iterator ret = Group::remove( i, move );
+    grav->lockSources();
     grav->removeFromLists( object, false );
+    grav->unlockSources();
     delete object;
     return ret;
 }
