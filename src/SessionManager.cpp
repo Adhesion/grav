@@ -129,8 +129,6 @@ SessionManager::~SessionManager()
     SessionEntry* session;
     std::map<SessionType, Group*>::iterator i;
 
-    objectManager->lockSources();
-
     for ( i = sessionMap.begin(); i != sessionMap.end(); ++i )
     {
         sessions = i->second;
@@ -142,14 +140,20 @@ SessionManager::~SessionManager()
             // specific to sessionentry
             RectangleBase* session = *sessionIt;
             sessionIt = sessions->remove( sessionIt );
+
+            objectManager->lockSources();
             objectManager->removeFromLists( session, false );
+            objectManager->unlockSources();
+
             delete session;
         }
+
+        objectManager->lockSources();
         objectManager->removeFromLists( sessions, false );
+        objectManager->unlockSources();
+
         delete sessions;
     }
-
-    objectManager->unlockSources();
 }
 
 void SessionManager::rearrange()
