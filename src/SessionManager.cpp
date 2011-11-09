@@ -201,7 +201,7 @@ void SessionManager::rearrange()
     {
         avButton->move( availableVideoSessions->getDestRBound(),
                 availableVideoSessions->getDestY() );
-        avButton->setHeight( availableVideoSessions->getDestHeight() * 0.5f );
+        avButton->setHeight( availableVideoSessions->getDestHeight() * 0.6f );
     }
 }
 
@@ -389,6 +389,7 @@ void SessionManager::unrotate( bool audio )
 void SessionManager::setAutoRotate( bool a )
 {
     availableVideoSessions->setRotating( a );
+    avButton->setPlaying( a );
 }
 
 void SessionManager::sessionEntryAction( SessionEntry* entry )
@@ -710,6 +711,12 @@ void SessionManager::unlockSessions()
 void SessionManager::setSessionTreeControl( SessionTreeControl* s )
 {
     sessionTree = s;
+}
+
+void SessionManager::setButtonTexture( std::string name )
+{
+    Texture t = GLUtil::getInstance()->getTexture( name );
+    avButton->setTexture( t.ID, t.width, t.height );
 }
 
 /*

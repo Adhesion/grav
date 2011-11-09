@@ -138,6 +138,13 @@ public:
 
     void setSessionTreeControl( SessionTreeControl* s );
 
+    /*
+     * We would do this in the constructor, but it has to be put off since the
+     * SessionManager is initialized before any GL stuff, texture loading etc.
+     * is.
+     */
+    void setButtonTexture( std::string name );
+
 private:
     /*
      * Note that all of these private functions are NOT thread safe and should

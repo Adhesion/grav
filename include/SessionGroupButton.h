@@ -44,9 +44,13 @@ public:
     void setControlledGroup( SessionGroup* g );
     SessionGroup* getControlledGroup();
 
+    void setPlaying( bool p );
+
 private:
     // note this is separate from the regular RectBase group/parent
     SessionGroup* controlledGroup;
+
+    bool playing;
 
 };
 

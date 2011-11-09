@@ -30,6 +30,7 @@ SessionGroupButton::SessionGroupButton( float _x, float _y ) :
     RectangleBase( _x, _y )
 {
     userMovable = false;
+    playing = false;
 }
 
 void SessionGroupButton::draw()
@@ -50,17 +51,37 @@ void SessionGroupButton::draw()
     float Xdist = scaleX / 2.5;
     float Ydist = scaleY / 2.5;
 
-    // the main triangle
-    glBegin( GL_TRIANGLES );
-
     glColor4f( borderColor.R * 0.5f, borderColor.G * 0.5f,
                 borderColor.B * 0.5f, borderColor.A * 0.7f );
 
-    glVertex3f( -Xdist, -Ydist, 0.0 );
-    glVertex3f( -Xdist, Ydist, 0.0 );
-    glVertex3f( Xdist, 0.0, 0.0 );
+    if ( playing )
+    {
+        // the pause symbol
+        glBegin( GL_QUADS );
 
-    glEnd();
+        glVertex3f( -Xdist * 0.7f, -Ydist * 0.8f, 0.0 );
+        glVertex3f( -Xdist * 0.7f, Ydist * 0.8f, 0.0 );
+        glVertex3f( -Xdist * 0.25f, Ydist * 0.8f, 0.0 );
+        glVertex3f( -Xdist * 0.25f, -Ydist * 0.8f, 0.0 );
+
+        glVertex3f( Xdist * 0.7f, -Ydist * 0.8f, 0.0 );
+        glVertex3f( Xdist * 0.7f, Ydist * 0.8f, 0.0 );
+        glVertex3f( Xdist * 0.25f, Ydist * 0.8f, 0.0 );
+        glVertex3f( Xdist * 0.25f, -Ydist * 0.8f, 0.0 );
+
+        glEnd();
+    }
+    else
+    {
+        // the main triangle
+        glBegin( GL_TRIANGLES );
+
+        glVertex3f( -Xdist * 0.7f, -Ydist, 0.0 );
+        glVertex3f( -Xdist * 0.7f, Ydist, 0.0 );
+        glVertex3f( Xdist, 0.0, 0.0 );
+
+        glEnd();
+    }
 
     glDisable( GL_BLEND );
 
@@ -98,4 +119,9 @@ void SessionGroupButton::setControlledGroup( SessionGroup* g )
 SessionGroup* SessionGroupButton::getControlledGroup()
 {
     return controlledGroup;
+}
+
+void SessionGroupButton::setPlaying( bool p )
+{
+    playing = p;
 }

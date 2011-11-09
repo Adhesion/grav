@@ -217,6 +217,7 @@ bool gravApp::OnInit()
 
     sessionTree->setSessionManager( sessionManager );
     sessionManager->setSessionTreeControl( sessionTree );
+    sessionManager->setButtonTexture( "circle" );
 
     for ( unsigned int i = 0; i < initialVideoAddresses.size(); i++ )
     {
