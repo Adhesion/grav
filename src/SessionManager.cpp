@@ -172,22 +172,29 @@ SessionManager::~SessionManager()
 
 void SessionManager::rearrange()
 {
-    // only do regular rearrange for session groups - button(s) later
     std::vector<RectangleBase*> objs;
 
-    // override regular group rearrange to add a forced rearrange on groups -
-    // they're unlocked to allow user movement but that causes setScale()
-    // to not resize their children (SessionEntries), so force that here
+    // only do regular rearrange for (visible) session groups - button(s) later
     for ( int i = 0; i < objects.size(); i++ )
     {
-        Group* sessions = dynamic_cast<Group*>( objects[i] );
+        SessionGroup* sessions = dynamic_cast<SessionGroup*>( objects[i] );
         if ( sessions != NULL )
         {
-            sessions->rearrange();
             objs.push_back( sessions );
         }
     }
     Group::rearrange( objs );
+
+    // force rearrange on the SessionGroups we already found -
+    // they're unlocked to allow user movement but that causes setScale()
+    // not to resize their children (SessionEntries), so force that here.
+    // also note this has to be done after the general group rearrange, or else
+    // the group one will interrupt the moves from that
+    for ( int i = 0; i < objs.size(); i++ )
+    {
+        SessionGroup* sessions = static_cast<SessionGroup*>( objs[i] );
+        sessions->rearrange();
+    }
 
     // ...now arrange button
     if ( avButton != NULL )
