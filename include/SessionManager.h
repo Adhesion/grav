@@ -35,6 +35,7 @@ class AudioManager;
 class mutex;
 class SessionTreeControl;
 class SessionGroup;
+class SessionGroupButton;
 class SessionEntry;
 class gravManager;
 
@@ -83,15 +84,28 @@ public:
      * Note audio is ignored for this for the time being - only rotating video
      * sessions for now.
      */
-    void rotate( bool audio );
-    void rotateTo( std::string addr, bool audio );
+    bool rotate( bool audio );
+    bool rotateTo( std::string addr, bool audio );
     void unrotate( bool audio );
+
+    /*
+     * Sets auto-rotate (just of available video now). The timer in
+     * SessionTreeControl actually triggers the rotation, this is just for
+     * visual purposes (in the available video SessionGroup)
+     */
+    void setAutoRotate( bool a );
 
     /*
      * Method that determines what happens on SessionEntry double-click.
      * For now, only do rotate on available video sessions.
      */
     void sessionEntryAction( SessionEntry* entry );
+
+    /*
+     * Method that determines what happens on SessionGroupButton double-click.
+     * For now, only trigger auto-rotate.
+     */
+    void sessionGroupButtonAction( SessionGroupButton* button );
 
     /*
      * Used for checking if user-moved SessionEntries should be shifted between
@@ -162,6 +176,8 @@ private:
     SessionGroup* videoSessions;
     SessionGroup* availableVideoSessions;
     SessionGroup* audioSessions;
+
+    SessionGroupButton* avButton;
 
     std::map<SessionType, Group*> sessionMap;
 

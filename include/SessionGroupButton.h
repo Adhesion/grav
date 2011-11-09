@@ -1,12 +1,10 @@
 /*
- * @file SessionGroup.h
+ * @file SessionGroupButton.h
  *
- * Definition of a class to group SessionEntries. (ie video sessions, audio
- * sessions, available video sessions)
- * Shares draw & intersect checking functionality with Runway which is why it
- * inherits from it.
+ * Definition of a class to act as an interactive GUI element attached to a
+ * SessionGroup.
  *
- * Created on: Sep 07, 2011
+ * Created on: Nov 07, 2011
  * @author Andrew Ford
  * Copyright (C) 2011 Rochester Institute of Technology
  *
@@ -26,33 +24,30 @@
  * along with grav.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SESSIONGROUP_H_
-#define SESSIONGROUP_H_
+#ifndef SESSIONGROUPBUTTON_H_
+#define SESSIONGROUPBUTTON_H_
 
-#include "Runway.h"
+#include "RectangleBase.h"
 
-class SessionGroupButton;
+class SessionGroup;
 
-class SessionGroup : public Runway
+class SessionGroupButton : public RectangleBase
 {
 
 public:
-    SessionGroup( float _x, float _y );
-
-    void handleOutsideMembers();
+    SessionGroupButton( float _x, float _y );
 
     void draw();
 
-    bool isRotating();
-    void setRotating( bool r );
+    void doubleClickAction();
+
+    void setControlledGroup( SessionGroup* g );
+    SessionGroup* getControlledGroup();
 
 private:
-    /*
-     * Triggers animation to signify rotating between SessionEntries (typically
-     * only for the AvailableVideo group).
-     */
-    bool rotating;
+    // note this is separate from the regular RectBase group/parent
+    SessionGroup* controlledGroup;
 
 };
 
-#endif /* SESSIONGROUP_H_ */
+#endif /* SESSIONGROUPBUTTON_H_ */

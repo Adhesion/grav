@@ -32,6 +32,7 @@
 #include "SessionManager.h"
 #include "SessionEntry.h"
 #include "SessionGroup.h"
+#include "SessionGroupButton.h"
 #include "VideoListener.h"
 #include "AudioManager.h"
 #include "grav.h"
@@ -58,7 +59,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
 
     preserveChildAspect = false;
 
-    locked = true;
+    locked = false;
     selectable = false;
     userMovable = false;
 
@@ -106,12 +107,19 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     audioColor.A = 0.3f;
     audioSessions->setBaseColor( audioColor );
 
+    avButton = new SessionGroupButton( getDestX(), getDestY() );
+    avButton->setPos( x, y );
+    avButton->setName( "Available Video Rotate Toggle" );
+    avButton->setControlledGroup( availableVideoSessions );
+
     // note we don't add audio here - this just hides it visually
     add( videoSessions );
     add( availableVideoSessions );
+    add( avButton );
     objectManager->lockSources();
     objectManager->addToDrawList( videoSessions );
     objectManager->addToDrawList( availableVideoSessions );
+    objectManager->addToDrawList( avButton );
     objectManager->unlockSources();
 
     sessionMap[ VIDEOSESSION ] = videoSessions;
@@ -154,18 +162,39 @@ SessionManager::~SessionManager()
 
         delete sessions;
     }
+
+    objectManager->lockSources();
+    objectManager->removeFromLists( avButton, false );
+    objectManager->unlockSources();
+
+    delete avButton;
 }
 
 void SessionManager::rearrange()
 {
+    // only do regular rearrange for session groups - button(s) later
+    std::vector<RectangleBase*> objs;
+
     // override regular group rearrange to add a forced rearrange on groups -
     // they're unlocked to allow user movement but that causes setScale()
     // to not resize their children (SessionEntries), so force that here
-    Group::rearrange();
     for ( int i = 0; i < objects.size(); i++ )
     {
-        Group* sessions = static_cast<Group*>( objects[i] );
-        sessions->rearrange();
+        Group* sessions = dynamic_cast<Group*>( objects[i] );
+        if ( sessions != NULL )
+        {
+            sessions->rearrange();
+            objs.push_back( sessions );
+        }
+    }
+    Group::rearrange( objs );
+
+    // ...now arrange button
+    if ( avButton != NULL )
+    {
+        avButton->move( availableVideoSessions->getDestRBound(),
+                availableVideoSessions->getDestY() );
+        avButton->setHeight( availableVideoSessions->getDestHeight() * 0.5f );
     }
 }
 
@@ -259,12 +288,12 @@ bool SessionManager::shiftSession( std::string addr, SessionType fromType )
     return true;
 }
 
-void SessionManager::rotate( bool audio )
+bool SessionManager::rotate( bool audio )
 {
-    rotateTo( "", audio );
+    return rotateTo( "", audio );
 }
 
-void SessionManager::rotateTo( std::string addr, bool audio )
+bool SessionManager::rotateTo( std::string addr, bool audio )
 {
     lockSessions();
 
@@ -272,11 +301,11 @@ void SessionManager::rotateTo( std::string addr, bool audio )
     int lastRotatePos = rotatePos;
     if ( lastRotatePos != -1 )
         lastRotateSession =
-           static_cast<SessionEntry*>( (*availableVideoSessions)[ rotatePos ] );
+          dynamic_cast<SessionEntry*>( (*availableVideoSessions)[ rotatePos ] );
     if ( numSessions == 0 )
     {
         unlockSessions();
-        return;
+        return false;
     }
 
     SessionEntry* current;
@@ -290,23 +319,24 @@ void SessionManager::rotateTo( std::string addr, bool audio )
             rotatePos = 0;
         }
         current =
-           static_cast<SessionEntry*>( (*availableVideoSessions)[ rotatePos ] );
+          dynamic_cast<SessionEntry*>( (*availableVideoSessions)[ rotatePos ] );
     }
     else
     {
         current = findSessionByAddress( addr, AVAILABLEVIDEOSESSION );
 
-        if ( current == NULL )
-        {
-            gravUtil::logWarning( "SessionManager::rotateTo: session %s"
-                    " not found\n", addr.c_str() );
-            unlockSessions();
-            return;
-        }
-        else
+        if ( current != NULL )
         {
             rotatePos = indexOf( current );
         }
+    }
+
+    if ( current == NULL )
+    {
+        gravUtil::logWarning( "SessionManager::rotateTo: session %s"
+                " not found\n", addr.c_str() );
+        unlockSessions();
+        return false;
     }
 
     // only rotate if there is a valid old one & it isn't the same as
@@ -324,6 +354,8 @@ void SessionManager::rotateTo( std::string addr, bool audio )
     }
 
     unlockSessions();
+
+    return true;
 }
 
 void SessionManager::unrotate( bool audio )
@@ -333,7 +365,7 @@ void SessionManager::unrotate( bool audio )
     SessionEntry* current = NULL;
     if ( rotatePos >= 0 && rotatePos < availableVideoSessions->numObjects() )
         current =
-           static_cast<SessionEntry*>( (*availableVideoSessions)[ rotatePos ] );
+          dynamic_cast<SessionEntry*>( (*availableVideoSessions)[ rotatePos ] );
 
     rotatePos = -1;
 
@@ -345,6 +377,11 @@ void SessionManager::unrotate( bool audio )
     }
 
     unlockSessions();
+}
+
+void SessionManager::setAutoRotate( bool a )
+{
+    availableVideoSessions->setRotating( a );
 }
 
 void SessionManager::sessionEntryAction( SessionEntry* entry )
@@ -375,6 +412,33 @@ void SessionManager::sessionEntryAction( SessionEntry* entry )
 
     // TODO this makes it so the user doesn't move sessions around after
     // potentially rotating them. probably should make this not so blunt
+    objectManager->clearSelected();
+}
+
+void SessionManager::sessionGroupButtonAction( SessionGroupButton* button )
+{
+    // like above, should be safe not to lock here
+
+    Group* group = button->getControlledGroup();
+    if ( group == videoSessions )
+    {
+        // do nothing here for now
+    }
+    else if ( group == availableVideoSessions )
+    {
+        sessionTree->toggleAutomaticRotate();
+    }
+    else if ( group == audioSessions )
+    {
+        // do nothing here for now
+    }
+    else
+    {
+        gravUtil::logWarning( "SessionManager::sessionGroupButtonAction: button"
+                                " not grouped?\n" );
+    }
+
+    // see above
     objectManager->clearSelected();
 }
 
@@ -592,7 +656,6 @@ bool SessionManager::iterateSessions()
         for ( int j = 0; j < sessions->numObjects(); j++ )
         {
             session = static_cast<SessionEntry*>( (*sessions)[j] );
-            if ( session == NULL ) printf( "\t!!!!!!!!!!\n\n" );
             haveSessions = session->iterate() || haveSessions;
         }
 
@@ -679,11 +742,12 @@ SessionEntry* SessionManager::findSessionByAddress( std::string address )
 
     for ( int i = 0; i < numObjects(); i++ )
     {
-        sessions = static_cast<Group*>( (*this)[i] );
+        sessions = dynamic_cast<Group*>( (*this)[i] );
         for ( int j = 0; j < sessions->numObjects(); j++ )
         {
-            session = static_cast<SessionEntry*>( (*sessions)[j] );
-            if ( session->getAddress().compare( address ) == 0 )
+            session = dynamic_cast<SessionEntry*>( (*sessions)[j] );
+            if ( session != NULL &&
+                    session->getAddress().compare( address ) == 0 )
                 return session;
         }
     }
@@ -701,8 +765,8 @@ SessionEntry* SessionManager::findSessionByAddress( std::string address,
 
     for ( int j = 0; j < sessions->numObjects(); j++ )
     {
-        session = static_cast<SessionEntry*>( (*sessions)[j] );
-        if ( session->getAddress().compare( address ) == 0 )
+        session = dynamic_cast<SessionEntry*>( (*sessions)[j] );
+        if ( session != NULL && session->getAddress().compare( address ) == 0 )
             return session;
     }
 

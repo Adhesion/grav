@@ -154,12 +154,17 @@ bool Group::isGroup()
 
 void Group::rearrange()
 {
+    rearrange( objects );
+}
+
+void Group::rearrange( std::vector<RectangleBase*> inObjs )
+{
     // it doesn't make sense to rearrange 0 objects, plus having objects.size
     // = 0 will cause div by 0 crashes later
-    if ( objects.size() == 0 ) return;
+    if ( inObjs.size() == 0 ) return;
 
     std::map<std::string, std::vector<RectangleBase*> > data;
-    data["objects"] = objects;
+    data["objects"] = inObjs;
 
     std::map<std::string, std::string> opts;
     opts["preserveAspect"] =
@@ -174,20 +179,20 @@ void Group::rearrange()
         // for finding the biggest object in the group
         float largestWidth = 0.0f, largestHeight = 0.0f;
 
-        for ( unsigned int i = 0; i < objects.size(); i++ )
+        for ( unsigned int i = 0; i < inObjs.size(); i++ )
         {
-            largestWidth = std::max( largestWidth, objects[i]->getWidth() );
-            largestHeight = std::max( largestHeight, objects[i]->getHeight() );
+            largestWidth = std::max( largestWidth, inObjs[i]->getWidth() );
+            largestHeight = std::max( largestHeight, inObjs[i]->getHeight() );
         }
 
-        int numCol = ceil( sqrt( objects.size() ) );
-        int numRow = objects.size() / numCol + ( objects.size() % numCol > 0 );
+        int numCol = ceil( sqrt( inObjs.size() ) );
+        int numRow = inObjs.size() / numCol + ( inObjs.size() % numCol > 0 );
 
         // resize the group based on the aspect ratios of the current member(s)
-        if ( objects.size() == 1 )
+        if ( inObjs.size() == 1 )
         {
             float objAspect =
-                    objects[0]->getDestWidth() / objects[0]->getDestHeight();
+                    inObjs[0]->getDestWidth() / inObjs[0]->getDestHeight();
             float diff = objAspect / ( getDestWidth() / getDestHeight() );
             RectangleBase::setScale( destScaleX * diff, destScaleY );
         }
@@ -216,7 +221,7 @@ void Group::rearrange()
 
     case ONEROW:
     {
-        ss << objects.size();
+        ss << inObjs.size();
         opts["numX"] = ss.str();
         ss.str( "" );
         opts["numY"] = "1";
@@ -225,7 +230,7 @@ void Group::rearrange()
 
     case ONECOLUMN:
     {
-        ss << objects.size();
+        ss << inObjs.size();
         opts["numX"] = "1";
         opts["numY"] = ss.str();
         ss.str( "" );

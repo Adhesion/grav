@@ -259,7 +259,12 @@ void SessionTreeControl::rotateVideoSessions()
 
 void SessionTreeControl::rotateToVideoSession( std::string addr )
 {
-    sessionManager->rotateTo( addr, false );
+    if ( !sessionManager->rotateTo( addr, false ) )
+    {
+        gravUtil::logError( "SessionTreeControl::rotateTo %s failed\n",
+                                addr.c_str() );
+        return;
+    }
 
     wxTreeItemId current = findSession( availableVideoNodeID,
             sessionManager->getCurrentRotateSessionAddress() );
@@ -310,6 +315,8 @@ void SessionTreeControl::toggleAutomaticRotate()
     {
         timer->Start( -1 );
     }
+
+    sessionManager->setAutoRotate( timer->IsRunning() );
 }
 
 bool SessionTreeControl::setEncryptionKey( std::string addr, std::string key )

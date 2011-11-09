@@ -25,11 +25,13 @@
 
 #include "SessionGroup.h"
 #include "SessionManager.h"
+#include "SessionGroupButton.h"
 
 SessionGroup::SessionGroup( float _x, float _y ) :
     Runway( _x, _y )
 {
     rearrangeStyle = ONEROW;
+    // note this inherits unlocked, unselectable, and unmovable from runway
 }
 
 void SessionGroup::handleOutsideMembers()
@@ -37,4 +39,24 @@ void SessionGroup::handleOutsideMembers()
     // do nothing here - parent (SessionManager) will have its check method
     // called, which will get the list of outside members and figure out where
     // they should go (ie, shouldn't necessarily remove like runway does)
+}
+
+void SessionGroup::draw()
+{
+    Runway::draw();
+
+    if ( rotating )
+    {
+
+    }
+}
+
+bool SessionGroup::isRotating()
+{
+    return rotating;
+}
+
+void SessionGroup::setRotating( bool r )
+{
+    rotating = r;
 }

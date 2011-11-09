@@ -75,6 +75,13 @@ public:
     void show( bool s, bool instant = false );
 
 protected:
+    /*
+     * This is so inherited classes can override rearrange (in order to separate
+     * groups of child objects & rearrange them differently) but still have
+     * access to the basic rearrangeStyle rearranges for chosen objects.
+     */
+    void rearrange( std::vector<RectangleBase*> objs );
+
     std::vector<RectangleBase*> objects;
     float buffer;
     LayoutManager layouts;
