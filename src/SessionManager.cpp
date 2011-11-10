@@ -392,6 +392,11 @@ void SessionManager::setAutoRotate( bool a )
     avButton->setPlaying( a );
 }
 
+void SessionManager::setRotateInterval( int i )
+{
+    availableVideoSessions->setRotateInterval( i );
+}
+
 void SessionManager::sessionEntryAction( SessionEntry* entry )
 {
     // since this doesn't modify any of the lists of sessions, it should be safe

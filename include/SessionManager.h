@@ -94,6 +94,7 @@ public:
      * visual purposes (in the available video SessionGroup)
      */
     void setAutoRotate( bool a );
+    void setRotateInterval( int i );
 
     /*
      * Method that determines what happens on SessionEntry double-click.

@@ -62,8 +62,7 @@ public:
     RotateTimer( SessionTreeControl* s );
     void Notify();
 
-    // override start so we notify immediately when starting, rather than
-    // waiting for the first interval to pass
+    // override start so we have the option of notifying immediately
     bool Start( int milliseconds = -1, bool oneShot = false );
 
 private:

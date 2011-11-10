@@ -86,6 +86,5 @@ void RotateTimer::Notify()
 
 bool RotateTimer::Start( int milliseconds, bool oneShot )
 {
-    Notify();
     return wxTimer::Start( milliseconds, oneShot );
 }

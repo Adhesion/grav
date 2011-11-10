@@ -313,7 +313,7 @@ void SessionTreeControl::toggleAutomaticRotate()
     }
     else
     {
-        timer->Start( -1 );
+        timer->Start( rotateInterval );
     }
 
     sessionManager->setAutoRotate( timer->IsRunning() );
@@ -549,12 +549,13 @@ void SessionTreeControl::disableEncryptionEvent( wxCommandEvent& evt )
     disableEncryption( selectedAddress );
 }
 
-void SessionTreeControl::startTimer( int ms )
+void SessionTreeControl::setTimerInterval( int i )
 {
-    timer->Start( ms );
-}
+    rotateInterval = i;
+    // if it's already running, restart it (will notify in i ms from now, not
+    // immediately)
+    if ( timer->IsRunning() )
+        timer->Start( rotateInterval );
 
-void SessionTreeControl::stopTimer()
-{
-    timer->Stop();
+    sessionManager->setRotateInterval( i );
 }

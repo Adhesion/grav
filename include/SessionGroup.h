@@ -45,6 +45,7 @@ public:
 
     bool isRotating();
     void setRotating( bool r );
+    void setRotateInterval( int i );
 
 private:
     /*
@@ -52,6 +53,7 @@ private:
      * only for the AvailableVideo group).
      */
     bool rotating;
+    int rotateInterval; // in milliseconds
 
 };
 

@@ -79,8 +79,7 @@ public:
     void setEncryptionEvent( wxCommandEvent& evt );
     void disableEncryptionEvent( wxCommandEvent& evt );
 
-    void startTimer( int ms );
-    void stopTimer();
+    void setTimerInterval( int ms );
 
     static int addVideoID;
     static int addAudioID;
@@ -103,6 +102,7 @@ private:
     SessionManager* sessionManager;
 
     RotateTimer* timer;
+    int rotateInterval;
 
     DECLARE_EVENT_TABLE()
 

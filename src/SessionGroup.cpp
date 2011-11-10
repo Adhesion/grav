@@ -60,3 +60,8 @@ void SessionGroup::setRotating( bool r )
 {
     rotating = r;
 }
+
+void SessionGroup::setRotateInterval( int i )
+{
+    rotateInterval = i;
+}
