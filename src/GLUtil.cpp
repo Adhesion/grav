@@ -417,6 +417,16 @@ Texture GLUtil::getTexture( std::string name )
     }
 }
 
+void GLUtil::setCanvas( GLCanvas* c )
+{
+    canvas = c;
+}
+
+GLCanvas* GLUtil::getCanvas()
+{
+    return canvas;
+}
+
 GLUtil::GLUtil()
 {
     enableShaders = false;

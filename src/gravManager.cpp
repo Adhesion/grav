@@ -432,6 +432,8 @@ void gravManager::draw()
     {
         glPushMatrix();
 
+        GLCanvas* canvas = GLUtil::getInstance()->getCanvas();
+
         long drawTime = canvas->getDrawTime();
         float color = (33.0f - (float)drawTime) / 17.0f;
         glColor4f( 1.0f, color, color, 0.8f );
@@ -1273,11 +1275,6 @@ void gravManager::setVideoListener( VideoListener* v )
     videoListener = v;
 }
 
-void gravManager::setCanvas( GLCanvas* c )
-{
-	canvas = c;
-}
-
 void gravManager::setVenueClientController( VenueClientController* vcc )
 {
     // if setting a new one, stop drawing the old one
@@ -1389,7 +1386,7 @@ Runway* gravManager::getRunway()
 void gravManager::setGraphicsDebugMode( bool g )
 {
     graphicsDebugView = g;
-    canvas->setDebugTimerUsage( g );
+    GLUtil::getInstance()->getCanvas()->setDebugTimerUsage( g );
 }
 
 bool gravManager::getGraphicsDebugMode()

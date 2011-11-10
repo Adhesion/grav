@@ -48,6 +48,7 @@ typedef struct
 } Texture;
 
 class RectangleBase;
+class GLCanvas;
 
 class GLUtil
 {
@@ -142,6 +143,9 @@ public:
     bool addTexture( std::string name, std::string fileName );
     Texture getTexture( std::string name );
 
+    void setCanvas( GLCanvas* c );
+    GLCanvas* getCanvas();
+
 protected:
     GLUtil();
     ~GLUtil();
@@ -170,6 +174,8 @@ private:
     bool useBufferFont;
 
     std::map<std::string, Texture> textures;
+
+    GLCanvas* canvas;
 
 };
 

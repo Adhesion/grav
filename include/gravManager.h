@@ -173,7 +173,6 @@ public:
     void setTree( TreeControl* t );
     void setAudio( AudioManager* a );
     void setVideoListener( VideoListener* v );
-    void setCanvas( GLCanvas* c );
     void setVenueClientController( VenueClientController* vcc );
     void setSessionManager( SessionManager* s );
     /*
@@ -243,8 +242,6 @@ private:
 
     // mostly just to grab the number of sources for arrangement purposes
     VideoListener* videoListener;
-
-    GLCanvas* canvas;
 
     VenueClientController* venueClientController;
 

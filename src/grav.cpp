@@ -176,6 +176,8 @@ bool gravApp::OnInit()
     GLUtil::getInstance()->addTexture( "circle", "circle.png" );
     GLUtil::getInstance()->addTexture( "earth", "earth.png" );
 
+    GLUtil::getInstance()->setCanvas( canvas );
+
     if ( headerSet )
         grav->setHeaderString( header );
 
@@ -208,7 +210,6 @@ bool gravApp::OnInit()
     grav->setInput( input );
     grav->setTree( sourceTree );
     grav->setVideoListener( videoSessionListener );
-    grav->setCanvas( canvas );
     grav->setVenueClientController( venueClientController ); // may be null
     grav->setSessionManager( sessionManager );
     grav->setAudio( audioSessionListener ); // may not necessarily be used
