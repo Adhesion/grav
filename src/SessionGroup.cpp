@@ -26,12 +26,17 @@
 #include "SessionGroup.h"
 #include "SessionManager.h"
 #include "SessionGroupButton.h"
+#include "GLCanvas.h"
+#include "Timers.h"
 
 SessionGroup::SessionGroup( float _x, float _y ) :
     Runway( _x, _y )
 {
     rearrangeStyle = ONEROW;
     // note this inherits unlocked, unselectable, and unmovable from runway
+
+    rotating = false;
+    timer = NULL;
 }
 
 void SessionGroup::handleOutsideMembers()
@@ -43,11 +48,47 @@ void SessionGroup::handleOutsideMembers()
 
 void SessionGroup::draw()
 {
-    Runway::draw();
+    // note this duplicates runway's draw so we can stick the rotating animation
+    // in between the border/background and the member drawing
+    animateValues();
 
-    if ( rotating )
+    drawRunwayBorder();
+
+    if ( rotating && timer != NULL )
     {
+        float xPos = getLBound() + ( scaleX * timer->getProgress() );
+        float size = scaleY / 4.0f;
 
+        glPushMatrix();
+
+        glRotatef( xAngle, 1.0, 0.0, 0.0 );
+        glRotatef( yAngle, 0.0, 1.0, 0.0 );
+        glRotatef( zAngle, 0.0, 0.0, 1.0 );
+
+        glTranslatef( xPos, y, z );
+
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+        glColor4f( borderColor.R, borderColor.G, borderColor.B, borderColor.A );
+
+        glBegin( GL_TRIANGLES );
+
+        glVertex3f( -size * 0.7f, -size, 0.0 );
+        glVertex3f( -size * 0.7f, size, 0.0 );
+        glVertex3f( size, 0.0, 0.0 );
+
+        glEnd();
+
+        glDisable( GL_BLEND );
+
+        glPopMatrix();
+    }
+
+    // draw members like a normal group
+    for ( unsigned int i = 0; i < objects.size(); i++ )
+    {
+        objects[i]->draw();
     }
 }
 
@@ -61,7 +102,7 @@ void SessionGroup::setRotating( bool r )
     rotating = r;
 }
 
-void SessionGroup::setRotateInterval( int i )
+void SessionGroup::setTimer( RotateTimer* t )
 {
-    rotateInterval = i;
+    timer = t;
 }

@@ -32,6 +32,7 @@
 #include "Runway.h"
 
 class SessionGroupButton;
+class RotateTimer;
 
 class SessionGroup : public Runway
 {
@@ -45,7 +46,8 @@ public:
 
     bool isRotating();
     void setRotating( bool r );
-    void setRotateInterval( int i );
+
+    void setTimer( RotateTimer* t );
 
 private:
     /*
@@ -53,7 +55,8 @@ private:
      * only for the AvailableVideo group).
      */
     bool rotating;
-    int rotateInterval; // in milliseconds
+
+    RotateTimer* timer; // so we can get the timer progress
 
 };
 

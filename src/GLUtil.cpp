@@ -25,6 +25,7 @@
 #include "VideoSource.h"
 #include "GLUtil.h"
 #include "PNGLoader.h"
+
 #include <string>
 
 GLUtil* GLUtil::instance = NULL;

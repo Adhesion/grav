@@ -556,6 +556,9 @@ void SessionTreeControl::setTimerInterval( int i )
     // immediately)
     if ( timer->IsRunning() )
         timer->Start( rotateInterval );
+}
 
-    sessionManager->setRotateInterval( i );
+RotateTimer* SessionTreeControl::getTimer()
+{
+    return timer;
 }

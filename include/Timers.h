@@ -60,13 +60,19 @@ class RotateTimer : public wxTimer
 
 public:
     RotateTimer( SessionTreeControl* s );
-    void Notify();
 
     // override start so we have the option of notifying immediately
     bool Start( int milliseconds = -1, bool oneShot = false );
 
+    float getProgress();
+
 private:
+    void Notify();
+
     SessionTreeControl* sessionTree;
+    wxStopWatch stopwatch;
+
+    int counterMax;
 
 };
 

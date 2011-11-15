@@ -76,15 +76,24 @@ void RenderTimer::resetTiming()
 RotateTimer::RotateTimer( SessionTreeControl* s ) :
     sessionTree( s )
 {
-
+    counterMax = 30000;
 }
 
 void RotateTimer::Notify()
 {
     sessionTree->rotateVideoSessions();
+    stopwatch.Start();
 }
 
 bool RotateTimer::Start( int milliseconds, bool oneShot )
 {
+    stopwatch.Start();
+    if ( milliseconds != -1 )
+        counterMax = milliseconds;
     return wxTimer::Start( milliseconds, oneShot );
+}
+
+float RotateTimer::getProgress()
+{
+    return (float)stopwatch.Time() / (float)counterMax;
 }

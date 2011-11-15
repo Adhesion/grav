@@ -179,6 +179,16 @@ long GLCanvas::getNonDrawTime()
     return lastNonDrawTimeAvg;
 }
 
+long GLCanvas::getDrawTimeAvg()
+{
+    return lastDrawTimeAvg;
+}
+
+long GLCanvas::getNonDrawTimeAvg()
+{
+    return lastNonDrawTimeAvg;
+}
+
 float GLCanvas::getFPS()
 {
     return fpsResult;

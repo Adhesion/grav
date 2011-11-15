@@ -28,7 +28,10 @@
 
 #include "GLUtil.h"
 
+// note GLUtil needs to be included first, since glew/glxew needs to set up its
+// #defines and such before other libs like glu are included (via wxglcanvas)
 #include <wx/glcanvas.h>
+#include <wx/stopwatch.h>
 
 #include <sys/time.h>
 
@@ -52,6 +55,8 @@ public:
 
     long getDrawTime();
     long getNonDrawTime();
+    long getDrawTimeAvg();
+    long getNonDrawTimeAvg();
     float getFPS();
 
     void setDebugTimerUsage( bool d );

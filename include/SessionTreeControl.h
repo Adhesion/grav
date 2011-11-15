@@ -80,6 +80,7 @@ public:
     void disableEncryptionEvent( wxCommandEvent& evt );
 
     void setTimerInterval( int ms );
+    RotateTimer* getTimer();
 
     static int addVideoID;
     static int addAudioID;
