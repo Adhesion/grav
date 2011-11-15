@@ -261,7 +261,7 @@ void SessionTreeControl::rotateToVideoSession( std::string addr )
 {
     if ( !sessionManager->rotateTo( addr, false ) )
     {
-        gravUtil::logError( "SessionTreeControl::rotateTo %s failed\n",
+        gravUtil::logVerbose( "SessionTreeControl::rotateTo %s failed\n",
                                 addr.c_str() );
         return;
     }
