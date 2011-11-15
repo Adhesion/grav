@@ -888,7 +888,7 @@ void gravManager::setWindowSize( int w, int h )
                                      true );
     }
 
-    sessionManager->setScale( screenRectSub.getDestWidth() * 0.55f,
+    sessionManager->setScale( screenRectSub.getDestWidth() * 0.65f,
                              screenRectSub.getDestHeight() * 0.25f, true );
 }
 
