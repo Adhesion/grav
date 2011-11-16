@@ -146,6 +146,11 @@ public:
      */
     void setButtonTexture( std::string name );
 
+    /*
+     * Recalculate size based on how many sessions we have.
+     */
+    void recalculateSize();
+
 private:
     /*
      * Note that all of these private functions are NOT thread safe and should

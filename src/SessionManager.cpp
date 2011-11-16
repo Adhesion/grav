@@ -720,6 +720,11 @@ void SessionManager::setButtonTexture( std::string name )
     avButton->setTexture( t.ID, t.width, t.height );
 }
 
+void SessionManager::recalculateSize()
+{
+
+}
+
 /*
  * Note all the following functions are private and NOT thread-safe.
  */

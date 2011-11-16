@@ -49,8 +49,9 @@ SessionEntry::SessionEntry( std::string addr, bool aud )
 
     session = NULL;
 
-    relativeTextScale = 0.002;
+    relativeTextScale = 0.00275;
     titleStyle = CENTEREDTEXT;
+    coloredText = false;
 
     disabledColor.R = 0.15f;
     disabledColor.G = 0.15f;

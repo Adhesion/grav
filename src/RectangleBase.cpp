@@ -188,7 +188,15 @@ float RectangleBase::getHeight()
 
 float RectangleBase::getTotalWidth()
 {
-    return getWidth() + ( 2.0f * getBorderSize() );
+    float w = getWidth() + ( 2.0f * getBorderSize() );
+    if ( titleStyle == CENTEREDTEXT )
+    {
+        return std::max( w, getTextWidth() );
+    }
+    else
+    {
+        return w;
+    }
 }
 
 float RectangleBase::getTotalHeight()
@@ -204,7 +212,15 @@ float RectangleBase::getTotalHeight()
 
 float RectangleBase::getDestTotalWidth()
 {
-    return getDestWidth() + ( 2.0f * getDestBorderSize() );
+    float w = getDestWidth() + ( 2.0f * getDestBorderSize() );
+    if ( titleStyle == CENTEREDTEXT )
+    {
+        return std::max( w, getDestTextWidth() );
+    }
+    else
+    {
+        return w;
+    }
 }
 
 float RectangleBase::getDestTotalHeight()
