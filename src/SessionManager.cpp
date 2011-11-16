@@ -56,6 +56,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     pause = false;
 
     rotatePos = -1;
+    lastRotateSession = NULL;
 
     preserveChildAspect = false;
 
@@ -234,6 +235,8 @@ bool SessionManager::addSession( std::string address, SessionType type )
     objectManager->unlockSources();
     entry->show( shown, !shown );
 
+    recalculateSize();
+
     unlockSessions();
     return ret;
 }
@@ -264,6 +267,9 @@ bool SessionManager::removeSession( std::string addr, SessionType type )
     objectManager->removeFromLists( entry, false );
     objectManager->unlockSources();
     delete entry; //destructor will remove object from its group
+
+    recalculateSize();
+
     unlockSessions();
     return true;
 }
@@ -375,7 +381,6 @@ void SessionManager::unrotate( bool audio )
           dynamic_cast<SessionEntry*>( (*availableVideoSessions)[ rotatePos ] );
 
     rotatePos = -1;
-
     lastRotateSession = NULL;
 
     if ( current != NULL )
@@ -722,7 +727,12 @@ void SessionManager::setButtonTexture( std::string name )
 
 void SessionManager::recalculateSize()
 {
-
+    int num = std::max( videoSessions->numObjects(),
+                        availableVideoSessions->numObjects() );
+    float Xscale = std::min( 0.9f, 0.4f + ( (float)num * 0.05f ) );
+    RectangleBase screen = objectManager->getScreenRect();
+    setScale( screen.getDestWidth() * Xscale, screen.getDestHeight() * 0.2f,
+                true );
 }
 
 /*
@@ -844,5 +854,8 @@ bool SessionManager::shiftSession( SessionEntry* entry )
 
     from->remove( entry );
     to->add( entry );
+
+    recalculateSize();
+
     return true;
 }
