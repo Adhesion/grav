@@ -64,7 +64,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     selectable = false;
     userMovable = false;
 
-    setBorderScale( 0.005 );
+    setBorderScale( 0.0f );
 
     setName( "Session Manager" );
 
@@ -72,7 +72,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     mainColor.R = 0.1f;
     mainColor.G = 0.1f;
     mainColor.B = 0.1f;
-    mainColor.A = 0.3f;
+    mainColor.A = 0.1f;
     setColor( mainColor );
 
     videoSessions = new SessionGroup( getDestX(), getDestY() );
@@ -200,8 +200,8 @@ void SessionManager::rearrange()
     // ...now arrange button
     if ( avButton != NULL )
     {
-        avButton->move( availableVideoSessions->getDestRBound(),
-                availableVideoSessions->getDestY() );
+        avButton->move( availableVideoSessions->getDestLBound(),
+                availableVideoSessions->getDestDBound() );
         avButton->setHeight( availableVideoSessions->getDestHeight() * 0.6f );
     }
 }
