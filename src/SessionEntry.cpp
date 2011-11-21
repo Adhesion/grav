@@ -67,6 +67,12 @@ SessionEntry::SessionEntry( std::string addr, bool aud )
     borderColor = disabledColor;
     borderColor.A = 0.0f;
     setColor( disabledColor );
+
+    // usually this is only called from draw, but SessionEntries might be sized
+    // such that it would need the text size to be accurate before it's drawn.
+    // (since it's using centered text)
+    // this should be safe since entries are only created from the main thread
+    delayedNameSizeUpdate();
 }
 
 SessionEntry::~SessionEntry()

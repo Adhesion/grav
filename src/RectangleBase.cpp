@@ -916,44 +916,7 @@ void RectangleBase::draw()
     // BBox() may do a GL call which needs to be on the main thread
     if ( nameSizeDirty )
     {
-        float oldHeight = getDestTotalHeight();
-        float oldOffsetX = getCenterOffsetX();
-        float oldOffsetY = getCenterOffsetY();
-        cutoffPos = -1;
-        textBounds = font->BBox( getSubName().c_str() );
-        // only do cutoff if title is at top - so if centered (or other?)
-        // display whole name even if it goes out of bounds
-        while ( titleStyle == TOPTEXT && getTextWidth() > getWidth() )
-        {
-            //relativeTextScale = 0.0009 * ( getWidth() / getTextWidth() );
-            if ( nameStart == -1 || nameEnd == -1 )
-            {
-                nameStart = 0;
-                nameEnd = getName().length();
-            }
-
-            int curEnd;
-            if ( cutoffPos == -1 )
-                curEnd = nameEnd;
-            else
-                curEnd = cutoffPos;
-            int numChars = curEnd - nameStart;
-
-            cutoffPos = curEnd - ceil( ( 1.0f -
-                  ( getWidth() / getTextWidth() ) ) * numChars ) - 1;
-            textBounds = font->BBox( getSubName().c_str() );
-        }
-
-        // also, since the text bounds might change, fix the height/pos
-        if ( fabs( oldHeight - getDestTotalHeight() ) > 0.001f &&
-             ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS ) )
-        {
-            setTotalHeight( oldHeight );
-            move( destX - ( getCenterOffsetX() - oldOffsetX ),
-                  destY - ( getCenterOffsetY() - oldOffsetY ) );
-        }
-
-        nameSizeDirty = false;
+        delayedNameSizeUpdate();
     }
 
     animateValues();
@@ -1182,6 +1145,51 @@ void RectangleBase::drawBorder( float Xdist, float Ydist, float s, float t )
     glEnd();
     glDisable( GL_BLEND );
     glDisable( GL_TEXTURE_2D );
+}
+
+/*
+ * This must ONLY be called from the main thread. See .h for reason.
+ */
+void RectangleBase::delayedNameSizeUpdate()
+{
+    float oldHeight = getDestTotalHeight();
+    float oldOffsetX = getCenterOffsetX();
+    float oldOffsetY = getCenterOffsetY();
+    cutoffPos = -1;
+    textBounds = font->BBox( getSubName().c_str() );
+    // only do cutoff if title is at top - so if centered (or other?)
+    // display whole name even if it goes out of bounds
+    while ( titleStyle == TOPTEXT && getTextWidth() > getWidth() )
+    {
+        //relativeTextScale = 0.0009 * ( getWidth() / getTextWidth() );
+        if ( nameStart == -1 || nameEnd == -1 )
+        {
+            nameStart = 0;
+            nameEnd = getName().length();
+        }
+
+        int curEnd;
+        if ( cutoffPos == -1 )
+            curEnd = nameEnd;
+        else
+            curEnd = cutoffPos;
+        int numChars = curEnd - nameStart;
+
+        cutoffPos = curEnd - ceil( ( 1.0f -
+              ( getWidth() / getTextWidth() ) ) * numChars ) - 1;
+        textBounds = font->BBox( getSubName().c_str() );
+    }
+
+    // also, since the text bounds might change, fix the height/pos
+    if ( fabs( oldHeight - getDestTotalHeight() ) > 0.001f &&
+         ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS ) )
+    {
+        setTotalHeight( oldHeight );
+        move( destX - ( getCenterOffsetX() - oldOffsetX ),
+              destY - ( getCenterOffsetY() - oldOffsetY ) );
+    }
+
+    nameSizeDirty = false;
 }
 
 void RectangleBase::animateValues()
