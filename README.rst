@@ -27,7 +27,7 @@ Compiling on Linux
            libpng12-0 wx2.8-headers libwxgtk2.8-0 libwxgtk2.8-dev libftgl-dev \
            libftgl2 python-dev libglu1-mesa libglu1-mesa-dev  libglew1.5-dev \
            libglew1.5 libavcodec-dev libswscale-dev libavutil-dev \
-           libpthread-stubs0-dev
+           libavformat-dev libpthread-stubs0-dev
 
    Or on a redhat based distro::
 
@@ -35,7 +35,7 @@ Compiling on Linux
            wxGTK ftgl-devel ftgl python-devel mesa-libGLU-devel mesa-libGLU \
            glew-devel glew
 
-   Note that Fedora doesn't ship with ffmpeg, which greatly enhances codec support.
+   Note that Fedora doesn't ship with FFmpeg, which greatly enhances codec support.
    You can either build it from source as is detailed below in step 2, or you can
    do the following to acquire it from ``rpmfusion.org``::
 
@@ -44,18 +44,18 @@ Compiling on Linux
            http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-rawhide.noarch.rpm
       yum install ffmpeg ffmpeg-devel
 
-2. **IF** you need to compile ffmpeg (OPTIONAL - you can get ffmpeg from a
-   package but note you need the newer .52 libavcodec version)...
+2. **IF** you need to compile FFmpeg (OPTIONAL - you can get FFmpeg from a
+   package but note you need libavcodec version 52 or newer)...
 
-   1. Get ``ffmpeg 0.5`` from `ffmpeg's website <http://ffmpeg.org>`_,
-      do::
+   1. Get ``FFmpeg 0.6`` (or newer) from `ffmpeg's website <http://ffmpeg.org>`_
+      (`libav <http://libav.org>`_ also works) and do::
 
          ./configure --enable-gpl --enable-postproc --enable-swscale \
               --enable-pthreads --enable-debug --enable-shared
 
       then compile & sudo make install (make install will probably install
       to ``/usr/local/lib`` by default).  Note that if you also have a system
-      copy of ffmpeg installed, there may be conflicts.  See [2]_.
+      copy of FFmpeg installed, there may be conflicts.  See [2]_.
 
 3. SVN checkout the UCL common library from here:
    https://mediatools.cs.ucl.ac.uk/repos/mmedia e.g.::
@@ -152,11 +152,11 @@ For VPMedia:
 
     * UCL common lib (UCL version recommended, if-media version also
       works but is not actively developed)
-    * ffmpeg: libavcodec.52, libswscale (see above - make sure you have
-      the .52 version of libavcodec or you'll need to compile yourself)
+    * FFmpeg: libavcodec.52+ (see above - make sure you have version 52 (or
+      newer) of libavcodec or you'll need to compile yourself), libavutil,
+      libavformat, libswscale 
     * libpthread
-    * libdv (for DV support, which is not really working/supported
-      at the moment in `grav`. essentially optional)
+    * libdv (for DV support - optional)
     * libtheora (optional)
 
 From `grav`:
