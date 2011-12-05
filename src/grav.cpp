@@ -80,11 +80,19 @@ bool gravApp::OnInit()
 
     // Some weirdness happens if this is called before arg handling, etc.
     gravUtil::initLogging();
+
     // Set verbosity here, nothing should use gravUtil::logVerbose before this.
     if ( verbose )
         wxLog::SetVerbose( true );
     if ( VPMverbose )
         vpmlog_set_log_level( VPMLOG_LEVEL_DEBUG );
+
+#ifdef VPMEDIA_HAVE_FFMPEG
+    if ( VPMverbose )
+        av_log_set_level( AV_LOG_VERBOSE );
+    else
+        av_log_set_level( AV_LOG_FATAL );
+#endif
 
     // GUI setup
     mainFrame = new Frame( (wxFrame*)NULL, -1, _("grav"),
