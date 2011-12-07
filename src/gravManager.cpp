@@ -349,14 +349,21 @@ void gravManager::draw()
 
     if ( input->haveValidMousePos() )
     {
-        bool sessionMouseover = input->getMouseX() > sessionManager->getLBound()
-                && input->getMouseX() < sessionManager->getRBound()
-                && input->getMouseY() < sessionManager->getUBound()
-                && input->getMouseY() > sessionManager->getDBound();
-        if ( sessionMouseover && !sessionManager->isShown() )
+        // make an exception here to do intersect including border
+        float border = sessionManager->getBorderSize();
+        bool sessionMouseover =
+                   input->getMouseX() > sessionManager->getLBound() - border &&
+                   input->getMouseX() < sessionManager->getRBound() + border &&
+                   input->getMouseY() < sessionManager->getUBound() + border &&
+                   input->getMouseY() > sessionManager->getDBound() - border;
+        if ( sessionMouseover )
         {
-            sessionManager->show( true );
+            // keep sessionmanager on top, including if new videos come in
             moveToTop( sessionManager );
+            if ( !sessionManager->isShown() )
+            {
+                sessionManager->show( true );
+            }
         }
         else if ( !sessionMouseover && sessionManager->isShown() )
         {

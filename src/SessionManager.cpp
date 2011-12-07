@@ -64,7 +64,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     selectable = false;
     userMovable = false;
 
-    setBorderScale( 0.0f );
+    setBorderScale( 0.05f );
 
     setName( "Session Manager" );
 
@@ -72,7 +72,7 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     mainColor.R = 0.1f;
     mainColor.G = 0.1f;
     mainColor.B = 0.1f;
-    mainColor.A = 0.1f;
+    mainColor.A = 0.0f;
     setColor( mainColor );
 
     videoSessions = new SessionGroup( getDestX(), getDestY() );
