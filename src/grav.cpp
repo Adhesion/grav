@@ -260,7 +260,7 @@ bool gravApp::OnInit()
     if ( autoRotateAvailableVideo )
     {
         sessionTree->toggleAutomaticRotate();
-        sessionTree->rotateVideoSessions();
+        sessionTree->rotateVideoSessions( true );
     }
 
     gravUtil::logVerbose( "grav::init function complete\n" );

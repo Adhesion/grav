@@ -252,12 +252,12 @@ void SessionTreeControl::shiftSession( std::string address, bool audio )
     }
 }
 
-void SessionTreeControl::rotateVideoSessions()
+void SessionTreeControl::rotateVideoSessions( bool fromAuto )
 {
-    rotateToVideoSession( "" );
+    rotateToVideoSession( "", fromAuto );
 }
 
-void SessionTreeControl::rotateToVideoSession( std::string addr )
+void SessionTreeControl::rotateToVideoSession( std::string addr, bool fromAuto )
 {
     if ( !sessionManager->rotateTo( addr, false ) )
     {
@@ -289,6 +289,12 @@ void SessionTreeControl::rotateToVideoSession( std::string addr )
             SetItemBackgroundColour( current, *wxWHITE );
             SetItemTextColour( current, *wxBLUE );
         }
+    }
+
+    // if manually rotated & currently autorotating, stop autorotating
+    if ( !fromAuto && timer->IsRunning() )
+    {
+        toggleAutomaticRotate();
     }
 }
 

@@ -81,7 +81,7 @@ RotateTimer::RotateTimer( SessionTreeControl* s ) :
 
 void RotateTimer::Notify()
 {
-    sessionTree->rotateVideoSessions();
+    sessionTree->rotateVideoSessions( true );
     stopwatch.Start();
 }
 

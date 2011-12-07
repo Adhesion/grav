@@ -56,9 +56,10 @@ public:
     /*
      * Rotate through the available video list.
      * Calling rotateTo with "" will rotate to next video.
+     * fromAuto signifies that it was called by a running timer.
      */
-    void rotateVideoSessions();
-    void rotateToVideoSession( std::string addr );
+    void rotateVideoSessions( bool fromAuto = false );
+    void rotateToVideoSession( std::string addr, bool fromAuto = false );
     void unrotateVideoSessions();
 
     void toggleAutomaticRotate();
