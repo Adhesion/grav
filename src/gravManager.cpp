@@ -377,7 +377,7 @@ void gravManager::draw()
     // necessary - this needs to be outside the lock() since a shift might
     // trigger a session disable, which may delete a video which needs to lock
     // on its own (ie, we're not doing reentrant mutexes)
-    if ( intersectCounter == 0 && sessionManager->getColor().A > 0.01f )
+    if ( intersectCounter == 0 && sessionManager->isShown() )
         sessionManager->checkGUISessionShift();
 
     // draw the click-and-drag selection box
