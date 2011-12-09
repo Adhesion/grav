@@ -56,8 +56,18 @@ void SessionGroupButton::draw()
 
     if ( playing )
     {
-        // the pause symbol
+        // stop symbol
         glBegin( GL_QUADS );
+
+        glVertex3f( -Xdist * 0.7f, -Ydist * 0.7f, 0.0 );
+        glVertex3f( -Xdist * 0.7f, Ydist * 0.7f, 0.0 );
+        glVertex3f( Xdist * 0.7f, Ydist * 0.7f, 0.0 );
+        glVertex3f( Xdist * 0.7f, -Ydist * 0.7f, 0.0 );
+
+        glEnd();
+
+        // here's the pause symbol if that ever gets implemented
+        /*glBegin( GL_QUADS );
 
         glVertex3f( -Xdist * 0.7f, -Ydist * 0.8f, 0.0 );
         glVertex3f( -Xdist * 0.7f, Ydist * 0.8f, 0.0 );
@@ -69,16 +79,16 @@ void SessionGroupButton::draw()
         glVertex3f( Xdist * 0.25f, Ydist * 0.8f, 0.0 );
         glVertex3f( Xdist * 0.25f, -Ydist * 0.8f, 0.0 );
 
-        glEnd();
+        glEnd();*/
     }
     else
     {
         // the main triangle
         glBegin( GL_TRIANGLES );
 
-        glVertex3f( -Xdist * 0.7f, -Ydist, 0.0 );
-        glVertex3f( -Xdist * 0.7f, Ydist, 0.0 );
-        glVertex3f( Xdist, 0.0, 0.0 );
+        glVertex3f( -Xdist * 0.7f, -Ydist * 0.8f, 0.0 );
+        glVertex3f( -Xdist * 0.7f, Ydist * 0.8f, 0.0 );
+        glVertex3f( Xdist * 0.8f, 0.0, 0.0 );
 
         glEnd();
     }
