@@ -29,6 +29,7 @@
 #include "gravUtil.h"
 
 int SideFrame::addVideoID = wxNewId();
+int SideFrame::addAvailableVideoID = wxNewId();
 int SideFrame::addAudioID = wxNewId();
 int SideFrame::rotateID = wxNewId();
 
@@ -54,11 +55,13 @@ void SideFrame::setupMenuBar()
     wxMenu* sessionMenu = new wxMenu();
     sessionMenu->Append( SideFrame::addVideoID,
                             _("Add video session...") );
+    sessionMenu->Append( SideFrame::addAvailableVideoID,
+                            _("Add available video session...") );
     sessionMenu->Append( SideFrame::addAudioID,
                             _("Add audio session...") );
     sessionMenu->AppendSeparator();
     sessionMenu->Append( SideFrame::rotateID,
-                            _("Rotate video sessions") );
+                            _("Rotate available video sessions") );
 
     // add menubar to parent frame here - kind of clunky
     wxMenuBar* menubar = new wxMenuBar();
@@ -68,6 +71,9 @@ void SideFrame::setupMenuBar()
 
     Connect( addVideoID, wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler( SideFrame::addVideoSessionEvent ) );
+    Connect( addAvailableVideoID, wxEVT_COMMAND_MENU_SELECTED,
+                  wxCommandEventHandler(
+                          SideFrame::addAvailableVideoSessionEvent ) );
     Connect( addAudioID, wxEVT_COMMAND_MENU_SELECTED,
                   wxCommandEventHandler( SideFrame::addAudioSessionEvent ) );
     Connect( rotateID, wxEVT_COMMAND_MENU_SELECTED,
@@ -108,6 +114,23 @@ void SideFrame::addVideoSessionEvent( wxCommandEvent& evt )
         {
             std::string address( dialog.GetValue().char_str() );
             tree->addSession( address, false, false );
+        }
+    }
+}
+
+void SideFrame::addAvailableVideoSessionEvent( wxCommandEvent& evt )
+{
+    SessionTreeControl* tree = findSessionTree( this );
+    if ( tree != NULL )
+    {
+        wxTextEntryDialog dialog( this,
+                                 _("Enter session in format address/port"),
+                                 _("Add New Available Video Session") );
+
+        if ( dialog.ShowModal() == wxID_OK )
+        {
+            std::string address( dialog.GetValue().char_str() );
+            tree->addSession( address, false, true );
         }
     }
 }

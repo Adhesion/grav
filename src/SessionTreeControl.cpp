@@ -33,6 +33,7 @@
 #include "Timers.h"
 
 int SessionTreeControl::addVideoID = wxNewId();
+int SessionTreeControl::addAvailableVideoID = wxNewId();
 int SessionTreeControl::addAudioID = wxNewId();
 int SessionTreeControl::toggleEnableID = wxNewId();
 int SessionTreeControl::removeID = wxNewId();
@@ -422,6 +423,16 @@ void SessionTreeControl::itemRightClick( wxTreeEvent& evt )
             wxCommandEventHandler( SessionTreeControl::addVideoSessionEvent ) );
     }
 
+    // right clicked on available video group or main group
+    if ( item == availableVideoNodeID || item == rootID )
+    {
+        rightClickMenu.Append( addAvailableVideoID,
+                _("Add available video session...") );
+        Connect( addAvailableVideoID, wxEVT_COMMAND_MENU_SELECTED,
+            wxCommandEventHandler(
+                    SessionTreeControl::addAvailableVideoSessionEvent ) );
+    }
+
     // right click on available video group
     if ( item == availableVideoNodeID )
     {
@@ -468,6 +479,18 @@ void SessionTreeControl::addVideoSessionEvent( wxCommandEvent& evt )
     {
         std::string address( dialog.GetValue().char_str() );
         addSession( address, false, false );
+    }
+}
+
+void SessionTreeControl::addAvailableVideoSessionEvent( wxCommandEvent& evt )
+{
+    wxTextEntryDialog dialog( this, _("Enter session in format address/port"),
+                                _("Add New Available Video Session") );
+
+    if ( dialog.ShowModal() == wxID_OK )
+    {
+        std::string address( dialog.GetValue().char_str() );
+        addSession( address, false, true );
     }
 }
 

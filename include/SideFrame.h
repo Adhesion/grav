@@ -40,12 +40,14 @@ public:
                     const wxPoint& pos, const wxSize& size );
 
     void addVideoSessionEvent( wxCommandEvent& evt );
+    void addAvailableVideoSessionEvent( wxCommandEvent& evt );
     void addAudioSessionEvent( wxCommandEvent& evt );
     void rotateEvent( wxCommandEvent& evt );
 
     void OnCloseWindow( wxCloseEvent& evt );
 
     static int addVideoID;
+    static int addAvailableVideoID;
     static int addAudioID;
     static int rotateID;
 

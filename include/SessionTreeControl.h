@@ -69,6 +69,7 @@ public:
 
     void itemRightClick( wxTreeEvent& evt );
     void addVideoSessionEvent( wxCommandEvent& evt );
+    void addAvailableVideoSessionEvent( wxCommandEvent& evt );
     void addAudioSessionEvent( wxCommandEvent& evt );
     void toggleEnableSessionEvent( wxCommandEvent& evt );
     void removeSessionEvent( wxCommandEvent& evt );
@@ -84,6 +85,7 @@ public:
     RotateTimer* getTimer();
 
     static int addVideoID;
+    static int addAvailableVideoID;
     static int addAudioID;
     static int toggleEnableID;
     static int removeID;
