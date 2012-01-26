@@ -333,24 +333,27 @@ void VideoSource::scaleNative()
     if ( vwidth == 0 || vheight == 0 )
         return;
 
-    // get the top left point of the screen in world coords, since that's
-    // what the screen coordinates are relative to
-    GLdouble topLeftX; GLdouble topLeftY; GLdouble topLeftZ;
-    // note: the weird number is because the Z of screen space does actually
-    // have an effect - that's what is returned when doing a world->screen
-    // conversion for any point at worldZ=0
-    GLUtil::getInstance()->screenToWorld( (double)0, (double)0, 0.990991f,
-                            &topLeftX, &topLeftY, &topLeftZ );
+    // get points of top left and bottom right of rectangle of the size of the
+    // video in pixels & convert from screen space (pixels) to world space
+    Point topLeft, bottomRight;
+    bool ret = true;
+    ret = ret && GLUtil::getInstance()->screenToRectIntersect( (GLdouble)0.0f,
+            (GLdouble)0.0f, (RectangleBase)(*this), topLeft );
+    ret = ret && GLUtil::getInstance()->screenToRectIntersect( (GLdouble)vwidth,
+            (GLdouble)vheight, (RectangleBase)(*this), bottomRight );
 
-    // now get the world space position of the video dimensions
-    GLdouble dimX; GLdouble dimY; GLdouble dimZ;
-    GLUtil::getInstance()->screenToWorld( (GLdouble)vwidth, (GLdouble)vheight,
-                                                0.990991f,
-                                            &dimX, &dimY, &dimZ );
-
-    // the difference between top-left and where the video would be is
-    // equal to the size of the video dimensions in world coords
-    setScale( (dimX-topLeftX)/aspect, dimY-topLeftY );
+    if ( ret )
+    {
+        // the difference between those two points is equal to the size of the
+        // video dimensions in world coords
+        setScale( (bottomRight.getX()-topLeft.getX())/aspect,
+                bottomRight.getY()-topLeft.getY() );
+    }
+    else
+    {
+        gravUtil::logVerbose( "VideoSource::scaleNative: raytrace intersect "
+                "failed, probably due to weird camera position\n" );
+    }
 }
 
 std::string VideoSource::getMetadata( VPMSession::VPMSession_SDES type )

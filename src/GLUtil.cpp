@@ -223,8 +223,11 @@ void GLUtil::screenToWorld( GLdouble scrX, GLdouble scrY, GLdouble scrZ,
 {
     updateMatrices();
 
-    gluUnProject( scrX, scrY, scrZ, modelview, projection, viewport,
+    GLint ret = gluUnProject( scrX, scrY, scrZ, modelview, projection, viewport,
                     x, y, z );
+    if ( ret == 0 )
+        gravUtil::logWarning( "GLUtil::screenToWorld: gluunproject returned "
+                "false\n" );
 }
 
 void GLUtil::screenToWorld( Point screenPoint, Point& worldPoint )
