@@ -63,9 +63,9 @@ gravManager::gravManager()
     autoCounter = 0;
     intersectCounter = 0;
 
-    origCamPoint = Point( 0.0f, 0.0f, 9.0f );
+    Point camPoint = Point( 0.0f, 0.0f, 9.0f );
     Point lookat( 0.0f, 0.0f, -25.0f );
-    cam = new Camera( origCamPoint, lookat );
+    cam = new Camera( camPoint, lookat );
 
     sources = new std::vector<VideoSource*>();
     drawnObjects = new std::vector<RectangleBase*>();
@@ -860,10 +860,12 @@ void gravManager::setWindowSize( int w, int h )
     GLdouble screenL, screenR, screenU, screenD;
     GLUtil* glUtil = GLUtil::getInstance();
 
-    // reset cam to original spot in order to project from correct spot and find
-    // the rectangle relative/facing to the original camera position
+    // save original camera position & reset in order to project from correct
+    // spot and find the rectangle relative/facing to the original camera
+    // position
     Point oldCamPoint = cam->getCenter();
-    cam->setCenter( origCamPoint );
+    Point oldLookat = cam->getLookat();
+    cam->resetPosition( false );
     cam->doGLLookat();
 
     // note this still uses the old screen rect - assumes it stays on the same
@@ -881,6 +883,7 @@ void gravManager::setWindowSize( int w, int h )
     screenD = bottomLeft.getY();
 
     cam->setCenter( oldCamPoint );
+    cam->setLookat( oldLookat );
     cam->doGLLookat();
 
     screenRectFull.setPos( (screenL+screenR)/2.0f, (screenU+screenD)/2.0f);

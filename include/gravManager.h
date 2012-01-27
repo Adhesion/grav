@@ -280,8 +280,6 @@ private:
     int intersectCounter;
     bool enableSiteIDGroups;
 
-    Point origCamPoint;
-
     bool usingThreads;
     mutex* sourceMutex; // this is owned by us
     int lockCount;

@@ -59,6 +59,11 @@ public:
     void moveLookat( float x, float y, float z );
     void moveLookat( Point p );
 
+    /*
+     * Reset camera to original position.
+     */
+    void resetPosition( bool anim );
+
     void setEarth( Earth* e );
 
     void animateValues();
@@ -68,8 +73,11 @@ private:
     Point destCenter;
     Point lookat;
     Point destLookat;
+
     Vector up;
-    Vector destUp;
+
+    Point origCenter;
+    Point origLookat;
 
     // cam has a reference to earth so it can update its up-down rotation axis
     // based on the cam position

@@ -35,8 +35,12 @@ Camera::Camera( Point c, Point l )
     lookatMoving = false;
 
     up = Vector( 0.0f, 1.0f, 0.0f );
+
     destCenter = center;
     destLookat = lookat;
+
+    origCenter = center;
+    origLookat = lookat;
 }
 
 void Camera::doGLLookat()
@@ -140,6 +144,20 @@ void Camera::moveLookat( Point p )
 void Camera::setEarth( Earth* e )
 {
     earth = e;
+}
+
+void Camera::resetPosition( bool anim )
+{
+    if ( anim )
+    {
+        moveCenter( origCenter );
+        moveLookat( origLookat );
+    }
+    else
+    {
+        setCenter( origCenter );
+        setLookat( origLookat );
+    }
 }
 
 void Camera::animateValues()
