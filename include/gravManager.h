@@ -164,6 +164,7 @@ public:
 
     float getCamX(); float getCamY(); float getCamZ();
     void setCamX( float x ); void setCamY( float y ); void setCamZ( float z );
+    void resetCamPosition();
 
     RectangleBase getScreenRect( bool full = false );
     RectangleBase getEarthRect();

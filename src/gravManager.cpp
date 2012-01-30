@@ -1241,6 +1241,11 @@ void gravManager::setCamZ( float z )
     cam->moveCenter( p );
 }
 
+void gravManager::resetCamPosition()
+{
+    cam->resetPosition( true );
+}
+
 RectangleBase gravManager::getScreenRect( bool full )
 {
     if ( full )

@@ -51,7 +51,7 @@ EVT_LEFT_DOWN(InputHandler::wxMouseLDown)
 EVT_LEFT_DCLICK(InputHandler::wxMouseLDClick)
 EVT_LEFT_UP(InputHandler::wxMouseLUp)
 EVT_RIGHT_DOWN(InputHandler::wxMouseRDown)
-END_EVENT_TABLE()
+END_EVENT_TABLE();
 
 InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
     : earth( e ), grav( g ), mainFrame( f )
@@ -171,6 +171,10 @@ InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
         docstr[ktoh('W')] = "[debug] Zoom in.";
         lookup[ktoh('S')] = &InputHandler::handleZoomout;
         docstr[ktoh('S')] = "[debug] Zoom out.";
+        lookup[ktoh('C', wxMOD_SHIFT | wxMOD_CMD)] =
+                            &InputHandler::handleCameraReset;
+        docstr[ktoh('C', wxMOD_SHIFT | wxMOD_CMD)] =
+                            "[debug] Reset camera position.";
     }
 }
 
@@ -561,22 +565,27 @@ void InputHandler::handleToggleRenderingSelected()
 
 void InputHandler::handleZoomout()
 {
-        grav->setCamZ(grav->getCamZ()+1);
+    grav->setCamZ(grav->getCamZ()+1);
 }
 
 void InputHandler::handleZoomin()
 {
-        grav->setCamZ(grav->getCamZ()-1);
+    grav->setCamZ(grav->getCamZ()-1);
 }
 
 void InputHandler::handleStrafeLeft()
 {
-        grav->setCamX(grav->getCamX()-1);
+    grav->setCamX(grav->getCamX()-1);
 }
 
 void InputHandler::handleStrafeRight()
 {
-        grav->setCamX(grav->getCamX()+1);
+    grav->setCamX(grav->getCamX()+1);
+}
+
+void InputHandler::handleCameraReset()
+{
+    grav->resetCamPosition();
 }
 
 void InputHandler::handleToggleAutoFocusRotate()

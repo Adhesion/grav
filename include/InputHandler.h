@@ -87,6 +87,7 @@ public:
     void handleZoomin();
     void handleStrafeLeft();
     void handleStrafeRight();
+    void handleCameraReset();
     void handleToggleAutoFocusRotate();
     void handleSelectAll();
     void handleToggleGraphicsDebug();
