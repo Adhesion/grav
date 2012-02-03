@@ -1,5 +1,5 @@
 /*
- * @file gravManager.cpp
+ * @file ObjectManager.cpp
  *
  * Implementation of major grav functions - holds lists of drawn objects and
  * sources, draws them, executes functions like automatic mode, etc.
@@ -50,11 +50,11 @@
 #include "Camera.h"
 #include "Point.h"
 
-#include "gravManager.h"
+#include "ObjectManager.h"
 
 #include <VPMedia/random_helper.h>
 
-gravManager::gravManager()
+ObjectManager::ObjectManager()
 {
     windowWidth = 0; windowHeight = 0; // this should be set immediately
                                        // after init
@@ -129,7 +129,7 @@ gravManager::gravManager()
     venueClientController = NULL; // just for before it gets set
 }
 
-gravManager::~gravManager()
+ObjectManager::~ObjectManager()
 {
     doDelayedDelete();
 
@@ -151,7 +151,7 @@ gravManager::~gravManager()
     mutex_free( sourceMutex );
 }
 
-void gravManager::draw()
+void ObjectManager::draw()
 {
     // don't draw if either of these objects haven't been initialized yet
     if ( !earth || !input ) return;
@@ -475,7 +475,7 @@ void gravManager::draw()
     autoCounter = ( autoCounter + 1 ) % 900;
 }
 
-void gravManager::clearSelected()
+void ObjectManager::clearSelected()
 {
     for ( std::vector<RectangleBase*>::iterator sli = selectedObjects->begin();
             sli != selectedObjects->end(); ++sli )
@@ -483,11 +483,11 @@ void gravManager::clearSelected()
     selectedObjects->clear();
 }
 
-void gravManager::ungroupAll()
+void ObjectManager::ungroupAll()
 {
     lockSources();
 
-    gravUtil::logVerbose( "gravManager::ungroupAll: deleting %i groups\n",
+    gravUtil::logVerbose( "ObjectManager::ungroupAll: deleting %i groups\n",
             siteIDGroups->size() );
     std::map<std::string,Group*>::iterator it;
     for ( it = siteIDGroups->begin(); it != siteIDGroups->end(); ++it )
@@ -502,17 +502,17 @@ void gravManager::ungroupAll()
             removeFromLists( g );
             objectsToDelete->push_back( g );
 
-            gravUtil::logVerbose( "gravManager::ungroupAll: group %s set to be "
-                    "deleted on draw\n", g->getName().c_str() );
+            gravUtil::logVerbose( "ObjectManager::ungroupAll: group %s set to "
+                    "be deleted on draw\n", g->getName().c_str() );
         }
     }
     siteIDGroups->clear();
-    gravUtil::logVerbose( "gravManager::ungroupAll: siteIDgroups cleared\n" );
+    gravUtil::logVerbose( "ObjectManager::ungroupAll: siteIDgroups cleared\n" );
 
     unlockSources();
 }
 
-void gravManager::addTestObject()
+void ObjectManager::addTestObject()
 {
     lockSources();
 
@@ -545,7 +545,7 @@ void gravManager::addTestObject()
     unlockSources();
 }
 
-void gravManager::tryDeleteObject( RectangleBase* obj )
+void ObjectManager::tryDeleteObject( RectangleBase* obj )
 {
     lockSources();
 
@@ -567,11 +567,11 @@ void gravManager::tryDeleteObject( RectangleBase* obj )
  * Note this is NOT thread-safe, lockSources() should be called around any calls
  * to this.
  */
-void gravManager::moveToTop( RectangleBase* object, bool checkGrouping )
+void ObjectManager::moveToTop( RectangleBase* object, bool checkGrouping )
 {
     if ( object == NULL )
     {
-        gravUtil::logError( "gravManager::moveToTop: object %s is NULL\n",
+        gravUtil::logError( "ObjectManager::moveToTop: object %s is NULL\n",
                             object->getName().c_str() );
         return;
     }
@@ -580,7 +580,7 @@ void gravManager::moveToTop( RectangleBase* object, bool checkGrouping )
     while ( i != drawnObjects->end() && (*i) != object ) ++i;
     if ( i == drawnObjects->end() )
     {
-        gravUtil::logError( "gravManager::moveToTop: object %s not found in "
+        gravUtil::logError( "ObjectManager::moveToTop: object %s not found in "
                             "draw list\n", object->getName().c_str() );
         return;
     }
@@ -591,7 +591,7 @@ void gravManager::moveToTop( RectangleBase* object, bool checkGrouping )
  * Note this is NOT thread-safe, lockSources() should be called around any calls
  * to this.
  */
-void gravManager::moveToTop( std::vector<RectangleBase*>::iterator i,
+void ObjectManager::moveToTop( std::vector<RectangleBase*>::iterator i,
                                 bool checkGrouping )
 {
     RectangleBase* temp = (*i);
@@ -619,7 +619,7 @@ void gravManager::moveToTop( std::vector<RectangleBase*>::iterator i,
     }
 }
 
-void gravManager::drawCurvedEarthLine( float lat, float lon,
+void ObjectManager::drawCurvedEarthLine( float lat, float lon,
                                 float destx, float desty, float destz )
 {
     // old method
@@ -827,7 +827,7 @@ void gravManager::drawCurvedEarthLine( float lat, float lon,
     */
 }
 
-void gravManager::drawEarthPoint( float lat, float lon, float size )
+void ObjectManager::drawEarthPoint( float lat, float lon, float size )
 {
     float sx, sy, sz;
     earth->convertLatLong( lat, lon, sx, sy, sz );
@@ -838,22 +838,22 @@ void gravManager::drawEarthPoint( float lat, float lon, float size )
     glEnd();
 }
 
-void gravManager::setBoxSelectDrawing( bool draw )
+void ObjectManager::setBoxSelectDrawing( bool draw )
 {
     drawSelectionBox = draw;
 }
 
-int gravManager::getWindowWidth()
+int ObjectManager::getWindowWidth()
 {
     return windowWidth;
 }
 
-int gravManager::getWindowHeight()
+int ObjectManager::getWindowHeight()
 {
     return windowHeight;
 }
 
-void gravManager::setWindowSize( int w, int h )
+void ObjectManager::setWindowSize( int w, int h )
 {
     windowWidth = w;
     windowHeight = h;
@@ -901,7 +901,7 @@ void gravManager::setWindowSize( int w, int h )
     sessionManager->recalculateSize();
 }
 
-void gravManager::recalculateRectSizes()
+void ObjectManager::recalculateRectSizes()
 {
     float screenU = screenRectFull.getDestUBound();
     float screenD = screenRectFull.getDestDBound();
@@ -931,27 +931,27 @@ void gravManager::recalculateRectSizes()
     screenRectSub.setScale( screenR-left, top-screenD );
 }
 
-bool gravManager::usingSiteIDGroups()
+bool ObjectManager::usingSiteIDGroups()
 {
     return enableSiteIDGroups;
 }
 
-void gravManager::setSiteIDGrouping( bool site )
+void ObjectManager::setSiteIDGrouping( bool site )
 {
     enableSiteIDGroups = site;
 }
 
-int gravManager::getHoldCounter()
+int ObjectManager::getHoldCounter()
 {
     return holdCounter;
 }
 
-void gravManager::resetAutoCounter()
+void ObjectManager::resetAutoCounter()
 {
     autoCounter = 0;
 }
 
-void gravManager::scaleSelectedObjects( float scaleAmt )
+void ObjectManager::scaleSelectedObjects( float scaleAmt )
 {
     for ( unsigned int i = 0; i < selectedObjects->size(); i++ )
     {
@@ -961,27 +961,27 @@ void gravManager::scaleSelectedObjects( float scaleAmt )
     }
 }
 
-std::vector<VideoSource*>* gravManager::getSources()
+std::vector<VideoSource*>* ObjectManager::getSources()
 {
     return sources;
 }
 
-std::vector<RectangleBase*>* gravManager::getDrawnObjects()
+std::vector<RectangleBase*>* ObjectManager::getDrawnObjects()
 {
     return drawnObjects;
 }
 
-std::vector<RectangleBase*>* gravManager::getSelectedObjects()
+std::vector<RectangleBase*>* ObjectManager::getSelectedObjects()
 {
     return selectedObjects;
 }
 
-std::map<std::string,Group*>* gravManager::getSiteIDGroups()
+std::map<std::string,Group*>* ObjectManager::getSiteIDGroups()
 {
     return siteIDGroups;
 }
 
-std::vector<RectangleBase*> gravManager::getMovableObjects()
+std::vector<RectangleBase*> ObjectManager::getMovableObjects()
 {
     std::vector<RectangleBase*> objects;
     for ( unsigned int i = 0; i < drawnObjects->size(); i++ )
@@ -995,7 +995,7 @@ std::vector<RectangleBase*> gravManager::getMovableObjects()
     return objects;
 }
 
-std::vector<RectangleBase*> gravManager::getUnselectedObjects()
+std::vector<RectangleBase*> ObjectManager::getUnselectedObjects()
 {
     std::vector<RectangleBase*> unselectedObjects;
     std::vector<RectangleBase*> movableObjs = getMovableObjects();
@@ -1010,7 +1010,7 @@ std::vector<RectangleBase*> gravManager::getUnselectedObjects()
     return unselectedObjects;
 }
 
-void gravManager::addNewSource( VideoSource* s )
+void ObjectManager::addNewSource( VideoSource* s )
 {
     if ( s == NULL ) return;
 
@@ -1062,7 +1062,7 @@ void gravManager::addNewSource( VideoSource* s )
     unlockSources();
 }
 
-void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
+void ObjectManager::deleteSource( std::vector<VideoSource*>::iterator si )
 {
     lockSources();
 
@@ -1124,7 +1124,7 @@ void gravManager::deleteSource( std::vector<VideoSource*>::iterator si )
     unlockSources();
 }
 
-void gravManager::deleteGroup( Group* g )
+void ObjectManager::deleteGroup( Group* g )
 {
     lockSources();
 
@@ -1137,12 +1137,12 @@ void gravManager::deleteGroup( Group* g )
     unlockSources();
 }
 
-void gravManager::addToDrawList( RectangleBase* obj )
+void ObjectManager::addToDrawList( RectangleBase* obj )
 {
     drawnObjects->push_back( obj );
 }
 
-void gravManager::removeFromLists( RectangleBase* obj, bool treeRemove )
+void ObjectManager::removeFromLists( RectangleBase* obj, bool treeRemove )
 {
     // remove it from the tree
     if ( tree && treeRemove )
@@ -1168,9 +1168,9 @@ void gravManager::removeFromLists( RectangleBase* obj, bool treeRemove )
     }
 }
 
-Group* gravManager::createSiteIDGroup( std::string data )
+Group* ObjectManager::createSiteIDGroup( std::string data )
 {
-    gravUtil::logVerbose( "gravManager::creating siteIDGroup based on %s\n",
+    gravUtil::logVerbose( "ObjectManager::creating siteIDGroup based on %s\n",
             data.c_str() );
 
     Group* g = new Group( 0.0f, 0.0f );
@@ -1205,48 +1205,48 @@ Group* gravManager::createSiteIDGroup( std::string data )
  * and the current destination, and moving based on that can cause new points
  * to be off from what you might expect.
  */
-float gravManager::getCamX()
+float ObjectManager::getCamX()
 {
     return cam->getDestCenter().getX();
 }
 
-float gravManager::getCamY()
+float ObjectManager::getCamY()
 {
     return cam->getDestCenter().getY();
 }
 
-float gravManager::getCamZ()
+float ObjectManager::getCamZ()
 {
     return cam->getDestCenter().getZ();
 }
 
-void gravManager::setCamX( float x )
+void ObjectManager::setCamX( float x )
 {
     Point p = cam->getDestCenter();
     p.setX( x );
     cam->moveCenter( p );
 }
 
-void gravManager::setCamY( float y )
+void ObjectManager::setCamY( float y )
 {
     Point p = cam->getDestCenter();
     p.setY( y );
     cam->moveCenter( p );
 }
 
-void gravManager::setCamZ( float z )
+void ObjectManager::setCamZ( float z )
 {
     Point p = cam->getDestCenter();
     p.setZ( z );
     cam->moveCenter( p );
 }
 
-void gravManager::resetCamPosition()
+void ObjectManager::resetCamPosition()
 {
     cam->resetPosition( true );
 }
 
-RectangleBase gravManager::getScreenRect( bool full )
+RectangleBase ObjectManager::getScreenRect( bool full )
 {
     if ( full )
         return screenRectFull;
@@ -1254,27 +1254,27 @@ RectangleBase gravManager::getScreenRect( bool full )
         return screenRectSub;
 }
 
-RectangleBase gravManager::getEarthRect()
+RectangleBase ObjectManager::getEarthRect()
 {
     return earthRect;
 }
 
-void gravManager::setEarth( Earth* e )
+void ObjectManager::setEarth( Earth* e )
 {
     earth = e;
 }
 
-void gravManager::setInput( InputHandler* i )
+void ObjectManager::setInput( InputHandler* i )
 {
     input = i;
 }
 
-void gravManager::setTree( TreeControl* t )
+void ObjectManager::setTree( TreeControl* t )
 {
     tree = t;
 }
 
-void gravManager::setAudio( AudioManager* a )
+void ObjectManager::setAudio( AudioManager* a )
 {
     if ( a != NULL )
         audioEnabled = true;
@@ -1284,12 +1284,12 @@ void gravManager::setAudio( AudioManager* a )
     audio = a;
 }
 
-void gravManager::setVideoListener( VideoListener* v )
+void ObjectManager::setVideoListener( VideoListener* v )
 {
     videoListener = v;
 }
 
-void gravManager::setVenueClientController( VenueClientController* vcc )
+void ObjectManager::setVenueClientController( VenueClientController* vcc )
 {
     // if setting a new one, stop drawing the old one
     if ( venueClientController != NULL )
@@ -1306,13 +1306,13 @@ void gravManager::setVenueClientController( VenueClientController* vcc )
     }
 }
 
-void gravManager::setSessionManager( SessionManager* s )
+void ObjectManager::setSessionManager( SessionManager* s )
 {
     sessionManager = s;
     drawnObjects->push_back( sessionManager );
 }
 
-void gravManager::setHeaderString( std::string h )
+void ObjectManager::setHeaderString( std::string h )
 {
     headerString = h;
     useHeader = headerString.compare( "" ) != 0;
@@ -1326,12 +1326,12 @@ void gravManager::setHeaderString( std::string h )
     recalculateRectSizes();
 }
 
-TreeControl* gravManager::getTree()
+TreeControl* ObjectManager::getTree()
 {
     return tree;
 }
 
-void gravManager::lockSources()
+void ObjectManager::lockSources()
 {
     if ( usingThreads )
     {
@@ -1340,7 +1340,7 @@ void gravManager::lockSources()
     }
 }
 
-void gravManager::unlockSources()
+void ObjectManager::unlockSources()
 {
     if ( usingThreads )
     {
@@ -1349,27 +1349,27 @@ void gravManager::unlockSources()
     }
 }
 
-void gravManager::setThreads( bool threads )
+void ObjectManager::setThreads( bool threads )
 {
     usingThreads = threads;
 }
 
-bool gravManager::usingRunway()
+bool ObjectManager::usingRunway()
 {
     return useRunway;
 }
 
-bool gravManager::usingGridAuto()
+bool ObjectManager::usingGridAuto()
 {
     return gridAuto;
 }
 
-bool gravManager::usingAutoFocusRotate()
+bool ObjectManager::usingAutoFocusRotate()
 {
     return autoFocusRotate;
 }
 
-void gravManager::setRunwayUsage( bool run )
+void ObjectManager::setRunwayUsage( bool run )
 {
     useRunway = run;
 
@@ -1378,37 +1378,37 @@ void gravManager::setRunwayUsage( bool run )
     recalculateRectSizes();
 }
 
-void gravManager::setGridAuto( bool g )
+void ObjectManager::setGridAuto( bool g )
 {
     gridAuto = g;
     if ( g && useRunway )
         setRunwayUsage( false );
 }
 
-void gravManager::setAutoFocusRotate( bool a )
+void ObjectManager::setAutoFocusRotate( bool a )
 {
     autoFocusRotate = a;
     if ( a && useRunway )
         setRunwayUsage( false );
 }
 
-Runway* gravManager::getRunway()
+Runway* ObjectManager::getRunway()
 {
     return runway;
 }
 
-void gravManager::setGraphicsDebugMode( bool g )
+void ObjectManager::setGraphicsDebugMode( bool g )
 {
     graphicsDebugView = g;
     GLUtil::getInstance()->getCanvas()->setDebugTimerUsage( g );
 }
 
-bool gravManager::getGraphicsDebugMode()
+bool ObjectManager::getGraphicsDebugMode()
 {
     return graphicsDebugView;
 }
 
-void gravManager::toggleShowVenueClientController()
+void ObjectManager::toggleShowVenueClientController()
 {
     if ( venueClientController != NULL )
     {
@@ -1416,7 +1416,7 @@ void gravManager::toggleShowVenueClientController()
     }
 }
 
-bool gravManager::isVenueClientControllerShown()
+bool ObjectManager::isVenueClientControllerShown()
 {
     if ( venueClientController != NULL )
     {
@@ -1428,7 +1428,7 @@ bool gravManager::isVenueClientControllerShown()
     }
 }
 
-bool gravManager::isVenueClientControllerShowable()
+bool ObjectManager::isVenueClientControllerShowable()
 {
     if ( venueClientController != NULL )
     {
@@ -1440,12 +1440,12 @@ bool gravManager::isVenueClientControllerShowable()
     }
 }
 
-bool gravManager::audioAvailable()
+bool ObjectManager::audioAvailable()
 {
     return audioEnabled && audio->getSourceCount() > 0;
 }
 
-void gravManager::doDelayedDelete()
+void ObjectManager::doDelayedDelete()
 {
     if ( objectsToDelete->size() > 0 )
     {

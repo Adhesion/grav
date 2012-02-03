@@ -1,7 +1,7 @@
 /*
  * @file grav.cpp
  *
- * Implementation of main grav app behavior, like creating the gravManager &
+ * Implementation of main grav app behavior, like creating the ObjectManager &
  * GL canvas objects, as well as parsing command line arguments.
  *
  * @author Andrew Ford
@@ -27,7 +27,7 @@
 #include "gravUtil.h"
 #include "Earth.h"
 #include "GLCanvas.h"
-#include "gravManager.h"
+#include "ObjectManager.h"
 #include "InputHandler.h"
 #include "TreeControl.h"
 #include "SessionTreeControl.h"
@@ -57,24 +57,24 @@ int gravApp::threadCounter = 0;
 
 bool gravApp::OnInit()
 {
-    grav = new gravManager();
+    objectMan = new ObjectManager();
     // defaults - can be changed by command line
     windowWidth = 900; windowHeight = 550;
     startX = 10; startY = 50;
-    // gravManager's windowwidth/height will be set by the glcanvas's resize
+    // ObjectManager's windowwidth/height will be set by the glcanvas's resize
     // callback
 
     parser.SetCmdLine( argc, argv );
 
-    videoSessionListener = new VideoListener( grav );
+    videoSessionListener = new VideoListener( objectMan );
     audioSessionListener = new AudioManager();
     sessionManager = new SessionManager( videoSessionListener,
-                                            audioSessionListener, grav );
+                                            audioSessionListener, objectMan );
     //videoInitialized = false; audioInitialized = false;
 
     if ( !handleArgs() )
     {
-        delete grav;
+        delete objectMan;
         return false;
     }
 
@@ -100,7 +100,7 @@ bool gravApp::OnInit()
                         wxSize( windowWidth, windowHeight ) );
     mainFrame->Show( true );
     mainFrame->SetName( _("main grav frame") );
-    mainFrame->setSourceManager( grav );
+    mainFrame->setObjectManager( objectMan );
     SetTopWindow( mainFrame );
     if ( startFullscreen )
         mainFrame->ShowFullScreen( true );
@@ -123,10 +123,10 @@ bool gravApp::OnInit()
     int attribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24,
                             0 };
 
-    canvas = new GLCanvas( mainFrame, grav, attribList,
+    canvas = new GLCanvas( mainFrame, objectMan, attribList,
                             mainFrame->GetClientSize() );
     sourceTree = new TreeControl( treeNotebook );
-    sourceTree->setSourceManager( grav );
+    sourceTree->setObjectManager( objectMan );
     sessionTree = new SessionTreeControl( treeNotebook );
     treeNotebook->AddPage( sourceTree, _("Videos"), true );
     treeNotebook->AddPage( sessionTree, _("Sessions") );
@@ -176,7 +176,7 @@ bool gravApp::OnInit()
         // bail out if something failed
         gravUtil::logError( "grav::OnInit(): ERROR: initGL() failed, "
                 "exiting\n" );
-        delete grav;
+        delete objectMan;
         return false;
     }
 
@@ -187,7 +187,7 @@ bool gravApp::OnInit()
     GLUtil::getInstance()->setCanvas( canvas );
 
     if ( headerSet )
-        grav->setHeaderString( header );
+        objectMan->setHeaderString( header );
 
     timer = new RenderTimer( canvas, timerInterval );
     //timer->Start();
@@ -195,7 +195,7 @@ bool gravApp::OnInit()
     //videoSession_listener->setTimer( t2 );
 
     earth = new Earth();
-    input = new InputHandler( earth, grav, mainFrame );
+    input = new InputHandler( earth, objectMan, mainFrame );
 
     // frame needs reference to inputhandler to generate help window for
     // shortcut hotkeys
@@ -210,17 +210,18 @@ bool gravApp::OnInit()
 
     if ( !disablePython )
     {
-        venueClientController = new VenueClientController( 0.0f, 0.0f, grav );
+        venueClientController = new VenueClientController( 0.0f, 0.0f,
+                objectMan );
         venueClientController->setSessionControl( sessionTree );
     }
 
-    grav->setEarth( earth );
-    grav->setInput( input );
-    grav->setTree( sourceTree );
-    grav->setVideoListener( videoSessionListener );
-    grav->setVenueClientController( venueClientController ); // may be null
-    grav->setSessionManager( sessionManager );
-    grav->setAudio( audioSessionListener ); // may not necessarily be used
+    objectMan->setEarth( earth );
+    objectMan->setInput( input );
+    objectMan->setTree( sourceTree );
+    objectMan->setVideoListener( videoSessionListener );
+    objectMan->setVenueClientController( venueClientController ); // may be null
+    objectMan->setSessionManager( sessionManager );
+    objectMan->setAudio( audioSessionListener ); // may not necessarily be used
 
     mapRTP();
 
@@ -293,7 +294,7 @@ int gravApp::OnExit()
 
     if ( venueClientController != NULL )
         delete venueClientController;
-    delete grav;
+    delete objectMan;
 
     VPMPayloadDecoderFactory::shutdown();
 
@@ -309,7 +310,7 @@ void gravApp::idleHandler( wxIdleEvent& evt )
     // start secondary thread if not running
     if ( usingThreads && !threadRunning )
     {
-        grav->setThreads( usingThreads );
+        objectMan->setThreads( usingThreads );
         threadRunning = true;
         VPMthread = thread_start( threadTest, this );
     }
@@ -402,9 +403,9 @@ bool gravApp::handleArgs()
 
     getAGVenueStreams = parser.Found( _("get-ag-venue-streams") );
 
-    grav->setAutoFocusRotate( parser.Found( _("automatic") ) );
+    objectMan->setAutoFocusRotate( parser.Found( _("automatic") ) );
 
-    grav->setGridAuto( parser.Found( _("gridauto") ) );
+    objectMan->setGridAuto( parser.Found( _("gridauto") ) );
 
     fps = 0;
     if ( parser.Found( _("fps"), &fps ) )

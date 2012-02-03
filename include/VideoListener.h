@@ -30,7 +30,7 @@
 
 #include <sys/time.h>
 
-class gravManager;
+class ObjectManager;
 class VPMVideoSink;
 class GLCanvas;
 class wxStopWatch;
@@ -42,7 +42,7 @@ class VideoListener : public VPMSessionListener
 {
 
 public:
-    VideoListener( gravManager* g );
+    VideoListener( ObjectManager* o );
     virtual void vpmsession_source_created( VPMSession &session,
                                           uint32_t ssrc,
                                           uint32_t pt,
@@ -66,7 +66,7 @@ public:
     void updatePixelCount( long mod );
 
 private:
-    gravManager* grav;
+    ObjectManager* objectMan;
     wxStopWatch* timer;
 
     // initial starting points for videos

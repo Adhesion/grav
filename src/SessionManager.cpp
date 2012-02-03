@@ -38,12 +38,12 @@
 #include "grav.h"
 #include "gravUtil.h"
 #include "SessionTreeControl.h"
-#include "gravManager.h"
+#include "ObjectManager.h"
 
 SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
-                                gravManager* g )
+                                ObjectManager* o )
     : Group( 0.0f, -6.0f ), videoSessionListener( vl ),
-      audioSessionListener( al ), objectManager( g )
+      audioSessionListener( al ), objectManager( o )
 {
     x = destX;
     y = destY - 10.0f; // for move-from-bottom animation

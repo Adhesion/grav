@@ -35,14 +35,15 @@
 
 #include <sys/time.h>
 
-class gravManager;
+class ObjectManager;
 class RenderTimer;
 
 class GLCanvas : public wxGLCanvas
 {
 
 public:
-    GLCanvas( wxWindow* parent, gravManager* g, int* attributes, wxSize size );
+    GLCanvas( wxWindow* parent, ObjectManager* o, int* attributes,
+            wxSize size );
     ~GLCanvas();
 
     void handlePaintEvent( wxPaintEvent& evt );
@@ -63,9 +64,9 @@ public:
     bool getDebugTimerUsage();
 
 private:
-    gravManager* grav;
+    ObjectManager* objectMan;
     wxGLContext* glContext;
-    DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE();
 
     void testDraw();
     void testKey( wxKeyEvent& evt );

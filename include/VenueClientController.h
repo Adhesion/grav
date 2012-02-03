@@ -34,14 +34,14 @@
 #include "PythonTools.h"
 #include "Group.h"
 
-class gravManager;
+class ObjectManager;
 class SessionTreeControl;
 
 class VenueClientController : public Group
 {
 
 public:
-    VenueClientController( float _x, float _y, gravManager* g );
+    VenueClientController( float _x, float _y, ObjectManager* g );
     ~VenueClientController();
 
     void draw();
@@ -91,7 +91,7 @@ private:
     PythonTools* pyTools;
     std::string AGToolsScript;
 
-    gravManager* grav;
+    ObjectManager* objectMan;
 
     SessionTreeControl* sessionControl;
 

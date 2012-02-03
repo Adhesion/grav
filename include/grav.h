@@ -39,7 +39,7 @@ class RenderTimer;
 class RotateTimer;
 class Frame;
 class SideFrame;
-class gravManager;
+class ObjectManager;
 class TreeControl;
 class SessionTreeControl;
 class VideoListener;
@@ -112,7 +112,7 @@ private:
     bool autoRotateAvailableVideo;
     int rotateIntervalMS;
 
-    gravManager* grav;
+    ObjectManager* objectMan;
     VenueClientController* venueClientController;
 
     bool usingThreads;

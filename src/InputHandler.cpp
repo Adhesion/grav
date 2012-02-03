@@ -30,7 +30,7 @@
 #include "VideoSource.h"
 #include "RectangleBase.h"
 #include "Group.h"
-#include "gravManager.h"
+#include "ObjectManager.h"
 #include "Earth.h"
 #include "Frame.h"
 #include "Runway.h"
@@ -53,8 +53,8 @@ EVT_LEFT_UP(InputHandler::wxMouseLUp)
 EVT_RIGHT_DOWN(InputHandler::wxMouseRDown)
 END_EVENT_TABLE();
 
-InputHandler::InputHandler( Earth* e, gravManager* g, Frame* f )
-    : earth( e ), grav( g ), mainFrame( f )
+InputHandler::InputHandler( Earth* e, ObjectManager* o, Frame* f )
+    : earth( e ), objectMan( o ), mainFrame( f )
 {
     tempSelectedObjects = new std::vector<RectangleBase*>();
     dragging = false;
@@ -205,19 +205,18 @@ void InputHandler::wxMouseMove( wxMouseEvent& evt )
 {
     // update mouse world position on mouse move - adds negligible CPU (~1%) and
     // obviously only when the mouse is moving. if need be, can potentially be
-    // put off to gravManager::draw() (ie every X frames)
+    // put off to ObjectManager::draw() (ie every X frames)
 
     // note that calculating screen pos -> world pos needs to do a GL call so
     // this has to be on the main thread
 
     int x = evt.GetPosition().x;
     // GL screen coords are y-flipped relative to GL screen coords
-    int y = grav->getWindowHeight() - evt.GetPosition().y;
+    int y = objectMan->getWindowHeight() - evt.GetPosition().y;
 
     Point intersect;
     validMousePos = GLUtil::getInstance()->screenToRectIntersect( x, y,
-                                                          grav->getScreenRect(),
-                                                          intersect );
+            objectMan->getScreenRect(), intersect );
     if ( !validMousePos )
         return;
 
@@ -262,7 +261,7 @@ void InputHandler::wxMouseLDClick( wxMouseEvent& evt )
 
 void InputHandler::wxMouseRDown( wxMouseEvent& evt )
 {
-    if ( grav->getSelectedObjects()->size() > 0 )
+    if ( objectMan->getSelectedObjects()->size() > 0 )
     {
         wxMenu rightClickMenu;
         rightClickMenu.Append( propertyID, _("Properties") );
@@ -273,20 +272,20 @@ void InputHandler::wxMouseRDown( wxMouseEvent& evt )
 void InputHandler::handlePrintSelected()
 {
     gravUtil::logMessage( "InputHandler::current sources selected: %i\n",
-            grav->getSelectedObjects()->size() );
-    for ( unsigned int i = 0; i < grav->getSelectedObjects()->size(); i++ )
+            objectMan->getSelectedObjects()->size() );
+    for ( unsigned int i = 0; i < objectMan->getSelectedObjects()->size(); i++ )
     {
         gravUtil::logMessage( "%s\n",
-                (*(grav->getSelectedObjects()))[i]->getName().c_str() );
+                (*(objectMan->getSelectedObjects()))[i]->getName().c_str() );
     }
 }
 
 void InputHandler::handleRearrangeGroups()
 {
     gravUtil::logMessage( "InputHandler::rearranging groups...\n" );
-    for ( unsigned int i = 0; i < grav->getSelectedObjects()->size(); i++ )
+    for ( unsigned int i = 0; i < objectMan->getSelectedObjects()->size(); i++ )
     {
-        RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
+        RectangleBase* temp = (*(objectMan->getSelectedObjects()))[i];
         if ( temp->isGroup() )
         {
             Group* g = (Group*)temp;
@@ -299,8 +298,8 @@ void InputHandler::handleUpdateGroupNames()
 {
     gravUtil::logMessage( "InputHandler::updating group names...\n" );
     std::map<std::string,Group*>::iterator mapi;
-    mapi = grav->getSiteIDGroups()->begin();
-    for ( ; mapi != grav->getSiteIDGroups()->end(); mapi++ )
+    mapi = objectMan->getSiteIDGroups()->begin();
+    for ( ; mapi != objectMan->getSiteIDGroups()->end(); mapi++ )
     {
         mapi->second->updateName();
     }
@@ -309,70 +308,72 @@ void InputHandler::handleUpdateGroupNames()
 void InputHandler::handlePerimeterArrange()
 {
     std::map<std::string, std::vector<RectangleBase*> > data;
-    data["objects"] = grav->getMovableObjects();
-    layouts.arrange(
-        "perimeter", grav->getScreenRect(), grav->getEarthRect(), data );
+    data["objects"] = objectMan->getMovableObjects();
+    layouts.arrange( "perimeter", objectMan->getScreenRect(),
+            objectMan->getEarthRect(), data );
 }
 
 void InputHandler::handleGridArrange()
 {
     std::map<std::string, std::vector<RectangleBase*> > data;
-    data["objects"] = grav->getMovableObjects();
-    layouts.arrange( "grid", grav->getScreenRect(), RectangleBase(), data );
+    data["objects"] = objectMan->getMovableObjects();
+    layouts.arrange( "grid", objectMan->getScreenRect(),
+            RectangleBase(), data );
 }
 
 void InputHandler::handleFocusArrange()
 {
-    if ( grav->getSelectedObjects()->size() > 0 )
+    if ( objectMan->getSelectedObjects()->size() > 0 )
     {
         std::map<std::string, std::vector<RectangleBase*> > data;
-        data["outers"] = grav->getUnselectedObjects();
-        data["inners"] = *(grav->getSelectedObjects());
-        layouts.arrange( "aspectFocus", grav->getScreenRect(), RectangleBase(),
-                            data );
+        data["outers"] = objectMan->getUnselectedObjects();
+        data["inners"] = *(objectMan->getSelectedObjects());
+        layouts.arrange( "aspectFocus", objectMan->getScreenRect(),
+                RectangleBase(), data );
     }
 }
 
 void InputHandler::handleFullscreenSelectedSingle()
 {
-    if ( grav->getSelectedObjects()->size() == 1 )
+    if ( objectMan->getSelectedObjects()->size() == 1 )
     {
-        (*grav->getSelectedObjects())[0]->fillToRect(grav->getScreenRect());
+        (*objectMan->getSelectedObjects())[0]->fillToRect(
+                objectMan->getScreenRect() );
     }
 }
 
 void InputHandler::handleFullerFullscreenSelectedSingle()
 {
-    if ( grav->getSelectedObjects()->size() == 1 )
+    if ( objectMan->getSelectedObjects()->size() == 1 )
     {
-        (*grav->getSelectedObjects())[0]->fillToRect(
-                grav->getScreenRect( true ), true );
+        (*objectMan->getSelectedObjects())[0]->fillToRect(
+                objectMan->getScreenRect( true ), true );
     }
 }
 
 void InputHandler::handleRunwayToggle()
 {
-    grav->setRunwayUsage( !grav->usingRunway() );
-    grav->clearSelected();
+    objectMan->setRunwayUsage( !objectMan->usingRunway() );
+    objectMan->clearSelected();
 }
 
 void InputHandler::handleInvertSelection()
 {
-    std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
+    std::vector<RectangleBase*> movableObjects = objectMan->getMovableObjects();
     for ( unsigned int i = 0; i < movableObjects.size(); i++ )
     {
         RectangleBase* obj = movableObjects[i];
         obj->setSelect( !obj->isSelected() );
         if ( obj->isSelected() )
         {
-            grav->getSelectedObjects()->push_back( obj );
+            objectMan->getSelectedObjects()->push_back( obj );
         }
         else
         {
             std::vector<RectangleBase*>::iterator it =
-                    grav->getSelectedObjects()->begin();
+                    objectMan->getSelectedObjects()->begin();
             while ( (*it) != obj ) it++;
-            grav->getSelectedObjects()->erase( it );
+            objectMan->getSelectedObjects()->erase( it );
         }
     }
 }
@@ -396,13 +397,13 @@ void InputHandler::handleInformation()
     std::vector<VideoSource*>::const_iterator si;
     gravUtil::logMessage( "InputHandler::printing source/object info...\n" );
     gravUtil::logMessage( "\tScreen size is %f x %f\n",
-                grav->getScreenRect().getWidth(),
-                grav->getScreenRect().getHeight() );
+            objectMan->getScreenRect().getWidth(),
+            objectMan->getScreenRect().getHeight() );
     gravUtil::logMessage( "\tWe currently have %i video sources.\n",
-             grav->getSources()->size() );
+            objectMan->getSources()->size() );
 
-    for ( si = grav->getSources()->begin();
-            si != grav->getSources()->end(); si++ )
+    for ( si = objectMan->getSources()->begin();
+            si != objectMan->getSources()->end(); si++ )
     {
         gravUtil::logMessage( "\t\tname: %s\n",
                 (*si)->getMetadata( VPMSession::VPMSESSION_SDES_NAME).c_str() );
@@ -438,10 +439,10 @@ void InputHandler::handleInformation()
     }
 
     gravUtil::logMessage( "\tWe currently have %i objects in drawnObjects.\n",
-                 grav->getDrawnObjects()->size() );
-    for ( unsigned int i = 0; i < grav->getDrawnObjects()->size(); i++ )
+            objectMan->getDrawnObjects()->size() );
+    for ( unsigned int i = 0; i < objectMan->getDrawnObjects()->size(); i++ )
     {
-        RectangleBase* temp = (*(grav->getDrawnObjects()))[i];
+        RectangleBase* temp = (*(objectMan->getDrawnObjects()))[i];
         gravUtil::logMessage( "\t\t%s (%fx%f)\n", temp->getName().c_str(),
                 temp->getDestWidth(), temp->getDestHeight() );
     }
@@ -451,9 +452,9 @@ void InputHandler::handleInformation()
 
 void InputHandler::handleToggleGroupLocks()
 {
-    for ( unsigned int i = 0; i < grav->getSelectedObjects()->size(); i++ )
+    for ( unsigned int i = 0; i < objectMan->getSelectedObjects()->size(); i++ )
     {
-        RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
+        RectangleBase* temp = (*(objectMan->getSelectedObjects()))[i];
         if ( temp->isGroup() )
         {
             Group* g = (Group*)temp;
@@ -468,23 +469,23 @@ void InputHandler::handleToggleGroupLocks()
 void InputHandler::handleMuteSelected()
 {
     std::vector<VideoSource*>::const_iterator si;
-    for ( si = grav->getSources()->begin();
-                    si != grav->getSources()->end(); ++si )
+    for ( si = objectMan->getSources()->begin();
+                    si != objectMan->getSources()->end(); ++si )
     {
         if ( (*si)->isSelected() )
         {
             (*si)->toggleMute();
             // add it to the runway if we're using it, it's visible, etc.
             if ( !(*si)->isGrouped() && (*si)->isMuted() &&
-                    grav->usingRunway() &&
-                    grav->getRunway()->isShown() )
+                    objectMan->usingRunway() &&
+                    objectMan->getRunway()->isShown() )
             {
-                grav->getRunway()->add( (*si) );
+                objectMan->getRunway()->add( (*si) );
                 (*si)->setSelect( false );
             }
         }
     }
-    grav->clearSelected();
+    objectMan->clearSelected();
 }
 
 void InputHandler::handleRandomTest()
@@ -496,8 +497,8 @@ void InputHandler::handleRandomTest()
 void InputHandler::handleNativeScaleAll()
 {
     std::vector<VideoSource*>::const_iterator si;
-    for ( si = grav->getSources()->begin();
-            si != grav->getSources()->end(); ++si )
+    for ( si = objectMan->getSources()->begin();
+            si != objectMan->getSources()->end(); ++si )
     {
         (*si)->scaleNative();
         if ( (*si)->isGrouped() )
@@ -508,8 +509,8 @@ void InputHandler::handleNativeScaleAll()
 void InputHandler::handleNativeScaleSelected()
 {
     std::vector<VideoSource*>::const_iterator si;
-    for ( si = grav->getSources()->begin();
-            si != grav->getSources()->end(); ++si )
+    for ( si = objectMan->getSources()->begin();
+            si != objectMan->getSources()->end(); ++si )
     {
         if ( (*si)->isSelected() )
         {
@@ -523,8 +524,8 @@ void InputHandler::handleNativeScaleSelected()
 void InputHandler::handleMoveAllToCenter()
 {
     std::vector<VideoSource*>::const_iterator si;
-    for ( si = grav->getSources()->begin();
-            si != grav->getSources()->end(); ++si )
+    for ( si = objectMan->getSources()->begin();
+            si != objectMan->getSources()->end(); ++si )
     {
         (*si)->move( 0.0f, 0.0f );
     }
@@ -533,28 +534,28 @@ void InputHandler::handleMoveAllToCenter()
 void InputHandler::handleToggleSiteGrouping()
 {
     // TODO -- condense this with a bang
-    if ( grav->usingSiteIDGroups() )
+    if ( objectMan->usingSiteIDGroups() )
     {
-        grav->setSiteIDGrouping( false );
-        grav->ungroupAll();
+        objectMan->setSiteIDGrouping( false );
+        objectMan->ungroupAll();
     }
     else
     {
-        grav->setSiteIDGrouping( true );
+        objectMan->setSiteIDGrouping( true );
     }
 }
 
 void InputHandler::handleToggleShowVenueClientController()
 {
-    grav->toggleShowVenueClientController();
+    objectMan->toggleShowVenueClientController();
 }
 
 void InputHandler::handleToggleRenderingSelected()
 {
-    for ( unsigned int i = 0; i < grav->getSelectedObjects()->size();
+    for ( unsigned int i = 0; i < objectMan->getSelectedObjects()->size();
                     i++ )
     {
-        RectangleBase* temp = (*(grav->getSelectedObjects()))[i];
+        RectangleBase* temp = (*(objectMan->getSelectedObjects()))[i];
         VideoSource* tempVS = dynamic_cast<VideoSource*>( temp );
         if ( tempVS != NULL )
         {
@@ -565,61 +566,61 @@ void InputHandler::handleToggleRenderingSelected()
 
 void InputHandler::handleZoomout()
 {
-    grav->setCamZ(grav->getCamZ()+1);
+    objectMan->setCamZ(objectMan->getCamZ()+1);
 }
 
 void InputHandler::handleZoomin()
 {
-    grav->setCamZ(grav->getCamZ()-1);
+    objectMan->setCamZ(objectMan->getCamZ()-1);
 }
 
 void InputHandler::handleStrafeLeft()
 {
-    grav->setCamX(grav->getCamX()-1);
+    objectMan->setCamX(objectMan->getCamX()-1);
 }
 
 void InputHandler::handleStrafeRight()
 {
-    grav->setCamX(grav->getCamX()+1);
+    objectMan->setCamX(objectMan->getCamX()+1);
 }
 
 void InputHandler::handleCameraReset()
 {
-    grav->resetCamPosition();
+    objectMan->resetCamPosition();
 }
 
 void InputHandler::handleToggleAutoFocusRotate()
 {
-    grav->setAutoFocusRotate( !grav->usingAutoFocusRotate() );
-    grav->resetAutoCounter();
+    objectMan->setAutoFocusRotate( !objectMan->usingAutoFocusRotate() );
+    objectMan->resetAutoCounter();
 }
 
 void InputHandler::handleSelectAll()
 {
-    std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
-    grav->clearSelected();
+    std::vector<RectangleBase*> movableObjects = objectMan->getMovableObjects();
+    objectMan->clearSelected();
     for ( unsigned int i = 0; i < movableObjects.size(); i++ )
     {
         movableObjects[i]->setSelect( true );
-        grav->getSelectedObjects()->push_back( movableObjects[i] );
+        objectMan->getSelectedObjects()->push_back( movableObjects[i] );
     }
 }
 
 void InputHandler::handleToggleGraphicsDebug()
 {
-    grav->setGraphicsDebugMode( !grav->getGraphicsDebugMode() );
+    objectMan->setGraphicsDebugMode( !objectMan->getGraphicsDebugMode() );
 }
 
 void InputHandler::handleDownscaleSelected()
 {
     float scaleAmt = 0.25f;
-    grav->scaleSelectedObjects( scaleAmt * -1.0f );
+    objectMan->scaleSelectedObjects( scaleAmt * -1.0f );
 }
 
 void InputHandler::handleUpscaleSelected()
 {
     float scaleAmt = 0.25f;
-    grav->scaleSelectedObjects( scaleAmt );
+    objectMan->scaleSelectedObjects( scaleAmt );
 }
 
 void InputHandler::handleToggleFullscreen()
@@ -634,22 +635,22 @@ void InputHandler::handleQuit()
 
 void InputHandler::handleClearSelected()
 {
-    grav->clearSelected();
+    objectMan->clearSelected();
 }
 
 void InputHandler::handleAddTestObject()
 {
-    grav->addTestObject();
+    objectMan->addTestObject();
 }
 
 void InputHandler::handleTryDeleteObject()
 {
-    std::vector<RectangleBase*> movableObjects = grav->getMovableObjects();
+    std::vector<RectangleBase*> movableObjects = objectMan->getMovableObjects();
     for ( unsigned int i = 0; i < movableObjects.size(); i++ )
     {
         RectangleBase* obj = movableObjects[i];
         if ( obj->isSelected() )
-            grav->tryDeleteObject( obj );
+            objectMan->tryDeleteObject( obj );
     }
 }
 
@@ -674,7 +675,7 @@ unsigned char InputHandler::htok( int hash )
 std::string InputHandler::htos( int hash )
 {
     char key = htok( hash );
-    std::map<char, std::string>::iterator upIter = unprintables.find(key);
+    std::map<char, std::string>::iterator upIter = unprintables.find( key );
     std::ostringstream sstr;
 
     std::string shi = (hash & wxMOD_SHIFT) ? "shift + " : "";
@@ -684,7 +685,7 @@ std::string InputHandler::htos( int hash )
     sstr << shi << alt << cmd;
 
     if ( upIter != unprintables.end() )
-        sstr << unprintables[key];
+        sstr << unprintables[ key ];
     else
         sstr << key;
 
@@ -744,7 +745,7 @@ void InputHandler::leftClick( bool doubleClick )
     dragPrevX = mouseX;
     dragPrevY = mouseY;
 
-    grav->setBoxSelectDrawing( false );
+    objectMan->setBoxSelectDrawing( false );
 
     // if we didn't click on a video, and we're not holding down ctrl to
     // begin a multi selection, so move the selected video(s) to the
@@ -752,30 +753,30 @@ void InputHandler::leftClick( bool doubleClick )
     selectVideos();
     if ( !clickedInside && !ctrlHeld )
     {
-        if ( !grav->getSelectedObjects()->empty() )
+        if ( !objectMan->getSelectedObjects()->empty() )
         {
             float movePosX = mouseX; float movePosY = mouseY;
             std::vector<RectangleBase*>::const_iterator sli;
 
             float avgX = 0.0f, avgY = 0.0f;
-            int num = grav->getSelectedObjects()->size();
+            int num = objectMan->getSelectedObjects()->size();
 
             if ( num == 1 )
             {
-                if ( (*(grav->getSelectedObjects()))[0]->isUserMovable() )
+                if ( (*(objectMan->getSelectedObjects()))[0]->isUserMovable() )
                 {
-                    (*(grav->getSelectedObjects()))[0]->move( movePosX,
+                    (*(objectMan->getSelectedObjects()))[0]->move( movePosX,
                                                                 movePosY );
                 }
-                (*(grav->getSelectedObjects()))[0]->setSelect( false );
+                (*(objectMan->getSelectedObjects()))[0]->setSelect( false );
             }
             // if moving >1, center the videos around the click point
             // we need to find the average pos beforehand
             else
             {
                 // average the vals
-                for ( sli = grav->getSelectedObjects()->begin();
-                       sli != grav->getSelectedObjects()->end();
+                for ( sli = objectMan->getSelectedObjects()->begin();
+                       sli != objectMan->getSelectedObjects()->end();
                        sli++ )
                 {
                     avgX += (*sli)->getX();
@@ -785,8 +786,8 @@ void InputHandler::leftClick( bool doubleClick )
                 avgY = avgY / num;
 
                 // move and set them to be unselected
-                for ( sli = grav->getSelectedObjects()->begin();
-                       sli != grav->getSelectedObjects()->end();
+                for ( sli = objectMan->getSelectedObjects()->begin();
+                       sli != objectMan->getSelectedObjects()->end();
                        sli++ )
                 {
                     if ( (*sli)->isUserMovable() )
@@ -797,15 +798,15 @@ void InputHandler::leftClick( bool doubleClick )
                     (*sli)->setSelect( false );
                 }
             }
-            grav->getSelectedObjects()->clear();
+            objectMan->getSelectedObjects()->clear();
         }
     }
     // or if we did click on a video...
     else if ( doubleClick )
     {
-        if ( grav->getSelectedObjects()->size() == 1 )
+        if ( objectMan->getSelectedObjects()->size() == 1 )
         {
-            (*grav->getSelectedObjects())[0]->doubleClickAction();
+            (*objectMan->getSelectedObjects())[0]->doubleClickAction();
         }
     }
     else // unused old stuff
@@ -825,7 +826,7 @@ void InputHandler::leftRelease()
     // allow for multiple box selection
     for ( unsigned int i = 0; i < tempSelectedObjects->size(); i++ )
     {
-        grav->getSelectedObjects()->push_back( (*tempSelectedObjects)[i] );
+        objectMan->getSelectedObjects()->push_back( (*tempSelectedObjects)[i] );
     }
     tempSelectedObjects->clear();
     leftButtonHeld = false;
@@ -833,9 +834,9 @@ void InputHandler::leftRelease()
     // if we were doing drag movement, deselect all
     // the getholdcounter check is to prevent user from losing a click selection
     // if they accidentally drag it a tiny bit
-    if ( dragging && grav->getHoldCounter() > 5 )
+    if ( dragging && objectMan->getHoldCounter() > 5 )
     {
-        grav->clearSelected();
+        objectMan->clearSelected();
     }
 
     // since there is no other way to drag (at the moment) without holding down
@@ -855,8 +856,8 @@ void InputHandler::mouseLeftHeldMove()
     if ( clickedInside )
     {
         std::vector<RectangleBase*>::reverse_iterator sli;
-        for ( sli = grav->getSelectedObjects()->rbegin();
-                sli != grav->getSelectedObjects()->rend();
+        for ( sli = objectMan->getSelectedObjects()->rbegin();
+                sli != objectMan->getSelectedObjects()->rend();
                 sli++ )
         {
             // since group members are controlled by the group somewhat,
@@ -869,7 +870,7 @@ void InputHandler::mouseLeftHeldMove()
                                 (dragEndY-dragPrevY) + (*sli)->getY() );
             }
         }
-        grav->setBoxSelectDrawing( false );
+        objectMan->setBoxSelectDrawing( false );
         dragging = true;
     }
     // if we didn't click inside & we're holding the left button, do the box
@@ -883,7 +884,7 @@ void InputHandler::mouseLeftHeldMove()
             (*sli)->setSelect(false);
         tempSelectedObjects->clear();
         selectVideos();
-        grav->setBoxSelectDrawing( true );
+        objectMan->setBoxSelectDrawing( true );
     }
 
     dragPrevX = mouseX;
@@ -899,8 +900,8 @@ bool InputHandler::selectVideos()
     // later in the list will render on top of previous ones
     std::vector<RectangleBase*>::const_iterator sli;
 
-    for ( si = grav->getDrawnObjects()->rbegin();
-            si != grav->getDrawnObjects()->rend(); ++si )
+    for ( si = objectMan->getDrawnObjects()->rbegin();
+            si != objectMan->getDrawnObjects()->rend(); ++si )
     {
         // rectangle that defines the selection area
         float selectL, selectR, selectU, selectD;
@@ -929,7 +930,7 @@ bool InputHandler::selectVideos()
         {
             // clear the list of selected if we're clicking on a new video
             if ( !leftButtonHeld && !(*si)->isSelected() && !ctrlHeld )
-                grav->clearSelected();
+                objectMan->clearSelected();
 
             videoSelected = true;
             RectangleBase* temp = (*si);
@@ -949,7 +950,7 @@ bool InputHandler::selectVideos()
                 if ( leftButtonHeld )
                     tempSelectedObjects->push_back( temp );
                 else
-                    grav->getSelectedObjects()->push_back( temp );
+                    objectMan->getSelectedObjects()->push_back( temp );
             }
             // if what we just clicked on is selected and we're holding ctrl,
             // deselect
@@ -957,19 +958,19 @@ bool InputHandler::selectVideos()
             {
                 temp->setSelect( false );
                 std::vector<RectangleBase*>::iterator sli =
-                                    grav->getSelectedObjects()->begin();
+                                    objectMan->getSelectedObjects()->begin();
                 while ( (*sli) != temp )
                     sli++;
-                grav->getSelectedObjects()->erase( sli );
+                objectMan->getSelectedObjects()->erase( sli );
             }
 
             // take the selected video and put it at the end of the list so
             // it'll be rendered on top - but only if we just clicked on it
             if ( !leftButtonHeld )
             {
-                grav->lockSources();
-                grav->moveToTop( temp );
-                grav->unlockSources();
+                objectMan->lockSources();
+                objectMan->moveToTop( temp );
+                objectMan->unlockSources();
 
                 break; // so we only select one video per click
                        // when single-clicking

@@ -1,5 +1,5 @@
 /*
- * @file gravManager.h
+ * @file ObjectManager.h
  *
  * Header file for major grav functions - holds lists of drawn objects and
  * sources, draws them, executes functions like automatic mode, etc.
@@ -23,8 +23,8 @@
  * along with grav.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GRAVMANAGER_H_
-#define GRAVMANAGER_H_
+#ifndef OBJECTMANAGER_H_
+#define OBJECTMANAGER_H_
 
 #include <wx/wx.h>
 #include <vector>
@@ -51,12 +51,12 @@ class SessionManager;
 class Camera;
 class Point;
 
-class gravManager
+class ObjectManager
 {
 
 public:
-    gravManager();
-    ~gravManager();
+    ObjectManager();
+    ~ObjectManager();
 
     /*
      * The main draw function: draws all objects in drawnObjects, as well as
@@ -294,4 +294,4 @@ private:
 
 };
 
-#endif /*GRAVMANAGER_H_*/
+#endif /*OBJECTMANAGER_H_*/

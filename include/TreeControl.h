@@ -29,7 +29,7 @@
 #include <wx/treectrl.h>
 #include <string>
 
-class gravManager;
+class ObjectManager;
 class RectangleBase;
 
 class TreeControl : public wxTreeCtrl
@@ -55,11 +55,11 @@ public:
     int OnCompareItems( const wxTreeItemId& item1,
                             const wxTreeItemId& item2 );
 
-    void setSourceManager( gravManager* g );
+    void setObjectManager( ObjectManager* o );
 
 private:
     wxTreeItemId rootID;
-    gravManager* sourceManager;
+    ObjectManager* objectMan;
 
 };
 

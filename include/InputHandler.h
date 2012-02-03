@@ -39,7 +39,7 @@ class VideoSource;
 class RectangleBase;
 class Earth;
 class Group;
-class gravManager;
+class ObjectManager;
 class LayoutManager;
 class Frame;
 
@@ -52,7 +52,7 @@ class InputHandler : public wxEvtHandler
 {
 
 public:
-    InputHandler( Earth* e, gravManager* g, Frame* f );
+    InputHandler( Earth* e, ObjectManager* g, Frame* f );
     ~InputHandler();
 
     void wxKeyDown( wxKeyEvent& evt );
@@ -130,7 +130,7 @@ private:
     Earth* earth;
 
     // parent class
-    gravManager* grav;
+    ObjectManager* objectMan;
 
     // main gui window so we can trigger the proper quit sequence
     Frame* mainFrame;
@@ -144,9 +144,6 @@ private:
     int ktoh( unsigned char key, int modifiers ); // key to hash
     unsigned char htok( int keyHash ); // hash to key
     std::string htos( int keyHash ); // Hash to string representation
-
-    // special input modifiers like CTRL
-    int special;
 
     GLdouble mouseX, mouseY;
 

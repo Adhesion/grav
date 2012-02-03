@@ -37,7 +37,7 @@ class SessionTreeControl;
 class SessionGroup;
 class SessionGroupButton;
 class SessionEntry;
-class gravManager;
+class ObjectManager;
 
 #include <vector>
 
@@ -56,7 +56,7 @@ class SessionManager : public Group
 {
 
 public:
-    SessionManager( VideoListener* vl, AudioManager* al, gravManager* g );
+    SessionManager( VideoListener* vl, AudioManager* al, ObjectManager* o );
     ~SessionManager();
 
     void rearrange();
@@ -194,7 +194,7 @@ private:
 
     std::map<SessionType, Group*> sessionMap;
 
-    gravManager* objectManager;
+    ObjectManager* objectManager;
 
     VideoListener* videoSessionListener;
     AudioManager* audioSessionListener;

@@ -24,7 +24,7 @@
 
 #include "VideoListener.h"
 #include "VideoSource.h"
-#include "gravManager.h"
+#include "ObjectManager.h"
 #include "GLCanvas.h"
 #include "Group.h"
 #include "TreeControl.h"
@@ -36,8 +36,8 @@
 
 #include <wx/wx.h>
 
-VideoListener::VideoListener( gravManager* g ) :
-    grav( g )
+VideoListener::VideoListener( ObjectManager* o ) :
+    objectMan( o )
 {
     initialX = -7.5f;
     initialY = 5.7f;
@@ -87,7 +87,7 @@ void VideoListener::vpmsession_source_created( VPMSession &session,
 
         VideoSource* source = new VideoSource( &session, this, ssrc, sink, x,
 													y );
-        grav->addNewSource( source );
+        objectMan->addNewSource( source );
 
         // new frame callback mostly just used for testing
         //sink->addNewFrameCallback( &newFrameCallbackTest, (void*)timer );
@@ -114,8 +114,8 @@ void VideoListener::vpmsession_source_deleted( VPMSession &session,
 {
     gravUtil::logVerbose( "VideoListener::deleting ssrc 0x%08x\n", ssrc );
     std::vector<VideoSource*>::iterator si;
-    for ( si = grav->getSources()->begin();
-            si != grav->getSources()->end(); ++si )
+    for ( si = objectMan->getSources()->begin();
+            si != objectMan->getSources()->end(); ++si )
     {
         if ( &session == (*si)->getSession() && (*si)->getssrc() == ssrc )
         {
@@ -124,7 +124,7 @@ void VideoListener::vpmsession_source_deleted( VPMSession &session,
             sourceCount--;
             updatePixelCount( -( (*si)->getVideoWidth() *
                                  (*si)->getVideoHeight() ) );
-            grav->deleteSource( si );
+            objectMan->deleteSource( si );
             return;
         }
     }
@@ -145,31 +145,32 @@ void VideoListener::vpmsession_source_app( VPMSession &session,
     std::string appS( app, 4 );
     std::string dataS( data, data_len );
 
-    if ( appS.compare( "site" ) == 0 && grav->usingSiteIDGroups() )
+    if ( appS.compare( "site" ) == 0 && objectMan->usingSiteIDGroups() )
     {
-        grav->lockSources();
+        objectMan->lockSources();
 
         // vic sends 4 nulls at the end of the rtcp_app string for some
         // reason, so chop those off
         dataS = std::string( dataS, 0, 32 );
-        std::vector<VideoSource*>::iterator i = grav->getSources()->begin();
+        std::vector<VideoSource*>::iterator i =
+                objectMan->getSources()->begin();
 
         // sometimes, if groups are enabled by default, we can get RTCP APP
         // before we get any sources added, resulting in a crash when we try
         // and dereference the sources pointer - so skip this if we don't have
         // any sources yet
-        if ( grav->getSources()->size() == 0 )
+        if ( objectMan->getSources()->size() == 0 )
         {
-            grav->unlockSources();
+            objectMan->unlockSources();
             return;
         }
 
         while ( (*i)->getssrc() != ssrc )
         {
             ++i;
-            if ( i == grav->getSources()->end() )
+            if ( i == objectMan->getSources()->end() )
             {
-                grav->unlockSources();
+                objectMan->unlockSources();
                 return;
             }
         }
@@ -178,10 +179,10 @@ void VideoListener::vpmsession_source_app( VPMSession &session,
         {
             Group* g;
             std::map<std::string,Group*>::iterator mapi =
-                                     grav->getSiteIDGroups()->find(dataS);
+                    objectMan->getSiteIDGroups()->find( dataS );
 
-            if ( mapi == grav->getSiteIDGroups()->end() )
-                g = grav->createSiteIDGroup( dataS );
+            if ( mapi == objectMan->getSiteIDGroups()->end() )
+                g = objectMan->createSiteIDGroup( dataS );
             else
                 g = mapi->second;
 
@@ -189,16 +190,16 @@ void VideoListener::vpmsession_source_app( VPMSession &session,
             g->add( *i );
 
             // adding & removing will replace the object under its group
-            if ( grav->getTree() )
+            if ( objectMan->getTree() )
             {
-                grav->getTree()->removeObject( (*i) );
-                grav->getTree()->addObject( (*i) );
+                objectMan->getTree()->removeObject( (*i) );
+                objectMan->getTree()->addObject( (*i) );
 
-                grav->getTree()->updateObjectName( g );
+                objectMan->getTree()->updateObjectName( g );
             }
         }
 
-        grav->unlockSources();
+        objectMan->unlockSources();
     }
 }
 

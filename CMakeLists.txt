@@ -90,11 +90,11 @@ set(SOURCES
 	src/GLCanvas.cpp
 	src/GLUtil.cpp
 	src/grav.cpp
-	src/gravManager.cpp
 	src/gravUtil.cpp
 	src/Group.cpp
 	src/InputHandler.cpp
 	src/LayoutManager.cpp
+	src/ObjectManager.cpp
 	src/PNGLoader.cpp
 	src/Point.cpp
 	src/PythonTools.cpp

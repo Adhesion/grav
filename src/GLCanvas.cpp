@@ -23,7 +23,7 @@
  * along with grav.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gravManager.h"
+#include "ObjectManager.h"
 #include "gravUtil.h"
 #include "GLCanvas.h"
 #include "InputHandler.h"
@@ -34,10 +34,10 @@ EVT_PAINT(GLCanvas::handlePaintEvent)
 EVT_SIZE(GLCanvas::resize)
 END_EVENT_TABLE()
 
-GLCanvas::GLCanvas( wxWindow* parent, gravManager* g, int* attributes,
+GLCanvas::GLCanvas( wxWindow* parent, ObjectManager* o, int* attributes,
                         wxSize size ) :
     wxGLCanvas( parent, wxID_ANY, attributes, wxDefaultPosition,
-                wxDefaultSize, 0, wxT("grav GLCanvas")), grav( g )
+                wxDefaultSize, 0, wxT("grav GLCanvas")), objectMan( o )
 {
     SetSize( size );
     glContext = new wxGLContext( this );
@@ -82,8 +82,8 @@ void GLCanvas::draw()
     SetCurrent( *glContext );
     wxPaintDC( this );
 
-    if ( grav != NULL )
-        grav->draw();
+    if ( objectMan != NULL )
+        objectMan->draw();
 
     SwapBuffers();
 
@@ -145,14 +145,14 @@ void GLCanvas::GLreshape( int w, int h )
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(grav->getCamX(), grav->getCamY(), grav->getCamZ(),
+    gluLookAt(objectMan->getCamX(), objectMan->getCamY(), objectMan->getCamZ(),
               0.0, 0.0, -25.0,
               0.0, 1.0, 0.0);
 
     // note this should be done last since stuff inside setwindowsize
     // (finding the world space bounds for the screen) depends on the matrices
     // above being accurate
-    grav->setWindowSize( w, h );
+    objectMan->setWindowSize( w, h );
 }
 
 void GLCanvas::stopTimer()

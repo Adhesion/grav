@@ -29,7 +29,7 @@
 
 #include <wx/wx.h>
 
-class gravManager;
+class ObjectManager;
 class InputHandler;
 class SideFrame;
 
@@ -40,7 +40,7 @@ public:
     Frame( wxWindow* parent, wxWindowID id, const wxString& title );
     Frame( wxWindow* parent, wxWindowID id, const wxString& title,
                     const wxPoint& pos, const wxSize& size );
-    void setSourceManager( gravManager* g );
+    void setObjectManager( ObjectManager* o );
     void setInputHandler( InputHandler* i );
     void spawnPropertyWindow( wxCommandEvent& evt );
 
@@ -60,7 +60,7 @@ private:
     // common close functionality to be accessed by the different entry points
     void cleanupAndDestroy();
 
-    gravManager* grav;
+    ObjectManager* objectMan;
     // reference to input to grab keyboard shortcuts to generate help menu
     InputHandler* input;
 

@@ -25,7 +25,7 @@
 
 #include "RectangleBase.h"
 #include "TreeControl.h"
-#include "gravManager.h"
+#include "ObjectManager.h"
 #include "gravUtil.h"
 #include "TreeNode.h"
 #include "Runway.h"
@@ -47,7 +47,7 @@ TreeControl::TreeControl( wxWindow* parent ) :
 
 TreeControl::~TreeControl()
 {
-    sourceManager->setTree( NULL );
+    objectMan->setTree( NULL );
 }
 
 void TreeControl::addObject( RectangleBase* obj )
@@ -184,7 +184,7 @@ int TreeControl::OnCompareItems( const wxTreeItemId& item1,
         return obj1->getName().compare( obj2->getName() );
 }
 
-void TreeControl::setSourceManager( gravManager* g )
+void TreeControl::setObjectManager( ObjectManager* g )
 {
-    sourceManager = g;
+    objectMan = g;
 }

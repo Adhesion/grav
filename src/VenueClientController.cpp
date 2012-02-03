@@ -24,14 +24,14 @@
  */
 
 #include "VenueClientController.h"
-#include "gravManager.h"
+#include "ObjectManager.h"
 #include "SessionTreeControl.h"
 #include "VenueNode.h"
 #include "gravUtil.h"
 
 VenueClientController::VenueClientController( float _x, float _y,
-                                                gravManager* g )
-    : Group( _x, _y ), grav( g )
+                                                ObjectManager* o )
+    : Group( _x, _y ), objectMan( o )
 {
     locked = false;
     selectable = false;
@@ -101,9 +101,9 @@ void VenueClientController::draw()
 void VenueClientController::remove( RectangleBase* object, bool move )
 {
     Group::remove( object, move );
-    grav->lockSources();
-    grav->removeFromLists( object, false );
-    grav->unlockSources();
+    objectMan->lockSources();
+    objectMan->removeFromLists( object, false );
+    objectMan->unlockSources();
     delete object;
 }
 
@@ -112,9 +112,9 @@ std::vector<RectangleBase*>::iterator VenueClientController::remove(
 {
     RectangleBase* object = (*i);
     std::vector<RectangleBase*>::iterator ret = Group::remove( i, move );
-    grav->lockSources();
-    grav->removeFromLists( object, false );
-    grav->unlockSources();
+    objectMan->lockSources();
+    objectMan->removeFromLists( object, false );
+    objectMan->unlockSources();
     delete object;
     return ret;
 }
@@ -174,9 +174,9 @@ void VenueClientController::updateExitMap()
         node->setName( i->first );
         Texture t = GLUtil::getInstance()->getTexture( "circle" );
         node->setTexture( t.ID, t.width, t.height );
-        grav->lockSources();
-        grav->addToDrawList( node );
-        grav->unlockSources();
+        objectMan->lockSources();
+        objectMan->addToDrawList( node );
+        objectMan->unlockSources();
         add( node );
     }
 }
@@ -349,9 +349,9 @@ void VenueClientController::show( bool s, bool instant )
     else
     {
         rearrange();
-        grav->lockSources();
-        grav->moveToTop( this );
-        grav->unlockSources();
+        objectMan->lockSources();
+        objectMan->moveToTop( this );
+        objectMan->unlockSources();
     }
 }
 

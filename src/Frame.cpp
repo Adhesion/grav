@@ -29,7 +29,7 @@
 #include "InputHandler.h"
 #include "VideoInfoDialog.h"
 #include "SessionTreeControl.h"
-#include "gravManager.h"
+#include "ObjectManager.h"
 #include "InputHandler.h"
 #include "gravUtil.h"
 #include "SideFrame.h"
@@ -51,7 +51,7 @@ EVT_MENU(toggleVCCID, Frame::toggleVCCEvent)
 EVT_MENU(toggleSideFrameID, Frame::toggleSideFrameEvent)
 EVT_MENU(toggleAutomaticID, Frame::toggleAutomaticEvent)
 EVT_MENU_OPEN(Frame::OnMenuOpen)
-END_EVENT_TABLE()
+END_EVENT_TABLE();
 
 Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title ) :
                 wxFrame( parent, id, title, wxDefaultPosition, wxDefaultSize ),
@@ -68,9 +68,9 @@ Frame::Frame( wxWindow* parent, wxWindowID id, const wxString& title,
     setupMenuBar();
 }
 
-void Frame::setSourceManager( gravManager* g )
+void Frame::setObjectManager( ObjectManager* o )
 {
-    grav = g;
+    objectMan = o;
 }
 
 void Frame::setInputHandler( InputHandler* i )
@@ -80,10 +80,10 @@ void Frame::setInputHandler( InputHandler* i )
 
 void Frame::spawnPropertyWindow( wxCommandEvent& evt )
 {
-    for ( unsigned int i = 0; i < grav->getSelectedObjects()->size(); i++ )
+    for ( unsigned int i = 0; i < objectMan->getSelectedObjects()->size(); i++ )
     {
         VideoInfoDialog* dialog = new VideoInfoDialog( this,
-                (*grav->getSelectedObjects())[i] );
+                (*objectMan->getSelectedObjects())[i] );
         dialog->Show();
     }
 }
@@ -187,15 +187,15 @@ void Frame::OnMenuOpen( wxMenuEvent& evt )
     {
         if ( (*i)->GetId() == toggleRunwayID )
         {
-            (*i)->Check( grav->usingRunway() );
+            (*i)->Check( objectMan->usingRunway() );
         }
         else if ( (*i)->GetId() == toggleVCCID )
         {
-            bool showable = grav->isVenueClientControllerShowable();
+            bool showable = objectMan->isVenueClientControllerShowable();
             (*i)->Enable( showable );
             if ( showable )
             {
-                (*i)->Check( grav->isVenueClientControllerShown() );
+                (*i)->Check( objectMan->isVenueClientControllerShown() );
             }
         }
         else if ( (*i)->GetId() == toggleSideFrameID )
@@ -208,7 +208,7 @@ void Frame::OnMenuOpen( wxMenuEvent& evt )
         }
         else if ( (*i)->GetId() == toggleAutomaticID )
         {
-            (*i)->Check( grav->usingAutoFocusRotate() );
+            (*i)->Check( objectMan->usingAutoFocusRotate() );
         }
     }
 }
@@ -284,13 +284,13 @@ SideFrame* Frame::findChildSideFrame()
 
 void Frame::toggleRunwayEvent( wxCommandEvent& evt )
 {
-    grav->setRunwayUsage( !grav->usingRunway() );
-    grav->clearSelected();
+    objectMan->setRunwayUsage( !objectMan->usingRunway() );
+    objectMan->clearSelected();
 }
 
 void Frame::toggleVCCEvent( wxCommandEvent& evt )
 {
-    grav->toggleShowVenueClientController();
+    objectMan->toggleShowVenueClientController();
 }
 
 void Frame::toggleSideFrameEvent( wxCommandEvent& evt )
@@ -304,6 +304,6 @@ void Frame::toggleSideFrameEvent( wxCommandEvent& evt )
 
 void Frame::toggleAutomaticEvent( wxCommandEvent& evt )
 {
-    grav->setAutoFocusRotate( !grav->usingAutoFocusRotate() );
-    grav->resetAutoCounter();
+    objectMan->setAutoFocusRotate( !objectMan->usingAutoFocusRotate() );
+    objectMan->resetAutoCounter();
 }
