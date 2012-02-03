@@ -131,6 +131,8 @@ ObjectManager::ObjectManager()
 
 ObjectManager::~ObjectManager()
 {
+    ungroupSiteIDGroups();
+
     doDelayedDelete();
 
     delete sources;
@@ -483,7 +485,7 @@ void ObjectManager::clearSelected()
     selectedObjects->clear();
 }
 
-void ObjectManager::ungroupAll()
+void ObjectManager::ungroupSiteIDGroups()
 {
     lockSources();
 
@@ -939,6 +941,10 @@ bool ObjectManager::usingSiteIDGroups()
 void ObjectManager::setSiteIDGrouping( bool site )
 {
     enableSiteIDGroups = site;
+    if ( !site )
+    {
+        ungroupSiteIDGroups();
+    }
 }
 
 int ObjectManager::getHoldCounter()

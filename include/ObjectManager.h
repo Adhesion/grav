@@ -65,7 +65,7 @@ public:
     void draw();
 
     void clearSelected();
-    void ungroupAll();
+    void ungroupSiteIDGroups();
 
     void addTestObject();
     /*

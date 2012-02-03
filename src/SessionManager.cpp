@@ -64,6 +64,8 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     selectable = false;
     userMovable = false;
 
+    rearrangeStyle = ONECOLUMN;
+
     setBorderScale( 0.05f );
 
     setName( "Session Manager" );

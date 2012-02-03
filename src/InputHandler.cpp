@@ -533,16 +533,7 @@ void InputHandler::handleMoveAllToCenter()
 
 void InputHandler::handleToggleSiteGrouping()
 {
-    // TODO -- condense this with a bang
-    if ( objectMan->usingSiteIDGroups() )
-    {
-        objectMan->setSiteIDGrouping( false );
-        objectMan->ungroupAll();
-    }
-    else
-    {
-        objectMan->setSiteIDGrouping( true );
-    }
+    objectMan->setSiteIDGrouping( !objectMan->usingSiteIDGroups() );
 }
 
 void InputHandler::handleToggleShowVenueClientController()

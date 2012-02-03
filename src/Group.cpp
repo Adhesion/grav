@@ -42,7 +42,7 @@ Group::Group( float _x, float _y ) :
     showLockStatus = true;
     preserveChildAspect = true;
 
-    rearrangeStyle = ONECOLUMN;
+    rearrangeStyle = ASPECT;
 
     buffer = 1.0f;
 }
