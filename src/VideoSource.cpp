@@ -287,7 +287,7 @@ void VideoSource::resizeBuffer()
     else
         aspect = 1.33f;
 
-    tex_width = GLUtil::getInstance()->pow2(vwidth);
+    tex_width = GLUtil::getInstance()->pow2( vwidth );
     if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
         tex_height = GLUtil::getInstance()->pow2( 3*vheight/2 );
     else
@@ -300,18 +300,20 @@ void VideoSource::resizeBuffer()
 
     // if it's not the first time we're allocating a texture
     // (ie, it's a resize) delete the previous texture
-    if ( !init ) glDeleteTextures( 1, &texid );
-    glGenTextures(1, &texid);
+    if ( !init )
+        glDeleteTextures( 1, &texid );
 
-    glBindTexture(GL_TEXTURE_2D, texid);
+    glGenTextures( 1, &texid );
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glBindTexture( GL_TEXTURE_2D, texid );
 
-    unsigned char *buffer = new unsigned char[tex_width * tex_height * 3];
-    memset(buffer, 128, tex_width * tex_height * 3);
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
+    unsigned char *buffer = new unsigned char[ tex_width * tex_height * 3 ];
+    memset( buffer, 128, tex_width * tex_height * 3 );
     glTexImage2D( GL_TEXTURE_2D,
                   0,
                   GL_RGB,
@@ -320,8 +322,8 @@ void VideoSource::resizeBuffer()
                   0,
                   GL_LUMINANCE,
                   GL_UNSIGNED_BYTE,
-                  buffer);
-    delete [] buffer;
+                  buffer );
+    delete[] buffer;
 
     // update text bounds since the width might be different
     updateTextBounds();
