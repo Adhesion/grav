@@ -47,7 +47,7 @@ int SessionTreeControl::disableEncryptionID = wxNewId();
 
 BEGIN_EVENT_TABLE(SessionTreeControl, wxTreeCtrl)
 EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY, SessionTreeControl::itemRightClick)
-END_EVENT_TABLE()
+END_EVENT_TABLE();
 
 SessionTreeControl::SessionTreeControl() :
     wxTreeCtrl( NULL, wxID_ANY )

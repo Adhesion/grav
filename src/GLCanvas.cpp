@@ -32,7 +32,7 @@
 BEGIN_EVENT_TABLE(GLCanvas, wxGLCanvas)
 EVT_PAINT(GLCanvas::handlePaintEvent)
 EVT_SIZE(GLCanvas::resize)
-END_EVENT_TABLE()
+END_EVENT_TABLE();
 
 GLCanvas::GLCanvas( wxWindow* parent, ObjectManager* o, int* attributes,
                         wxSize size ) :

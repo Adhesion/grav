@@ -35,7 +35,7 @@ int SideFrame::rotateID = wxNewId();
 
 BEGIN_EVENT_TABLE(SideFrame, wxFrame)
 EVT_CLOSE(SideFrame::OnCloseWindow)
-END_EVENT_TABLE()
+END_EVENT_TABLE();
 
 SideFrame::SideFrame( wxWindow* parent, wxWindowID id, const wxString& title ) :
                 wxFrame( parent, id, title, wxDefaultPosition, wxDefaultSize )

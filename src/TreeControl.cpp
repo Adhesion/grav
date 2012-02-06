@@ -32,7 +32,7 @@
 
 #include <wx/wx.h>
 
-IMPLEMENT_DYNAMIC_CLASS( TreeControl, wxTreeCtrl )
+IMPLEMENT_DYNAMIC_CLASS( TreeControl, wxTreeCtrl );
 
 TreeControl::TreeControl() :
     wxTreeCtrl( NULL, wxID_ANY )

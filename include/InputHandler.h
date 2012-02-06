@@ -177,7 +177,7 @@ private:
     // "ctrl only" etc.
     int modifiers;
 
-    DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE();
 
 };
 
