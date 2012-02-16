@@ -45,6 +45,17 @@ RectangleBase::RectangleBase( float _x, float _y )
     move( _x, _y );
 }
 
+RectangleBase::RectangleBase( float l, float r, float u, float d )
+{
+    setDefaults();
+    x = -15.0f; y = 15.0f; z = 0.0f;
+
+    printf( "RectBase(): %f, %f, %f, %f\n", l, r, u, d );
+
+    setScale( r - l, u - d );
+    move( ( r + l ) / 2.0f, ( u + d ) / 2.0f );
+}
+
 RectangleBase::RectangleBase( const RectangleBase& other )
 {
     x = other.x; y = other.y; z = other.z;
@@ -284,6 +295,46 @@ float RectangleBase::getDestDBound()
     return destY - (getDestHeight()/2.0f);
 }
 
+float RectangleBase::getTotalLBound()
+{
+    return x - (getTotalWidth()/2.0f) + getCenterOffsetX();
+}
+
+float RectangleBase::getTotalRBound()
+{
+    return x + (getTotalWidth()/2.0f) + getCenterOffsetX();
+}
+
+float RectangleBase::getTotalUBound()
+{
+    return y + (getTotalHeight()/2.0f) + getCenterOffsetY();
+}
+
+float RectangleBase::getTotalDBound()
+{
+    return y - (getTotalHeight()/2.0f) + getCenterOffsetY();
+}
+
+float RectangleBase::getDestTotalLBound()
+{
+    return destX - (getDestTotalWidth()/2.0f) + getDestCenterOffsetX();
+}
+
+float RectangleBase::getDestTotalRBound()
+{
+    return destX + (getDestTotalWidth()/2.0f) + getDestCenterOffsetX();
+}
+
+float RectangleBase::getDestTotalUBound()
+{
+    return destY + (getDestTotalHeight()/2.0f) + getDestCenterOffsetY();
+}
+
+float RectangleBase::getDestTotalDBound()
+{
+    return destY - (getDestTotalHeight()/2.0f) + getDestCenterOffsetY();
+}
+
 Vector RectangleBase::getNormal()
 {
     return normal;
@@ -507,42 +558,50 @@ void RectangleBase::setBorderScale( float b )
 
 void RectangleBase::fillToRect( RectangleBase r, bool full )
 {
-    fillToRect( r.getDestLBound(), r.getDestRBound(), r.getDestUBound(),
-                    r.getDestDBound(), full );
-}
-
-void RectangleBase::fillToRect( float innerL, float innerR,
-                                float innerU, float innerD, bool full )
-{
-    float spaceAspect = fabs( ( innerR - innerL ) / ( innerU - innerD ) );
+    gravUtil::logMessage( "RectBase::fillToRect with rect input %f x %f at %f, %f (full %i)\n",
+            r.getDestWidth(), r.getDestHeight(), r.getDestX(), r.getDestY(), full );
+    float spaceAspect = r.getDestWidth() / r.getDestHeight();
 
     // full sizes the object such that the inner part of the rect will match
     // the argument rect, full = false sizes it such that the border and text
     // fit in the argument rect (hence using total width/height)
     if ( full )
     {
-        float objectAspect = getWidth() / getHeight();
+        float objectAspect = getDestWidth() / getDestHeight();
 
         if ( ( spaceAspect - objectAspect ) > 0.01f )
-            setHeight( innerU - innerD );
+            setHeight( r.getDestHeight() );
         else
-            setWidth( innerR - innerL );
+            setWidth( r.getDestWidth() );
 
-        move( ( innerR + innerL ) / 2.0f, ( innerU + innerD ) / 2.0f );
+        move( r.getDestX(), r.getDestY() );
     }
     else
     {
-        float objectAspect = getTotalWidth() / getTotalHeight();
+        float objectAspect = getDestTotalWidth() / getDestTotalHeight();
+
+        gravUtil::logMessage( "aspects: %f -> %f\n", objectAspect, spaceAspect );
 
         if ( ( spaceAspect - objectAspect ) > 0.01f )
-            setTotalHeight( innerU - innerD );
+            setTotalHeight( r.getDestHeight() );
         else
-            setTotalWidth( innerR - innerL );
+            setTotalWidth( r.getDestWidth() );
+
         // TODO need to change this if getCenterOffsetX() is ever meaningful
         // and maybe the above one as well
-        move( ( innerR + innerL ) / 2.0f,
-              ( ( innerU + innerD ) / 2.0f ) - getCenterOffsetY() );
+        move( r.getDestX(), r.getDestY() - getCenterOffsetY() );
     }
+
+    gravUtil::logMessage( "RectBase::fillToRect with rect input end at %f x %f (full %i)\n", getDestTotalWidth(), getDestTotalHeight(), full );
+}
+
+void RectangleBase::fillToRect( float innerL, float innerR,
+                                float innerU, float innerD, bool full )
+{
+    gravUtil::logMessage( "RectBase::fillToRect non-rect %f x %f (%f,%f %f,%f (full %i))\n",
+            innerR - innerL, innerU - innerD, innerL, innerR, innerU, innerD, full );
+
+    fillToRect( RectangleBase( innerL, innerR, innerU, innerD ), full );
 }
 
 void RectangleBase::setTexture( GLuint tex, int width, int height )
@@ -816,6 +875,7 @@ bool RectangleBase::updateName()
 
 void RectangleBase::updateTextBounds()
 {
+    printf( "RectBase::updateTextBounds()\n" );
     if ( font )
     {
         nameSizeDirty = true;
@@ -1152,9 +1212,14 @@ void RectangleBase::drawBorder( float Xdist, float Ydist, float s, float t )
  */
 void RectangleBase::delayedNameSizeUpdate()
 {
-    float oldHeight = getDestTotalHeight();
-    float oldOffsetX = getCenterOffsetX();
-    float oldOffsetY = getCenterOffsetY();
+    // get o version of this to compare size
+    // set its total size - bit of a hack to account for aspect ratio changes in
+    // potential subclasses
+    RectangleBase old( getDestTotalLBound(), getDestTotalRBound(), getDestTotalUBound(), getDestTotalDBound() );
+    gravUtil::logMessage( "RectBase::delayed name size update: current %s\n", getName().c_str() );
+    gravUtil::logMessage( "\tcomparison: \n\t\tcurrent %fx%f (%fx%f), (%f, %f) vs\n\t\told %fx%f (%fx%f), (%f, %f)\n",
+            getDestWidth(), getDestHeight(), getDestTotalWidth(), getDestTotalHeight(), getDestX(), getDestY(),
+            old.getDestWidth(), old.getDestHeight(), old.getDestTotalWidth(), old.getDestTotalHeight(), old.getDestX(), old.getDestY() );
     cutoffPos = -1;
     textBounds = font->BBox( getSubName().c_str() );
     // only do cutoff if title is at top - so if centered (or other?)
@@ -1181,13 +1246,14 @@ void RectangleBase::delayedNameSizeUpdate()
     }
 
     // also, since the text bounds might change, fix the height/pos
-    if ( fabs( oldHeight - getDestTotalHeight() ) > 0.001f &&
+    /*if ( fabs( oldHeight - getDestTotalHeight() ) > 0.001f &&
          ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS ) )
     {
         setTotalHeight( oldHeight );
         move( destX - ( getCenterOffsetX() - oldOffsetX ),
               destY - ( getCenterOffsetY() - oldOffsetY ) );
-    }
+    }*/
+    fillToRect( old, false );
 
     nameSizeDirty = false;
 }

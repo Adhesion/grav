@@ -59,6 +59,7 @@ class RectangleBase
 public:
     RectangleBase();
     RectangleBase( float _x, float _y );
+    RectangleBase( float l, float r, float u, float d );
     RectangleBase( const RectangleBase& other );
     virtual ~RectangleBase();
 
@@ -80,8 +81,7 @@ public:
     float getBorderScale();
 
     /*
-     * Boundaries of the object, for both current & final positions. Note that
-     * these do not include border/text.
+     * Boundaries of the object, for both current & final positions.
      */
     float getLBound();
     float getRBound();
@@ -92,6 +92,16 @@ public:
     float getDestRBound();
     float getDestUBound();
     float getDestDBound();
+
+    float getTotalLBound();
+    float getTotalRBound();
+    float getTotalUBound();
+    float getTotalDBound();
+
+    float getDestTotalLBound();
+    float getDestTotalRBound();
+    float getDestTotalUBound();
+    float getDestTotalDBound();
 
     Vector getNormal();
 
