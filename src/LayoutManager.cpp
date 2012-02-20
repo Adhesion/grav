@@ -63,15 +63,17 @@ bool LayoutManager::arrange( std::string method,
         std::map<std::string, std::vector<RectangleBase*> > data,
         std::map<std::string, std::string> options )
 {
-    float outerL = outerRect.getDestLBound();
-    float outerR = outerRect.getDestRBound();
-    float outerU = outerRect.getDestUBound();
-    float outerD = outerRect.getDestDBound();
+    Bounds outerBounds = outerRect.getDestBounds();
+    float outerL = outerBounds.L;
+    float outerR = outerBounds.R;
+    float outerU = outerBounds.U;
+    float outerD = outerBounds.D;
 
-    float innerL = innerRect.getDestLBound();
-    float innerR = innerRect.getDestRBound();
-    float innerU = innerRect.getDestUBound();
-    float innerD = innerRect.getDestDBound();
+    Bounds innerBounds = innerRect.getDestBounds();
+    float innerL = innerBounds.L;
+    float innerR = innerBounds.R;
+    float innerU = innerBounds.U;
+    float innerD = innerBounds.D;
 
     return arrange(method,
             outerL, outerR, outerU, outerD,
@@ -373,8 +375,8 @@ bool LayoutManager::gridArrange( float outerL, float outerR,
     {
         for ( unsigned int i = 0; i < objects.size(); i++ )
         {
-            float objectAspect =
-                       objects[i]->getDestTotalWidth()/objects[i]->getDestTotalHeight();
+            float objectAspect = objects[i]->getDestTotalWidth() /
+                                 objects[i]->getDestTotalHeight();
             float aspect = 1.0f;
             float newWidth = 1.0f;
             float newHeight = 1.0f;

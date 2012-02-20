@@ -353,11 +353,12 @@ void ObjectManager::draw()
     {
         // make an exception here to do intersect including border
         float border = sessionManager->getBorderSize();
+        Bounds bounds = sessionManager->getBounds();
         bool sessionMouseover =
-                   input->getMouseX() > sessionManager->getLBound() - border &&
-                   input->getMouseX() < sessionManager->getRBound() + border &&
-                   input->getMouseY() < sessionManager->getUBound() + border &&
-                   input->getMouseY() > sessionManager->getDBound() - border;
+                   input->getMouseX() > bounds.L - border &&
+                   input->getMouseX() < bounds.R + border &&
+                   input->getMouseY() < bounds.U + border &&
+                   input->getMouseY() > bounds.D - border;
         if ( sessionMouseover )
         {
             // keep sessionmanager on top, including if new videos come in
@@ -423,8 +424,9 @@ void ObjectManager::draw()
         glEnable( GL_BLEND );
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glColor4f( 0.953f, 0.431f, 0.129f, 0.5f );
-        float textXPos = screenRectFull.getLBound() + textOffset;
-        float textYPos = screenRectFull.getUBound() -
+        Bounds screenBounds = screenRectFull.getBounds();
+        float textXPos = screenBounds.L + textOffset;
+        float textYPos = screenBounds.U -
                 ( ( headerTextBox.Upper().Yf() - headerTextBox.Lower().Yf() )
                         * textScale ) - textOffset;
         glTranslatef( textXPos, textYPos, 0.0f );
@@ -446,7 +448,8 @@ void ObjectManager::draw()
         long drawTime = canvas->getDrawTime();
         float color = (33.0f - (float)drawTime) / 17.0f;
         glColor4f( 1.0f, color, color, 0.8f );
-        glTranslatef( 0.0f, screenRectFull.getUBound() * 0.9f, 0.0f );
+        Bounds screenBounds = screenRectFull.getBounds();
+        glTranslatef( 0.0f, screenBounds.U * 0.9f, 0.0f );
         float debugScale = textScale / 2.5f;
         glScalef( debugScale, debugScale, debugScale );
         char text[100];
@@ -905,32 +908,31 @@ void ObjectManager::setWindowSize( int w, int h )
 
 void ObjectManager::recalculateRectSizes()
 {
-    float screenU = screenRectFull.getDestUBound();
-    float screenD = screenRectFull.getDestDBound();
-    float screenL = screenRectFull.getDestLBound();
-    float screenR = screenRectFull.getDestRBound();
+    Bounds screenBounds = screenRectFull.getDestBounds();
     // if we have header, make the sub rectangle smaller accordingly
     // same for moving runway down, and shifting sub to the right because of the
     // runway
-    float top = screenU;
-    float left = screenL;
+    float top = screenBounds.U;
+    float left = screenBounds.L;
     if ( useHeader )
-        top = screenU - ( 2.0f * textOffset ) -
+        top = screenBounds.U - ( 2.0f * textOffset ) -
                 ( ( headerTextBox.Upper().Yf() - headerTextBox.Lower().Yf() )
                     * textScale );
 
     // resize the runway to go on the left side
     // TODO: make this work for horizontal, vertical, let user change it
-    runway->setScale( fabs( screenR - screenL ) * 0.07f,
-                      fabs( top - screenD ) * 0.93f, true );
-    runway->setPos( screenL + (fabs( top - screenD ) * 0.035f) +
-                  runway->getDestWidth() / 2.0f, ( top + screenD ) / 2.0f );
+    runway->setScale( ( screenBounds.R - screenBounds.L ) * 0.07f,
+                      ( top - screenBounds.D ) * 0.93f, true );
+    runway->setPos( screenBounds.L + ( ( top - screenBounds.D ) * 0.035f) +
+                        runway->getDestWidth() / 2.0f,
+                    ( top + screenBounds.D ) / 2.0f );
 
     if ( useRunway )
-       left = screenL + (fabs( top - screenD ) * 0.035f * 2.0f) +
-               ( fabs( screenR - screenL ) * 0.07f );
-    screenRectSub.setPos( (left+screenR)/2.0f, (top+screenD)/2.0f);
-    screenRectSub.setScale( screenR-left, top-screenD );
+       left = screenBounds.L + ( ( top - screenBounds.D ) * 0.035f * 2.0f) +
+               ( ( screenBounds.R - screenBounds.L ) * 0.07f );
+    screenRectSub.setPos( ( left + screenBounds.R ) / 2.0f,
+                          ( top + screenBounds.D ) / 2.0f );
+    screenRectSub.setScale( screenBounds.R - left, top - screenBounds.D );
 }
 
 bool ObjectManager::usingSiteIDGroups()

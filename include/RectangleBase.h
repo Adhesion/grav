@@ -41,6 +41,14 @@ typedef struct
     float A;
 } RGBAColor;
 
+typedef struct
+{
+    float L;
+    float R;
+    float U;
+    float D;
+} Bounds;
+
 enum TextStyle
 {
     TOPTEXT,
@@ -83,25 +91,10 @@ public:
     /*
      * Boundaries of the object, for both current & final positions.
      */
-    float getLBound();
-    float getRBound();
-    float getUBound();
-    float getDBound();
-
-    float getDestLBound();
-    float getDestRBound();
-    float getDestUBound();
-    float getDestDBound();
-
-    float getTotalLBound();
-    float getTotalRBound();
-    float getTotalUBound();
-    float getTotalDBound();
-
-    float getDestTotalLBound();
-    float getDestTotalRBound();
-    float getDestTotalUBound();
-    float getDestTotalDBound();
+    Bounds getBounds();
+    Bounds getDestBounds();
+    Bounds getTotalBounds();
+    Bounds getDestTotalBounds();
 
     Vector getNormal();
 

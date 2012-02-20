@@ -202,8 +202,8 @@ void SessionManager::rearrange()
     // ...now arrange button
     if ( avButton != NULL )
     {
-        avButton->move( availableVideoSessions->getDestLBound(),
-                availableVideoSessions->getDestDBound() );
+        Bounds avBounds = availableVideoSessions->getDestBounds();
+        avButton->move( avBounds.L, avBounds.D );
         avButton->setHeight( availableVideoSessions->getDestHeight() * 0.6f );
     }
 }

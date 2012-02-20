@@ -56,7 +56,7 @@ void SessionGroup::draw()
 
     if ( rotating && timer != NULL )
     {
-        float xPos = getLBound() + ( scaleX * timer->getProgress() );
+        float xPos = getBounds().L + ( scaleX * timer->getProgress() );
         float size = scaleY / 4.0f;
 
         glPushMatrix();

@@ -255,84 +255,44 @@ float RectangleBase::getDestHeight()
     return destScaleY;
 }
 
-float RectangleBase::getLBound()
+Bounds RectangleBase::getBounds()
 {
-    return x - (getWidth()/2.0f);
+    Bounds b;
+    b.L = x - (getWidth()/2.0f);
+    b.R = x + (getWidth()/2.0f);
+    b.U = y + (getHeight()/2.0f);
+    b.D = y - (getHeight()/2.0f);
+    return b;
 }
 
-float RectangleBase::getRBound()
+Bounds RectangleBase::getDestBounds()
 {
-    return x + (getWidth()/2.0f);
+    Bounds b;
+    b.L = destX - (getDestWidth()/2.0f);
+    b.R = destX + (getDestWidth()/2.0f);
+    b.U = destY + (getDestHeight()/2.0f);
+    b.D = destY - (getDestHeight()/2.0f);
+    return b;
 }
 
-float RectangleBase::getUBound()
+Bounds RectangleBase::getTotalBounds()
 {
-    return y + (getHeight()/2.0f);
+    Bounds b;
+    b.L = x - (getTotalWidth()/2.0f) + getCenterOffsetX();
+    b.R = x + (getTotalWidth()/2.0f) + getCenterOffsetX();
+    b.U = y + (getTotalHeight()/2.0f) + getCenterOffsetY();
+    b.D = y - (getTotalHeight()/2.0f) + getCenterOffsetY();
+    return b;
 }
 
-float RectangleBase::getDBound()
+Bounds RectangleBase::getDestTotalBounds()
 {
-    return y - (getHeight()/2.0f);
-}
-
-float RectangleBase::getDestLBound()
-{
-    return destX - (getDestWidth()/2.0f);
-}
-
-float RectangleBase::getDestRBound()
-{
-    return destX + (getDestWidth()/2.0f);
-}
-
-float RectangleBase::getDestUBound()
-{
-    return destY + (getDestHeight()/2.0f);
-}
-
-float RectangleBase::getDestDBound()
-{
-    return destY - (getDestHeight()/2.0f);
-}
-
-float RectangleBase::getTotalLBound()
-{
-    return x - (getTotalWidth()/2.0f) + getCenterOffsetX();
-}
-
-float RectangleBase::getTotalRBound()
-{
-    return x + (getTotalWidth()/2.0f) + getCenterOffsetX();
-}
-
-float RectangleBase::getTotalUBound()
-{
-    return y + (getTotalHeight()/2.0f) + getCenterOffsetY();
-}
-
-float RectangleBase::getTotalDBound()
-{
-    return y - (getTotalHeight()/2.0f) + getCenterOffsetY();
-}
-
-float RectangleBase::getDestTotalLBound()
-{
-    return destX - (getDestTotalWidth()/2.0f) + getDestCenterOffsetX();
-}
-
-float RectangleBase::getDestTotalRBound()
-{
-    return destX + (getDestTotalWidth()/2.0f) + getDestCenterOffsetX();
-}
-
-float RectangleBase::getDestTotalUBound()
-{
-    return destY + (getDestTotalHeight()/2.0f) + getDestCenterOffsetY();
-}
-
-float RectangleBase::getDestTotalDBound()
-{
-    return destY - (getDestTotalHeight()/2.0f) + getDestCenterOffsetY();
+    Bounds b;
+    b.L = destX - (getDestTotalWidth()/2.0f) + getDestCenterOffsetX();
+    b.R = destX + (getDestTotalWidth()/2.0f) + getDestCenterOffsetX();
+    b.U = destY + (getDestTotalHeight()/2.0f) + getDestCenterOffsetY();
+    b.D = destY - (getDestTotalHeight()/2.0f) + getDestCenterOffsetY();
+    return b;
 }
 
 Vector RectangleBase::getNormal()
@@ -558,8 +518,8 @@ void RectangleBase::setBorderScale( float b )
 
 void RectangleBase::fillToRect( RectangleBase r, bool full )
 {
-    gravUtil::logMessage( "RectBase::fillToRect with rect input %f x %f at %f, %f (full %i)\n",
-            r.getDestWidth(), r.getDestHeight(), r.getDestX(), r.getDestY(), full );
+    //gravUtil::logMessage( "RectBase::fillToRect with rect input %f x %f at %f, %f (full %i)\n",
+    //        r.getDestWidth(), r.getDestHeight(), r.getDestX(), r.getDestY(), full );
     float spaceAspect = r.getDestWidth() / r.getDestHeight();
 
     // full sizes the object such that the inner part of the rect will match
@@ -592,14 +552,14 @@ void RectangleBase::fillToRect( RectangleBase r, bool full )
         move( r.getDestX(), r.getDestY() - getCenterOffsetY() );
     }
 
-    gravUtil::logMessage( "RectBase::fillToRect with rect input end at %f x %f (full %i)\n", getDestTotalWidth(), getDestTotalHeight(), full );
+    //gravUtil::logMessage( "RectBase::fillToRect with rect input end at %f x %f (full %i)\n", getDestTotalWidth(), getDestTotalHeight(), full );
 }
 
 void RectangleBase::fillToRect( float innerL, float innerR,
                                 float innerU, float innerD, bool full )
 {
-    gravUtil::logMessage( "RectBase::fillToRect non-rect %f x %f (%f,%f %f,%f (full %i))\n",
-            innerR - innerL, innerU - innerD, innerL, innerR, innerU, innerD, full );
+    //gravUtil::logMessage( "RectBase::fillToRect non-rect %f x %f (%f,%f %f,%f (full %i))\n",
+    //        innerR - innerL, innerU - innerD, innerL, innerR, innerU, innerD, full );
 
     fillToRect( RectangleBase( innerL, innerR, innerU, innerD ), full );
 }
@@ -892,26 +852,26 @@ void RectangleBase::setSubstring( int start, int end )
 
 bool RectangleBase::intersect( float L, float R, float U, float D )
 {
-    return !( L > getRBound() || R < getLBound() ||
-              D > getUBound() || U < getDBound() );
+    Bounds b = getBounds();
+    return !( L > b.R || R < b.L || D > b.U || U < b.D );
 }
 
 bool RectangleBase::intersect( RectangleBase* other )
 {
-    return intersect( other->getLBound(), other->getRBound(),
-                      other->getUBound(), other->getDBound() );
+    Bounds ob = other->getBounds();
+    return intersect( ob.L, ob.R, ob.U, ob.D );
 }
 
 bool RectangleBase::destIntersect( float L, float R, float U, float D )
 {
-    return !( L > getDestRBound() || R < getDestLBound() ||
-              D > getDestUBound() || U < getDestDBound() );
+    Bounds b = getDestBounds();
+    return !( L > b.R || R < b.L || D > b.U || U < b.D );
 }
 
 bool RectangleBase::destIntersect( RectangleBase* other )
 {
-    return destIntersect( other->getDestLBound(), other->getDestRBound(),
-                          other->getDestUBound(), other->getDestDBound() );
+    Bounds ob = other->getDestBounds();
+    return destIntersect( ob.L, ob.R, ob.U, ob.D );
 }
 
 void RectangleBase::doubleClickAction()
@@ -1215,7 +1175,8 @@ void RectangleBase::delayedNameSizeUpdate()
     // get o version of this to compare size
     // set its total size - bit of a hack to account for aspect ratio changes in
     // potential subclasses
-    RectangleBase old( getDestTotalLBound(), getDestTotalRBound(), getDestTotalUBound(), getDestTotalDBound() );
+    Bounds oldBounds = getDestTotalBounds();
+    RectangleBase old( oldBounds.L, oldBounds.R, oldBounds.U, oldBounds.D );
     gravUtil::logMessage( "RectBase::delayed name size update: current %s\n", getName().c_str() );
     gravUtil::logMessage( "\tcomparison: \n\t\tcurrent %fx%f (%fx%f), (%f, %f) vs\n\t\told %fx%f (%fx%f), (%f, %f)\n",
             getDestWidth(), getDestHeight(), getDestTotalWidth(), getDestTotalHeight(), getDestX(), getDestY(),
@@ -1226,7 +1187,6 @@ void RectangleBase::delayedNameSizeUpdate()
     // display whole name even if it goes out of bounds
     while ( titleStyle == TOPTEXT && getTextWidth() > getWidth() )
     {
-        //relativeTextScale = 0.0009 * ( getWidth() / getTextWidth() );
         if ( nameStart == -1 || nameEnd == -1 )
         {
             nameStart = 0;

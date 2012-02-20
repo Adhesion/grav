@@ -242,9 +242,9 @@ void Group::rearrange( std::vector<RectangleBase*> inObjs )
         break;
     }
 
+    Bounds destBounds = getDestBounds();
     layouts.arrange( "grid",
-                     getDestLBound(), getDestRBound(),
-                     getDestUBound(), getDestDBound(),
+                     destBounds.L, destBounds.R, destBounds.U, destBounds.D,
                      0, 0, 0, 0,
                      data, opts );
 }
