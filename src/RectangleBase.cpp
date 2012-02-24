@@ -54,6 +54,23 @@ RectangleBase::RectangleBase( float l, float r, float u, float d )
 
     setScale( r - l, u - d );
     move( ( r + l ) / 2.0f, ( u + d ) / 2.0f );
+
+    printf( "Rect constructor from bounds\n" );
+    printf( "Grouped? %i\n", isGrouped() );
+}
+
+RectangleBase::RectangleBase( Bounds b )
+{
+    setDefaults();
+    x = -15.0f; y = 15.0f; z = 0.0f;
+
+    printf( "RectBase(): %f, %f, %f, %f\n", b.L, b.R, b.U, b.D );
+
+    setScale( b.R - b.L, b.U - b.D );
+    move( ( b.R + b.L ) / 2.0f, ( b.U + b.D ) / 2.0f );
+
+    printf( "Rect constructor from bounds\n" );
+    printf( "Grouped? %i\n", isGrouped() );
 }
 
 RectangleBase::RectangleBase( const RectangleBase& other )
@@ -64,6 +81,9 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     destScaleX = other.destScaleX; destScaleY = other.destScaleY;
     xAngle = other.xAngle; yAngle = other.yAngle; zAngle = other.zAngle;
     normal = other.normal;
+
+    intendedWidth = other.intendedWidth;
+    intendedHeight = other.intendedHeight;
 
     effectVal = other.effectVal;
 
@@ -144,7 +164,7 @@ void RectangleBase::setDefaults()
 
     shown = true;
 
-    debugDraw = false;
+    debugDraw = true;
 
     relativeTextScale = 0.0009;
     titleStyle = TOPTEXT;
@@ -183,8 +203,8 @@ void RectangleBase::setDefaults()
 
     font = GLUtil::getInstance()->getMainFont();
 
-    //borderTex = PNGLoader::loadPNG( "/home/andrew/work/src/grav/Debug/border.png",
-    //                                twidth, theight );
+    intendedWidth = getDestTotalWidth();
+    intendedHeight = getDestTotalHeight();
 }
 
 float RectangleBase::getWidth()
@@ -440,6 +460,7 @@ void RectangleBase::move( float _x, float _y )
     }
     else
         positionAnimating = true;
+
 }
 
 void RectangleBase::setPos( float _x, float _y )
@@ -458,6 +479,9 @@ void RectangleBase::setScale( float xs, float ys )
     }
     else
         scaleAnimating = true;
+
+    intendedWidth = getDestTotalWidth();
+    intendedHeight = getDestTotalHeight();
 }
 
 void RectangleBase::setScale( float xs, float ys, bool resizeMembers )
@@ -518,8 +542,8 @@ void RectangleBase::setBorderScale( float b )
 
 void RectangleBase::fillToRect( RectangleBase r, bool full )
 {
-    //gravUtil::logMessage( "RectBase::fillToRect with rect input %f x %f at %f, %f (full %i)\n",
-    //        r.getDestWidth(), r.getDestHeight(), r.getDestX(), r.getDestY(), full );
+    gravUtil::logMessage( "RectBase::fillToRect with rect input %f x %f at %f, %f (full %i)\n",
+            r.getDestWidth(), r.getDestHeight(), r.getDestX(), r.getDestY(), full );
     float spaceAspect = r.getDestWidth() / r.getDestHeight();
 
     // full sizes the object such that the inner part of the rect will match
@@ -535,12 +559,17 @@ void RectangleBase::fillToRect( RectangleBase r, bool full )
             setWidth( r.getDestWidth() );
 
         move( r.getDestX(), r.getDestY() );
+
+        // override setting intended bounds in setscale, since we know the input to
+        // this function is what we want the size to be ideally
+        intendedWidth = r.getDestTotalWidth();
+        intendedHeight = r.getDestTotalHeight();
     }
     else
     {
         float objectAspect = getDestTotalWidth() / getDestTotalHeight();
 
-        gravUtil::logMessage( "aspects: %f -> %f\n", objectAspect, spaceAspect );
+        gravUtil::logMessage( "aspects: %f in %f\n", objectAspect, spaceAspect );
 
         if ( ( spaceAspect - objectAspect ) > 0.01f )
             setTotalHeight( r.getDestHeight() );
@@ -550,16 +579,20 @@ void RectangleBase::fillToRect( RectangleBase r, bool full )
         // TODO need to change this if getCenterOffsetX() is ever meaningful
         // and maybe the above one as well
         move( r.getDestX(), r.getDestY() - getCenterOffsetY() );
+
+        // see above
+        intendedWidth = r.getDestWidth();
+        intendedHeight = r.getDestHeight();
     }
 
-    //gravUtil::logMessage( "RectBase::fillToRect with rect input end at %f x %f (full %i)\n", getDestTotalWidth(), getDestTotalHeight(), full );
+    gravUtil::logMessage( "RectBase::fillToRect with rect input end at %f x %f (full %i)\n\n", getDestTotalWidth(), getDestTotalHeight(), full );
 }
 
 void RectangleBase::fillToRect( float innerL, float innerR,
                                 float innerU, float innerD, bool full )
 {
-    //gravUtil::logMessage( "RectBase::fillToRect non-rect %f x %f (%f,%f %f,%f (full %i))\n",
-    //        innerR - innerL, innerU - innerD, innerL, innerR, innerU, innerD, full );
+    gravUtil::logMessage( "RectBase::fillToRect non-rect %f x %f (%f,%f %f,%f (full %i))\n",
+            innerR - innerL, innerU - innerD, innerL, innerR, innerU, innerD, full );
 
     fillToRect( RectangleBase( innerL, innerR, innerU, innerD ), full );
 }
@@ -967,6 +1000,29 @@ void RectangleBase::draw()
         glEnable( GL_BLEND );
         glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
+        // draw intended bounds
+        glBegin( GL_QUADS );
+
+        glColor4f( borderColor.R/2.0f,
+                   borderColor.G/2.0f,
+                   borderColor.B/2.0f,
+                   borderColor.A/2.0f );
+
+        float iXdist = intendedWidth / 2.0f;
+        float iYdist = intendedHeight / 2.0f;
+        float Xoff = getCenterOffsetX();
+        float Yoff = getCenterOffsetY();
+        glVertex3f(-iXdist + Xoff, iYdist + Yoff, 0.0);
+        glVertex3f(iXdist + Xoff, iYdist + Yoff, 0.0);
+        glVertex3f(iXdist + Xoff, -iYdist + Yoff, 0.0);
+        glVertex3f(-iXdist + Xoff, -iYdist + Yoff, 0.0);
+        /*glVertex3f(intendedBounds.L, intendedBounds.U, 0.0);
+        glVertex3f(intendedBounds.R, intendedBounds.U, 0.0);
+        glVertex3f(intendedBounds.R, intendedBounds.D, 0.0);
+        glVertex3f(intendedBounds.L, intendedBounds.D, 0.0);*/
+
+        glEnd();
+
         // draw border box
         glBegin( GL_QUADS );
 
@@ -1172,15 +1228,15 @@ void RectangleBase::drawBorder( float Xdist, float Ydist, float s, float t )
  */
 void RectangleBase::delayedNameSizeUpdate()
 {
-    // get o version of this to compare size
-    // set its total size - bit of a hack to account for aspect ratio changes in
-    // potential subclasses
-    Bounds oldBounds = getDestTotalBounds();
-    RectangleBase old( oldBounds.L, oldBounds.R, oldBounds.U, oldBounds.D );
-    gravUtil::logMessage( "RectBase::delayed name size update: current %s\n", getName().c_str() );
-    gravUtil::logMessage( "\tcomparison: \n\t\tcurrent %fx%f (%fx%f), (%f, %f) vs\n\t\told %fx%f (%fx%f), (%f, %f)\n",
-            getDestWidth(), getDestHeight(), getDestTotalWidth(), getDestTotalHeight(), getDestX(), getDestY(),
-            old.getDestWidth(), old.getDestHeight(), old.getDestTotalWidth(), old.getDestTotalHeight(), old.getDestX(), old.getDestY() );
+    // get old bounds of this to compare size
+    RectangleBase intended;
+    intended.setScale( intendedWidth, intendedHeight );
+    intended.setPos( getDestX() + getCenterOffsetX(),
+                     getDestY() + getCenterOffsetY() );
+    gravUtil::logMessage( "RectBase::delayed name size update: current %s\n-----------------------------------\n", getName().c_str() );
+    //gravUtil::logMessage( "\tcomparison: \n\t\tcurrent %fx%f (%fx%f), (%f, %f) vs\n\t\tintended bounds %f, %f, %f, %f)\n",
+    //        getDestWidth(), getDestHeight(), getDestTotalWidth(), getDestTotalHeight(), getDestX(), getDestY(),
+    //        oldBounds.L, oldBounds.R, oldBounds.U, oldBounds.D );
     cutoffPos = -1;
     textBounds = font->BBox( getSubName().c_str() );
     // only do cutoff if title is at top - so if centered (or other?)
@@ -1205,15 +1261,9 @@ void RectangleBase::delayedNameSizeUpdate()
         textBounds = font->BBox( getSubName().c_str() );
     }
 
-    // also, since the text bounds might change, fix the height/pos
-    /*if ( fabs( oldHeight - getDestTotalHeight() ) > 0.001f &&
-         ( titleStyle == TOPTEXT || titleStyle == FULLCAPTIONS ) )
-    {
-        setTotalHeight( oldHeight );
-        move( destX - ( getCenterOffsetX() - oldOffsetX ),
-              destY - ( getCenterOffsetY() - oldOffsetY ) );
-    }*/
-    fillToRect( old, false );
+    // also, since the text bounds might change, resize to fill the intended
+    // rectangle
+    fillToRect( intended, false );
 
     nameSizeDirty = false;
 }

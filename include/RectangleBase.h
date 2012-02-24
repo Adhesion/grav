@@ -68,6 +68,7 @@ public:
     RectangleBase();
     RectangleBase( float _x, float _y );
     RectangleBase( float l, float r, float u, float d );
+    RectangleBase( Bounds b );
     RectangleBase( const RectangleBase& other );
     virtual ~RectangleBase();
 
@@ -312,6 +313,11 @@ protected:
     float scaleX, scaleY;
     float destScaleX, destScaleY;
     Vector normal;
+
+    // remember the intended size when resizing so if the aspect ratio changes
+    // we can fill the original rectangle properly
+    float intendedWidth;
+    float intendedHeight;
 
     // value for the amplitude of the audio connection
     float effectVal;
