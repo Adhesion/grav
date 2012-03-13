@@ -42,6 +42,7 @@ VideoSource::VideoSource( VPMSession* _session, VideoListener* l,
     tex_width = 0; tex_height = 0;
     texid = 0;
     aspect = 1.33f;
+    destAspect = aspect;
     useAlpha = false;
     enableRendering = true;
 }
@@ -73,7 +74,7 @@ void VideoSource::draw()
     glRotatef( yAngle, 0.0, 1.0, 0.0 );
     glRotatef( zAngle, 0.0, 0.0, 1.0 );
 
-    glTranslatef(x,y,z);
+    glTranslatef( x, y, z );
 
     //glDepthMask( GL_FALSE );
     //glDepthRange (0.0, 0.9);
@@ -277,6 +278,12 @@ void VideoSource::draw()
 
 void VideoSource::resizeBuffer()
 {
+    // get intended size so we can resize, since the width might change here
+    RectangleBase intended;
+    intended.setScale( intendedWidth, intendedHeight );
+    intended.setPos( getDestX() + getCenterOffsetX(),
+                     getDestY() + getCenterOffsetY() );
+
 	listener->updatePixelCount( -( vwidth * vheight ) );
     vwidth = videoSink->getImageWidth();
     vheight = videoSink->getImageHeight();
@@ -324,6 +331,8 @@ void VideoSource::resizeBuffer()
                   GL_UNSIGNED_BYTE,
                   buffer );
     delete[] buffer;
+
+    fillToRect( intended, false );
 
     // update text bounds since the width might be different
     updateTextBounds();

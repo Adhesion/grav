@@ -113,6 +113,7 @@ private:
 
     // original aspect ratio of the video
     float aspect;
+    float destAspect;
 
     // remake the buffer when the video gets resized
     void resizeBuffer();
