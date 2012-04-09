@@ -584,8 +584,6 @@ void RectangleBase::fillToRect( RectangleBase r, bool full )
         intendedWidth = r.getDestWidth();
         intendedHeight = r.getDestHeight();
     }
-
-    gravUtil::logMessage( "RectBase::fillToRect with rect input end at %f x %f (full %i)\n\n", getDestTotalWidth(), getDestTotalHeight(), full );
 }
 
 void RectangleBase::fillToRect( float innerL, float innerR,

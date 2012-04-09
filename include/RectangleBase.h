@@ -379,7 +379,7 @@ protected:
     bool debugDraw;
 
     bool animated;
-    void animateValues();
+    virtual void animateValues();
 
     bool positionAnimating;
     bool scaleAnimating;

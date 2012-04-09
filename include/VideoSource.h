@@ -115,6 +115,10 @@ private:
     float aspect;
     float destAspect;
 
+    // override animate to animate aspect
+    void animateValues();
+    bool aspectAnimating;
+
     // remake the buffer when the video gets resized
     void resizeBuffer();
 

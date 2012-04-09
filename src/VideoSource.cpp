@@ -43,6 +43,7 @@ VideoSource::VideoSource( VPMSession* _session, VideoListener* l,
     texid = 0;
     aspect = 1.33f;
     destAspect = aspect;
+    aspectAnimating = false;
     useAlpha = false;
     enableRendering = true;
 }
@@ -290,9 +291,14 @@ void VideoSource::resizeBuffer()
     listener->updatePixelCount(  vwidth * vheight );
 
     if ( vheight > 0 )
-        aspect = (float)vwidth / (float)vheight;
+        destAspect = (float)vwidth / (float)vheight;
     else
-        aspect = 1.33f;
+        destAspect = 1.33f;
+
+    if ( animated )
+        aspectAnimating = true;
+    else
+        aspect = destAspect;
 
     tex_width = GLUtil::getInstance()->pow2( vwidth );
     if ( videoSink->getImageFormat() == VIDEO_FORMAT_YUV420 )
@@ -463,7 +469,7 @@ float VideoSource::getHeight()
 
 float VideoSource::getDestWidth()
 {
-    return aspect * destScaleX;
+    return destAspect * destScaleX;
 }
 
 float VideoSource::getDestHeight()
@@ -473,7 +479,7 @@ float VideoSource::getDestHeight()
 
 void VideoSource::setWidth( float w )
 {
-    setScale( w/aspect, destScaleY * (w/(destScaleX*aspect)) );
+    setScale( w/destAspect, destScaleY * (w/(destScaleX*destAspect)) );
 }
 
 void VideoSource::setHeight( float h )
@@ -483,7 +489,7 @@ void VideoSource::setHeight( float h )
 
 float VideoSource::getOriginalAspect()
 {
-    return aspect;
+    return destAspect;
 }
 
 void VideoSource::toggleMute()
@@ -548,4 +554,20 @@ void VideoSource::show( bool s, bool instant )
 {
     RectangleBase::show( s, instant );
     useAlpha = !s;
+}
+
+void VideoSource::animateValues()
+{
+    RectangleBase::animateValues();
+
+    if ( aspectAnimating )
+    {
+        aspect += ( destAspect - aspect ) / 7.5f;
+
+        if ( fabs( destAspect - aspect ) < 0.01f )
+        {
+            aspect = destAspect;
+            aspectAnimating = false;
+        }
+    }
 }
