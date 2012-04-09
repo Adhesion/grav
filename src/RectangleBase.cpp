@@ -50,13 +50,8 @@ RectangleBase::RectangleBase( float l, float r, float u, float d )
     setDefaults();
     x = -15.0f; y = 15.0f; z = 0.0f;
 
-    printf( "RectBase(): %f, %f, %f, %f\n", l, r, u, d );
-
     setScale( r - l, u - d );
     move( ( r + l ) / 2.0f, ( u + d ) / 2.0f );
-
-    printf( "Rect constructor from bounds\n" );
-    printf( "Grouped? %i\n", isGrouped() );
 }
 
 RectangleBase::RectangleBase( Bounds b )
@@ -64,13 +59,8 @@ RectangleBase::RectangleBase( Bounds b )
     setDefaults();
     x = -15.0f; y = 15.0f; z = 0.0f;
 
-    printf( "RectBase(): %f, %f, %f, %f\n", b.L, b.R, b.U, b.D );
-
     setScale( b.R - b.L, b.U - b.D );
     move( ( b.R + b.L ) / 2.0f, ( b.U + b.D ) / 2.0f );
-
-    printf( "Rect constructor from bounds\n" );
-    printf( "Grouped? %i\n", isGrouped() );
 }
 
 RectangleBase::RectangleBase( const RectangleBase& other )
@@ -164,7 +154,7 @@ void RectangleBase::setDefaults()
 
     shown = true;
 
-    debugDraw = true;
+    debugDraw = false;
 
     relativeTextScale = 0.0009;
     titleStyle = TOPTEXT;
@@ -542,8 +532,6 @@ void RectangleBase::setBorderScale( float b )
 
 void RectangleBase::fillToRect( RectangleBase r, bool full )
 {
-    gravUtil::logMessage( "RectBase::fillToRect with rect input %f x %f at %f, %f (full %i)\n",
-            r.getDestWidth(), r.getDestHeight(), r.getDestX(), r.getDestY(), full );
     float spaceAspect = r.getDestWidth() / r.getDestHeight();
 
     // full sizes the object such that the inner part of the rect will match
@@ -560,16 +548,14 @@ void RectangleBase::fillToRect( RectangleBase r, bool full )
 
         move( r.getDestX(), r.getDestY() );
 
-        // override setting intended bounds in setscale, since we know the input to
-        // this function is what we want the size to be ideally
+        // override setting intended bounds in setscale, since we know the input
+        // to this function is what we want the size to be ideally
         intendedWidth = r.getDestTotalWidth();
         intendedHeight = r.getDestTotalHeight();
     }
     else
     {
         float objectAspect = getDestTotalWidth() / getDestTotalHeight();
-
-        gravUtil::logMessage( "aspects: %f in %f\n", objectAspect, spaceAspect );
 
         if ( ( spaceAspect - objectAspect ) > 0.01f )
             setTotalHeight( r.getDestHeight() );
@@ -589,9 +575,6 @@ void RectangleBase::fillToRect( RectangleBase r, bool full )
 void RectangleBase::fillToRect( float innerL, float innerR,
                                 float innerU, float innerD, bool full )
 {
-    gravUtil::logMessage( "RectBase::fillToRect non-rect %f x %f (%f,%f %f,%f (full %i))\n",
-            innerR - innerL, innerU - innerD, innerL, innerR, innerU, innerD, full );
-
     fillToRect( RectangleBase( innerL, innerR, innerU, innerD ), full );
 }
 
@@ -866,7 +849,6 @@ bool RectangleBase::updateName()
 
 void RectangleBase::updateTextBounds()
 {
-    printf( "RectBase::updateTextBounds()\n" );
     if ( font )
     {
         nameSizeDirty = true;
@@ -1231,10 +1213,6 @@ void RectangleBase::delayedNameSizeUpdate()
     intended.setScale( intendedWidth, intendedHeight );
     intended.setPos( getDestX() + getCenterOffsetX(),
                      getDestY() + getCenterOffsetY() );
-    gravUtil::logMessage( "RectBase::delayed name size update: current %s\n-----------------------------------\n", getName().c_str() );
-    //gravUtil::logMessage( "\tcomparison: \n\t\tcurrent %fx%f (%fx%f), (%f, %f) vs\n\t\tintended bounds %f, %f, %f, %f)\n",
-    //        getDestWidth(), getDestHeight(), getDestTotalWidth(), getDestTotalHeight(), getDestX(), getDestY(),
-    //        oldBounds.L, oldBounds.R, oldBounds.U, oldBounds.D );
     cutoffPos = -1;
     textBounds = font->BBox( getSubName().c_str() );
     // only do cutoff if title is at top - so if centered (or other?)
@@ -1274,7 +1252,6 @@ void RectangleBase::animateValues()
     // movement animation
     if ( positionAnimating )
     {
-        //gravUtil::logMessage( "RectBase::animate::pos\n" );
         x += ( destX - x ) / 7.5f;
         y += ( destY - y ) / 7.5f;
 
@@ -1283,13 +1260,11 @@ void RectangleBase::animateValues()
             x = destX;
             y = destY;
             positionAnimating = false;
-            //gravUtil::logMessage( "RectBase::animate::done with pos\n" );
         }
     }
 
     if ( scaleAnimating )
     {
-        //gravUtil::logMessage( "RectBase::animate::scale\n" );
         scaleX += ( destScaleX - scaleX ) / 7.5f;
         scaleY += ( destScaleY - scaleY ) / 7.5f;
 
@@ -1299,13 +1274,11 @@ void RectangleBase::animateValues()
             scaleX = destScaleX;
             scaleY = destScaleY;
             scaleAnimating = false;
-            //gravUtil::logMessage( "RectBase::animate::done with scale\n" );
         }
     }
 
     if ( borderColAnimating )
     {
-        //gravUtil::logMessage( "RectBase::animate::bordercol\n" );
         borderColor.R += ( destBColor.R - borderColor.R ) / 3.0f;
         borderColor.G += ( destBColor.G - borderColor.G ) / 3.0f;
         borderColor.B += ( destBColor.B - borderColor.B ) / 3.0f;
@@ -1321,13 +1294,11 @@ void RectangleBase::animateValues()
             borderColor.B = destBColor.B;
             borderColor.A = destBColor.A;
             borderColAnimating = false;
-            //gravUtil::logMessage( "RectBase::animate::done with bordercol\n" );
         }
     }
 
     if ( secondColAnimating )
     {
-        //gravUtil::logMessage( "RectBase::animate::secondcol\n" );
         secondaryColor.R += ( destSecondaryColor.R - secondaryColor.R ) / 3.0f;
         secondaryColor.G += ( destSecondaryColor.G - secondaryColor.G ) / 3.0f;
         secondaryColor.B += ( destSecondaryColor.B - secondaryColor.B ) / 3.0f;
@@ -1343,7 +1314,6 @@ void RectangleBase::animateValues()
             secondaryColor.B = destSecondaryColor.B;
             secondaryColor.A = destSecondaryColor.A;
             secondColAnimating = false;
-            //gravUtil::logMessage( "RectBase::animate::done with secondcol\n" );
         }
     }
 }

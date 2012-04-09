@@ -87,6 +87,7 @@ void VideoListener::vpmsession_source_created( VPMSession &session,
 
         VideoSource* source = new VideoSource( &session, this, ssrc, sink, x,
 													y );
+        source->setScale( 5.25f, 5.25f );
         objectMan->addNewSource( source );
 
         // new frame callback mostly just used for testing
@@ -94,6 +95,7 @@ void VideoListener::vpmsession_source_created( VPMSession &session,
 
         // do some basic grid positions
         // TODO make this better, use layoutmanager somehow?
+        // probably should be moved to objectManager regardless
         x += 8.8f;
         if ( x > 15.0f )
         {
