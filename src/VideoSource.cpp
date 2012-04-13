@@ -41,7 +41,7 @@ VideoSource::VideoSource( VPMSession* _session, VideoListener* l,
     aspect = (float)vwidth / (float)vheight;
     tex_width = 0; tex_height = 0;
     texid = 0;
-    aspect = 1.33f;
+    aspect = 1.56f;
     destAspect = aspect;
     aspectAnimating = false;
     useAlpha = false;
@@ -282,8 +282,14 @@ void VideoSource::resizeBuffer()
     // get intended size so we can resize, since the width might change here
     RectangleBase intended;
     intended.setScale( intendedWidth, intendedHeight );
-    intended.setPos( getDestX() + getCenterOffsetX(),
-                     getDestY() + getCenterOffsetY() );
+    float posX = getDestX();
+    float posY = getDestY();
+    if ( !lastFillFull )
+    {
+        posX += getCenterOffsetX();
+        posY += getCenterOffsetY();
+    }
+    intended.setPos( posX, posY );
 
 	listener->updatePixelCount( -( vwidth * vheight ) );
     vwidth = videoSink->getImageWidth();
@@ -338,7 +344,8 @@ void VideoSource::resizeBuffer()
                   buffer );
     delete[] buffer;
 
-    fillToRect( intended, false );
+    // fill to intended size
+    fillToRect( intended, lastFillFull );
 
     // update text bounds since the width might be different
     updateTextBounds();
@@ -365,6 +372,14 @@ void VideoSource::scaleNative()
         // video dimensions in world coords
         setScale( (bottomRight.getX()-topLeft.getX())/aspect,
                 bottomRight.getY()-topLeft.getY() );
+
+        // override intended size to match inner rect & set to resize based on
+        // inner rect on size change - doesn't quite fit if the video resizes to
+        // be larger (will fit vertically) but prevents vertical movement if
+        // text is added or removed
+        intendedWidth = getDestWidth();
+        intendedHeight = getDestHeight();
+        lastFillFull = true;
     }
     else
     {

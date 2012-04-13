@@ -318,6 +318,9 @@ protected:
     // we can fill the original rectangle properly
     float intendedWidth;
     float intendedHeight;
+    // remember whether the last fillToRect had full=true (therefore the
+    // intended size represents the inner size, not total size)
+    bool lastFillFull;
 
     // value for the amplitude of the audio connection
     float effectVal;

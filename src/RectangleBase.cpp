@@ -74,6 +74,7 @@ RectangleBase::RectangleBase( const RectangleBase& other )
 
     intendedWidth = other.intendedWidth;
     intendedHeight = other.intendedHeight;
+    lastFillFull = other.lastFillFull;
 
     effectVal = other.effectVal;
 
@@ -195,6 +196,7 @@ void RectangleBase::setDefaults()
 
     intendedWidth = getDestTotalWidth();
     intendedHeight = getDestTotalHeight();
+    lastFillFull = false;
 }
 
 float RectangleBase::getWidth()
@@ -472,6 +474,7 @@ void RectangleBase::setScale( float xs, float ys )
 
     intendedWidth = getDestTotalWidth();
     intendedHeight = getDestTotalHeight();
+    lastFillFull = false;
 }
 
 void RectangleBase::setScale( float xs, float ys, bool resizeMembers )
@@ -547,11 +550,6 @@ void RectangleBase::fillToRect( RectangleBase r, bool full )
             setWidth( r.getDestWidth() );
 
         move( r.getDestX(), r.getDestY() );
-
-        // override setting intended bounds in setscale, since we know the input
-        // to this function is what we want the size to be ideally
-        intendedWidth = r.getDestTotalWidth();
-        intendedHeight = r.getDestTotalHeight();
     }
     else
     {
@@ -565,11 +563,13 @@ void RectangleBase::fillToRect( RectangleBase r, bool full )
         // TODO need to change this if getCenterOffsetX() is ever meaningful
         // and maybe the above one as well
         move( r.getDestX(), r.getDestY() - getCenterOffsetY() );
-
-        // see above
-        intendedWidth = r.getDestWidth();
-        intendedHeight = r.getDestHeight();
     }
+
+    // override setting intended bounds in setscale, since we know the input
+    // to this function is what we want the size to be ideally
+    intendedWidth = r.getDestWidth();
+    intendedHeight = r.getDestHeight();
+    lastFillFull = full;
 }
 
 void RectangleBase::fillToRect( float innerL, float innerR,
@@ -996,10 +996,6 @@ void RectangleBase::draw()
         glVertex3f(iXdist + Xoff, iYdist + Yoff, 0.0);
         glVertex3f(iXdist + Xoff, -iYdist + Yoff, 0.0);
         glVertex3f(-iXdist + Xoff, -iYdist + Yoff, 0.0);
-        /*glVertex3f(intendedBounds.L, intendedBounds.U, 0.0);
-        glVertex3f(intendedBounds.R, intendedBounds.U, 0.0);
-        glVertex3f(intendedBounds.R, intendedBounds.D, 0.0);
-        glVertex3f(intendedBounds.L, intendedBounds.D, 0.0);*/
 
         glEnd();
 
@@ -1211,8 +1207,15 @@ void RectangleBase::delayedNameSizeUpdate()
     // get old bounds of this to compare size
     RectangleBase intended;
     intended.setScale( intendedWidth, intendedHeight );
-    intended.setPos( getDestX() + getCenterOffsetX(),
-                     getDestY() + getCenterOffsetY() );
+    float posX = getDestX();
+    float posY = getDestY();
+    if ( !lastFillFull )
+    {
+        posX += getCenterOffsetX();
+        posY += getCenterOffsetY();
+    }
+    intended.setPos( posX, posY );
+
     cutoffPos = -1;
     textBounds = font->BBox( getSubName().c_str() );
     // only do cutoff if title is at top - so if centered (or other?)
@@ -1239,7 +1242,7 @@ void RectangleBase::delayedNameSizeUpdate()
 
     // also, since the text bounds might change, resize to fill the intended
     // rectangle
-    fillToRect( intended, false );
+    fillToRect( intended, lastFillFull );
 
     nameSizeDirty = false;
 }
