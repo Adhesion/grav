@@ -31,6 +31,7 @@
 #include <sys/time.h>
 
 class ObjectManager;
+class SessionManager;
 class VPMVideoSink;
 class GLCanvas;
 class wxStopWatch;
@@ -60,6 +61,7 @@ public:
                                      uint32_t data_len);
 
     void setTimer( wxStopWatch* t );
+    void setSessionManager( SessionManager* s );
 
     int getSourceCount();
     long getPixelCount();
@@ -67,6 +69,7 @@ public:
 
 private:
     ObjectManager* objectMan;
+    SessionManager* sessionMan;
     wxStopWatch* timer;
 
     // initial starting points for videos

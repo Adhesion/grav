@@ -151,6 +151,24 @@ public:
      */
     void recalculateSize();
 
+    /*
+     * !!! NOT THREAD SAFE !!!
+     * Finds session by address. In cases of duplicate address, will find the
+     * first one. (order of video -> available video -> audio)
+     * These are also NOT THREAD SAFE! (mostly since they get called by other
+     * functions, inside their own lock()s)
+     * !!! NOT THREAD SAFE !!!
+     */
+    SessionEntry* findSessionByAddress( std::string address );
+    SessionEntry* findSessionByAddress( std::string address, SessionType type );
+    /*
+     * Alternate versions to find by encapsulated pointer, mostly just for
+     * VideoListener to identify sessions/pass to VideoSource.
+     */
+    SessionEntry* findSessionByVPMSession( VPMSession* s );
+    SessionEntry* findSessionByVPMSession( VPMSession* s, SessionType type );
+    int indexOf( SessionEntry* entry );
+
 private:
     /*
      * Note that all of these private functions are NOT thread safe and should
@@ -162,18 +180,6 @@ private:
      */
     bool initSession( SessionEntry* session );
     void disableSession( SessionEntry* session );
-
-    /*
-     * !!! NOT THREAD SAFE !!!
-     * Finds session by address. In cases of duplicate address, will find the
-     * first one. (order of video -> available video -> audio)
-     * These are also NOT THREAD SAFE! (mostly since they get called by other
-     * functions, inside their own lock()s)
-     * !!! NOT THREAD SAFE !!!
-     */
-    SessionEntry* findSessionByAddress( std::string address );
-    SessionEntry* findSessionByAddress( std::string address, SessionType type );
-    int indexOf( SessionEntry* entry );
 
     /*
      * Internal non-thread-safe implementation of shift, so we can call it from

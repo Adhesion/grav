@@ -210,6 +210,11 @@ uint32_t SessionEntry::getTimestamp()
     return sessionTS;
 }
 
+VPMSession* SessionEntry::getVPMSession()
+{
+    return session;
+}
+
 bool SessionEntry::iterate()
 {
     bool running = isSessionEnabled() && processingEnabled;

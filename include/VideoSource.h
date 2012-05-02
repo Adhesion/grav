@@ -34,12 +34,13 @@
 #include "RectangleBase.h"
 
 class VideoListener;
+class SessionEntry;
 
 class VideoSource : public RectangleBase
 {
 
 public:
-    VideoSource( VPMSession* _session, VideoListener* l, uint32_t _ssrc,
+    VideoSource( SessionEntry* _session, VideoListener* l, uint32_t _ssrc,
 					VPMVideoBufferSink* vs, float x, float y );
     ~VideoSource();
 
@@ -73,7 +74,7 @@ public:
      * against the session in the delete callback, so we don't delete the wrong
      * one if it happens to have the same ssrc as another stream.
      */
-    VPMSession* getSession();
+    SessionEntry* getSession();
 
     unsigned int getVideoWidth();
     unsigned int getVideoHeight();
@@ -98,7 +99,8 @@ public:
 private:
     // reference to the session that this video comes from - needed for grabbing
     // metadata from RTCP/SDES
-    VPMSession* session;
+    SessionEntry* session;
+
     // reference to listener that made it, to update pixel counts
     VideoListener* listener;
 

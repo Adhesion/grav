@@ -25,6 +25,8 @@
 #include "VideoListener.h"
 #include "VideoSource.h"
 #include "ObjectManager.h"
+#include "SessionManager.h"
+#include "SessionEntry.h"
 #include "GLCanvas.h"
 #include "Group.h"
 #include "TreeControl.h"
@@ -85,8 +87,25 @@ void VideoListener::vpmsession_source_created( VPMSession &session,
 
         d->connectVideoProcessor( sink );
 
-        VideoSource* source = new VideoSource( &session, this, ssrc, sink, x,
-													y );
+        // this is a bit clunky - VideoSource needs to have a reference to the
+        // general SessionEntry but we only know the VPMSession pointer (not
+        // even the address since that's only in VPMSession_net)
+        // this should be thread-safe since this function will be called on the
+        // second thread
+        // TODO will change if session are on their own threads?
+        SessionEntry* se = sessionMan->findSessionByVPMSession( &session );
+
+        // if we're getting a new video from a VPMSession but it's not found in
+        // the SessionManager something is seriously fubar
+        if ( se == NULL )
+        {
+            gravUtil::logError( "VideoListener::vpmsession_source_created: "
+                    "session not found in SessionManager. Something is "
+                    "horribly wrong :(\n" );
+            return;
+        }
+
+        VideoSource* source = new VideoSource( se, this, ssrc, sink, x, y );
         source->setScale( 5.25f, 5.25f );
         objectMan->addNewSource( source );
 
@@ -119,7 +138,8 @@ void VideoListener::vpmsession_source_deleted( VPMSession &session,
     for ( si = objectMan->getSources()->begin();
             si != objectMan->getSources()->end(); ++si )
     {
-        if ( &session == (*si)->getSession() && (*si)->getssrc() == ssrc )
+        if ( &session == (*si)->getSession()->getVPMSession() &&
+             (*si)->getssrc() == ssrc )
         {
             gravUtil::logVerbose( "VideoListener::found ssrc as source"
                     " 0x%08x\n", (*si) );
@@ -208,6 +228,11 @@ void VideoListener::vpmsession_source_app( VPMSession &session,
 void VideoListener::setTimer( wxStopWatch* t )
 {
     timer = t;
+}
+
+void VideoListener::setSessionManager( SessionManager* s )
+{
+    sessionMan = s;
 }
 
 int VideoListener::getSourceCount()

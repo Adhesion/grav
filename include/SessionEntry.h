@@ -61,6 +61,7 @@ public:
 
     std::string getAddress();
     uint32_t getTimestamp();
+    VPMSession* getVPMSession();
 
     bool iterate();
 

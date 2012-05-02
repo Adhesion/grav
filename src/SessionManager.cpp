@@ -738,34 +738,8 @@ void SessionManager::recalculateSize()
 }
 
 /*
- * Note all the following functions are private and NOT thread-safe.
+ * Note the following are NOT THREAD SAFE but public (for now)
  */
-
-bool SessionManager::initSession( SessionEntry* session )
-{
-    bool audio = session->isAudioSession();
-    std::string type = std::string( audio ? "audio" : "video" );
-    VPMSessionListener* listener = audio ?
-        (VPMSessionListener*)audioSessionListener :
-            (VPMSessionListener*)videoSessionListener;
-
-    if ( !session->initSession( listener ) )
-    {
-        gravUtil::logError( "SessionManager::initSession: "
-            "failed to initialize %s session on %s\n", type.c_str(),
-                session->getAddress().c_str() );
-        return false;
-    }
-
-    gravUtil::logVerbose( "SessionManager::initialized %s session on %s\n",
-            type.c_str(), session->getAddress().c_str() );
-    return true;
-}
-
-void SessionManager::disableSession( SessionEntry* session )
-{
-    session->disableSession();
-}
 
 SessionEntry* SessionManager::findSessionByAddress( std::string address )
 {
@@ -807,6 +781,45 @@ SessionEntry* SessionManager::findSessionByAddress( std::string address,
     return NULL;
 }
 
+SessionEntry* SessionManager::findSessionByVPMSession( VPMSession* s )
+{
+    Group* sessions;
+    SessionEntry* session;
+
+    for ( int i = 0; i < numObjects(); i++ )
+    {
+        sessions = dynamic_cast<Group*>( (*this)[i] );
+        for ( int j = 0; j < sessions->numObjects(); j++ )
+        {
+            session = dynamic_cast<SessionEntry*>( (*sessions)[j] );
+            if ( session != NULL && session->getVPMSession() == s )
+                return session;
+        }
+    }
+
+    gravUtil::logWarning( "SessionManager::findSessionByVPMSession: session "
+                            "0x%08x not found\n", s );
+    return NULL;
+}
+
+SessionEntry* SessionManager::findSessionByVPMSession( VPMSession* s,
+        SessionType type )
+{
+    Group* sessions = sessionMap[ type ];
+    SessionEntry* session;
+
+    for ( int j = 0; j < sessions->numObjects(); j++ )
+    {
+        session = dynamic_cast<SessionEntry*>( (*sessions)[j] );
+        if ( session != NULL && session->getVPMSession() == s )
+            return session;
+    }
+
+    gravUtil::logWarning( "SessionManager::findSessionByVPMSession: session "
+                            "0x%08x not found\n", s );
+    return NULL;
+}
+
 int SessionManager::indexOf( SessionEntry* entry )
 {
     Group* sessions = entry->getGroup();
@@ -819,6 +832,36 @@ int SessionManager::indexOf( SessionEntry* entry )
         return -1;
     else
         return i;
+}
+
+/*
+ * Note all the following functions are private and NOT thread-safe.
+ */
+
+bool SessionManager::initSession( SessionEntry* session )
+{
+    bool audio = session->isAudioSession();
+    std::string type = std::string( audio ? "audio" : "video" );
+    VPMSessionListener* listener = audio ?
+        (VPMSessionListener*)audioSessionListener :
+            (VPMSessionListener*)videoSessionListener;
+
+    if ( !session->initSession( listener ) )
+    {
+        gravUtil::logError( "SessionManager::initSession: "
+            "failed to initialize %s session on %s\n", type.c_str(),
+                session->getAddress().c_str() );
+        return false;
+    }
+
+    gravUtil::logVerbose( "SessionManager::initialized %s session on %s\n",
+            type.c_str(), session->getAddress().c_str() );
+    return true;
+}
+
+void SessionManager::disableSession( SessionEntry* session )
+{
+    session->disableSession();
 }
 
 bool SessionManager::shiftSession( SessionEntry* entry )

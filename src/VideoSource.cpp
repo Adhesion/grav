@@ -24,13 +24,14 @@
 
 #include "VideoSource.h"
 #include "VideoListener.h"
+#include "SessionEntry.h"
 #include "GLUtil.h"
 #include "gravUtil.h"
 #include <cmath>
 
 #include <VPMedia/video/VPMVideoDecoder.h>
 
-VideoSource::VideoSource( VPMSession* _session, VideoListener* l,
+VideoSource::VideoSource( SessionEntry* _session, VideoListener* l,
 							uint32_t _ssrc, VPMVideoBufferSink* vs,
 							float _x, float _y ) :
     RectangleBase( _x, _y ), session( _session ), listener( l ), ssrc( _ssrc ),
@@ -394,8 +395,11 @@ std::string VideoSource::getMetadata( VPMSession::VPMSession_SDES type )
     uint32_t bufferLen = sizeof( buffer );
     std::string temp = std::string();
 
-    if ( session->getRemoteSDES( ssrc, type, buffer, bufferLen ) )
+    if ( session->getVPMSession()->getRemoteSDES( ssrc, type, buffer,
+                                                    bufferLen ) )
+    {
         temp = std::string( buffer );
+    }
 
     return temp;
 }
@@ -457,7 +461,7 @@ const char* VideoSource::getPayloadDesc()
     return videoSink->getVideoDecoder()->getDesc();
 }
 
-VPMSession* VideoSource::getSession()
+SessionEntry* VideoSource::getSession()
 {
     return session;
 }
@@ -509,7 +513,7 @@ float VideoSource::getOriginalAspect()
 
 void VideoSource::toggleMute()
 {
-    session->enableSource( ssrc, isMuted() );
+    session->getVPMSession()->enableSource( ssrc, isMuted() );
     enableRendering = !isMuted();
 
     if ( isMuted() )
@@ -531,7 +535,7 @@ void VideoSource::toggleMute()
 
 bool VideoSource::isMuted()
 {
-    return !session->isSourceEnabled( ssrc );
+    return !( session->getVPMSession()->isSourceEnabled( ssrc ) );
 }
 
 void VideoSource::setRendering( bool r )

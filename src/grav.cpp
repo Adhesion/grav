@@ -70,6 +70,9 @@ bool gravApp::OnInit()
     audioSessionListener = new AudioManager();
     sessionManager = new SessionManager( videoSessionListener,
                                             audioSessionListener, objectMan );
+    // video session listener needs to have ref to session manager to figure out
+    // VPMSession -> SessionEntry
+    videoSessionListener->setSessionManager( sessionManager );
     //videoInitialized = false; audioInitialized = false;
 
     if ( !handleArgs() )
