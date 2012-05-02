@@ -220,29 +220,39 @@ bool SessionEntry::iterate()
 
 void SessionEntry::doubleClickAction()
 {
+    SessionManager* manager = getParentManager();
+
+    if ( manager != NULL )
+    {
+        manager->sessionEntryAction( this );
+    }
+}
+
+SessionManager* SessionEntry::getParentManager()
+{
     Group* parent = getGroup();
     if ( parent == NULL )
     {
-        gravUtil::logWarning( "SessionEntry::doubleClick: entry not grouped? "
-                "(invalid session setup)\n" );
-        return;
+        gravUtil::logWarning( "SessionEntry::getParentManager: entry not "
+                "grouped? (invalid session setup)\n" );
+        return NULL;
     }
 
     Group* gParent = parent->getGroup();
     if ( gParent == NULL )
     {
-        gravUtil::logWarning( "SessionEntry::doubleClick: parent not grouped? "
-                "(invalid session setup)\n" );
-        return;
+        gravUtil::logWarning( "SessionEntry::getParentManager: parent not "
+                "grouped? (invalid session setup)\n" );
+        return NULL;
     }
 
     SessionManager* manager = dynamic_cast<SessionManager*>( gParent );
     if ( manager == NULL )
     {
-        gravUtil::logWarning( "SessionEntry::doubleClick: not member of one of "
-                "session manager's groups? (invalid session setup)\n" );
-        return;
+        gravUtil::logWarning( "SessionEntry::getParentManager: not member of "
+                "one of session manager's groups? (invalid session setup)\n" );
+        return NULL;
     }
 
-    manager->sessionEntryAction( this );
+    return manager;
 }

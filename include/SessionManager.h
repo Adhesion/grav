@@ -164,10 +164,12 @@ private:
     void disableSession( SessionEntry* session );
 
     /*
+     * !!! NOT THREAD SAFE !!!
      * Finds session by address. In cases of duplicate address, will find the
      * first one. (order of video -> available video -> audio)
-     * These are also not thread safe. (mostly since they get called by other
+     * These are also NOT THREAD SAFE! (mostly since they get called by other
      * functions, inside their own lock()s)
+     * !!! NOT THREAD SAFE !!!
      */
     SessionEntry* findSessionByAddress( std::string address );
     SessionEntry* findSessionByAddress( std::string address, SessionType type );

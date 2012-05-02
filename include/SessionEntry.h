@@ -31,6 +31,7 @@
 #include "RectangleBase.h"
 
 class VPMSessionListener;
+class SessionManager;
 
 class SessionEntry : public RectangleBase
 {
@@ -64,6 +65,7 @@ public:
     bool iterate();
 
     void doubleClickAction();
+    SessionManager* getParentManager();
 
 private:
     std::string address;

@@ -83,7 +83,7 @@ void VideoListener::vpmsession_source_created( VPMSession &session,
             return;
         }
 
-        d->connectVideoProcessor(sink);
+        d->connectVideoProcessor( sink );
 
         VideoSource* source = new VideoSource( &session, this, ssrc, sink, x,
 													y );
