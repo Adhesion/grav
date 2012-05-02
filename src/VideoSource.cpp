@@ -47,6 +47,7 @@ VideoSource::VideoSource( SessionEntry* _session, VideoListener* l,
     aspectAnimating = false;
     useAlpha = false;
     enableRendering = true;
+    altAddress = "";
 }
 
 VideoSource::~VideoSource()
@@ -573,6 +574,16 @@ void VideoSource::show( bool s, bool instant )
 {
     RectangleBase::show( s, instant );
     useAlpha = !s;
+}
+
+std::string VideoSource::getAltAddress()
+{
+    return altAddress;
+}
+
+void VideoSource::setAltAddress( std::string addr )
+{
+    altAddress = addr;
 }
 
 void VideoSource::animateValues()

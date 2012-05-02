@@ -96,6 +96,9 @@ public:
     // override RectangleBase::show to affect alpha usage for video rendering
     void show( bool s, bool instant );
 
+    std::string getAltAddress();
+    void setAltAddress( std::string addr );
+
 private:
     // reference to the session that this video comes from - needed for grabbing
     // metadata from RTCP/SDES
@@ -109,6 +112,9 @@ private:
 
     // the source of the video data
     VPMVideoBufferSink* videoSink;
+
+    // alternate address for thumbnail (this) -> full stream
+    std::string altAddress;
 
     // original dimensions of the video
     unsigned int vwidth, vheight;
