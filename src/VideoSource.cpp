@@ -253,7 +253,7 @@ void VideoSource::draw()
     // push disabled via the color
     if ( !enableRendering )
     {
-        float dist = getWidth() * 0.1f;
+        float dist = getHeight() * 0.15f;
 
         glBegin( GL_LINES );
         glLineWidth( 3.0f );
@@ -268,6 +268,40 @@ void VideoSource::draw()
         glVertex3f( -Xdist + dist, Ydist - dist, 0.0f );
 
         glEnd();
+    }
+
+    if ( altAddress.compare( "" ) != 0 )
+    {
+        float scaleFactor = getTextScale() * 1.25f;
+        float offset = getHeight() * 0.01f;
+
+        glPushMatrix();
+
+        glTranslatef( -Xdist + offset, -Ydist + offset, 0.0f );
+        glScalef( scaleFactor, scaleFactor, scaleFactor );
+        glColor4f( 0.55f, 0.55f, 0.95f, borderColor.A + 0.1f );
+
+        std::string plus = "+HD";
+        font->Render( plus.c_str() );
+
+        glPopMatrix();
+
+        /*glBegin( GL_QUADS );
+        float dist = getHeight() * 0.15f;
+
+        glColor4f( 0.4f, 0.4f, 0.8f, borderColor.A - 0.3f );
+
+        glVertex3f( Xdist - dist, -Ydist + ( dist / 3.0f ), 0.0f );
+        glVertex3f( Xdist - dist, -Ydist + ( 2.0f * dist / 3.0f ), 0.0f );
+        glVertex3f( Xdist, -Ydist + ( 2.0f * dist / 3.0f ), 0.0f );
+        glVertex3f( Xdist, -Ydist + ( dist / 3.0f ), 0.0f );
+
+        glVertex3f( Xdist - ( 2.0f * dist / 3.0f ), -Ydist, 0.0f );
+        glVertex3f( Xdist - ( 2.0f * dist / 3.0f ), -Ydist + dist, 0.0f );
+        glVertex3f( Xdist - ( dist / 3.0f ), -Ydist + dist, 0.0f );
+        glVertex3f( Xdist - ( dist / 3.0f ), -Ydist, 0.0f );
+
+        glEnd();*/
     }
 
     // see above
