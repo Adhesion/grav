@@ -28,6 +28,7 @@
 #include <wx/file.h>
 #include <wx/filename.h>
 #include <wx/log.h>
+#include <wx/textfile.h>
 
 gravUtil* gravUtil::instance = NULL;
 
@@ -51,6 +52,7 @@ void gravUtil::cleanup()
 
 gravUtil::gravUtil()
 {
+    printf( "gravUtil()\n" );
     sep = wxFileName::GetPathSeparator();
     std::string subdir = "py";
     resourceDirList.push_back( "." + sep );
@@ -91,6 +93,34 @@ void gravUtil::addPath( std::string path )
         path += sep;
     }
     resourceDirList.insert( start, path );
+}
+
+std::map< std::string, std::string > gravUtil::parseThumbnailFile(
+            wxString filename )
+{
+    wxTextFile tf;
+    tf.Open( filename );
+
+    std::string str = std::string( tf.GetFirstLine().char_str() );
+    std::map< std::string, std::string > ret;
+
+    while ( !tf.Eof() )
+    {
+        size_t cPos = str.find( ':' );
+
+        if ( cPos == std::string::npos )
+        {
+            printf( "gravUtil::parseThumbnailFile: error parsing file\n" );
+            return std::map< std::string, std::string >();
+        }
+
+        ret[ str.substr( 0, cPos ) ] = str.substr( cPos + 1,
+                                                   str.length() - cPos );
+
+        str = std::string( tf.GetNextLine().char_str() );
+    }
+
+    return ret;
 }
 
 void gravUtil::initLogging()

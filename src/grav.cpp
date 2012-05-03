@@ -81,6 +81,8 @@ bool gravApp::OnInit()
         return false;
     }
 
+    printf( "args handled\n" );
+
     // Some weirdness happens if this is called before arg handling, etc.
     gravUtil::initLogging();
 
@@ -225,6 +227,12 @@ bool gravApp::OnInit()
     objectMan->setVenueClientController( venueClientController ); // may be null
     objectMan->setSessionManager( sessionManager );
     objectMan->setAudio( audioSessionListener ); // may not necessarily be used
+
+    if ( haveThumbnailFile )
+    {
+        objectMan->setThumbnailMap(
+                gravUtil::getInstance()->parseThumbnailFile( thumbnailFile ) );
+    }
 
     mapRTP();
 
@@ -446,6 +454,8 @@ bool gravApp::handleArgs()
     {
         rotateIntervalMS = 30000;
     }
+
+    haveThumbnailFile = parser.Found( _("tf"), &thumbnailFile );
 
     wxString videoKeyWX;
     haveVideoKey = parser.Found( _("video-key"), &videoKeyWX );

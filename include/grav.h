@@ -53,6 +53,7 @@ class gravApp : public wxApp
 {
 
 public:
+
     static bool threadDebug;
     static int threadCounter;
 
@@ -153,6 +154,9 @@ private:
 
     int startX, startY;
 
+    wxString thumbnailFile;
+    bool haveThumbnailFile;
+
 };
 
 static const wxCmdLineEntryDesc cmdLineDesc[] =
@@ -243,6 +247,12 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
         wxCMD_LINE_OPTION, _("arav"), _("auto-rotate-available-video"),
             _("rotate through available video sessions every [num] seconds"),
             wxCMD_LINE_VAL_NUMBER
+    },
+
+    {
+        wxCMD_LINE_OPTION, _("tf"), _("thumbnail-file"),
+            _("parse text file of thumbnail video names:alternate streams"),
+            wxCMD_LINE_VAL_STRING
     },
 
     {

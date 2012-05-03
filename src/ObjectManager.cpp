@@ -281,8 +281,27 @@ void ObjectManager::draw()
         {
             // only bother updating it on the tree if it actually
             // changes - to suppress "" from getting shown
-            if ( (*si)->updateName() && tree )
-                tree->updateObjectName( (*si) );
+            if ( (*si)->updateName() )
+            {
+                if ( tree )
+                {
+                    tree->updateObjectName( (*si) );
+                }
+
+                VideoSource* vid = dynamic_cast<VideoSource*>( (*si) );
+                if ( vid )
+                {
+                    std::map<std::string, std::string>::iterator mi =
+                            thumbnailMap.find( vid->getName() );
+                    if ( mi != thumbnailMap.end() )
+                    {
+                        vid->setAltAddress( mi->second );
+                        gravUtil::logVerbose( "ObjectManager::draw(): %s alt "
+                                "address set to %s\n", vid->getName().c_str(),
+                                ( mi->second ).c_str() );
+                    }
+                }
+            }
         }
 
         // only draw if not grouped - groups are responsible for
@@ -1446,6 +1465,11 @@ bool ObjectManager::isVenueClientControllerShowable()
     {
         return false;
     }
+}
+
+void ObjectManager::setThumbnailMap( std::map<std::string, std::string> tm )
+{
+    thumbnailMap = tm;
 }
 
 bool ObjectManager::audioAvailable()

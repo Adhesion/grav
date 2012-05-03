@@ -96,8 +96,12 @@ public:
     // override RectangleBase::show to affect alpha usage for video rendering
     void show( bool s, bool instant );
 
+    // alternate addresses for thumbnails
     std::string getAltAddress();
     void setAltAddress( std::string addr );
+
+    // override double click to switch to alt address, if available
+    void doubleClickAction();
 
 private:
     // reference to the session that this video comes from - needed for grabbing

@@ -32,6 +32,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 #include <stdarg.h>
 
@@ -53,6 +54,9 @@ public:
      * Add a full pathname to the beginning of the path list.
      */
     void addPath( std::string path );
+
+    std::map< std::string, std::string > parseThumbnailFile(
+            wxString filename );
 
     /*
      * Log functions - goes straight to WX for now, abstracting just in case we

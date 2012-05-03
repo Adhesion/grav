@@ -204,6 +204,8 @@ public:
     bool isVenueClientControllerShown();
     bool isVenueClientControllerShowable();
 
+    void setThumbnailMap( std::map<std::string, std::string> tm );
+
 private:
     /*
      * Delete video sources set to be deleted. This should ONLY be called from
@@ -225,6 +227,8 @@ private:
     // temp lists for doing auto/audio focus
     std::vector<RectangleBase*> outerObjs;
     std::vector<RectangleBase*> innerObjs;
+
+    std::map<std::string, std::string> thumbnailMap;
 
     LayoutManager* layouts;
 

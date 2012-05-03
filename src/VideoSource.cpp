@@ -25,6 +25,7 @@
 #include "VideoSource.h"
 #include "VideoListener.h"
 #include "SessionEntry.h"
+#include "SessionManager.h"
 #include "GLUtil.h"
 #include "gravUtil.h"
 #include <cmath>
@@ -584,6 +585,23 @@ std::string VideoSource::getAltAddress()
 void VideoSource::setAltAddress( std::string addr )
 {
     altAddress = addr;
+}
+
+void VideoSource::doubleClickAction()
+{
+    if ( altAddress.compare( "" ) != 0 )
+    {
+        SessionManager* manager = session->getParentManager();
+        if ( manager )
+        {
+            manager->rotateTo( altAddress, false );
+        }
+    }
+    else
+    {
+        gravUtil::logVerbose( "VideoSource::doubleClickAction(): no alternate "
+                "address to connect to\n" );
+    }
 }
 
 void VideoSource::animateValues()

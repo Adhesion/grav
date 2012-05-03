@@ -54,6 +54,8 @@ VideoInfoDialog::VideoInfoDialog( wxWindow* parent, RectangleBase* o )
                 "\n";
         labelTextStd += "Codec:\n";
         infoTextStd += std::string( video->getPayloadDesc() ) + "\n";
+        labelTextStd += "Alternate Address:\n";
+        infoTextStd += video->getAltAddress() + "\n";
         char width[10];
         char height[10];
         sprintf( width, "%u", video->getVideoWidth() );
