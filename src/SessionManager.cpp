@@ -368,6 +368,8 @@ bool SessionManager::rotateTo( std::string addr, bool audio )
         initSession( current );
     }
 
+    objectManager->setFocusSession( current->getAddress() );
+
     unlockSessions();
 
     return true;

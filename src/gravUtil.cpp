@@ -52,7 +52,6 @@ void gravUtil::cleanup()
 
 gravUtil::gravUtil()
 {
-    printf( "gravUtil()\n" );
     sep = wxFileName::GetPathSeparator();
     std::string subdir = "py";
     resourceDirList.push_back( "." + sep );

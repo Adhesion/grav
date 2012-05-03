@@ -81,8 +81,6 @@ bool gravApp::OnInit()
         return false;
     }
 
-    printf( "args handled\n" );
-
     // Some weirdness happens if this is called before arg handling, etc.
     gravUtil::initLogging();
 

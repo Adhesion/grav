@@ -47,6 +47,7 @@
 #include "LayoutManager.h"
 #include "VenueClientController.h"
 #include "SessionManager.h"
+#include "SessionEntry.h"
 #include "Camera.h"
 #include "Point.h"
 
@@ -115,6 +116,8 @@ ObjectManager::ObjectManager()
     useRunway = true;
     gridAuto = false;
     autoFocusRotate = false;
+    sessionFocus = false;
+    focusSession = "";
 
     audioEnabled = false;
     audioFocusTrigger = false;
@@ -1065,7 +1068,7 @@ void ObjectManager::addNewSource( VideoSource* s )
                                                     tempOuterObjs.end() );
         tempOuterObjs.erase( tempOuterObjs.end()-1 );
 
-        std::map<std::string, std::vector<RectangleBase*> > data = \
+        std::map<std::string, std::vector<RectangleBase*> > data =
             std::map<std::string, std::vector<RectangleBase*> >();
         data["inners"] = tempInnerObj;
         data["outers"] = tempOuterObjs;
@@ -1075,10 +1078,46 @@ void ObjectManager::addNewSource( VideoSource* s )
     // ...or rearrange it as a grid if the option is set...
     else if ( gridAuto )
     {
-        std::map<std::string, std::vector<RectangleBase*> > data = \
+        std::map<std::string, std::vector<RectangleBase*> > data =
             std::map<std::string, std::vector<RectangleBase*> >();
         data["objects"] = getMovableObjects();
         layouts->arrange("grid", getScreenRect(), getEarthRect(), data);
+    }
+    // ...or if session focus is enabled, put videos from focused session in
+    // center...
+    else if ( sessionFocus )
+    {
+        if ( s->getSession()->getAddress().compare( focusSession ) == 0 )
+        {
+            sessionFocusObjs.push_back( s );
+        }
+
+        std::vector<RectangleBase*> tempOuterObjs = getMovableObjects();
+        std::vector<RectangleBase*>::iterator sfo;
+        for ( sfo = sessionFocusObjs.begin(); sfo != sessionFocusObjs.end();
+                ++sfo )
+        {
+            std::vector<RectangleBase*>::iterator to;
+            to = tempOuterObjs.begin();
+            while ( to != tempOuterObjs.end() )
+            {
+                if ( (*sfo) == (*to) )
+                {
+                    to = tempOuterObjs.erase( to );
+                }
+                else
+                {
+                    ++to;
+                }
+            }
+        }
+
+        std::map<std::string, std::vector<RectangleBase*> > data =
+            std::map<std::string, std::vector<RectangleBase*> >();
+        data["inners"] = sessionFocusObjs;
+        data["outers"] = tempOuterObjs;
+        layouts->arrange( "aspectFocus", getScreenRect(), RectangleBase(),
+                            data );
     }
     // otherwise add to runway if we're using it & have >9 videos
     else if ( useRunway && videoListener->getSourceCount() > 9 )
@@ -1470,6 +1509,13 @@ bool ObjectManager::isVenueClientControllerShowable()
 void ObjectManager::setThumbnailMap( std::map<std::string, std::string> tm )
 {
     thumbnailMap = tm;
+    sessionFocus = true;
+}
+
+void ObjectManager::setFocusSession( std::string f )
+{
+    focusSession = f;
+    sessionFocusObjs.clear();
 }
 
 bool ObjectManager::audioAvailable()

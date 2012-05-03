@@ -205,6 +205,8 @@ public:
     bool isVenueClientControllerShowable();
 
     void setThumbnailMap( std::map<std::string, std::string> tm );
+    // currently only called on session manager rotate
+    void setFocusSession( std::string f );
 
 private:
     /*
@@ -224,9 +226,10 @@ private:
     std::vector<RectangleBase*>* objectsToAddToTree;
     std::vector<RectangleBase*>* objectsToRemoveFromTree;
 
-    // temp lists for doing auto/audio focus
+    // temp lists for doing auto/audio/session focus
     std::vector<RectangleBase*> outerObjs;
     std::vector<RectangleBase*> innerObjs;
+    std::vector<RectangleBase*> sessionFocusObjs;
 
     std::map<std::string, std::string> thumbnailMap;
 
@@ -292,6 +295,13 @@ private:
     bool useRunway;
     bool gridAuto;
     bool autoFocusRotate;
+    // whether session focus is enabled - currently only set when setting the
+    // thumbnail map
+    bool sessionFocus;
+    // current focused session - could use get current rotate session from
+    // sessionmanager, but possible thread-safety issues / may want to focus on
+    // separate main session instead of just the rotated session in the future
+    std::string focusSession;
 
     bool graphicsDebugView;
     long pixelCount;
