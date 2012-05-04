@@ -1225,6 +1225,12 @@ void ObjectManager::removeFromLists( RectangleBase* obj, bool treeRemove )
     if ( i != drawnObjects->end() )
         drawnObjects->erase( i );
 
+    // same for session focus objs
+    i = sessionFocusObjs.begin();
+    while ( i != sessionFocusObjs.end() && (*i) != obj ) i++;
+    if ( i != sessionFocusObjs.end() )
+        sessionFocusObjs.erase( i );
+
     if ( obj->isSelected() )
     {
         std::vector<RectangleBase*>::iterator j =
