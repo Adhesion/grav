@@ -435,6 +435,7 @@ GLUtil::GLUtil()
 {
     enableShaders = false;
     useBufferFont = false;
+    mainFont = NULL;
 
     frag420 =
     "uniform sampler2D texture;\n"
@@ -484,7 +485,10 @@ GLUtil::GLUtil()
 
 GLUtil::~GLUtil()
 {
-    delete mainFont;
+    if ( mainFont != NULL )
+    {
+        delete mainFont;
+    }
 
     std::map<std::string, Texture>::iterator i;
     for ( i = textures.begin(); i != textures.end(); ++i )

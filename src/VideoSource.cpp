@@ -244,7 +244,7 @@ void VideoSource::draw()
         float scaleFactor = getTextScale();
         glScalef( scaleFactor, scaleFactor, scaleFactor );
         std::string waitingMessage( "Waiting for video..." );
-        font->Render( waitingMessage.c_str() );
+        GLUtil::getInstance()->getMainFont()->Render( waitingMessage.c_str() );
         glPopMatrix();
     }
 
@@ -282,7 +282,7 @@ void VideoSource::draw()
         glColor4f( 0.55f, 0.55f, 0.95f, borderColor.A + 0.1f );
 
         std::string plus = "+HD";
-        font->Render( plus.c_str() );
+        GLUtil::getInstance()->getMainFont()->Render( plus.c_str() );
 
         glPopMatrix();
 

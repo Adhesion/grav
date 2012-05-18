@@ -143,6 +143,9 @@ private:
     std::string header;
     bool headerSet;
 
+    bool autoFocusRotate;
+    bool gridAuto;
+
     bool enableShaders;
     bool bufferFont;
 

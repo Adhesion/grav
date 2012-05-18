@@ -31,6 +31,7 @@ SessionGroupButton::SessionGroupButton( float _x, float _y ) :
 {
     userMovable = false;
     playing = false;
+    titleStyle = NOTEXT;
 }
 
 void SessionGroupButton::draw()

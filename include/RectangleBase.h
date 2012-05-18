@@ -53,7 +53,8 @@ enum TextStyle
 {
     TOPTEXT,
     CENTEREDTEXT,
-    FULLCAPTIONS
+    FULLCAPTIONS,
+    NOTEXT
 };
 
 // we need to do forward declaration since rectanglebase and group circularly
@@ -347,7 +348,6 @@ protected:
     // if name ends up being wider than the object itself, cut off with ellipsis
     int cutoffPos;
 
-    FTFont* font;
     FTBBox textBounds;
     // amount to scale the text relative to the total size
     float relativeTextScale;

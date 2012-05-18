@@ -57,14 +57,22 @@ int gravApp::threadCounter = 0;
 
 bool gravApp::OnInit()
 {
+    parser.SetCmdLine( argc, argv );
+
+    if ( !handleArgs() )
+    {
+        return false;
+    }
+
+    // Some weirdness happens if this is called before arg handling, etc.
+    gravUtil::initLogging();
+
     objectMan = new ObjectManager();
     // defaults - can be changed by command line
     windowWidth = 900; windowHeight = 550;
     startX = 10; startY = 50;
     // ObjectManager's windowwidth/height will be set by the glcanvas's resize
     // callback
-
-    parser.SetCmdLine( argc, argv );
 
     videoSessionListener = new VideoListener( objectMan );
     audioSessionListener = new AudioManager();
@@ -73,16 +81,6 @@ bool gravApp::OnInit()
     // video session listener needs to have ref to session manager to figure out
     // VPMSession -> SessionEntry
     videoSessionListener->setSessionManager( sessionManager );
-    //videoInitialized = false; audioInitialized = false;
-
-    if ( !handleArgs() )
-    {
-        delete objectMan;
-        return false;
-    }
-
-    // Some weirdness happens if this is called before arg handling, etc.
-    gravUtil::initLogging();
 
     // Set verbosity here, nothing should use gravUtil::logVerbose before this.
     if ( verbose )
@@ -225,6 +223,9 @@ bool gravApp::OnInit()
     objectMan->setVenueClientController( venueClientController ); // may be null
     objectMan->setSessionManager( sessionManager );
     objectMan->setAudio( audioSessionListener ); // may not necessarily be used
+
+    objectMan->setAutoFocusRotate( autoFocusRotate );
+    objectMan->setGridAuto( gridAuto );
 
     if ( haveThumbnailFile )
     {
@@ -412,9 +413,9 @@ bool gravApp::handleArgs()
 
     getAGVenueStreams = parser.Found( _("get-ag-venue-streams") );
 
-    objectMan->setAutoFocusRotate( parser.Found( _("automatic") ) );
+    autoFocusRotate = parser.Found( _("automatic") );
 
-    objectMan->setGridAuto( parser.Found( _("gridauto") ) );
+    gridAuto = parser.Found( _("gridauto") );
 
     fps = 0;
     if ( parser.Found( _("fps"), &fps ) )

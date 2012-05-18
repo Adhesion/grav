@@ -99,7 +99,6 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     finalName = other.finalName;
     cutoffPos = other.cutoffPos;
 
-    font = other.font;
     relativeTextScale = other.relativeTextScale;
     borderScale = other.borderScale;
     titleStyle = other.titleStyle;
@@ -126,14 +125,9 @@ RectangleBase::RectangleBase( const RectangleBase& other )
 RectangleBase::~RectangleBase()
 {
     if ( isGrouped() )
+    {
         myGroup->remove( this );
-
-    // if this is set externally, then we shouldn't delete it since other
-    // things might be using it
-    //glDeleteTextures( 1, &borderTex );
-
-    // font is not deleted here since the default is to use the global one from
-    // GLUtil, and that will delete it
+    }
 }
 
 void RectangleBase::setDefaults()
@@ -191,8 +185,6 @@ void RectangleBase::setDefaults()
 
     // TODO: this should be dynamic
     lat = 43.165556f; lon = -77.611389f;
-
-    font = GLUtil::getInstance()->getMainFont();
 
     intendedWidth = getDestTotalWidth();
     intendedHeight = getDestTotalHeight();
@@ -636,7 +628,6 @@ float RectangleBase::getOriginalAspect()
 
 void RectangleBase::setName( std::string s )
 {
-    bool nameChanged = s.compare( name ) == 0;
     name = s;
     updateTextBounds();
 }
@@ -849,7 +840,7 @@ bool RectangleBase::updateName()
 
 void RectangleBase::updateTextBounds()
 {
-    if ( font )
+    if ( GLUtil::getInstance()->getMainFont() )
     {
         nameSizeDirty = true;
     }
@@ -1043,10 +1034,10 @@ void RectangleBase::draw()
         float textLY = (getHeight()/2.0f) + getBorderSize() + getTextOffset();
         float textUY = textLY + getTextHeight();
 
-        glVertex3f(-Xdist, textLY, 0.0);
-        glVertex3f(-Xdist, textUY, 0.0);
-        glVertex3f(Xdist, textUY, 0.0);
-        glVertex3f(Xdist, textLY, 0.0);
+        glVertex3f( -Xdist, textLY, 0.0 );
+        glVertex3f( -Xdist, textUY, 0.0 );
+        glVertex3f( Xdist, textUY, 0.0 );
+        glVertex3f( Xdist, textLY, 0.0 );
 
         glEnd();
 
@@ -1058,11 +1049,11 @@ void RectangleBase::draw()
                    borderColor.B/2.3f,
                    borderColor.A/1.3f );
 
-        glVertex3f(-Xdist, 0.0, 0.0);
-        glVertex3f(Xdist, 0.0, 0.0);
+        glVertex3f( -Xdist, 0.0, 0.0 );
+        glVertex3f( Xdist, 0.0, 0.0 );
 
-        glVertex3f(0.0, Ydist, 0.0);
-        glVertex3f(0.0, -Ydist, 0.0);
+        glVertex3f( 0.0, Ydist, 0.0 );
+        glVertex3f( 0.0, -Ydist, 0.0 );
 
         glEnd();
 
@@ -1071,48 +1062,43 @@ void RectangleBase::draw()
 
     drawBorder( Xdist, Ydist, s, t );
 
-    glPushMatrix();
-
-    float textYPos = 0.0f;
-    float textXPos = 0.0f;
-    if ( titleStyle == TOPTEXT )
+    if ( GLUtil::getInstance()->getMainFont() && titleStyle != NOTEXT )
     {
-        textXPos = -getWidth() / 2.0f;
-        textYPos = ( getHeight() / 2.0f ) + getBorderSize() + getTextOffset();
-    }
-    else if ( titleStyle == CENTEREDTEXT )
-    {
-        textXPos = -getTextWidth() / 2.0f;
-        textYPos = -getTextHeight() / 2.0f;
-    }
-    else if ( titleStyle == FULLCAPTIONS )
-    {
-        textXPos = -getTextWidth() / 2.0f;
-        textYPos = ( -getHeight() / 2.0f ) - getBorderSize() - getTextOffset() -
-                    getTextHeight();
-    }
+        glPushMatrix();
 
-    float scaleFactor = getTextScale();
+        float textYPos = 0.0f;
+        float textXPos = 0.0f;
+        if ( titleStyle == TOPTEXT )
+        {
+            textXPos = -getWidth() / 2.0f;
+            textYPos = ( getHeight() / 2.0f ) + getBorderSize() +
+                    getTextOffset();
+        }
+        else if ( titleStyle == CENTEREDTEXT )
+        {
+            textXPos = -getTextWidth() / 2.0f;
+            textYPos = -getTextHeight() / 2.0f;
+        }
+        else if ( titleStyle == FULLCAPTIONS )
+        {
+            textXPos = -getTextWidth() / 2.0f;
+            textYPos = ( -getHeight() / 2.0f ) - getBorderSize() -
+                    getTextOffset() - getTextHeight();
+        }
 
-    /*if ( isGroup() )
-    {
-        yOffset += getTextHeight();
-        scaleFactor *= 0.75f;
-    }*/
+        float scaleFactor = getTextScale();
 
-    glTranslatef( textXPos, textYPos, 0.0f );
-    //glRasterPos2f( -getWidth()/2.0f, getHeight()/2.0f+yOffset );
-    glScalef( scaleFactor, scaleFactor, scaleFactor );
+        glTranslatef( textXPos, textYPos, 0.0f );
+        //glRasterPos2f( -getWidth()/2.0f, getHeight()/2.0f+yOffset );
+        glScalef( scaleFactor, scaleFactor, scaleFactor );
 
-    glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glEnable( GL_LINE_SMOOTH );
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glEnable( GL_LINE_SMOOTH );
 
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
-    if ( font )
-    {
         std::string renderedName = getSubName();
 
         if ( cutoffPos != -1 )
@@ -1121,7 +1107,9 @@ void RectangleBase::draw()
         }
 
         if ( showLockStatus && !locked )
+        {
             renderedName += " (unlocked)";
+        }
 
         if ( debugDraw )
         {
@@ -1132,16 +1120,18 @@ void RectangleBase::draw()
 
         // color call from before will carry over otherwise
         if ( !coloredText )
+        {
             glColor4f( 1.0f, 1.0f, 1.0f, borderColor.A );
+        }
 
         const char* nc = renderedName.c_str();
-        font->Render(nc);
+        GLUtil::getInstance()->getMainFont()->Render( nc );
+
+        glDisable( GL_BLEND );
+        glDisable( GL_LINE_SMOOTH );
+
+        glPopMatrix();
     }
-
-    glDisable( GL_BLEND );
-    glDisable( GL_LINE_SMOOTH );
-
-    glPopMatrix();
 
     glPopMatrix(); // from initial position setup
 
@@ -1217,7 +1207,8 @@ void RectangleBase::delayedNameSizeUpdate()
     intended.setPos( posX, posY );
 
     cutoffPos = -1;
-    textBounds = font->BBox( getSubName().c_str() );
+    textBounds = GLUtil::getInstance()->getMainFont()->BBox(
+            getSubName().c_str() );
     // only do cutoff if title is at top - so if centered (or other?)
     // display whole name even if it goes out of bounds
     while ( titleStyle == TOPTEXT && getTextWidth() > getWidth() )
@@ -1237,7 +1228,8 @@ void RectangleBase::delayedNameSizeUpdate()
 
         cutoffPos = curEnd - ceil( ( 1.0f -
               ( getWidth() / getTextWidth() ) ) * numChars ) - 1;
-        textBounds = font->BBox( getSubName().c_str() );
+        textBounds = GLUtil::getInstance()->getMainFont()->BBox(
+                getSubName().c_str() );
     }
 
     // also, since the text bounds might change, resize to fill the intended
