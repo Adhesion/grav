@@ -134,7 +134,7 @@ install(TARGETS grav
 	RUNTIME DESTINATION bin
 	)
 
-install(FILES circle.png border.png earth.png FreeSans.ttf
+install(FILES circle.png border.png earth.png FreeSans.ttf grav-icon.xpm
 	DESTINATION share/grav
 	)
 
