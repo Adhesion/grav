@@ -177,6 +177,9 @@ bool gravApp::OnInit()
         // bail out if something failed
         gravUtil::logError( "grav::OnInit(): ERROR: initGL() failed, "
                 "exiting\n" );
+        delete sessionManager;
+        delete videoSessionListener;
+        delete audioSessionListener;
         delete objectMan;
         return false;
     }
