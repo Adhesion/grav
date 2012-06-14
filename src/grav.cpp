@@ -116,6 +116,19 @@ bool gravApp::OnInit()
     treeFrame->Show( true );
     treeFrame->SetSizeHints( 250, 500, 250, 500 );
 
+    std::string iconLoc = gravUtil::getInstance()->findFile( "grav-icon.xpm" );
+
+    if ( iconLoc.compare( "" ) != 0 )
+    {
+        wxIcon mainIcon( wxString( iconLoc.c_str(), wxConvUTF8 ),
+                wxBITMAP_TYPE_XPM );
+        wxIcon treeIcon( wxString( iconLoc.c_str(), wxConvUTF8 ),
+                wxBITMAP_TYPE_XPM );
+
+        mainFrame->SetIcon( mainIcon );
+        treeFrame->SetIcon( treeIcon );
+    }
+
     treePanel = new wxPanel( treeFrame, wxID_ANY, treeFrame->GetPosition(),
                                 treeFrame->GetSize() );
     treeNotebook = new wxNotebook( treePanel, wxID_ANY,
