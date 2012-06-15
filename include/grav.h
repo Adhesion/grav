@@ -157,7 +157,7 @@ private:
 
     int startX, startY;
 
-    wxString thumbnailFile;
+    std::string thumbnailFile;
     bool haveThumbnailFile;
 
 };

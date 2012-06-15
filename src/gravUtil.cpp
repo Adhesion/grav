@@ -54,6 +54,7 @@ gravUtil::gravUtil()
 {
     sep = wxFileName::GetPathSeparator();
     std::string subdir = "py";
+    resourceDirList.push_back( "" ); // to allow full path input
     resourceDirList.push_back( "." + sep );
     resourceDirList.push_back( "." + sep + subdir + sep );
     resourceDirList.push_back( GRAV_RESOURCE_DIR );
@@ -95,10 +96,10 @@ void gravUtil::addPath( std::string path )
 }
 
 std::map< std::string, std::string > gravUtil::parseThumbnailFile(
-            wxString filename )
+            std::string filename )
 {
     wxTextFile tf;
-    tf.Open( filename );
+    tf.Open( wxString( filename.c_str(), wxConvUTF8 ) );
 
     std::string str = std::string( tf.GetFirstLine().char_str() );
     std::map< std::string, std::string > ret;

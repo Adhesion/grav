@@ -245,8 +245,13 @@ bool gravApp::OnInit()
 
     if ( haveThumbnailFile )
     {
-        objectMan->setThumbnailMap(
-                gravUtil::getInstance()->parseThumbnailFile( thumbnailFile ) );
+        std::string thumbPath = gravUtil::getInstance()->findFile(
+                thumbnailFile );
+        if ( thumbPath.compare( "" ) != 0 )
+        {
+            objectMan->setThumbnailMap(
+                gravUtil::getInstance()->parseThumbnailFile( thumbPath ) );
+        }
     }
 
     mapRTP();
@@ -470,20 +475,25 @@ bool gravApp::handleArgs()
         rotateIntervalMS = 30000;
     }
 
-    haveThumbnailFile = parser.Found( _("tf"), &thumbnailFile );
+    wxString thumbnailFileWX;
+    haveThumbnailFile = parser.Found( _("tf"), &thumbnailFileWX );
+    if ( haveThumbnailFile )
+    {
+        thumbnailFile = std::string( thumbnailFileWX.char_str() );
+    }
 
     wxString videoKeyWX;
     haveVideoKey = parser.Found( _("video-key"), &videoKeyWX );
     if ( haveVideoKey )
     {
-        initialVideoKey = std::string( (char*)videoKeyWX.char_str() );
+        initialVideoKey = std::string( videoKeyWX.char_str() );
     }
 
     wxString audioKeyWX;
     haveAudioKey = parser.Found( _("audio-key"), &audioKeyWX );
     if ( haveAudioKey )
     {
-        initialAudioKey = std::string( (char*)audioKeyWX.char_str() );
+        initialAudioKey = std::string( audioKeyWX.char_str() );
     }
 
     long int startXTemp, startYTemp, widthTemp, heightTemp;

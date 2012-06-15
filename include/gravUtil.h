@@ -56,7 +56,7 @@ public:
     void addPath( std::string path );
 
     std::map< std::string, std::string > parseThumbnailFile(
-            wxString filename );
+            std::string filename );
 
     /*
      * Log functions - goes straight to WX for now, abstracting just in case we
