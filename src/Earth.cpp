@@ -27,8 +27,6 @@
 
 #include <cmath>
 
-const float PI = 3.1415926535;
-
 Earth::Earth()
 {
     x = 0.0f; y = 0.0f, z = -25.0f;

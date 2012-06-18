@@ -28,6 +28,8 @@
 
 #include "GLUtil.h"
 
+const float PI = 3.1415926535;
+
 class Earth
 {
 

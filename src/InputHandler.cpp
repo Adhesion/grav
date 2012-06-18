@@ -139,12 +139,16 @@ InputHandler::InputHandler( Earth* e, ObjectManager* o, Frame* f )
     lookup[ktoh('A', wxMOD_ALT)] = &InputHandler::handleToggleAutoFocusRotate;
     docstr[ktoh('A', wxMOD_ALT)] = "Toggle 'automatic' mode (rotating focus)";
 
+    lookup[ktoh('O')] = &InputHandler::handleToggleOrbit;
+    docstr[ktoh('O')] = "Toggle orbital positions of videos around the globe.";
+
     lookup[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
                         &InputHandler::handleToggleGraphicsDebug;
     docstr[ktoh('D', wxMOD_SHIFT | wxMOD_CMD)] =
                         "Toggle graphics debugging information.";
 
-    if ( debug ) {
+    if ( debug )
+    {
         /* Debug keys */
         lookup[ktoh(' ')] = &InputHandler::handleAddTestObject;
         docstr[ktoh(' ')] = "[debug] Add a test window to the screen.";
@@ -155,8 +159,9 @@ InputHandler::InputHandler( Earth* e, ObjectManager* o, Frame* f )
         unprintables[(unsigned char)127] = "(delete)";
         lookup[ktoh('K')] = &InputHandler::handlePrintSelected;
         docstr[ktoh('K')] = "[debug] Print information about selected windows.";
-        lookup[ktoh('O')] = &InputHandler::handleRandomTest;
-        docstr[ktoh('O')] = "[debug] Print out randomly generated numbers.";
+        lookup[ktoh('R', wxMOD_SHIFT)] = &InputHandler::handleRandomTest;
+        docstr[ktoh('R', wxMOD_SHIFT)] = "[debug] Print out randomly generated "
+                "numbers.";
         lookup[ktoh('0')] = &InputHandler::handleMoveAllToCenter;
         docstr[ktoh('0')] = "[debug] Move all objects to the center.";
         lookup[ktoh('I')] = &InputHandler::handleInformation;
@@ -529,6 +534,11 @@ void InputHandler::handleMoveAllToCenter()
     {
         (*si)->move( 0.0f, 0.0f );
     }
+}
+
+void InputHandler::handleToggleOrbit()
+{
+    objectMan->toggleOrbit();
 }
 
 void InputHandler::handleToggleSiteGrouping()

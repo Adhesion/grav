@@ -80,6 +80,7 @@ public:
     void handleNativeScaleAll();
     void handleNativeScaleSelected();
     void handleMoveAllToCenter();
+    void handleToggleOrbit();
     void handleToggleSiteGrouping();
     void handleToggleShowVenueClientController();
     void handleToggleRenderingSelected();

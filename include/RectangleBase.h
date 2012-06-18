@@ -173,6 +173,11 @@ public:
     void setBorderScale( float b );
 
     /*
+     * Sets x, y & z rotation.
+     */
+    void setRotation( float x, float y, float z );
+
+    /*
      * Fill to another rectangle.
      */
     void fillToRect( RectangleBase rect, bool full = false );
@@ -185,7 +190,7 @@ public:
     void setTexture( GLuint tex, int width, int height );
 
     float getX(); float getY(); float getZ();
-    float getDestX(); float getDestY();
+    float getDestX(); float getDestY(); float getDestZ();
     float getScaleX(); float getScaleY();
     float getLat(); float getLon();
 
@@ -307,9 +312,9 @@ public:
 
 protected:
     // position in world space (center of the object)
-    float x,y,z;
+    float x, y, z;
     // x/y destinations for movement/animation
-    float destX, destY;
+    float destX, destY, destZ;
     float xAngle, yAngle, zAngle;
     float scaleX, scaleY;
     float destScaleX, destScaleY;

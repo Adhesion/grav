@@ -66,7 +66,7 @@ RectangleBase::RectangleBase( Bounds b )
 RectangleBase::RectangleBase( const RectangleBase& other )
 {
     x = other.x; y = other.y; z = other.z;
-    destX = other.destX; destY = other.destY;
+    destX = other.destX; destY = other.destY; destZ = other.destZ;
     scaleX = other.scaleX; scaleY = other.scaleY;
     destScaleX = other.destScaleX; destScaleY = other.destScaleY;
     xAngle = other.xAngle; yAngle = other.yAngle; zAngle = other.zAngle;
@@ -135,7 +135,7 @@ void RectangleBase::setDefaults()
     scaleX = 5.0f; scaleY = 5.0f;
     xAngle = 0.0f; yAngle = 0.0f; zAngle = 0.0f;
     x = 0.0f; y = 0.0f; z = 0.0f;
-    destX = x; destY = y;
+    destX = x; destY = y; destZ = z;
     destScaleX = scaleX; destScaleY = scaleY;
     // TODO make this actually based on the rotation
     normal = Vector( 0.0f, 0.0f, 1.0f );
@@ -444,7 +444,6 @@ void RectangleBase::move( float _x, float _y )
     }
     else
         positionAnimating = true;
-
 }
 
 void RectangleBase::setPos( float _x, float _y )
@@ -525,6 +524,13 @@ void RectangleBase::setBorderScale( float b )
     borderScale = b;
 }
 
+void RectangleBase::setRotation( float x, float y, float z )
+{
+    xAngle = x;
+    yAngle = y;
+    zAngle = z;
+}
+
 void RectangleBase::fillToRect( RectangleBase r, bool full )
 {
     float spaceAspect = r.getDestWidth() / r.getDestHeight();
@@ -594,6 +600,11 @@ float RectangleBase::getY()
 float RectangleBase::getDestY()
 {
     return destY;
+}
+
+float RectangleBase::getDestZ()
+{
+    return destZ;
 }
 
 float RectangleBase::getZ()

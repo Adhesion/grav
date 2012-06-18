@@ -166,6 +166,12 @@ public:
     void setCamX( float x ); void setCamY( float y ); void setCamZ( float z );
     void resetCamPosition();
 
+    /*
+     * Rearrange videos to orbit the globe in accordance with their lat/long
+     * position.
+     */
+    void toggleOrbit();
+
     RectangleBase getScreenRect( bool full = false );
     RectangleBase getEarthRect();
 

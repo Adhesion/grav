@@ -1318,6 +1318,55 @@ void ObjectManager::resetCamPosition()
     cam->resetPosition( true );
 }
 
+void ObjectManager::toggleOrbit()
+{
+    std::vector<RectangleBase*> objs = getMovableObjects();
+    std::vector<RectangleBase*>::iterator i;
+
+    for ( i = objs.begin(); i != objs.end(); ++i )
+    {
+        // get a vector from the rect to the earth projected onto the XZ plane
+        // (ie, ignore Y) to compare with the regular rect->earth vector in
+        // order to find the angles to rotate
+        Vector proj( earth->getX() - (*i)->getDestX(), 0.0f,
+                earth->getZ() - (*i)->getDestZ() );
+        proj.normalize();
+
+        // regular vector from rect to earth
+        Vector earthDir( earth->getX() - (*i)->getDestX(),
+                earth->getY() - (*i)->getDestY(),
+                earth->getZ() - (*i)->getDestZ() );
+        earthDir.normalize();
+
+        // forward lookat vector for rect, opposite of its normal since they
+        // start out facing away from the earth
+        Vector lookAt( (*i)->getNormal().getX() * -1.0f,
+                (*i)->getNormal().getY() * -1.0f,
+                (*i)->getNormal().getZ() * -1.0f );
+        lookAt.normalize();
+
+        // note: we can assume "right" (normally a vector parallel to the plane
+        // of the rectangle) is aligned with the camera, since the rectangles
+        // in non-orbit mode are indeed aligned with the camera
+        //Vector right( 1.0f, 0.0f, 0.0f );
+        //Vector up( 1.0f, 0.0f, 0.0f );
+
+        float yaw = acos( lookAt.dotProduct( proj ) ) * 180.0f / PI;
+        float tilt = acos( earthDir.dotProduct( proj ) ) * 180.0f / PI;
+
+        if ( (*i)->getDestX() < earth->getX() )
+        {
+            yaw *= -1.0f;
+        }
+        if ( (*i)->getDestY() > earth->getY() )
+        {
+            tilt *= -1.0f;
+        }
+
+        (*i)->setRotation( tilt, yaw, 0.0f );
+    }
+}
+
 RectangleBase ObjectManager::getScreenRect( bool full )
 {
     if ( full )
