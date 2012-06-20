@@ -1334,7 +1334,7 @@ void ObjectManager::orbitVideos()
     for ( i = objs.begin(); i != objs.end(); ++i )
     {
         // move to lat/lon position
-        Point p = earth->convertLatLong( (*i)->getLat(), (*i)->getLon() );
+        Point p = earth->convertLatLong( (*i)->getLat(), (*i)->getLon(), true );
         (*i)->move( p.getX(), p.getY(), p.getZ() );
 
         // get a vector from the rect to the earth projected onto the XZ plane
