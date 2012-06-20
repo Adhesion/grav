@@ -171,6 +171,8 @@ public:
      * position.
      */
     void toggleOrbit();
+    void orbitVideos();
+    void resetOrbit();
 
     RectangleBase getScreenRect( bool full = false );
     RectangleBase getEarthRect();
@@ -182,6 +184,7 @@ public:
     void setVideoListener( VideoListener* v );
     void setVenueClientController( VenueClientController* vcc );
     void setSessionManager( SessionManager* s );
+
     /*
      * Note, this should be called after GL setup since it needs to calculate
      * the text size, which depends on the font being set up.
@@ -308,6 +311,8 @@ private:
     // sessionmanager, but possible thread-safety issues / may want to focus on
     // separate main session instead of just the rotated session in the future
     std::string focusSession;
+
+    bool orbiting;
 
     bool graphicsDebugView;
     long pixelCount;

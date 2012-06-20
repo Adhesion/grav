@@ -33,6 +33,8 @@
 
 #include <cmath>
 
+#include <VPMedia/random_helper.h>
+
 RectangleBase::RectangleBase()
 {
     setDefaults();
@@ -184,7 +186,9 @@ void RectangleBase::setDefaults()
     secondColAnimating = false;
 
     // TODO: this should be dynamic
-    lat = 43.165556f; lon = -77.611389f;
+    //lat = 43.165556f; lon = -77.611389f;
+    lat = ( (float)random32() / (float)random32_max() * 180.0f ) - 90.0f;
+    lon = ( (float)random32() / (float)random32_max() * 360.0f ) - 180.0f;
 
     intendedWidth = getDestTotalWidth();
     intendedHeight = getDestTotalHeight();
@@ -433,23 +437,26 @@ float RectangleBase::getDestCenterOffsetY()
     return ret;
 }
 
-void RectangleBase::move( float _x, float _y )
+void RectangleBase::move( float _x, float _y, float _z )
 {
     destX = _x;
     destY = _y;
+    destZ = _z;
     if ( !animated )
     {
         x = _x;
         y = _y;
+        z = _z;
     }
     else
         positionAnimating = true;
 }
 
-void RectangleBase::setPos( float _x, float _y )
+void RectangleBase::setPos( float _x, float _y, float _z )
 {
     destX = _x; x = _x;
     destY = _y; y = _y;
+    destZ = _z; z = _z;
 }
 
 void RectangleBase::setScale( float xs, float ys )
@@ -1260,11 +1267,14 @@ void RectangleBase::animateValues()
     {
         x += ( destX - x ) / 7.5f;
         y += ( destY - y ) / 7.5f;
+        z += ( destZ - z ) / 7.5f;
 
-        if ( fabs( destX - x ) < 0.01f && fabs( destY - y ) < 0.01f )
+        if ( fabs( destX - x ) < 0.01f && fabs( destY - y ) < 0.01f &&
+                fabs( destZ - z ) < 0.01f )
         {
             x = destX;
             y = destY;
+            z = destZ;
             positionAnimating = false;
         }
     }

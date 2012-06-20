@@ -134,8 +134,8 @@ public:
      * Change the position of the object. Move may or may not have animation
      * (based on the animation switch), set will never have animation.
      */
-    virtual void move( float _x, float _y );
-    virtual void setPos( float _x, float _y );
+    virtual void move( float _x, float _y, float _z = 0.0f );
+    virtual void setPos( float _x, float _y, float z = 0.0f );
 
     /*
      * Change the scaling of the object.

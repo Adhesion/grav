@@ -722,15 +722,19 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     // TODO: are these axes backwards?
     case WXK_UP:
         earth->rotate( -2.0f, 0.0f, 0.0f );
+        objectMan->orbitVideos();
         break;
     case WXK_DOWN:
         earth->rotate( 2.0f, 0.0f, 0.0f );
+        objectMan->orbitVideos();
         break;
     case WXK_LEFT:
         earth->rotate( 0.0f, 0.0f, -2.0f );
+        objectMan->orbitVideos();
         break;
     case WXK_RIGHT:
         earth->rotate( 0.0f, 0.0f, 2.0f );
+        objectMan->orbitVideos();
         break;
     }
 }

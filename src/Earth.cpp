@@ -135,7 +135,7 @@ void Earth::draw()
 }
 
 void Earth::convertLatLong( float lat, float lon, float &ex, float &ey,
-                            float &ez)
+                            float &ez )
 {
     // grab the modelview matrix so we can calculate the result of the
     // rotation manually
@@ -201,6 +201,17 @@ void Earth::convertLatLong( float lat, float lon, float &ex, float &ey,
     //ez = (ex*GLUtil::modelview[2]) + (ey*GLUtil::modelview[3]) + (ez*GLUtil::modelview[10]) + GLUtil::modelview[14];
 
     //glPopMatrix();
+}
+
+Point Earth::convertLatLong( float lat, float lon )
+{
+    Point p;
+    float x, y, z;
+    convertLatLong( lat, lon, x, y, z );
+    p.setX( x );
+    p.setY( y );
+    p.setZ( z );
+    return p;
 }
 
 void Earth::rotate( float x, float y, float z )

@@ -123,6 +123,8 @@ ObjectManager::ObjectManager()
     audioFocusTrigger = false;
     audio = NULL;
 
+    orbiting = false;
+
     sourceMutex = mutex_create();
     lockCount = 0;
 
@@ -1320,11 +1322,21 @@ void ObjectManager::resetCamPosition()
 
 void ObjectManager::toggleOrbit()
 {
+    orbiting = !orbiting;
+    orbiting ? orbitVideos() : resetOrbit();
+}
+
+void ObjectManager::orbitVideos()
+{
     std::vector<RectangleBase*> objs = getMovableObjects();
     std::vector<RectangleBase*>::iterator i;
 
     for ( i = objs.begin(); i != objs.end(); ++i )
     {
+        // move to lat/lon position
+        Point p = earth->convertLatLong( (*i)->getLat(), (*i)->getLon() );
+        (*i)->move( p.getX(), p.getY(), p.getZ() );
+
         // get a vector from the rect to the earth projected onto the XZ plane
         // (ie, ignore Y) to compare with the regular rect->earth vector in
         // order to find the angles to rotate
@@ -1364,6 +1376,18 @@ void ObjectManager::toggleOrbit()
         }
 
         (*i)->setRotation( tilt, yaw, 0.0f );
+    }
+}
+
+void ObjectManager::resetOrbit()
+{
+    std::vector<RectangleBase*> objs = getMovableObjects();
+    std::vector<RectangleBase*>::iterator i;
+
+    for ( i = objs.begin(); i != objs.end(); ++i )
+    {
+        (*i)->move( (*i)->getDestX(), (*i)->getDestY(), 0.0f );
+        (*i)->setRotation( 0.0f, 0.0f, 0.0f );
     }
 }
 

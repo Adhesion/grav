@@ -39,6 +39,7 @@ public:
     void draw();
     void convertLatLong( float lat, float lon, float &ex, float &ey,
                         float &ez );
+    Point convertLatLong( float lat, float lon );
     void rotate( float x, float y, float z );
     float getX(); float getY(); float getZ();
     float getRadius();
