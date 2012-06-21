@@ -437,25 +437,38 @@ float RectangleBase::getDestCenterOffsetY()
     return ret;
 }
 
-void RectangleBase::move( float _x, float _y, float _z )
+void RectangleBase::move( float _x, float _y )
 {
     destX = _x;
     destY = _y;
-    destZ = _z;
     if ( !animated )
     {
         x = _x;
         y = _y;
-        z = _z;
     }
     else
         positionAnimating = true;
 }
 
-void RectangleBase::setPos( float _x, float _y, float _z )
+void RectangleBase::move( float _x, float _y, float _z )
+{
+    move( _x, _y );
+    destZ = _z;
+    if ( !animated )
+    {
+        z = destZ;
+    }
+}
+
+void RectangleBase::setPos( float _x, float _y )
 {
     destX = _x; x = _x;
     destY = _y; y = _y;
+}
+
+void RectangleBase::setPos( float _x, float _y, float _z )
+{
+    setPos( _x, _y );
     destZ = _z; z = _z;
 }
 
