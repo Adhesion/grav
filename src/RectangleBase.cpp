@@ -619,6 +619,16 @@ float RectangleBase::getZ()
     return z;
 }
 
+Point RectangleBase::getPos()
+{
+    return Point( x, y, z );
+}
+
+Point RectangleBase::getDestPos()
+{
+    return Point( destX, destY, destZ );
+}
+
 float RectangleBase::getScaleX()
 {
     return scaleX;

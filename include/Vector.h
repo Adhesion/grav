@@ -41,7 +41,8 @@ public:
     void normalize();
     float getLength();
 
-    Vector operator/( const float& factor );
+    Vector operator/( float factor );
+    Vector operator*( float factor );
 
 private:
     float x, y, z;

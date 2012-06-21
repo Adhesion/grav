@@ -210,6 +210,11 @@ float Earth::getZ()
     return z;
 }
 
+Point Earth::getPos()
+{
+    return Point( x, y, z );
+}
+
 float Earth::getRadius()
 {
     return radius;

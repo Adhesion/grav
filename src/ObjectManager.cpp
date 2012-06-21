@@ -1345,23 +1345,18 @@ void ObjectManager::orbitVideos()
         proj.normalize();
 
         // regular vector from rect to earth
-        Vector earthDir( earth->getX() - (*i)->getDestX(),
-                earth->getY() - (*i)->getDestY(),
-                earth->getZ() - (*i)->getDestZ() );
+        Vector earthDir = earth->getPos() - (*i)->getDestPos();
         earthDir.normalize();
 
         // forward lookat vector for rect, opposite of its normal since they
         // start out facing away from the earth
-        Vector lookAt( (*i)->getNormal().getX() * -1.0f,
-                (*i)->getNormal().getY() * -1.0f,
-                (*i)->getNormal().getZ() * -1.0f );
+        Vector lookAt = (*i)->getNormal() * -1.0f;
         lookAt.normalize();
 
-        // note: we can assume "right" (normally a vector parallel to the plane
-        // of the rectangle) is aligned with the camera, since the rectangles
-        // in non-orbit mode are indeed aligned with the camera
-        //Vector right( 1.0f, 0.0f, 0.0f );
-        //Vector up( 1.0f, 0.0f, 0.0f );
+        // move obj out from earth a bit
+        Vector moveVec = ( (*i)->getDestPos() - earth->getPos() ) * 0.1f;
+        p = p + moveVec;
+        (*i)->move( p.getX(), p.getY(), p.getZ() );
 
         float yaw = acos( lookAt.dotProduct( proj ) ) * 180.0f / PI;
         float tilt = acos( earthDir.dotProduct( proj ) ) * 180.0f / PI;

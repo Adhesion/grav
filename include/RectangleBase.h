@@ -191,6 +191,8 @@ public:
 
     float getX(); float getY(); float getZ();
     float getDestX(); float getDestY(); float getDestZ();
+    Point getPos();
+    Point getDestPos();
     float getScaleX(); float getScaleY();
     float getLat(); float getLon();
 

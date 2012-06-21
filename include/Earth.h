@@ -42,6 +42,7 @@ public:
     Point convertLatLong( float lat, float lon, bool dest = false );
     void rotate( float x, float y, float z );
     float getX(); float getY(); float getZ();
+    Point getPos();
     float getRadius();
 
 private:
