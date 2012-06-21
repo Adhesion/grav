@@ -1333,6 +1333,8 @@ void ObjectManager::orbitVideos()
 
     for ( i = objs.begin(); i != objs.end(); ++i )
     {
+        (*i)->setScale( 5.0f, 5.0f );
+
         // move to lat/lon position
         Point p = earth->convertLatLong( (*i)->getLat(), (*i)->getLon(), true );
         (*i)->move( p );
