@@ -72,6 +72,8 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     scaleX = other.scaleX; scaleY = other.scaleY;
     destScaleX = other.destScaleX; destScaleY = other.destScaleY;
     xAngle = other.xAngle; yAngle = other.yAngle; zAngle = other.zAngle;
+    destXAngle = other.destXAngle; destYAngle = other.destYAngle;
+    destZAngle = other.destZAngle;
     normal = other.normal;
 
     intendedWidth = other.intendedWidth;
@@ -122,6 +124,7 @@ RectangleBase::RectangleBase( const RectangleBase& other )
     scaleAnimating = other.scaleAnimating;
     borderColAnimating = other.borderColAnimating;
     secondColAnimating = other.secondColAnimating;
+    rotationAnimating = other.rotationAnimating;
 }
 
 RectangleBase::~RectangleBase()
@@ -139,6 +142,7 @@ void RectangleBase::setDefaults()
     x = 0.0f; y = 0.0f; z = 0.0f;
     destX = x; destY = y; destZ = z;
     destScaleX = scaleX; destScaleY = scaleY;
+    destXAngle = xAngle; destYAngle = yAngle; destZAngle = zAngle;
     // TODO make this actually based on the rotation
     normal = Vector( 0.0f, 0.0f, 1.0f );
 
@@ -184,6 +188,7 @@ void RectangleBase::setDefaults()
     scaleAnimating = false;
     borderColAnimating = false;
     secondColAnimating = false;
+    rotationAnimating = false;
 
     // TODO: this should be dynamic
     //lat = 43.165556f; lon = -77.611389f;
@@ -556,9 +561,20 @@ void RectangleBase::setBorderScale( float b )
 
 void RectangleBase::setRotation( float x, float y, float z )
 {
-    xAngle = x;
-    yAngle = y;
-    zAngle = z;
+    destXAngle = x;
+    destYAngle = y;
+    destZAngle = z;
+
+    if ( !animated )
+    {
+        xAngle = x;
+        yAngle = y;
+        zAngle = z;
+    }
+    else
+    {
+        rotationAnimating = true;
+    }
 }
 
 void RectangleBase::fillToRect( RectangleBase r, bool full )
@@ -1363,6 +1379,22 @@ void RectangleBase::animateValues()
             secondaryColor.B = destSecondaryColor.B;
             secondaryColor.A = destSecondaryColor.A;
             secondColAnimating = false;
+        }
+    }
+
+    if ( rotationAnimating )
+    {
+        xAngle += ( destXAngle - xAngle ) / 7.5f;
+        yAngle += ( destYAngle - yAngle ) / 7.5f;
+        zAngle += ( destZAngle - zAngle ) / 7.5f;
+
+        if ( fabs( destXAngle - xAngle ) < 0.01f && fabs( destYAngle - yAngle ) < 0.01f &&
+                fabs( destZAngle - zAngle ) < 0.01f )
+        {
+            xAngle = destXAngle;
+            yAngle = destYAngle;
+            zAngle = destZAngle;
+            rotationAnimating = false;
         }
     }
 }

@@ -322,6 +322,7 @@ protected:
     // x/y destinations for movement/animation
     float destX, destY, destZ;
     float xAngle, yAngle, zAngle;
+    float destXAngle, destYAngle, destZAngle;
     float scaleX, scaleY;
     float destScaleX, destScaleY;
     Vector normal;
@@ -399,6 +400,7 @@ protected:
     bool scaleAnimating;
     bool borderColAnimating;
     bool secondColAnimating;
+    bool rotationAnimating;
 
 };
 
