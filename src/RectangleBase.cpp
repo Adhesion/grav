@@ -459,6 +459,16 @@ void RectangleBase::setPos( float _x, float _y, float _z )
     destZ = _z; z = _z;
 }
 
+void RectangleBase::move( Point p )
+{
+    move( p.getX(), p.getY(), p.getZ() );
+}
+
+void RectangleBase::setPos( Point p )
+{
+    setPos( p.getX(), p.getY(), p.getZ() );
+}
+
 void RectangleBase::setScale( float xs, float ys )
 {
     destScaleX = xs; destScaleY = ys;

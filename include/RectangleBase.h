@@ -136,6 +136,8 @@ public:
      */
     virtual void move( float _x, float _y, float _z = 0.0f );
     virtual void setPos( float _x, float _y, float z = 0.0f );
+    virtual void move( Point p );
+    virtual void setPos( Point p );
 
     /*
      * Change the scaling of the object.

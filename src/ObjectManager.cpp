@@ -1335,7 +1335,7 @@ void ObjectManager::orbitVideos()
     {
         // move to lat/lon position
         Point p = earth->convertLatLong( (*i)->getLat(), (*i)->getLon(), true );
-        (*i)->move( p.getX(), p.getY(), p.getZ() );
+        (*i)->move( p );
 
         // get a vector from the rect to the earth projected onto the XZ plane
         // (ie, ignore Y) to compare with the regular rect->earth vector in
@@ -1356,16 +1356,21 @@ void ObjectManager::orbitVideos()
         // move obj out from earth a bit
         Vector moveVec = ( (*i)->getDestPos() - earth->getPos() ) * 0.1f;
         p = p + moveVec;
-        (*i)->move( p.getX(), p.getY(), p.getZ() );
+        (*i)->move( p );
 
         float yaw = acos( lookAt.dotProduct( proj ) ) * 180.0f / PI;
         float tilt = acos( earthDir.dotProduct( proj ) ) * 180.0f / PI;
 
+        // bit of a hack, this could use some work
         if ( (*i)->getDestX() < earth->getX() )
         {
             yaw *= -1.0f;
         }
         if ( (*i)->getDestY() > earth->getY() )
+        {
+            tilt *= -1.0f;
+        }
+        if ( (*i)->getDestZ() < earth->getZ() )
         {
             tilt *= -1.0f;
         }
