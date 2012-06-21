@@ -139,9 +139,12 @@ void GLCanvas::GLreshape( int w, int h )
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(-screen_width/10.0, screen_width/10.0,
-              -screen_height/10.0, screen_height/10.0,
-              0.1, 50.0);
+    //glFrustum(-screen_width/10.0, screen_width/10.0,
+    //          -screen_height/10.0, screen_height/10.0,
+    //          0.1, 50.0);
+    glFrustum(-screen_width, screen_width,
+              -screen_height, screen_height,
+              1.0, 50.0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

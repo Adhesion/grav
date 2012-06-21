@@ -74,15 +74,17 @@ void VideoSource::draw()
     // set up our position
     glPushMatrix();
 
-    glTranslatef( x, y, z );
+    // dumb hack here to prevent z-fighting on orbit
+    glTranslatef( x, y, z + 0.05f );
 
     glRotatef( xAngle, 1.0, 0.0, 0.0 );
     glRotatef( yAngle, 0.0, 1.0, 0.0 );
     glRotatef( zAngle, 0.0, 0.0, 1.0 );
 
     //glDepthMask( GL_FALSE );
-    //glDepthRange (0.0, 0.9);
-    //glPolygonOffset( 0.2, 0.8 );
+    //glEnable( GL_POLYGON_OFFSET_FILL );
+    //glDepthRange ( 0.0, 0.9 );
+    //glPolygonOffset( 1.0, 1.0 );
 
     float s = 1.0;
     float t = 1.0;
@@ -312,6 +314,7 @@ void VideoSource::draw()
 
     glPopMatrix();
 
+    //glDisable( GL_POLYGON_OFFSET_FILL );
 }
 
 void VideoSource::resizeBuffer()

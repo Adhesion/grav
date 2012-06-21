@@ -275,7 +275,10 @@ void ObjectManager::draw()
 
     // this makes the depth buffer read-only for this bit - this prevents
     // z-fighting on the videos which are coplanar
-    glDepthMask( GL_FALSE );
+    if ( !orbiting )
+    {
+        glDepthMask( GL_FALSE );
+    }
 
     // iterate through all objects to be drawn, and draw
     for ( si = drawnObjects->begin(); si != drawnObjects->end(); si++ )
@@ -488,7 +491,10 @@ void ObjectManager::draw()
     }
 
     // back to writeable z-buffer for proper earth/line rendering
-    glDepthMask( GL_TRUE );
+    if ( !orbiting )
+    {
+        glDepthMask( GL_TRUE );
+    }
 
     glFlush();
 

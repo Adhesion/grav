@@ -187,7 +187,7 @@ void RectangleBase::setDefaults()
 
     // TODO: this should be dynamic
     //lat = 43.165556f; lon = -77.611389f;
-    lat = ( (float)random32() / (float)random32_max() * 180.0f ) - 90.0f;
+    lat = ( (float)random32() / (float)random32_max() * 90.0f ) - 45.0f;
     lon = ( (float)random32() / (float)random32_max() * 360.0f ) - 180.0f;
 
     intendedWidth = getDestTotalWidth();
