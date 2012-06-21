@@ -1356,7 +1356,7 @@ void ObjectManager::orbitVideos()
         lookAt.normalize();
 
         // move obj out from earth a bit
-        Vector moveVec = ( (*i)->getDestPos() - earth->getPos() ) * 0.1f;
+        Vector moveVec = ( (*i)->getDestPos() - earth->getPos() ) * 0.2f;
         p = p + moveVec;
         (*i)->move( p );
 
@@ -1377,7 +1377,8 @@ void ObjectManager::orbitVideos()
             tilt *= -1.0f;
         }
 
-        (*i)->setRotation( tilt, yaw, 0.0f );
+        // tilt not used for now, acting a bit weird
+        (*i)->setRotation( 0.0f, yaw, 0.0f );
     }
 }
 
