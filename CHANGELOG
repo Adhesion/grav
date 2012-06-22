@@ -2,10 +2,21 @@
 grav CHANGELOG
 ==============
 
-Version [next]
+Version 0.2.0
 --------------
 
-* Fix miscellaneous sizing bugs (objects will resize correctly on name change)
+* Added visual session manager - video sessions can be shifted between the main
+  list and the available list, you can 'change channels' within the available
+  list, and you can enable automatic channel changing with the lower-left
+  button. Appears at the bottom of the screen on mouseover.
+* Added the ability to orbit videos around the globe (according to their
+  lat/long from RTP location) by pressing the 'o' key.
+* Added --thumbnail-file option - given a text file, grav will parse it and make
+  associations between videos (by name) and an alternate address, enabling the
+  ability to switch to that address on double-click (assuming the address is in
+  the available list).
+* Added application icon (by Victoria Murray)
+* Fixed miscellaneous sizing bugs (objects will resize correctly on name change)
 
 Version 0.1.0
 -------------

@@ -56,6 +56,11 @@ Compiling on Linux
       then compile & sudo make install (make install will probably install
       to ``/usr/local/lib`` by default).  Note that if you also have a system
       copy of FFmpeg installed, there may be conflicts.  See [2]_.
+      Also note, with new versions of ffmpeg/libav, some of the libavcodec
+      functions may be deprecated. There are examples of the new functions
+      commented out in the VPMedia source (mostly in video/mpeg4/mpeg4.cpp)
+      There may be issues with padding/the EMU_EDGE flag in very new versions
+      as well (causes artifacts in certain size videos)
 
 3. SVN checkout the UCL common library from here:
    https://mediatools.cs.ucl.ac.uk/repos/mmedia e.g.::
@@ -328,6 +333,12 @@ group in the side window, or automatically every X seconds with the ``-arav``
 the main list and the available video list via the right-click menu in the side
 window.
 
+In addition, sessions can be manipulated via the visual session manager which
+appears at the bottom of the main screen on mouseover. Sessions can be shifted
+between the main & available lists by click-and-drag. Double-click on a session
+in the available list to switch to it. Double-click the bottom left play/pause
+button to toggle automatic rotation of available video sessions.
+
 Runway
 ------
 
@@ -354,10 +365,27 @@ venue and add them to the main list of connected video sessions.
 To automatically grab video addresses from a running Venue Client when grav
 is started, use the command line option ``-agvs``.
 
+Orbiting
+--------
+
+Press the ``o`` key to orbit videos around the globe according to their RTP
+lat/long position. Rearranging the videos via ``r``, ``p`` etc. will disable
+orbit mode if it is enabled.
+
+Thumbnail Association
+---------------------
+Using the ``--thumbnail-file`` command line option with the location of a text
+file will create associations between videos (by name) and alternate addresses
+(ie, for thumbnailing HD streams). Videos with available alternate addresses
+(assuming the address is in the available list) will have +HD listed in their
+bottom right corner. Double-click on video with +HD to switch to its alternate
+address in the available video list. Text file format is currently
+``name:address/port``.
+
 Notes
 =====
 
-`grav` (C) 2011 Rochester Institute of Technology.
+`grav` (C) 2011-2012 Rochester Institute of Technology.
 
 Authored by `Andrew Ford <http://github.com/adhesion>`_ with
 contributions from `Ralph Bean <http://github.com/ralphbean>`_.
