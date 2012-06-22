@@ -1349,6 +1349,12 @@ void ObjectManager::toggleOrbit()
 
 void ObjectManager::orbitVideos()
 {
+    // zoom in cam a bit
+    cam->resetPosition( true );
+    Point c = cam->getDestCenter();
+    c.setZ( c.getZ() - 5.0f );
+    cam->moveCenter( c );
+
     std::vector<RectangleBase*> objs = getMovableObjects();
     std::vector<RectangleBase*>::iterator i;
 
@@ -1405,6 +1411,8 @@ void ObjectManager::orbitVideos()
 
 void ObjectManager::resetOrbit()
 {
+    cam->resetPosition( true );
+
     std::vector<RectangleBase*> objs = getMovableObjects();
     std::vector<RectangleBase*>::iterator i;
 
