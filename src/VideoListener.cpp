@@ -92,7 +92,7 @@ void VideoListener::vpmsession_source_created( VPMSession &session,
         // even the address since that's only in VPMSession_net)
         // this should be thread-safe since this function will be called on the
         // second thread
-        // TODO will change if session are on their own threads?
+        // TODO will change if sessions are on their own threads?
         SessionEntry* se = sessionMan->findSessionByVPMSession( &session );
 
         // if we're getting a new video from a VPMSession but it's not found in
@@ -105,8 +105,10 @@ void VideoListener::vpmsession_source_created( VPMSession &session,
             return;
         }
 
-        VideoSource* source = new VideoSource( se, this, ssrc, sink, x, y );
+        VideoSource* source = new VideoSource( se, this, ssrc, sink, 0.0f,
+                0.0f );
         source->setScale( 5.25f, 5.25f );
+        source->move( x, y );
         objectMan->addNewSource( source );
 
         // new frame callback mostly just used for testing

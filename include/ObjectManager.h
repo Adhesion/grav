@@ -173,6 +173,9 @@ public:
     void toggleOrbit();
     void orbitVideos();
     void resetOrbit();
+    bool isOrbiting();
+
+    void rotateEarth( float x, float y, float z );
 
     RectangleBase getScreenRect( bool full = false );
     RectangleBase getEarthRect();

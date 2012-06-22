@@ -31,7 +31,6 @@
 #include "RectangleBase.h"
 #include "Group.h"
 #include "ObjectManager.h"
-#include "Earth.h"
 #include "Frame.h"
 #include "Runway.h"
 
@@ -53,8 +52,8 @@ EVT_LEFT_UP(InputHandler::wxMouseLUp)
 EVT_RIGHT_DOWN(InputHandler::wxMouseRDown)
 END_EVENT_TABLE();
 
-InputHandler::InputHandler( Earth* e, ObjectManager* o, Frame* f )
-    : earth( e ), objectMan( o ), mainFrame( f )
+InputHandler::InputHandler( ObjectManager* o, Frame* f )
+    : objectMan( o ), mainFrame( f )
 {
     tempSelectedObjects = new std::vector<RectangleBase*>();
     dragging = false;
@@ -312,6 +311,11 @@ void InputHandler::handleUpdateGroupNames()
 
 void InputHandler::handlePerimeterArrange()
 {
+    if ( objectMan->isOrbiting() )
+    {
+        objectMan->toggleOrbit();
+    }
+
     std::map<std::string, std::vector<RectangleBase*> > data;
     data["objects"] = objectMan->getMovableObjects();
     layouts.arrange( "perimeter", objectMan->getScreenRect(),
@@ -320,6 +324,11 @@ void InputHandler::handlePerimeterArrange()
 
 void InputHandler::handleGridArrange()
 {
+    if ( objectMan->isOrbiting() )
+    {
+        objectMan->toggleOrbit();
+    }
+
     std::map<std::string, std::vector<RectangleBase*> > data;
     data["objects"] = objectMan->getMovableObjects();
     layouts.arrange( "grid", objectMan->getScreenRect(),
@@ -330,6 +339,11 @@ void InputHandler::handleFocusArrange()
 {
     if ( objectMan->getSelectedObjects()->size() > 0 )
     {
+        if ( objectMan->isOrbiting() )
+        {
+            objectMan->toggleOrbit();
+        }
+
         std::map<std::string, std::vector<RectangleBase*> > data;
         data["outers"] = objectMan->getUnselectedObjects();
         data["inners"] = *(objectMan->getSelectedObjects());
@@ -342,6 +356,11 @@ void InputHandler::handleFullscreenSelectedSingle()
 {
     if ( objectMan->getSelectedObjects()->size() == 1 )
     {
+        if ( objectMan->isOrbiting() )
+        {
+            objectMan->toggleOrbit();
+        }
+
         (*objectMan->getSelectedObjects())[0]->fillToRect(
                 objectMan->getScreenRect() );
     }
@@ -351,6 +370,11 @@ void InputHandler::handleFullerFullscreenSelectedSingle()
 {
     if ( objectMan->getSelectedObjects()->size() == 1 )
     {
+        if ( objectMan->isOrbiting() )
+        {
+            objectMan->toggleOrbit();
+        }
+
         (*objectMan->getSelectedObjects())[0]->fillToRect(
                 objectMan->getScreenRect( true ), true );
     }
@@ -721,20 +745,16 @@ void InputHandler::processKeyboard( int keyCode, int x, int y )
     // u/d/l/r arrow keys, for WX
     // TODO: are these axes backwards?
     case WXK_UP:
-        earth->rotate( -2.0f, 0.0f, 0.0f );
-        objectMan->orbitVideos();
+        objectMan->rotateEarth( -2.0f, 0.0f, 0.0f );
         break;
     case WXK_DOWN:
-        earth->rotate( 2.0f, 0.0f, 0.0f );
-        objectMan->orbitVideos();
+        objectMan->rotateEarth( 2.0f, 0.0f, 0.0f );
         break;
     case WXK_LEFT:
-        earth->rotate( 0.0f, 0.0f, -2.0f );
-        objectMan->orbitVideos();
+        objectMan->rotateEarth( 0.0f, 0.0f, -2.0f );
         break;
     case WXK_RIGHT:
-        earth->rotate( 0.0f, 0.0f, 2.0f );
-        objectMan->orbitVideos();
+        objectMan->rotateEarth( 0.0f, 0.0f, 2.0f );
         break;
     }
 }

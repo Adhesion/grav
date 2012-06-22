@@ -37,7 +37,6 @@
 
 class VideoSource;
 class RectangleBase;
-class Earth;
 class Group;
 class ObjectManager;
 class LayoutManager;
@@ -52,7 +51,7 @@ class InputHandler : public wxEvtHandler
 {
 
 public:
-    InputHandler( Earth* e, ObjectManager* g, Frame* f );
+    InputHandler( ObjectManager* g, Frame* f );
     ~InputHandler();
 
     void wxKeyDown( wxKeyEvent& evt );
@@ -128,7 +127,6 @@ public:
 
 private:
     std::vector<RectangleBase*>* tempSelectedObjects;
-    Earth* earth;
 
     // parent class
     ObjectManager* objectMan;

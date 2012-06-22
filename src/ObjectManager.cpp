@@ -205,7 +205,8 @@ void ObjectManager::draw()
 
     // periodically automatically rearrange if on automatic - take last object
     // and put it in center
-    if ( autoCounter == 0 && getMovableObjects().size() > 0 && autoFocusRotate )
+    if ( !orbiting && autoCounter == 0 && getMovableObjects().size() > 0 &&
+            autoFocusRotate )
     {
         outerObjs = getMovableObjects();
         innerObjs = std::vector<RectangleBase*>( outerObjs.begin(),
@@ -234,6 +235,13 @@ void ObjectManager::draw()
             tree->addObject( (*objectsToAddToTree)[i] );
         }
         objectsToAddToTree->clear();
+
+        // bit of a hack to force orbit on adding a new video
+        // can't do it in addsource since GL stuff can only be on main thread
+        if ( orbiting )
+        {
+            orbitVideos();
+        }
     }
     // same for remove
     if ( objectsToRemoveFromTree->size() > 0 && tree != NULL )
@@ -358,13 +366,20 @@ void ObjectManager::draw()
     {
         if ( audioFocusTrigger )
         {
-            std::map<std::string, std::vector<RectangleBase*> > data = \
-                std::map<std::string, std::vector<RectangleBase*> >();
-            data["inners"] = innerObjs;
-            data["outers"] = outerObjs;
-            layouts->arrange( "aspectFocus", getScreenRect(), RectangleBase(),
-                                data );
-            audioFocusTrigger = false;
+            if ( !orbiting )
+            {
+                std::map<std::string, std::vector<RectangleBase*> > data =
+                    std::map<std::string, std::vector<RectangleBase*> >();
+                data["inners"] = innerObjs;
+                data["outers"] = outerObjs;
+                layouts->arrange( "aspectFocus", getScreenRect(),
+                                    RectangleBase(), data );
+                audioFocusTrigger = false;
+            }
+            else
+            {
+                // rotate earth to talking site here?
+            }
         }
 
         outerObjs.clear();
@@ -1067,7 +1082,7 @@ void ObjectManager::addNewSource( VideoSource* s )
     if ( tree != NULL )
         objectsToAddToTree->push_back( (RectangleBase*)s );
 
-    // do extra placement stuff
+    // do extra placement stuff:
     // execute automatic mode layout again if it's on...
     if ( autoFocusRotate )
     {
@@ -1397,6 +1412,20 @@ void ObjectManager::resetOrbit()
     {
         (*i)->move( (*i)->getDestX(), (*i)->getDestY(), 0.0f );
         (*i)->setRotation( 0.0f, 0.0f, 0.0f );
+    }
+}
+
+bool ObjectManager::isOrbiting()
+{
+    return orbiting;
+}
+
+void ObjectManager::rotateEarth( float x, float y, float z )
+{
+    earth->rotate( x, y, z );
+    if ( orbiting )
+    {
+        orbitVideos();
     }
 }
 

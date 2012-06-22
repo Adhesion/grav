@@ -212,7 +212,7 @@ bool gravApp::OnInit()
     //videoSession_listener->setTimer( t2 );
 
     earth = new Earth();
-    input = new InputHandler( earth, objectMan, mainFrame );
+    input = new InputHandler( objectMan, mainFrame );
 
     // frame needs reference to inputhandler to generate help window for
     // shortcut hotkeys
