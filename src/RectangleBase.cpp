@@ -43,26 +43,26 @@ RectangleBase::RectangleBase()
 RectangleBase::RectangleBase( float _x, float _y )
 {
     setDefaults();
-    x = -15.0f; y = 15.0f; z = 0.0f;
-    move( _x, _y );
+    //x = -15.0f; y = 15.0f; z = 0.0f;
+    setPos( _x, _y );
 }
 
 RectangleBase::RectangleBase( float l, float r, float u, float d )
 {
     setDefaults();
-    x = -15.0f; y = 15.0f; z = 0.0f;
+    //x = -15.0f; y = 15.0f; z = 0.0f;
 
     setScale( r - l, u - d );
-    move( ( r + l ) / 2.0f, ( u + d ) / 2.0f );
+    setPos( ( r + l ) / 2.0f, ( u + d ) / 2.0f );
 }
 
 RectangleBase::RectangleBase( Bounds b )
 {
     setDefaults();
-    x = -15.0f; y = 15.0f; z = 0.0f;
+    //x = -15.0f; y = 15.0f; z = 0.0f;
 
     setScale( b.R - b.L, b.U - b.D );
-    move( ( b.R + b.L ) / 2.0f, ( b.U + b.D ) / 2.0f );
+    setPos( ( b.R + b.L ) / 2.0f, ( b.U + b.D ) / 2.0f );
 }
 
 RectangleBase::RectangleBase( const RectangleBase& other )
@@ -137,11 +137,11 @@ RectangleBase::~RectangleBase()
 
 void RectangleBase::setDefaults()
 {
-    scaleX = 5.0f; scaleY = 5.0f;
+    scaleX = 1.5f; scaleY = 1.5f;
     xAngle = 0.0f; yAngle = 0.0f; zAngle = 0.0f;
     x = 0.0f; y = 0.0f; z = 0.0f;
     destX = x; destY = y; destZ = z;
-    destScaleX = scaleX; destScaleY = scaleY;
+    destScaleX = 5.0f; destScaleY = 5.0f;
     destXAngle = xAngle; destYAngle = yAngle; destZAngle = zAngle;
     // TODO make this actually based on the rotation
     normal = Vector( 0.0f, 0.0f, 1.0f );

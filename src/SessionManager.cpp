@@ -45,8 +45,9 @@ SessionManager::SessionManager( VideoListener* vl, AudioManager* al,
     : Group( 0.0f, -6.0f ), videoSessionListener( vl ),
       audioSessionListener( al ), objectManager( o )
 {
-    x = destX;
-    y = destY - 10.0f; // for move-from-bottom animation
+    // for move-from-bottom animation
+    y = y - 10.0f;
+    move( destX, destY );
 
     sessionMutex = mutex_create();
 
