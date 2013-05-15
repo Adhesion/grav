@@ -27,7 +27,7 @@ Compiling on Linux
            libpng12-0 wx2.8-headers libwxgtk2.8-0 libwxgtk2.8-dev libftgl-dev \
            libftgl2 python-dev libglu1-mesa libglu1-mesa-dev  libglew1.5-dev \
            libglew1.5 libavcodec-dev libswscale-dev libavutil-dev \
-           libavformat-dev libpthread-stubs0-dev
+           libavformat-dev libpthread-stubs0-dev libuclmmbase1-dev libuclmmbase1 
 
    Or on a redhat based distro::
 
